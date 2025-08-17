@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>dusk-module</groupId>
+    <artifactId>dusk-module-auth</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+    <name>dusk-module-auth</name>
+
+    <parent>
+        <groupId>com.dusk</groupId>
+        <artifactId>dusk-module-parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath/>
+    </parent>
+
+    <properties>
+        <!--        用于flyway 插件迁移自定义迁移表名-->
+        <flyway.table>flyway_schema_history_auth</flyway.table>
+        <!--        crux依赖-->
+        <dusk-common.version>0.0.1-SNAPSHOT</dusk-common.version>
+        <flyway.url>jdbc:postgresql://localhost:5432/crux</flyway.url>
+        <flyway.password>Unitech2020</flyway.password>
+        <xdocreport.version>2.0.4</xdocreport.version>
+        <spire-doc.version>5.2.0</spire-doc.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.dusk</groupId>
+            <artifactId>dusk-common</artifactId>
+            <version>${dusk-common.version}</version>
+        </dependency>
+
+        <!-- <dependency> -->
+        <!--     <groupId>com.dusk</groupId> -->
+        <!--     <artifactId>dusk-module-face-shared</artifactId> -->
+        <!-- </dependency> -->
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-security</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid-spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.github.whvcse</groupId>
+            <artifactId>easy-captcha</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.github.binarywang</groupId>
+            <artifactId>weixin-java-miniapp</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-spring-boot-starter-jaxws</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-http-jetty</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>easyexcel</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.hankcs</groupId>
+            <artifactId>hanlp</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <!-- 1.15 版本解决了 Base64 decode 最后字符错误问题。1.9也没问题，但1.14就有bug -->
+            <version>1.15</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20200518</version>
+        </dependency>
+
+<!--
+        <dependency>
+            <groupId>com.tenxun.qywx</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.9</version>
+            <scope>system</scope>
+            <systemPath>${pom.basedir}/lib/commons-codec-1.9.jar</systemPath>
+        </dependency>
+-->
+
+ <!--       <dependency>
+            <groupId>com.tenxun.qywx</groupId>
+            <artifactId>json</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${pom.basedir}/lib/json-20200518.jar</systemPath>
+        </dependency>-->
+        <dependency>
+            <groupId>fr.opensagres.xdocreport</groupId>
+            <artifactId>fr.opensagres.xdocreport.core</artifactId>
+            <version>${xdocreport.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.opensagres.xdocreport</groupId>
+            <artifactId>fr.opensagres.xdocreport.document</artifactId>
+            <version>${xdocreport.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.opensagres.xdocreport</groupId>
+            <artifactId>fr.opensagres.xdocreport.template</artifactId>
+            <version>${xdocreport.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.opensagres.xdocreport</groupId>
+            <artifactId>fr.opensagres.xdocreport.document.docx</artifactId>
+            <version>${xdocreport.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.opensagres.xdocreport</groupId>
+            <artifactId>fr.opensagres.xdocreport.template.freemarker</artifactId>
+            <version>${xdocreport.version}</version>
+        </dependency>
+
+        <!-- <dependency> -->
+        <!--     <groupId>e-iceblue</groupId> -->
+        <!--     <artifactId>spire.doc.free</artifactId> -->
+        <!--     <version>${spire-doc.version}</version> -->
+        <!-- </dependency> -->
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                <artifactId>maven-jaxb22-plugin</artifactId>
+                <version>0.14.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <schemaDirectory>${project.basedir}/src/main/resources/wsdl</schemaDirectory>
+                    <schemaIncludes>
+                        <include>*.wsdl</include>
+                    </schemaIncludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.mysema.maven</groupId>
+                <artifactId>apt-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

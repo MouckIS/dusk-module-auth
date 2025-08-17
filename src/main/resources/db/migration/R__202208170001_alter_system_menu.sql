@@ -1,0 +1,1 @@
+alter table if exists sys_menu add column if not exists type varchar(255);

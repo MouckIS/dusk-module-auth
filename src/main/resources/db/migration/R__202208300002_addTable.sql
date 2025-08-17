@@ -1,0 +1,2 @@
+create table if not exists sys_dynamic_menu (id int8 not null, create_id int8, create_time timestamp, name varchar(255), dynamic_type varchar(255),identify varchar(2000),business_key varchar(2000),tenant_id int8, role_id int8 not null, primary key (id));
+create index index_sysdynamicmenu_business_key on sys_dynamic_menu (business_key);

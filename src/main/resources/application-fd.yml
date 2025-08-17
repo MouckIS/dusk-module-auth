@@ -1,0 +1,164 @@
+server:
+  port: ${SERVER_PORT:53201}
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain,text/css,text/javascript
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 2000MB
+      max-request-size: 2000MB
+  # application
+  application:
+    name: ${SPRING_APPLICATION_NAME:dusk-module-auth}
+  #阿里数据库连接池设置
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: org.postgresql.Driver
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/crux}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:Unitech2020}
+    druid:
+      max-active: 10
+      min-idle: 2
+      initial-size: 5
+      max-wait: 60000
+      # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+      time-between-eviction-runs-millis: 3000
+      # 配置一个连接在池中最小生存的时间，单位是毫秒
+      min-evictable-idle-time-millis: 30000
+      validation-query: SELECT 1
+      test-on-borrow: false
+      test-on-return: false
+      # 打开PSCache，并且指定每个连接上PSCache的大小
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+      filter:
+        slf4j:
+          statement-sql-pretty-format: true
+          result-set-log-enabled: false
+          statement-executable-sql-log-enable: false
+          enabled: true
+  rabbitmq:
+    is-enabled: ${SPRING_RABBITMQ_ISENABLED:true}
+
+  flyway:
+    enabled: false
+    table: flyway_schema_history_auth
+
+  redis:
+    #    开发过程中缓存容易冲突，这里默认使用本机的redis
+    host: 127.0.0.1
+    password:
+  mvc:
+    async:
+      request-timeout: 3600000
+
+dubbo:
+  protocol:
+    name: dubbo
+    port: -1
+  registry:
+    address: zookeeper://${spring.cloud.zookeeper.connect-string}
+  scan:
+    base-packages: com.dusk.module.auth.service
+  consumer:
+    check: false
+  provider:
+    timeout: 2000
+app:
+  use-redis: true
+  #  是否强制过滤租户权限（租户admin拥有全部权限） 默认false
+  disable-tenant-auth-filter: false
+  login:
+    #    登陆密码解密用国密4解密 默认得密钥是crux天下无敌得16进制转换
+    encrypt-key: 63727578e5a4a9e4b88be697a0e6958c
+  security:
+    ignores: ["/error/**","/swagger-resources/**","/swagger-ui.html","/v2/api-docs","/webjars/**","/login"]
+  #app消息推送
+  notification:
+    #就地部署
+    local:
+      enabled: ${APP_NOTIFICATION_LOCAL_ENABLE:false}
+      publish-url: http://192.168.53.245:18090/notification/publish
+      timeout: 2000
+
+
+mqtt:
+  is-enabled: true
+
+# 这是单机配置，不适合集群
+seata:
+  enabled: false
+  service:
+    vgroup-mapping:
+      dusk-module-auth-seata-service-group: default
+    grouplist:
+      default: 192.168.105.105:8091
+jieshun:
+  host: http://192.168.53.160:53302
+wx:
+  #  是否允许测试模式 测试模式的话 不存在的手机号登陆会指向帐户名为  key 为account的帐户名来登陆
+  test:
+    enabled: ${WX_TEST_ENABLED:true}
+    account: test
+  miniapp:
+    configs:
+      - appid: #微信小程序的appid
+        secret: #微信小程序的Secret
+        token: #微信小程序消息服务器配置的token
+        aesKey: #微信小程序消息服务器配置的EncodingAESKey
+        msgDataFormat: JSON
+  cp:
+    app: #模板配置
+      templateId: dk67e8671a7d8d5dfa #模板Id
+      templateSecret: 2IT0-x6Iizsgc5J3xsvi3t_BwAJoOuX2X4UEqympJOg #模板Secret
+      token: SgPSX3YgKh8L35PoznovqT6w   #应用模板Token
+      encodingAESKey: 8Mv3RmBcg5xNF4cymGlF6l3jgszt0O2dgICWlMIlmXJ #应用模板EncodingAESKey
+
+    service: #服务商
+      corpId: wwcbd487395c1f467d    #供应商的企业id
+      providerSecret: EMPsaBs_Zsxdah3-TPf4vN8-WCX0QNMxh1mkUazqRJMiFwNYiOZx4zX8Xh11Uq-J #服务商的secret
+
+    client: #客户企业
+
+      #测试环境
+      #corpId: wwe512e54aeff737d8    #客户的企业id
+      #agentId: 1000008    #应用id
+      #appSecret: z9-X63XINP7hcsxKX5BB9MBByLR4tPoGTMJPq0TlS04 #代开发授权应用secret
+
+      #现场环境
+      corpId: ${WX CP CLIENT CORPID:wwc94bf4903d47ac8e}    #客户的企业id
+      agentId: ${WX CP CLIENT AGENTID:1000010}    #应用id
+      appSecret: ${WX CP CLIENT APPSECRET:xtxxXq9gK1EdqKwVDnqiShkOP7cP5yFrmQaq030_j1M} #代开发授权应用secret
+#同步国网ISC数据
+isc:
+  sync:
+    enable: false
+    endpoint: "http://0.0.0.0:9000/iscService"
+    defalut-password: asd!1234
+    applications:
+      - appid: ff8080817d30ce57017d310ce20b0000
+        #租户名
+        tenant-name: isc
+
+#第三方单点登陆
+sso:
+  # 单点登陆时差 允许范围 单位分钟，对于无法校时的服务器（常见于内网服务器） 该值设置成999即可
+  time-diff: 120
+
+
+# 开启i国网单点登陆接口
+igwsso:
+  enable: false
+  iscAppId: 6c6b24f2e7bb4d9d8ff155e12de2f622
+  iscSecret: 897db13398fc4a17acc021e7d23a1222
+  # 这里必须以“/”结尾
+  address: https://igw.isgcc.net:18443/
+  service: https://
+
+## 消息推送配置
+aliyun-push:
+  iosAppKey: ${ALIYUN_PUSH_IOSAPPKEY:""}
+  androidAppKey: ${ALIYUN_PUSH_ANDROIDAPPKEY:31911606}

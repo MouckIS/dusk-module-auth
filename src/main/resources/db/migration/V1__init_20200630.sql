@@ -1,0 +1,25 @@
+create table if not exists sys_audit_logs (id int8 not null, browser_info varchar(255), client_ip_address varchar(255), create_id int8, exception text, execution_duration int4 not null, execution_time timestamp, method_name varchar(255), parameters text, service_name varchar(255), tenant_id int8, primary key (id));
+create table if not exists sys_common_setting (id int8 not null, create_id int8, create_time timestamp, dr int4, last_modify_id int8, last_modify_time timestamp, tenant_id int8, version int4, description varchar(255), group_name varchar(255), key varchar(255), value varchar(255), primary key (id));
+create table if not exists sys_edition (id int8 not null, create_id int8, create_time timestamp, annual_price numeric(19, 2), display_name varchar(64), dr int4, expiring_edition_id int8, last_modify_id int8, last_modify_time timestamp, monthly_price numeric(19, 2), name varchar(32), trial_day_count int4, version int4, waiting_day_after_expire int4, primary key (id));
+create table if not exists sys_feature_value (id int8 not null, create_id int8, create_time timestamp, description varchar(255), edition_id int8, last_modify_id int8, last_modify_time timestamp, name varchar(255), tenant_id int8, value varchar(255), version int4, primary key (id));
+create table if not exists sys_org_user (user_id int8 not null, org_id int8 not null);
+create table if not exists sys_organization (id int8 not null, create_id int8, create_time timestamp, dr int4, last_modify_id int8, last_modify_time timestamp, tenant_id int8, version int4, code varchar(255), display_name varchar(255), sort_index int4, station boolean, parent_id int8, primary key (id));
+create table if not exists sys_permissions (id int8 not null, create_id int8, create_time timestamp, name varchar(255), tenant_id int8, role_id int8 not null, primary key (id));
+create table if not exists sys_role (id int8 not null, create_id int8, create_time timestamp, dr int4, last_modify_id int8, last_modify_time timestamp, tenant_id int8, version int4, is_default boolean not null, role_code varchar(255), role_name varchar(255), primary key (id));
+create table if not exists sys_setting (id int8 not null, create_id int8, create_time timestamp, last_modify_id int8, last_modify_time timestamp, name varchar(255), tenant_id int8, user_id int8, value varchar(255), version int4, primary key (id));
+create table if not exists sys_tenant (id int8 not null, create_id int8, create_time timestamp, active boolean not null, conn_password varchar(255), conn_url varchar(255), conn_user_name varchar(255), deleter_user_id varchar(255), deletion_time timestamp, dr int4, in_trial_period boolean not null, last_modify_id int8, last_modify_time timestamp, logo_file_type varchar(255), logo_id varchar(255), name varchar(255), subscription_end_date_utc timestamp, tenant_name varchar(255), use_default_db boolean not null, version int4, edition_id int8, primary key (id));
+create table if not exists sys_user (id int8 not null, create_id int8, create_time timestamp, dr int4, last_modify_id int8, last_modify_time timestamp, tenant_id int8, version int4, access_failed_count Integer default 0, active boolean not null, admin boolean not null, default_station int8, email_address varchar(255), email_confirmed boolean not null, lockout_end_date_utc timestamp, name varchar(255), password varchar(255), phone_confirmed boolean not null, phone_no varchar(255), profile_picture_id int8, should_change_password_on_next_login boolean default false, sur_name varchar(255), user_name varchar(255), primary key (id));
+create table if not exists sys_user_role (user_id int8 not null, role_id int8 not null);
+alter table if exists sys_audit_logs add constraint FKl54ywf9ll4yne7saxr1ongxp8 foreign key (create_id) references sys_user;
+alter table if exists sys_org_user add constraint FK9w2kut71bao182brra0tvc26e foreign key (org_id) references sys_organization;
+alter table if exists sys_org_user add constraint FKhg7pjxss6bitqx3sfyrlwex15 foreign key (user_id) references sys_user;
+alter table if exists sys_organization add constraint FKc50ghw3gv37epedfra5n124xg foreign key (parent_id) references sys_organization;
+alter table if exists sys_permissions add constraint FKlh7m7bbwy67ln2juc7g06mb48 foreign key (role_id) references sys_role;
+alter table if exists sys_role add constraint FKg1a1ww5jjydcbfdbjdnjrk6us foreign key (create_id) references sys_user;
+alter table if exists sys_tenant add constraint FKpuc0v5ufbpc69aapoxwcrabht foreign key (edition_id) references sys_edition;
+alter table if exists sys_user_role add constraint FKhh52n8vd4ny9ff4x9fb8v65qx foreign key (role_id) references sys_role;
+alter table if exists sys_user_role add constraint FKb40xxfch70f5qnyfw8yme1n1s foreign key (user_id) references sys_user;
+
+-- 种子数据
+insert into sys_user(id,dr,version,user_name,admin,active,password,phone_confirmed,email_confirmed,name,create_time)
+values (3,0,1,'admin',true,true,'$2a$10$6wESxWlkf6uW17.J1zyUauxM/sS6LlAlMhvT9Agv7C829KWs1NjuS',true,true,'管理员',now());

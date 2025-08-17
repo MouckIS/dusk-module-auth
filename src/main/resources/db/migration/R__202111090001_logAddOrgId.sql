@@ -1,0 +1,1 @@
+alter table if exists public.sys_audit_logs add column if not exists org_id varchar(5000);

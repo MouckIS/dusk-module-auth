@@ -1,0 +1,1 @@
+alter table if exists dashboard_zone_item_ref add column if not exists graph_id int8;

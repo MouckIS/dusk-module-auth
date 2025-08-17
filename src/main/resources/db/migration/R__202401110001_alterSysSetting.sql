@@ -1,0 +1,1 @@
+alter table if exists sys_setting alter column value type varchar(1000);

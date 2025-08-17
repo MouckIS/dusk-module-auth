@@ -1,0 +1,1 @@
+ALTER TABLE IF EXISTS sys_tenant DROP COLUMN tb_customer_id;

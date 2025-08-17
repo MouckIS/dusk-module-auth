@@ -1,0 +1,1 @@
+alter table sys_tenant alter column in_trial_period drop not null;

@@ -1,0 +1,1 @@
+alter table if exists sys_organization add column if not exists description varchar(1000);

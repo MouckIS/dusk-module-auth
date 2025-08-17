@@ -1,0 +1,1 @@
+alter table if exists sys_user add column if not exists user_status varchar(20)
