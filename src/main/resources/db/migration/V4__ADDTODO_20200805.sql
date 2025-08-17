@@ -1,0 +1,4 @@
+-- 添加待办表
+create table sys_todo_permissions (id int8 not null, create_id int8, create_time timestamp, permission varchar(255), todo_id int8, primary key (id));
+create table sys_todos (id int8 not null, create_id int8, create_time timestamp, dr int4, last_modify_id int8, last_modify_time timestamp, tenant_id int8, version int4, business_id varchar(50), extensions varchar(2000), finish boolean not null, finish_time timestamp, finish_use_id int8, state varchar(255), target_type varchar(255), title varchar(255), type varchar(50), type_name varchar(50), primary key (id));
+alter table if exists sys_todo_permissions add constraint FKl3is2wfcsg1e2myefpxttldpw foreign key (todo_id) references sys_todos;

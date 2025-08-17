@@ -1,0 +1,653 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:ns1="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.sgcc.com/isc/service/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IscService" targetNamespace="http://www.sgcc.com/isc/service/">
+  <wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.sgcc.com/isc/service/" version="1.0">
+<xs:element name="syncBizOrgRole">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="BIZORGROLE_ID" type="xs:string"/>
+        <xs:element name="BIZORGROLE_NAME" type="xs:string"/>
+        <xs:element name="BIZROLE_ID" type="xs:string"/>
+        <xs:element name="BIZORG_ID" type="xs:string"/>
+        <xs:element name="UPDATE_DATE" type="xs:string"/>
+        <xs:element name="IS_DELETED" type="xs:string"/>
+        <xs:element maxOccurs="unbounded" minOccurs="0" name="EXTENDS" type="tns:ExtendType"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+<xs:element name="syncBizOrgRoleOfUser">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" minOccurs="0" name="OrgRoleOfUserList" type="tns:BizOrgRoleOfUserType"/>
+        <xs:element name="USER_ID" type="xs:string"/>
+        <xs:element name="UPDATE_DATE" type="xs:string"/>
+        <xs:element maxOccurs="unbounded" minOccurs="0" name="EXTENDS" type="tns:ExtendType"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+<xs:element name="syncBizOrganization">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" minOccurs="0" name="OrgList" type="tns:BizOrgType"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+<xs:element name="syncBizRole">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="BIZROLE_ID" type="xs:string"/>
+        <xs:element name="BIZROLE_NAME" type="xs:string"/>
+        <xs:element name="BIZROLEGROUP_ID" type="xs:string"/>
+        <xs:element name="UPDATE_DATE" type="xs:string"/>
+        <xs:element name="IS_DELETED" type="xs:string"/>
+        <xs:element maxOccurs="unbounded" minOccurs="0" name="EXTENDS" type="tns:ExtendType"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+<xs:element name="syncBizRoleGroup">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="BIZROLEGROUP_ID" type="xs:string"/>
+        <xs:element name="BIZROLEGROUP_NAME" type="xs:string"/>
+        <xs:element name="UPDATE_DATE" type="xs:string"/>
+        <xs:element minOccurs="0" name="IS_DELETED" type="xs:string"/>
+        <xs:element maxOccurs="unbounded" minOccurs="0" name="EXTENDS" type="tns:ExtendType"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+<xs:element name="syncBizRoleOfUser">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="USER_ID" type="xs:string"/>
+        <xs:element maxOccurs="unbounded" minOccurs="0" name="BIZROLE_ID" type="xs:string"/>
+        <xs:element name="UPDATE_DATE" type="xs:string"/>
+        <xs:element maxOccurs="unbounded" minOccurs="0" name="EXTENDS" type="tns:ExtendType"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+<xs:element name="syncDataSet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="DATASET_ID" type="xs:string"/>
+        <xs:element name="DATASET_NAME" type="xs:string"/>
+        <xs:element minOccurs="0" name="DATASET_CODE" type="xs:string"/>
+        <xs:element name="DATATYPE_ID" type="xs:string"/>
+        <xs:element name="UPDATE_DATE" type="xs:string"/>
+        <xs:element name="IS_DELETED" type="xs:string"/>
+        <xs:element maxOccurs="unbounded" minOccurs="0" name="EXTENDS" type="tns:ExtendType"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+<xs:element name="syncDataSetOfOrgRole">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="BIZORGROLE_ID" type="xs:string"/>
+        <xs:element maxOccurs="unbounded" minOccurs="0" name="DATASET_ID" type="xs:string"/>
+        <xs:element name="UPDATE_DATE" type="xs:string"/>
+        <xs:element maxOccurs="unbounded" minOccurs="0" name="EXTENDS" type="tns:ExtendType"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+<xs:element name="syncDataType">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="DATATYPE_ID" type="xs:string"/>
+        <xs:element name="DATATYPE_NAME" type="xs:string"/>
+        <xs:element name="DATATYPE_CODE" type="xs:string"/>
+        <xs:element name="UPDATE_DATE" type="xs:string"/>
+        <xs:element name="IS_DELETED" type="xs:string"/>
+        <xs:element maxOccurs="unbounded" minOccurs="0" name="EXTENDS" type="tns:ExtendType"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+<xs:element name="syncFunction">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="FUNC_ID" type="xs:string"/>
+        <xs:element name="FUNC_NAME" type="xs:string"/>
+        <xs:element minOccurs="0" name="FUNC_URL" type="xs:string"/>
+        <xs:element minOccurs="0" name="PARENT_FUNC_ID" type="xs:string"/>
+        <xs:element minOccurs="0" name="FUNC_INFO" type="xs:string"/>
+        <xs:element minOccurs="0" name="SORT_NO" type="xs:string"/>
+        <xs:element name="FUNC_STATUS" type="xs:string"/>
+        <xs:element minOccurs="0" name="IS_LEAF" type="xs:string"/>
+        <xs:element name="UPDATE_DATE" type="xs:string"/>
+        <xs:element name="IS_DELETED" type="xs:string"/>
+        <xs:element maxOccurs="unbounded" minOccurs="0" name="EXTENDS" type="tns:ExtendType"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+<xs:element name="syncFunctionOfBizRole">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="BIZROLE_ID" type="xs:string"/>
+        <xs:element maxOccurs="unbounded" minOccurs="0" name="FUNC_ID" type="xs:string"/>
+        <xs:element name="UPDATE_DATE" type="xs:string"/>
+        <xs:element maxOccurs="unbounded" minOccurs="0" name="EXTENDS" type="tns:ExtendType"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+<xs:element name="syncFunctionOfOrgRole">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="BIZORGROLE_ID" type="xs:string"/>
+        <xs:element maxOccurs="unbounded" minOccurs="0" name="FUNC_ID" type="xs:string"/>
+        <xs:element name="UPDATE_DATE" type="xs:string"/>
+        <xs:element maxOccurs="unbounded" minOccurs="0" name="EXTENDS" type="tns:ExtendType"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+<xs:element name="syncResOfBizRole">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="BIZROLE_ID" type="xs:string"/>
+        <xs:element maxOccurs="unbounded" minOccurs="0" name="RES_ID" type="xs:string"/>
+        <xs:element name="UPDATE_DATE" type="xs:string"/>
+        <xs:element maxOccurs="unbounded" minOccurs="0" name="EXTENDS" type="tns:ExtendType"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+<xs:element name="syncResOfOrgRole">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="BIZORGROLE_ID" type="xs:string"/>
+        <xs:element maxOccurs="unbounded" minOccurs="0" name="RES_ID" type="xs:string"/>
+        <xs:element name="UPDATE_DATE" type="xs:string"/>
+        <xs:element maxOccurs="unbounded" minOccurs="0" name="EXTENDS" type="tns:ExtendType"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+<xs:element name="syncResource">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="RES_ID" type="xs:string"/>
+        <xs:element name="RES_NAME" type="xs:string"/>
+        <xs:element minOccurs="0" name="RES_CODE" type="xs:string"/>
+        <xs:element minOccurs="0" name="FUNC_ID" type="xs:string"/>
+        <xs:element minOccurs="0" name="RES_INFO" type="xs:string"/>
+        <xs:element minOccurs="0" name="SORT_NO" type="xs:string"/>
+        <xs:element name="UPDATE_DATE" type="xs:string"/>
+        <xs:element name="IS_DELETED" type="xs:string"/>
+        <xs:element maxOccurs="unbounded" minOccurs="0" name="EXTENDS" type="tns:ExtendType"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+<xs:element name="syncResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="result" type="xs:string"/>
+        <xs:element name="time" type="xs:string"/>
+        <xs:element name="description" type="xs:string"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+<xs:element name="syncUser">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" minOccurs="0" name="UserList" type="tns:UserType"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+<xs:complexType name="ExtendType">
+    <xs:sequence>
+      <xs:element name="KEY" type="xs:string"/>
+      <xs:element name="VALUE" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="BizOrgType">
+    <xs:sequence>
+      <xs:element name="BIZORG_ID" type="xs:string"/>
+      <xs:element minOccurs="0" name="BIZORG_CODE" type="xs:string"/>
+      <xs:element name="BIZORG_NAME" type="xs:string"/>
+      <xs:element minOccurs="0" name="SHORT_NAME" type="xs:string"/>
+      <xs:element minOccurs="0" name="BIZORG_TYPE" type="xs:string"/>
+      <xs:element minOccurs="0" name="PARENT_BIZORG_ID" type="xs:string"/>
+      <xs:element minOccurs="0" name="SORT_NO" type="xs:string"/>
+      <xs:element minOccurs="0" name="BASE_ORG_CODE" type="xs:string"/>
+      <xs:element minOccurs="0" name="BIZORG_DESC" type="xs:string"/>
+      <xs:element name="UPDATE_DATE" type="xs:string"/>
+      <xs:element name="IS_DELETED" type="xs:string"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="EXTENDS" type="tns:ExtendType"/>
+      <xs:element minOccurs="0" name="BIZORG_CATLOG" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="UserType">
+    <xs:sequence>
+      <xs:element name="USER_ID" type="xs:string"/>
+      <xs:element name="LOGIN_NAME" type="xs:string"/>
+      <xs:element name="REAL_NAME" type="xs:string"/>
+      <xs:element name="USER_STATUS" type="xs:string"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="BIZORG_ID" type="xs:string"/>
+      <xs:element minOccurs="0" name="GENDER" type="xs:string"/>
+      <xs:element minOccurs="0" name="IDENTITY_NO" type="xs:string"/>
+      <xs:element minOccurs="0" name="BIRTHDAY" type="xs:string"/>
+      <xs:element minOccurs="0" name="MOBILE" type="xs:string"/>
+      <xs:element minOccurs="0" name="OFFICE_PHONE" type="xs:string"/>
+      <xs:element minOccurs="0" name="EMAIL" type="xs:string"/>
+      <xs:element minOccurs="0" name="EMPLOY_NO" type="xs:string"/>
+      <xs:element minOccurs="0" name="POSITION_CODE" type="xs:string"/>
+      <xs:element minOccurs="0" name="POSITION_NAME" type="xs:string"/>
+      <xs:element minOccurs="0" name="JOB" type="xs:string"/>
+      <xs:element minOccurs="0" name="DUTY" type="xs:string"/>
+      <xs:element minOccurs="0" name="DEGREE_CODE" type="xs:string"/>
+      <xs:element minOccurs="0" name="COMMENTS" type="xs:string"/>
+      <xs:element name="UPDATE_DATE" type="xs:string"/>
+      <xs:element name="IS_DELETED" type="xs:string"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="EXTENDS" type="tns:ExtendType"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="BizOrgRoleOfUserType">
+    <xs:sequence>
+      <xs:element name="BIZORGROLE_ID" type="xs:string"/>
+      <xs:element name="BIZORG_ID" type="xs:string"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="EXTENDS" type="tns:ExtendType"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="DataTypeOfRoleType">
+    <xs:sequence>
+      <xs:element name="ROLE_ID" type="xs:string"/>
+      <xs:element name="DATATYPE_ID" type="xs:string"/>
+      <xs:element name="UPDATE_DATE" type="xs:string"/>
+      <xs:element name="IS_DELETED" type="xs:string"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="EXTENDS" type="tns:ExtendType"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="ResOfFunctionType">
+    <xs:sequence>
+      <xs:element name="FUNC_ID" type="xs:string"/>
+      <xs:element name="RES_ID" type="xs:string"/>
+      <xs:element name="UPDATE_DATE" type="xs:string"/>
+      <xs:element name="IS_DELETED" type="xs:string"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="EXTENDS" type="tns:ExtendType"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="OrgRoleOfBizRoleType">
+    <xs:sequence>
+      <xs:element name="BIZROLE_ID" type="xs:string"/>
+      <xs:element name="ORGROLE_ID" type="xs:string"/>
+      <xs:element name="UPDATE_DATE" type="xs:string"/>
+      <xs:element name="IS_DELETED" type="xs:string"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="EXTENDS" type="tns:ExtendType"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="syncDataType">
+    <wsdl:part element="tns:syncDataType" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncFunctionResponse">
+    <wsdl:part element="tns:syncResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncDataSetResponse">
+    <wsdl:part element="tns:syncResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncFunctionOfBizRoleResponse">
+    <wsdl:part element="tns:syncResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncBizOrgRoleOfUser">
+    <wsdl:part element="tns:syncBizOrgRoleOfUser" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncResOfOrgRole">
+    <wsdl:part element="tns:syncResOfOrgRole" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncBizRoleGroup">
+    <wsdl:part element="tns:syncBizRoleGroup" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncBizOrgRoleOfUserResponse">
+    <wsdl:part element="tns:syncResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncDataSet">
+    <wsdl:part element="tns:syncDataSet" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncBizRole">
+    <wsdl:part element="tns:syncBizRole" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncResOfBizRoleResponse">
+    <wsdl:part element="tns:syncResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncBizOrgRoleResponse">
+    <wsdl:part element="tns:syncResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncFunctionOfOrgRole">
+    <wsdl:part element="tns:syncFunctionOfOrgRole" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncDataTypeResponse">
+    <wsdl:part element="tns:syncResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncBizRoleGroupResponse">
+    <wsdl:part element="tns:syncResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncFunction">
+    <wsdl:part element="tns:syncFunction" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncDataSetOfOrgRole">
+    <wsdl:part element="tns:syncDataSetOfOrgRole" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncBizOrganizationResponse">
+    <wsdl:part element="tns:syncResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncResOfOrgRoleResponse">
+    <wsdl:part element="tns:syncResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncFunctionOfBizRole">
+    <wsdl:part element="tns:syncFunctionOfBizRole" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncFunctionOfOrgRoleResponse">
+    <wsdl:part element="tns:syncResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncBizRoleOfUser">
+    <wsdl:part element="tns:syncBizRoleOfUser" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncResOfBizRole">
+    <wsdl:part element="tns:syncResOfBizRole" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncUserResponse">
+    <wsdl:part element="tns:syncResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncDataSetOfOrgRoleResponse">
+    <wsdl:part element="tns:syncResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncBizRoleResponse">
+    <wsdl:part element="tns:syncResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncUser">
+    <wsdl:part element="tns:syncUser" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncResourceResponse">
+    <wsdl:part element="tns:syncResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncBizRoleOfUserResponse">
+    <wsdl:part element="tns:syncResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncBizOrgRole">
+    <wsdl:part element="tns:syncBizOrgRole" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncBizOrganization">
+    <wsdl:part element="tns:syncBizOrganization" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="syncResource">
+    <wsdl:part element="tns:syncResource" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="isc">
+    <wsdl:operation name="syncBizRoleGroup">
+      <wsdl:input message="tns:syncBizRoleGroup" name="syncBizRoleGroup">
+    </wsdl:input>
+      <wsdl:output message="tns:syncBizRoleGroupResponse" name="syncBizRoleGroupResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncFunction">
+      <wsdl:input message="tns:syncFunction" name="syncFunction">
+    </wsdl:input>
+      <wsdl:output message="tns:syncFunctionResponse" name="syncFunctionResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncBizOrganization">
+      <wsdl:input message="tns:syncBizOrganization" name="syncBizOrganization">
+    </wsdl:input>
+      <wsdl:output message="tns:syncBizOrganizationResponse" name="syncBizOrganizationResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncUser">
+      <wsdl:input message="tns:syncUser" name="syncUser">
+    </wsdl:input>
+      <wsdl:output message="tns:syncUserResponse" name="syncUserResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncBizRole">
+      <wsdl:input message="tns:syncBizRole" name="syncBizRole">
+    </wsdl:input>
+      <wsdl:output message="tns:syncBizRoleResponse" name="syncBizRoleResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncResOfBizRole">
+      <wsdl:input message="tns:syncResOfBizRole" name="syncResOfBizRole">
+    </wsdl:input>
+      <wsdl:output message="tns:syncResOfBizRoleResponse" name="syncResOfBizRoleResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncDataSet">
+      <wsdl:input message="tns:syncDataSet" name="syncDataSet">
+    </wsdl:input>
+      <wsdl:output message="tns:syncDataSetResponse" name="syncDataSetResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncResource">
+      <wsdl:input message="tns:syncResource" name="syncResource">
+    </wsdl:input>
+      <wsdl:output message="tns:syncResourceResponse" name="syncResourceResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncBizOrgRole">
+      <wsdl:input message="tns:syncBizOrgRole" name="syncBizOrgRole">
+    </wsdl:input>
+      <wsdl:output message="tns:syncBizOrgRoleResponse" name="syncBizOrgRoleResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncFunctionOfOrgRole">
+      <wsdl:input message="tns:syncFunctionOfOrgRole" name="syncFunctionOfOrgRole">
+    </wsdl:input>
+      <wsdl:output message="tns:syncFunctionOfOrgRoleResponse" name="syncFunctionOfOrgRoleResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncBizOrgRoleOfUser">
+      <wsdl:input message="tns:syncBizOrgRoleOfUser" name="syncBizOrgRoleOfUser">
+    </wsdl:input>
+      <wsdl:output message="tns:syncBizOrgRoleOfUserResponse" name="syncBizOrgRoleOfUserResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncDataSetOfOrgRole">
+      <wsdl:input message="tns:syncDataSetOfOrgRole" name="syncDataSetOfOrgRole">
+    </wsdl:input>
+      <wsdl:output message="tns:syncDataSetOfOrgRoleResponse" name="syncDataSetOfOrgRoleResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncResOfOrgRole">
+      <wsdl:input message="tns:syncResOfOrgRole" name="syncResOfOrgRole">
+    </wsdl:input>
+      <wsdl:output message="tns:syncResOfOrgRoleResponse" name="syncResOfOrgRoleResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncFunctionOfBizRole">
+      <wsdl:input message="tns:syncFunctionOfBizRole" name="syncFunctionOfBizRole">
+    </wsdl:input>
+      <wsdl:output message="tns:syncFunctionOfBizRoleResponse" name="syncFunctionOfBizRoleResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncDataType">
+      <wsdl:input message="tns:syncDataType" name="syncDataType">
+    </wsdl:input>
+      <wsdl:output message="tns:syncDataTypeResponse" name="syncDataTypeResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncBizRoleOfUser">
+      <wsdl:input message="tns:syncBizRoleOfUser" name="syncBizRoleOfUser">
+    </wsdl:input>
+      <wsdl:output message="tns:syncBizRoleOfUserResponse" name="syncBizRoleOfUserResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="IscServiceSoapBinding" type="tns:isc">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="syncBizRoleGroup">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="syncBizRoleGroup">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="syncBizRoleGroupResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncBizOrganization">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="syncBizOrganization">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="syncBizOrganizationResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncFunction">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="syncFunction">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="syncFunctionResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncUser">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="syncUser">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="syncUserResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncBizRole">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="syncBizRole">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="syncBizRoleResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncDataSet">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="syncDataSet">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="syncDataSetResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncResOfBizRole">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="syncResOfBizRole">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="syncResOfBizRoleResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncResource">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="syncResource">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="syncResourceResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncBizOrgRole">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="syncBizOrgRole">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="syncBizOrgRoleResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncBizOrgRoleOfUser">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="syncBizOrgRoleOfUser">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="syncBizOrgRoleOfUserResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncFunctionOfOrgRole">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="syncFunctionOfOrgRole">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="syncFunctionOfOrgRoleResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncDataSetOfOrgRole">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="syncDataSetOfOrgRole">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="syncDataSetOfOrgRoleResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncResOfOrgRole">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="syncResOfOrgRole">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="syncResOfOrgRoleResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncDataType">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="syncDataType">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="syncDataTypeResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncFunctionOfBizRole">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="syncFunctionOfBizRole">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="syncFunctionOfBizRoleResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="syncBizRoleOfUser">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="syncBizRoleOfUser">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="syncBizRoleOfUserResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="IscService">
+    <wsdl:port binding="tns:IscServiceSoapBinding" name="iscPort">
+      <soap:address location="http://localhost:8080/webservicetest/iscPort"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

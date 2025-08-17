@@ -1,0 +1,1 @@
+ALTER TABLE  sys_user ADD COLUMN IF NOT EXISTS signature_picture_id int8 ;

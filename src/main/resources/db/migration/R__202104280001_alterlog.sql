@@ -1,0 +1,1 @@
+alter table sys_audit_logs  alter column browser_info type varchar(1024);

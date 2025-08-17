@@ -1,0 +1,1 @@
+ALTER TABLE IF EXISTS sys_tenant ADD COLUMN tb_customer_id uuid DEFAULT NULL;

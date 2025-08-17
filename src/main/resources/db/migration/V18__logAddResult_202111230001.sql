@@ -1,0 +1,1 @@
+alter table if exists sys_audit_logs add column result varchar(10485760);

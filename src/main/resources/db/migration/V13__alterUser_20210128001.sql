@@ -1,0 +1,1 @@
+ALTER TABLE  sys_user ADD COLUMN IF not EXISTS work_number VARCHAR(50);

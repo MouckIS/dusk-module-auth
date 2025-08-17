@@ -1,0 +1,120 @@
+server:
+  port: ${SERVER_PORT:53201}
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain,text/css,text/javascript
+
+spring:
+  # application
+  application:
+    name: ${SPRING_APPLICATION_NAME:dusk-module-auth}
+  #阿里数据库连接池设置
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: org.postgresql.Driver
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/crux}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:unitech}
+    druid:
+      max-active: 10
+      min-idle: 2
+      initial-size: 5
+      max-wait: 60000
+      # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+      time-between-eviction-runs-millis: 3000
+      # 配置一个连接在池中最小生存的时间，单位是毫秒
+      min-evictable-idle-time-millis: 30000
+      validation-query: SELECT 1
+      test-on-borrow: false
+      test-on-return: false
+      # 打开PSCache，并且指定每个连接上PSCache的大小
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+      filter:
+        slf4j:
+          statement-sql-pretty-format: true
+          result-set-log-enabled: false
+          statement-executable-sql-log-enable: false
+          enabled: true
+  rabbitmq:
+    is-enabled: ${SPRING_RABBITMQ_ISENABLED:false}
+
+  flyway:
+    enabled: false
+    table: flyway_schema_history_auth
+
+  redis:
+    #    开发过程中缓存容易冲突，这里默认使用本机的redis
+    host: 127.0.0.1
+
+dubbo:
+  protocol:
+    name: dubbo
+    port: -1
+  registry:
+    address: zookeeper://${spring.cloud.zookeeper.connect-string}
+  scan:
+    base-packages: com.dusk.module.auth.service
+  consumer:
+    check: false
+  provider:
+    timeout: 2000
+app:
+  use-redis: true
+  #  是否强制过滤租户权限（租户admin拥有全部权限） 默认false
+  disable-tenant-auth-filter: false
+  login:
+    #    登陆密码解密用国密4解密 默认得密钥是crux天下无敌得16进制转换
+    encrypt-key: 63727578e5a4a9e4b88be697a0e6958c
+  security:
+    ignores: ["/error/**","/swagger-resources/**","/swagger-ui.html","/v2/api-docs","/webjars/**","/login"]
+
+mqtt:
+  is-enabled: true
+
+# 这是单机配置，不适合集群
+seata:
+  enabled: false
+  service:
+    vgroup-mapping:
+      dusk-module-auth-seata-service-group: default
+    grouplist:
+      default: 192.168.105.183:8091
+
+wx:
+  #  是否允许测试模式 测试模式的话 不存在的手机号登陆会指向帐户名为  key 为account的帐户名来登陆
+  test:
+    enabled: ${WX_TEST_ENABLED:true}
+    account: test
+  miniapp:
+    configs:
+      - appid: #微信小程序的appid
+        secret: #微信小程序的Secret
+        token: #微信小程序消息服务器配置的token
+        aesKey: #微信小程序消息服务器配置的EncodingAESKey
+        msgDataFormat: JSON
+#同步国网ISC数据
+isc:
+  sync:
+    enable: false
+    endpoint: "http://0.0.0.0:9000/iscService"
+    defalut-password: asd!1234
+    applications:
+      - appid: ff8080817d30ce57017d310ce20b0000
+        #租户名
+        tenant-name: isc
+
+
+# 开启i国网单点登陆接口
+igwsso:
+  enable: false
+  iscAppId: 6c6b24f2e7bb4d9d8ff155e12de2f622
+  iscSecret: 897db13398fc4a17acc021e7d23a1222
+  # 这里必须以“/”结尾
+  address: https://igw.isgcc.net:18443/
+  service: https://
+
+## 消息推送配置
+aliyun-push:
+  iosAppKey: ${ALIYUN_PUSH_IOSAPPKEY:""}
+  androidAppKey: ${ALIYUN_PUSH_ANDROIDAPPKEY:31911606}
