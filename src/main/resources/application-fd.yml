@@ -42,6 +42,9 @@ spring:
           enabled: true
   rabbitmq:
     is-enabled: ${SPRING_RABBITMQ_ISENABLED:true}
+    username: dusk
+    password: DuskTech#mq
+    addresses: localhost
 
   flyway:
     enabled: false

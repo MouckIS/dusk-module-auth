@@ -56,26 +56,26 @@ public class UserLogAspect {
         }
     }
 
-    @Around("execution(* com.dusk.module.auth.controller.FaceController.authenticate(..))")
-    public Object logFaceLogIn(ProceedingJoinPoint joinPoint) throws Throwable {
-        LogInOutEvent logInOutEvent = new LogInOutEvent(LoginLogType.LOGIN_IN, LocalDateTime.now(), false);
-        Object result;
-        try {
-            result = joinPoint.proceed();
-            try {
-                fillLog(logInOutEvent, (String) result);
-            } catch (Exception e) {
-                log.error("人脸登录日志初始化参数异常：" + e.getMessage());
-            }
-        } catch (Exception e) {
-            logInOutEvent.setMsg(StrUtil.subPre(e.getMessage(), 1000));
-            throw e;
-        } finally {
-            logInOutEvent.setSuccess(logInOutEvent.getUserName() != null);
-            eventPublisher.publishEvent(logInOutEvent);
-        }
-        return result;
-    }
+    //@Around("execution(* com.dusk.module.auth.controller.FaceController.authenticate(..))")
+    //public Object logFaceLogIn(ProceedingJoinPoint joinPoint) throws Throwable {
+    //    LogInOutEvent logInOutEvent = new LogInOutEvent(LoginLogType.LOGIN_IN, LocalDateTime.now(), false);
+    //    Object result;
+    //    try {
+    //        result = joinPoint.proceed();
+    //        try {
+    //            fillLog(logInOutEvent, (String) result);
+    //        } catch (Exception e) {
+    //            log.error("人脸登录日志初始化参数异常：" + e.getMessage());
+    //        }
+    //    } catch (Exception e) {
+    //        logInOutEvent.setMsg(StrUtil.subPre(e.getMessage(), 1000));
+    //        throw e;
+    //    } finally {
+    //        logInOutEvent.setSuccess(logInOutEvent.getUserName() != null);
+    //        eventPublisher.publishEvent(logInOutEvent);
+    //    }
+    //    return result;
+    //}
 
     private void fillLog(LogInOutEvent logInOutEvent, String token) {
         if (StringUtils.isNoneBlank(token)) {
