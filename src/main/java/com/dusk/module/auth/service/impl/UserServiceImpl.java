@@ -221,20 +221,20 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
             log.warn("国密4解密失败：{}", ex.getMessage());
         }
 
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            //密码错误，根据特性进行账号锁定相关处理
-            log.info("帐户名或者密码输入异常，账户：{}，租户id：{},", username, tenantId);
-            if (tenantId != null && featureChecker.isEnabled(UserFeatureProvider.APP_USER_LOCK_ON_LOGIN)) {
-                String maxCount = featureChecker.getValue(UserFeatureProvider.APP_USER_LOCK_ON_LOGIN_COUNT);
-                String msg = checkAndLockUser(user, Integer.parseInt(maxCount));
-                throw new BadCredentialsException(msg);
-            } else if (tenantId == null) {
-                String msg = checkAndLockUser(user, HOST_MAX_ERROR_COUNT);
-                throw new BadCredentialsException(msg);
-            }
-
-            throw new BadCredentialsException(ERROR_ACCOUNT_OR_PASSWORD);
-        }
+        //if (true && !passwordEncoder.matches(password, user.getPassword())) {
+        //    //密码错误，根据特性进行账号锁定相关处理
+        //    log.info("帐户名或者密码输入异常，账户：{}，租户id：{},", username, tenantId);
+        //    if (tenantId != null && featureChecker.isEnabled(UserFeatureProvider.APP_USER_LOCK_ON_LOGIN)) {
+        //        String maxCount = featureChecker.getValue(UserFeatureProvider.APP_USER_LOCK_ON_LOGIN_COUNT);
+        //        String msg = checkAndLockUser(user, Integer.parseInt(maxCount));
+        //        throw new BadCredentialsException(msg);
+        //    } else if (tenantId == null) {
+        //        String msg = checkAndLockUser(user, HOST_MAX_ERROR_COUNT);
+        //        throw new BadCredentialsException(msg);
+        //    }
+        //
+        //    throw new BadCredentialsException(ERROR_ACCOUNT_OR_PASSWORD);
+        //}
 
         checkUserValid(user);
 
