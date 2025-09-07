@@ -21,8 +21,9 @@
         <flyway.table>flyway_schema_history_auth</flyway.table>
         <!--        crux依赖-->
         <dusk-common.version>0.0.1-SNAPSHOT</dusk-common.version>
-        <flyway.url>jdbc:postgresql://localhost:5432/crux</flyway.url>
-        <flyway.password>Unitech2020</flyway.password>
+        <flyway.user>postgres</flyway.user>
+        <flyway.url>jdbc:postgresql://wsl.com:5432/crux</flyway.url>
+        <flyway.password>DuskTech@postgre</flyway.password>
         <xdocreport.version>2.0.4</xdocreport.version>
         <spire-doc.version>5.2.0</spire-doc.version>
     </properties>
