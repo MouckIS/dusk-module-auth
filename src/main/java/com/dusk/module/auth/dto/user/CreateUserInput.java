@@ -6,7 +6,7 @@ import lombok.Setter;
 import com.dusk.common.module.auth.dto.CreateOrUpdateUserInput;
 import com.dusk.common.module.auth.enums.EUnitType;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * @Author kefuming

@@ -7,7 +7,7 @@ import com.dusk.common.framework.constant.EntityConstant;
 import com.dusk.common.framework.entity.BaseEntity;
 import com.dusk.module.auth.enums.LoginLogType;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 /**

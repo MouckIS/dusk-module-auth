@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import com.dusk.common.framework.dto.ImgBase64Dto;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * @author kefuming

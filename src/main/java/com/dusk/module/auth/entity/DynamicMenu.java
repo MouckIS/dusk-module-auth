@@ -8,7 +8,7 @@ import com.dusk.common.framework.constant.EntityConstant;
 import com.dusk.common.framework.entity.CreationEntity;
 import com.dusk.common.module.auth.enums.DynamicMenuOpenType;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 /**
  * @author kefuming

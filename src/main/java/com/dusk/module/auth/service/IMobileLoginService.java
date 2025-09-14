@@ -3,7 +3,7 @@ package com.dusk.module.auth.service;
 import com.dusk.module.auth.dto.mobilelogin.MobileUserDto;
 import com.dusk.module.auth.dto.mobilelogin.SendCaptchaInput;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**

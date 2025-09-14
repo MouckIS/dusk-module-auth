@@ -17,7 +17,7 @@ public class RolePermissionImportListener extends AnalysisEventListener<LinkedHa
 
     private int currentRow;
     @Getter
-    private RoleDto roleDto;
+    private final RoleDto roleDto;
 
     public RolePermissionImportListener() {
         roleDto = new RoleDto();
@@ -54,11 +54,7 @@ public class RolePermissionImportListener extends AnalysisEventListener<LinkedHa
 
     void readRoleDefault(LinkedHashMap<Integer, String> data) {
         String value = data.get(2);
-        if (StringUtils.equals("是", value)) {
-            roleDto.setDefault(true);
-        } else {
-            roleDto.setDefault(false);
-        }
+        roleDto.setDefault(StringUtils.equals("是", value));
     }
 
     void readRolePermission(LinkedHashMap<Integer, String> data) {

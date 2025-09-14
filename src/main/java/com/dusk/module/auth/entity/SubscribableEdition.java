@@ -7,11 +7,11 @@ import com.dusk.common.framework.constant.EntityConstant;
 import com.dusk.common.framework.entity.CreationEntity;
 import com.dusk.module.auth.enums.PaymentPeriodType;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Version;
-import javax.validation.constraints.NotBlank;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
+import jakarta.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 

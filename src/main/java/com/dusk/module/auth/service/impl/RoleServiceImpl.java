@@ -515,7 +515,7 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
         for (int i = 0; i < 4 * level; i++) {
             sb.append(" ");
         }
-        permission.setDisplayName(sb.toString() + permission.getDisplayName());
+        permission.setDisplayName(sb + permission.getDisplayName());
         dataList.add(permission);
         for (ExportRolePermissionDto child : permission.getChildren()) {
             appendRolePermissionExcelDataList(dataList, child, level + 1);

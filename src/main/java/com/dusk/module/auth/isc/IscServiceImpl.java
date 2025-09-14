@@ -21,8 +21,8 @@ import com.dusk.module.auth.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.jws.WebService;
-import javax.xml.ws.Holder;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Holder;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -190,7 +190,7 @@ public class IscServiceImpl implements IscService {
                 userEditDto.setName(userType.getREALNAME());
                 //设置组织机构， 以bizOrgId关联crux中org的code
                 userInput.setOrganizationUnits(orgs.stream().filter(org -> userType.getBIZORGID().contains(org.getCode())).map(OrganizationUnit::getId).collect(Collectors.toList()));
-                Long userId = userService.createOrUpdateUser((CreateUserInput) userInput);
+                Long userId = userService.createOrUpdateUser(userInput);
                 extendFieldService.addOrUpdateField(userId, User.class.getName(), ISC_USER_ID, userType.getUSERID());
 
                 result.value = "0";

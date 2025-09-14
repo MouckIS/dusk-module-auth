@@ -7,7 +7,7 @@ import com.dusk.common.framework.dto.PagedAndSortedInputDto;
 import com.dusk.common.module.auth.enums.EUnitType;
 import org.springframework.data.domain.Sort;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * 获取未分配的厂站用户
@@ -33,7 +33,7 @@ public class GetNotAssignedStationUsersInput extends PagedAndSortedInputDto {
         if (StringUtils.isBlank(sorting)) {
             return Sort.unsorted();
         }
-        String sortingStr = "u." + sorting;;
+        String sortingStr = "u." + sorting;
         return Sort.by(sortingDirection, sortingStr);
     }
 }

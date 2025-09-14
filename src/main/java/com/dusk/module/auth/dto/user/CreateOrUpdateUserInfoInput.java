@@ -8,7 +8,7 @@ import lombok.Setter;
 import com.dusk.common.module.auth.dto.CreateOrUpdateUserInput;
 import com.dusk.module.auth.enums.ELevel;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 

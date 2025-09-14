@@ -8,7 +8,7 @@ import com.dusk.common.framework.dto.PagedAndSortedInputDto;
 import com.dusk.common.framework.entity.BaseEntity;
 import org.springframework.data.domain.Sort;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * @author kefuming

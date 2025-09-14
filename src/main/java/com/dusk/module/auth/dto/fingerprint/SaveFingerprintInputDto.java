@@ -6,8 +6,8 @@ import lombok.Setter;
 import com.dusk.common.framework.dto.VersionDto;
 import com.dusk.common.module.auth.enums.FingerprintFromEnum;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * @author kefuming

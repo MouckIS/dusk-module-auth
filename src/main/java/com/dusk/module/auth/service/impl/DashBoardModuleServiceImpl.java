@@ -27,11 +27,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -202,7 +203,7 @@ public class DashBoardModuleServiceImpl extends CreateOrUpdateService<DashboardM
             String templateJson = JSONUtil.toJsonStr(JSONUtil.parse(moduleDetailList));
 
             response.setContentType("text/plain;charset=UTF-8");
-            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(String.format("数据大屏主题模块配置_%s.json", DateUtils.localDateToString(LocalDate.now())), "UTF-8"));
+            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(String.format("数据大屏主题模块配置_%s.json", DateUtils.localDateToString(LocalDate.now())), StandardCharsets.UTF_8));
             response.addHeader("Content-Length", "" + templateJson.getBytes().length);
             OutputStream output = response.getOutputStream();
             output.write(templateJson.getBytes());

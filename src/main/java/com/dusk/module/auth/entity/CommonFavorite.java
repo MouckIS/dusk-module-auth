@@ -5,8 +5,8 @@ import lombok.experimental.FieldNameConstants;
 import com.dusk.common.framework.annotation.DataPermission;
 import com.dusk.common.framework.entity.FullAuditedEntity;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 /**
  * 公用收藏夹

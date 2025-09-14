@@ -158,11 +158,7 @@ public class TenantPermissionServiceImpl extends BaseService<TenantPermission, I
         List<RolePermissionDto> result = new ArrayList<>();
         permissions.forEach(s -> {
             RolePermissionDto rolePermissionDto = dozerMapper.map(s, RolePermissionDto.class);
-            if (hasPermissions.contains(s.getName())) {
-                rolePermissionDto.setGranted(true);
-            } else {
-                rolePermissionDto.setGranted(false);
-            }
+            rolePermissionDto.setGranted(hasPermissions.contains(s.getName()));
             result.add(rolePermissionDto);
         });
         return result;

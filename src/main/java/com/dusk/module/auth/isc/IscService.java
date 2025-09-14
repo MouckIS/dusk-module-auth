@@ -2,12 +2,12 @@ package com.dusk.module.auth.isc;
 
 import com.sgcc.isc.service.*;
 
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebService;
-import javax.xml.ws.Holder;
-import javax.xml.ws.RequestWrapper;
-import javax.xml.ws.ResponseWrapper;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Holder;
+import jakarta.xml.ws.RequestWrapper;
+import jakarta.xml.ws.ResponseWrapper;
 import java.util.List;
 
 /**
@@ -31,7 +31,7 @@ public interface IscService {
     @WebMethod
     @RequestWrapper(localName = "syncBizRoleGroup", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncBizRoleGroup")
     @ResponseWrapper(localName = "syncResponse", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncResponse")
-    public void syncBizRoleGroup(
+    void syncBizRoleGroup(
             @WebParam(name = "BIZROLEGROUP_ID", targetNamespace = "") String bizrolegroupID,
             @WebParam(name = "BIZROLEGROUP_NAME", targetNamespace = "") String bizrolegroupNAME,
             @WebParam(name = "UPDATE_DATE", targetNamespace = "") String updateDATE,
@@ -51,7 +51,7 @@ public interface IscService {
     @WebMethod
     @RequestWrapper(localName = "syncBizOrganization", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncBizOrganization")
     @ResponseWrapper(localName = "syncResponse", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncResponse")
-    public void syncBizOrganization(
+    void syncBizOrganization(
             @WebParam(name = "OrgList", targetNamespace = "") List<BizOrgType> orgList,
             @WebParam(name = "result", targetNamespace = "", mode = WebParam.Mode.OUT) Holder<String> result,
             @WebParam(name = "time", targetNamespace = "", mode = WebParam.Mode.OUT) Holder<String> time,
@@ -77,7 +77,7 @@ public interface IscService {
     @WebMethod
     @RequestWrapper(localName = "syncFunction", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncFunction")
     @ResponseWrapper(localName = "syncResponse", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncResponse")
-    public void syncFunction(
+    void syncFunction(
             @WebParam(name = "FUNC_ID", targetNamespace = "") String funcID,
             @WebParam(name = "FUNC_NAME", targetNamespace = "") String funcNAME,
             @WebParam(name = "FUNC_URL", targetNamespace = "") String funcURL,
@@ -103,7 +103,7 @@ public interface IscService {
     @WebMethod
     @RequestWrapper(localName = "syncUser", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncUser")
     @ResponseWrapper(localName = "syncResponse", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncResponse")
-    public void syncUser(
+    void syncUser(
             @WebParam(name = "UserList", targetNamespace = "") List<UserType> userList,
             @WebParam(name = "result", targetNamespace = "", mode = WebParam.Mode.OUT) Holder<String> result,
             @WebParam(name = "time", targetNamespace = "", mode = WebParam.Mode.OUT) Holder<String> time,
@@ -124,7 +124,7 @@ public interface IscService {
     @WebMethod
     @RequestWrapper(localName = "syncBizRole", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncBizRole")
     @ResponseWrapper(localName = "syncResponse", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncResponse")
-    public void syncBizRole(
+    void syncBizRole(
             @WebParam(name = "BIZROLE_ID", targetNamespace = "") String bizroleID,
             @WebParam(name = "BIZROLE_NAME", targetNamespace = "") String bizroleNAME,
             @WebParam(name = "BIZROLEGROUP_ID", targetNamespace = "") String bizrolegroupID,
@@ -151,7 +151,7 @@ public interface IscService {
     @WebMethod
     @RequestWrapper(localName = "syncDataSet", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncDataSet")
     @ResponseWrapper(localName = "syncResponse", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncResponse")
-    public void syncDataSet(
+    void syncDataSet(
             @WebParam(name = "DATASET_ID", targetNamespace = "") String datasetID,
             @WebParam(name = "DATASET_NAME", targetNamespace = "") String datasetNAME,
             @WebParam(name = "DATASET_CODE", targetNamespace = "") String datasetCODE,
@@ -176,7 +176,7 @@ public interface IscService {
     @WebMethod
     @RequestWrapper(localName = "syncResOfBizRole", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncResOfBizRole")
     @ResponseWrapper(localName = "syncResponse", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncResponse")
-    public void syncResOfBizRole(
+    void syncResOfBizRole(
             @WebParam(name = "BIZROLE_ID", targetNamespace = "") String bizroleID,
             @WebParam(name = "RES_ID", targetNamespace = "") List<String> resID,
             @WebParam(name = "UPDATE_DATE", targetNamespace = "") String updateDATE,
@@ -203,7 +203,7 @@ public interface IscService {
     @WebMethod
     @RequestWrapper(localName = "syncResource", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncResource")
     @ResponseWrapper(localName = "syncResponse", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncResponse")
-    public void syncResource(
+    void syncResource(
             @WebParam(name = "RES_ID", targetNamespace = "") String resID,
             @WebParam(name = "RES_NAME", targetNamespace = "") String resNAME,
             @WebParam(name = "RES_CODE", targetNamespace = "") String resCODE,
@@ -233,7 +233,7 @@ public interface IscService {
     @WebMethod
     @RequestWrapper(localName = "syncBizOrgRole", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncBizOrgRole")
     @ResponseWrapper(localName = "syncResponse", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncResponse")
-    public void syncBizOrgRole(
+    void syncBizOrgRole(
             @WebParam(name = "BIZORGROLE_ID", targetNamespace = "") String bizorgroleID,
             @WebParam(name = "BIZORGROLE_NAME", targetNamespace = "") String bizorgroleNAME,
             @WebParam(name = "BIZROLE_ID", targetNamespace = "") String bizroleID,
@@ -258,7 +258,7 @@ public interface IscService {
     @WebMethod
     @RequestWrapper(localName = "syncBizOrgRoleOfUser", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncBizOrgRoleOfUser")
     @ResponseWrapper(localName = "syncResponse", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncResponse")
-    public void syncBizOrgRoleOfUser(
+    void syncBizOrgRoleOfUser(
             @WebParam(name = "OrgRoleOfUserList", targetNamespace = "") List<BizOrgRoleOfUserType> orgRoleOfUserList,
             @WebParam(name = "USER_ID", targetNamespace = "") String userID,
             @WebParam(name = "UPDATE_DATE", targetNamespace = "") String updateDATE,
@@ -280,7 +280,7 @@ public interface IscService {
     @WebMethod
     @RequestWrapper(localName = "syncFunctionOfOrgRole", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncFunctionOfOrgRole")
     @ResponseWrapper(localName = "syncResponse", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncResponse")
-    public void syncFunctionOfOrgRole(
+    void syncFunctionOfOrgRole(
             @WebParam(name = "BIZORGROLE_ID", targetNamespace = "") String bizorgroleID,
             @WebParam(name = "FUNC_ID", targetNamespace = "") List<String> funcID,
             @WebParam(name = "UPDATE_DATE", targetNamespace = "") String updateDATE,
@@ -302,7 +302,7 @@ public interface IscService {
     @WebMethod
     @RequestWrapper(localName = "syncDataSetOfOrgRole", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncDataSetOfOrgRole")
     @ResponseWrapper(localName = "syncResponse", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncResponse")
-    public void syncDataSetOfOrgRole(
+    void syncDataSetOfOrgRole(
             @WebParam(name = "BIZORGROLE_ID", targetNamespace = "") String bizorgroleID,
             @WebParam(name = "DATASET_ID", targetNamespace = "") List<String> datasetID,
             @WebParam(name = "UPDATE_DATE", targetNamespace = "") String updateDATE,
@@ -324,7 +324,7 @@ public interface IscService {
     @WebMethod
     @RequestWrapper(localName = "syncResOfOrgRole", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncResOfOrgRole")
     @ResponseWrapper(localName = "syncResponse", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncResponse")
-    public void syncResOfOrgRole(
+    void syncResOfOrgRole(
             @WebParam(name = "BIZORGROLE_ID", targetNamespace = "") String bizorgroleID,
             @WebParam(name = "RES_ID", targetNamespace = "") List<String> resID,
             @WebParam(name = "UPDATE_DATE", targetNamespace = "") String updateDATE,
@@ -348,7 +348,7 @@ public interface IscService {
     @WebMethod
     @RequestWrapper(localName = "syncDataType", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncDataType")
     @ResponseWrapper(localName = "syncResponse", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncResponse")
-    public void syncDataType(
+    void syncDataType(
             @WebParam(name = "DATATYPE_ID", targetNamespace = "") String datatypeID,
             @WebParam(name = "DATATYPE_NAME", targetNamespace = "") String datatypeNAME,
             @WebParam(name = "DATATYPE_CODE", targetNamespace = "") String datatypeCODE,
@@ -372,7 +372,7 @@ public interface IscService {
     @WebMethod
     @RequestWrapper(localName = "syncFunctionOfBizRole", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncFunctionOfBizRole")
     @ResponseWrapper(localName = "syncResponse", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncResponse")
-    public void syncFunctionOfBizRole(
+    void syncFunctionOfBizRole(
             @WebParam(name = "BIZROLE_ID", targetNamespace = "") String bizroleID,
             @WebParam(name = "FUNC_ID", targetNamespace = "") List<String> funcID,
             @WebParam(name = "UPDATE_DATE", targetNamespace = "") String updateDATE,
@@ -394,7 +394,7 @@ public interface IscService {
     @WebMethod
     @RequestWrapper(localName = "syncBizRoleOfUser", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncBizRoleOfUser")
     @ResponseWrapper(localName = "syncResponse", targetNamespace = "http://www.sgcc.com/isc/service/", className = "com.sgcc.isc.service.SyncResponse")
-    public void syncBizRoleOfUser(
+    void syncBizRoleOfUser(
             @WebParam(name = "USER_ID", targetNamespace = "") String userID,
             @WebParam(name = "BIZROLE_ID", targetNamespace = "") List<String> bizroleID,
             @WebParam(name = "UPDATE_DATE", targetNamespace = "") String updateDATE,

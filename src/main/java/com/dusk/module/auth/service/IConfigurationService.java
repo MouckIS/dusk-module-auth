@@ -3,7 +3,7 @@ package com.dusk.module.auth.service;
 
 import com.dusk.module.auth.dto.configuration.ConfigurationDto;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * @author kefuming

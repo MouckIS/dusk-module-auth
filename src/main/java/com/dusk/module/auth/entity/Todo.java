@@ -6,7 +6,7 @@ import lombok.experimental.FieldNameConstants;
 import com.dusk.common.framework.entity.FullAuditedEntity;
 import com.dusk.common.module.auth.enums.ToDoTargetType;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

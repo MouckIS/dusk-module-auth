@@ -5,8 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import com.dusk.common.module.auth.enums.UserStatus;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 /**

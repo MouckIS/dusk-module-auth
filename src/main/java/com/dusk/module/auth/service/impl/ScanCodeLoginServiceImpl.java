@@ -31,7 +31,7 @@ public class ScanCodeLoginServiceImpl implements IScanCodeLoginService {
 
     private static final String SCAN_CODE_LOGIN_KEY = "CRUX:LOGIN:SCANCODE:";
     //缓存5分钟
-    private static int LOGIN_KEY_TIME = 5;
+    private static final int LOGIN_KEY_TIME = 5;
 
     @Override
     public String getLoginKey() {

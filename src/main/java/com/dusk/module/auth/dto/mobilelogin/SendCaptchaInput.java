@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import com.dusk.module.auth.dto.captcha.CaptchaInputDto;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 
 /**
  * @author kefuming

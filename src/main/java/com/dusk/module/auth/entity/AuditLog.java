@@ -7,7 +7,7 @@ import com.dusk.common.framework.entity.BaseEntity;
 import org.springframework.util.StringUtils;
 import com.dusk.common.framework.annotation.Tenant;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 /**

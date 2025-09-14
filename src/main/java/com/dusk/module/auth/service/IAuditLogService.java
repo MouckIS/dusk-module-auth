@@ -9,7 +9,7 @@ import com.dusk.module.auth.entity.AuditLog;
 import com.dusk.module.auth.repository.IAuditLogRepository;
 import org.springframework.data.domain.Page;
 
-import javax.servlet.ServletOutputStream;
+import jakarta.servlet.ServletOutputStream;
 
 /**
  * @author kefuming

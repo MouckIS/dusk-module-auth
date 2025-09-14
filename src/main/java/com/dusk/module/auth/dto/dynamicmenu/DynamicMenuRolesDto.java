@@ -7,8 +7,8 @@ import com.dusk.common.framework.dto.EntityDto;
 import com.dusk.common.module.auth.dto.dynamicmenu.DynamicLinkRoles;
 import com.dusk.common.module.auth.enums.DynamicMenuOpenType;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import java.time.LocalDateTime;
 import java.util.List;
 

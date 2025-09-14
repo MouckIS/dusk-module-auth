@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import com.dusk.common.framework.dto.EntityDto;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDate;
 import java.util.List;
 

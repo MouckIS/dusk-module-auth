@@ -51,6 +51,7 @@ spring:
     password: DuskTech#mq
     addresses: wsl.com
 
+
   flyway:
     enabled: false
     table: flyway_schema_history_auth

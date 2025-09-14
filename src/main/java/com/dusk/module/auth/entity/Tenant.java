@@ -10,7 +10,7 @@ import com.dusk.common.framework.exception.BusinessException;
 import com.dusk.module.auth.enums.EditionPaymentType;
 import com.dusk.module.auth.enums.PaymentPeriodType;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 

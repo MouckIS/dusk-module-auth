@@ -21,10 +21,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author kefuming
@@ -64,7 +65,7 @@ public class AuditLogController extends CruxBaseController {
     public void exportLog(@Valid ExportAuditLogsInput input, HttpServletResponse response) throws IOException {
         response.setContentType("application/vnd.ms-excel;charset=utf-8");
         response.setCharacterEncoding("utf-8");
-        String fileName = URLEncoder.encode("审计日志导出", "UTF-8").replaceAll("\\+", "%20");
+        String fileName = URLEncoder.encode("审计日志导出", StandardCharsets.UTF_8).replaceAll("\\+", "%20");
         response.setHeader("Content-Disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
         auditLogService.exportLog(input, response.getOutputStream());
     }

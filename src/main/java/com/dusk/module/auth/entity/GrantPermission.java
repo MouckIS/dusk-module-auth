@@ -7,7 +7,7 @@ import com.dusk.common.framework.constant.EntityConstant;
 import com.dusk.common.framework.entity.BaseEntity;
 import com.dusk.common.framework.entity.CreationEntity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 /**
  * @author kefuming

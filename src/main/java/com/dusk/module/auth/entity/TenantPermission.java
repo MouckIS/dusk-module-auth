@@ -3,8 +3,8 @@ package com.dusk.module.auth.entity;
 import lombok.Data;
 import com.dusk.common.framework.entity.CreationEntity;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 /**
  * 租户和版本权限公用的表

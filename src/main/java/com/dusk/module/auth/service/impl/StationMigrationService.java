@@ -23,7 +23,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,7 +51,7 @@ public class StationMigrationService implements IStationMigrationService {
 
     @PostConstruct
     public void autoMigration(){
-        boolean needMigration = springContextUtils.getBean(StationMigrationService.class).needMigration();//忽略租户过滤
+        boolean needMigration = SpringContextUtils.getBean(StationMigrationService.class).needMigration();//忽略租户过滤
         if(needMigration){ //新的厂站表没有数据的时候执行一次迁移
             migration();
         }

@@ -81,8 +81,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -296,7 +296,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     public PagedResultDto<UserListDto> getUsersList(GetUsersInput getUserInput) {
         Page<User> page = getUsers(getUserInput);
         List<UserListDto> list = DozerUtils.mapList(dozerMapper, page.getContent(), UserListDto.class, (s, t) -> {
-            if (s.getLockoutEndDateUtc() != null && s.getLockoutEndDateUtc().compareTo(LocalDateTime.now()) > 0) {
+            if (s.getLockoutEndDateUtc() != null && s.getLockoutEndDateUtc().isAfter(LocalDateTime.now())) {
                 t.setLock(true);
             }
             t.setActive(checkUserIsActive(s));
@@ -1140,10 +1140,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     @Override
     public boolean checkUserIsActive(User user) {
         LocalDateTime now = LocalDateTime.now();
-        if (user.isActive() && !((user.getActiveStartDate() != null && now.isBefore(user.getActiveStartDate().atStartOfDay())) || (user.getActiveEndDate() != null && !now.isBefore(user.getActiveEndDate().plusDays(1).atStartOfDay())))) {
-            return true;
-        }
-        return false;
+        return user.isActive() && !((user.getActiveStartDate() != null && now.isBefore(user.getActiveStartDate().atStartOfDay())) || (user.getActiveEndDate() != null && !now.isBefore(user.getActiveEndDate().plusDays(1).atStartOfDay())));
     }
 
     @Override
@@ -1343,7 +1340,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
             user.setActiveEndDate(null);
         } else {
             if (user.getActiveStartDate() != null && user.getActiveEndDate() != null) {
-                if (user.getActiveEndDate().compareTo(user.getActiveStartDate()) < 0) {
+                if (user.getActiveEndDate().isBefore(user.getActiveStartDate())) {
                     throw new BusinessException("账号激活结束日期必须大于起始日期");
                 }
             }
@@ -1374,7 +1371,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
             // 2020/5/18 发送邮件激活。
             String url = activeAddr + "?userId=" + user.getId();
             if (redisUtil != null) {
-                String key = REDIS_KEY_ACTIVE + UUID.randomUUID().toString();
+                String key = REDIS_KEY_ACTIVE + UUID.randomUUID();
                 String code = UUID.randomUUID().toString();
                 url += "&key=" + key + "&code=" + code;
                 redisUtil.setCache(key, code, 15 * 60);

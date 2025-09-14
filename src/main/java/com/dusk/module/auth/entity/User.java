@@ -7,7 +7,7 @@ import com.dusk.common.framework.entity.FullAuditedEntity;
 import com.dusk.common.module.auth.enums.EUnitType;
 import com.dusk.common.module.auth.enums.UserStatus;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;

@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.Getter;
 import org.w3c.dom.stylesheets.LinkStyle;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +21,7 @@ public class BindRoleToOrgInput {
     private Long roleId;
 
     @ApiModelProperty("组织id列表")
-    private List<Long> orgIds = new ArrayList<>();
+    private final List<Long> orgIds = new ArrayList<>();
 
     @ApiModelProperty("是否包含子区域")
     private boolean includeChild;

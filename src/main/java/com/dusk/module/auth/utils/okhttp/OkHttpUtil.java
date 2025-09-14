@@ -2,7 +2,7 @@ package com.dusk.module.auth.utils.okhttp;
 
 import lombok.SneakyThrows;
 
-import javax.net.ssl.*;
+import jakarta.net.ssl.*;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;

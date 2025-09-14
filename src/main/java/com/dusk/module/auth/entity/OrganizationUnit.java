@@ -7,7 +7,7 @@ import com.dusk.common.framework.entity.TreeEntity;
 import com.dusk.common.module.auth.enums.EUnitType;
 import com.dusk.module.auth.enums.OrgLabel;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 

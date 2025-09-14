@@ -5,10 +5,10 @@ import lombok.Setter;
 import com.dusk.common.framework.entity.FullAuditedEntity;
 import com.dusk.module.auth.enums.dashboard.DashboardModuleType;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 
 /**
  * @author jianjianhong

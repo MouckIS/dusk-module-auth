@@ -4,8 +4,8 @@ import lombok.Data;
 import lombok.experimental.FieldNameConstants;
 import com.dusk.common.framework.entity.FullAuditedEntity;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 /**
  * 〈首页数据展示的设置项〉

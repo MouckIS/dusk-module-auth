@@ -6,10 +6,10 @@ import lombok.experimental.FieldNameConstants;
 import com.dusk.common.framework.entity.FullAuditedEntity;
 import com.dusk.common.module.auth.enums.FingerprintFromEnum;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 
 /**
  * @author kefuming

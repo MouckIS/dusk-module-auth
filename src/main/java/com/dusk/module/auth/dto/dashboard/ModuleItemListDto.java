@@ -5,8 +5,8 @@ import lombok.Data;
 import com.dusk.common.framework.dto.EntityDto;
 import com.dusk.module.auth.enums.dashboard.DashboardModuleType;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 
 /**
  * @author jianjianhong

@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.experimental.FieldNameConstants;
 import com.dusk.common.framework.entity.TreeEntity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 

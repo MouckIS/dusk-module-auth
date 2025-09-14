@@ -5,8 +5,8 @@ import lombok.Data;
 import com.dusk.common.framework.dto.EntityDto;
 import com.dusk.module.auth.enums.dashboard.DashboardModuleType;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * @author jianjianhong

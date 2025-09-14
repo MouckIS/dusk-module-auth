@@ -5,7 +5,7 @@ import lombok.Data;
 import com.dusk.common.framework.dto.EntityDto;
 import com.dusk.common.framework.dto.VersionDto;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * @Author kefuming

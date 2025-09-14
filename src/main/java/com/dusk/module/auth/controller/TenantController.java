@@ -28,8 +28,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -134,7 +134,7 @@ public class TenantController extends CruxBaseController {
         try {
             Page<User> page = userService.getUsers(input);
             List<UserListDto> list = DozerUtils.mapList(dozerMapper, page.getContent(), UserListDto.class, (s, t) -> {
-                if (s.getLockoutEndDateUtc() != null && s.getLockoutEndDateUtc().compareTo(LocalDateTime.now()) > 0) {
+                if (s.getLockoutEndDateUtc() != null && s.getLockoutEndDateUtc().isAfter(LocalDateTime.now())) {
                     t.setLock(true);
                 }
             });

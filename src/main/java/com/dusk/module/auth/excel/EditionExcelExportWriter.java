@@ -24,7 +24,7 @@ import java.util.List;
 @Slf4j
 public class EditionExcelExportWriter {
 
-    private SubscribableEdition edition;
+    private final SubscribableEdition edition;
 
     @Setter
     private List<String> editionPermissions;
@@ -36,7 +36,7 @@ public class EditionExcelExportWriter {
     private List<TenantFeature> editionFeatures;
 
     @Getter
-    private Workbook workbook;
+    private final Workbook workbook;
 
     boolean hasWrite = false;
 

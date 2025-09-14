@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -50,7 +50,7 @@ public class SysMenuServiceImpl extends BaseService <SysMenu, ISysMenuRepository
                 var next = iterator.next();
                 if(next.getId().equals(dto.getId())){
                     UtBeanUtils.copyNotNullProperties(dto,next);
-                    iterator.remove();;
+                    iterator.remove();
                     saveList.add(next);
                     break;
                 }

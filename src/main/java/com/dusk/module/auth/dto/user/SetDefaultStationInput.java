@@ -3,7 +3,7 @@ package com.dusk.module.auth.dto.user;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * @author kefuming

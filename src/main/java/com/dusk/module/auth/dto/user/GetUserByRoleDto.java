@@ -5,7 +5,7 @@ import lombok.Data;
 import com.dusk.common.framework.dto.PagedAndSortedInputDto;
 import com.dusk.common.module.auth.enums.EUnitType;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * @author kefuming

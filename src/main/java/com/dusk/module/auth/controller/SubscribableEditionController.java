@@ -25,10 +25,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -65,7 +66,7 @@ public class SubscribableEditionController  extends CruxBaseController {
     public void exportEdition(@PathVariable Long id, HttpServletResponse response) throws Exception{
         response.setContentType("application/vnd.ms-excel;charset=utf-8");
         response.setCharacterEncoding("utf-8");
-        String fileName = URLEncoder.encode("版本信息导出", "UTF-8").replaceAll("\\+", "%20");
+        String fileName = URLEncoder.encode("版本信息导出", StandardCharsets.UTF_8).replaceAll("\\+", "%20");
         response.setHeader("Content-Disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
         Workbook workbook = editionService.export(id);
         workbook.write(response.getOutputStream());

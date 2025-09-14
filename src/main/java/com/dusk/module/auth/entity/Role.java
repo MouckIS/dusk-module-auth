@@ -8,7 +8,7 @@ import com.dusk.common.framework.entity.BaseEntity;
 import com.dusk.common.framework.entity.CreationEntity;
 import com.dusk.common.framework.entity.FullAuditedEntity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;

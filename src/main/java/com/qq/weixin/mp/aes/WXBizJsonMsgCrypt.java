@@ -14,12 +14,13 @@
 package com.qq.weixin.mp.aes;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Random;
 
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
+import jakarta.crypto.Cipher;
+import jakarta.crypto.spec.IvParameterSpec;
+import jakarta.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
 
@@ -39,7 +40,7 @@ import org.apache.commons.codec.binary.Base64;
  * </ol>
  */
 public class WXBizJsonMsgCrypt {
-	static Charset CHARSET = Charset.forName("utf-8");
+	static Charset CHARSET = StandardCharsets.UTF_8;
 	Base64 base64 = new Base64();
 	byte[] aesKey;
 	String token;

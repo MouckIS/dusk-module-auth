@@ -13,7 +13,7 @@ import com.dusk.module.auth.entity.Role;
 import com.dusk.module.auth.entity.User;
 import org.springframework.data.domain.Page;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 

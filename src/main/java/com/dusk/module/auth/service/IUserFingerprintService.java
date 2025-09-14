@@ -11,8 +11,6 @@ import com.dusk.module.auth.repository.IUserFingerprintRepository;
 
 import java.util.List;
 
-;
-
 /**
  * @author panyanlin1
  * @date 2021-05-11 17:10:02

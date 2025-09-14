@@ -6,8 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import com.dusk.common.module.auth.enums.DynamicMenuOpenType;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 
 /**
  * @author kefuming
