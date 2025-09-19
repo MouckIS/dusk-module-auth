@@ -24,15 +24,14 @@
         <flyway.user>postgres</flyway.user>
         <flyway.url>jdbc:postgresql://wsl.com:5432/crux</flyway.url>
         <flyway.password>DuskTech@postgre</flyway.password>
-        <xdocreport.version>2.0.4</xdocreport.version>
-        <spire-doc.version>5.2.0</spire-doc.version>
+
+
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.dusk</groupId>
             <artifactId>dusk-common</artifactId>
-            <version>${dusk-common.version}</version>
         </dependency>
 
         <!-- <dependency> -->
@@ -114,55 +113,26 @@
             <artifactId>json</artifactId>
             <version>20200518</version>
         </dependency>
-
-<!--
-        <dependency>
-            <groupId>com.tenxun.qywx</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>1.9</version>
-            <scope>system</scope>
-            <systemPath>${pom.basedir}/lib/commons-codec-1.9.jar</systemPath>
-        </dependency>
--->
-
- <!--       <dependency>
-            <groupId>com.tenxun.qywx</groupId>
-            <artifactId>json</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${pom.basedir}/lib/json-20200518.jar</systemPath>
-        </dependency>-->
         <dependency>
             <groupId>fr.opensagres.xdocreport</groupId>
             <artifactId>fr.opensagres.xdocreport.core</artifactId>
-            <version>${xdocreport.version}</version>
         </dependency>
         <dependency>
             <groupId>fr.opensagres.xdocreport</groupId>
             <artifactId>fr.opensagres.xdocreport.document</artifactId>
-            <version>${xdocreport.version}</version>
         </dependency>
         <dependency>
             <groupId>fr.opensagres.xdocreport</groupId>
             <artifactId>fr.opensagres.xdocreport.template</artifactId>
-            <version>${xdocreport.version}</version>
         </dependency>
         <dependency>
             <groupId>fr.opensagres.xdocreport</groupId>
             <artifactId>fr.opensagres.xdocreport.document.docx</artifactId>
-            <version>${xdocreport.version}</version>
         </dependency>
         <dependency>
             <groupId>fr.opensagres.xdocreport</groupId>
             <artifactId>fr.opensagres.xdocreport.template.freemarker</artifactId>
-            <version>${xdocreport.version}</version>
         </dependency>
-
-        <!-- <dependency> -->
-        <!--     <groupId>e-iceblue</groupId> -->
-        <!--     <artifactId>spire.doc.free</artifactId> -->
-        <!--     <version>${spire-doc.version}</version> -->
-        <!-- </dependency> -->
     </dependencies>
 
     <build>
