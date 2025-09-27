@@ -1,7 +1,7 @@
 package com.dusk.module.auth.common.permission;
 
-import com.dusk.common.framework.auth.permission.Permission;
-import com.dusk.common.framework.auth.permission.UrlPermission;
+import com.dusk.common.core.auth.permission.Permission;
+import com.dusk.common.core.auth.permission.UrlPermission;
 
 import java.util.List;
 import java.util.Map;

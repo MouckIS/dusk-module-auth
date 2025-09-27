@@ -2,8 +2,8 @@ package com.dusk.module.auth.push.local.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.common.framework.pusher.Navigation;
-import com.dusk.common.framework.pusher.NoticationLevel;
+import com.dusk.common.core.pusher.Navigation;
+import com.dusk.common.core.pusher.NoticationLevel;
 
 /**
  * @author kefuming

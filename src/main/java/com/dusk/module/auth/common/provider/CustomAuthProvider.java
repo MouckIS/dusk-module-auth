@@ -1,9 +1,9 @@
 package com.dusk.module.auth.common.provider;
 
-import com.dusk.common.framework.auth.IAuthProvider;
-import com.dusk.common.framework.auth.permission.Permission;
-import com.dusk.common.framework.auth.permission.UrlPermission;
-import com.dusk.common.framework.lock.annotation.Lock4j;
+import com.dusk.common.core.auth.IAuthProvider;
+import com.dusk.common.core.auth.permission.Permission;
+import com.dusk.common.core.auth.permission.UrlPermission;
+import com.dusk.common.core.lock.annotation.Lock4j;
 import com.dusk.module.auth.common.permission.IPermissionCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;

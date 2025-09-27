@@ -1,9 +1,9 @@
 package com.dusk.module.auth.common.permission.impl;
 
 import lombok.Data;
-import com.dusk.common.framework.auth.permission.MultiTenancySides;
-import com.dusk.common.framework.auth.permission.Permission;
-import com.dusk.common.framework.auth.permission.UrlPermission;
+import com.dusk.common.core.auth.permission.MultiTenancySides;
+import com.dusk.common.core.auth.permission.Permission;
+import com.dusk.common.core.auth.permission.UrlPermission;
 import com.dusk.module.auth.common.permission.IAuthPermissionManager;
 import com.dusk.module.auth.common.permission.IPermissionCache;
 import org.springframework.beans.factory.annotation.Autowired;

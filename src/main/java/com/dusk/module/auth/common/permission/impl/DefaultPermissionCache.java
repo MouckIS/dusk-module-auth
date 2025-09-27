@@ -2,9 +2,9 @@ package com.dusk.module.auth.common.permission.impl;
 
 import com.github.dozermapper.core.Mapper;
 import lombok.Data;
-import com.dusk.common.framework.auth.permission.Permission;
-import com.dusk.common.framework.auth.permission.RoleInfo;
-import com.dusk.common.framework.auth.permission.UrlPermission;
+import com.dusk.common.core.auth.permission.Permission;
+import com.dusk.common.core.auth.permission.RoleInfo;
+import com.dusk.common.core.auth.permission.UrlPermission;
 import com.dusk.module.auth.common.permission.IPermissionCache;
 import com.dusk.module.auth.common.permission.PermissionUtil;
 import com.dusk.module.auth.repository.IGrantPermissionRepository;

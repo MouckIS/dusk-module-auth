@@ -11,7 +11,7 @@ import com.sgcc.isc.service.BizOrgType;
 import com.sgcc.isc.service.ExtendType;
 import com.sgcc.isc.service.UserType;
 import lombok.extern.slf4j.Slf4j;
-import com.dusk.common.framework.tenant.TenantContextHolder;
+import com.dusk.common.core.tenant.TenantContextHolder;
 import com.dusk.common.module.auth.dto.CreateOrUpdateUserInput;
 import com.dusk.common.module.auth.dto.UserEditDto;
 import com.dusk.module.auth.dto.role.RoleCreateOrEditDto;

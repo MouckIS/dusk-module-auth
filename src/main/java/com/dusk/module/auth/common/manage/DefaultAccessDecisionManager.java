@@ -1,6 +1,6 @@
 package com.dusk.module.auth.common.manage;
 
-import com.dusk.common.framework.model.UserContext;
+import com.dusk.common.core.model.UserContext;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.authentication.InsufficientAuthenticationException;

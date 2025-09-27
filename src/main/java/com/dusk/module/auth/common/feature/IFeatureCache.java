@@ -1,6 +1,6 @@
 package com.dusk.module.auth.common.feature;
 
-import com.dusk.common.framework.feature.ui.TenantFeature;
+import com.dusk.common.core.feature.ui.TenantFeature;
 
 import java.util.List;
 

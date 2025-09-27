@@ -10,8 +10,8 @@ import com.dusk.module.auth.dto.role.RoleDto;
 import java.util.LinkedHashMap;
 
 /**
- * @Author: pengmengjiang
- * @Date: 2021/2/5 15:58
+ * @author: pengmengjiang
+ * @date: 2021/2/5 15:58
  */
 public class RolePermissionImportListener extends AnalysisEventListener<LinkedHashMap<Integer, String>> {
 

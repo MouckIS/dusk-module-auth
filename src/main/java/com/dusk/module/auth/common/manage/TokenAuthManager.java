@@ -2,13 +2,13 @@ package com.dusk.module.auth.common.manage;
 
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
-import com.dusk.common.framework.jpa.Sequence;
-import com.dusk.common.framework.jwt.JwtSettings;
-import com.dusk.common.framework.jwt.JwtTokenFactory;
-import com.dusk.common.framework.jwt.extractor.JwtHeaderTokenExtractor;
-import com.dusk.common.framework.model.UserContext;
-import com.dusk.common.framework.redis.RedisUtil;
-import com.dusk.common.framework.utils.UserContextUtils;
+import com.dusk.common.core.jpa.Sequence;
+import com.dusk.common.core.jwt.JwtSettings;
+import com.dusk.common.core.jwt.JwtTokenFactory;
+import com.dusk.common.core.jwt.extractor.JwtHeaderTokenExtractor;
+import com.dusk.common.core.model.UserContext;
+import com.dusk.common.core.redis.RedisUtil;
+import com.dusk.common.core.utils.UserContextUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

@@ -3,8 +3,8 @@ package com.dusk.module.auth.entity;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
-import com.dusk.common.framework.entity.BaseEntity;
-import com.dusk.common.framework.entity.CreationEntity;
+import com.dusk.common.core.entity.BaseEntity;
+import com.dusk.common.core.entity.CreationEntity;
 
 import javax.persistence.*;
 
