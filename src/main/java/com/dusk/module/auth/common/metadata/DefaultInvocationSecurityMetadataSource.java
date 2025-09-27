@@ -1,8 +1,8 @@
 package com.dusk.module.auth.common.metadata;
 
-import com.dusk.common.framework.auth.permission.RoleInfo;
-import com.dusk.common.framework.auth.permission.UrlPermission;
-import com.dusk.common.framework.constant.AuthConstant;
+import com.dusk.common.core.auth.permission.RoleInfo;
+import com.dusk.common.core.auth.permission.UrlPermission;
+import com.dusk.common.core.constant.AuthConstant;
 import com.dusk.module.auth.common.permission.IAuthPermissionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.ConfigAttribute;

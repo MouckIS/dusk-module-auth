@@ -1,6 +1,6 @@
 package com.dusk.module.auth.common.provider;
 
-import com.dusk.common.framework.model.UserContext;
+import com.dusk.common.core.model.UserContext;
 import com.dusk.module.auth.common.util.LoginUtils;
 import com.dusk.module.auth.entity.User;
 import com.dusk.module.auth.service.IUserService;

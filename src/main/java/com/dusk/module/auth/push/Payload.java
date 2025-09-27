@@ -4,7 +4,7 @@ import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.common.framework.pusher.*;
+import com.dusk.common.core.pusher.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,8 +12,8 @@ import java.util.Map;
 /**
  * 消息推送的内容
  *
- * @Author kefuming
- * @Date 2020/9/21 15:35
+ * @author kefuming
+ * @date 2020/9/21 15:35
  */
 public class Payload {
 

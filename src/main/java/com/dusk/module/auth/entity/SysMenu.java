@@ -3,9 +3,9 @@ package com.dusk.module.auth.entity;
 
 import lombok.Data;
 import lombok.experimental.FieldNameConstants;
-import com.dusk.common.framework.annotation.Tenant;
-import com.dusk.common.framework.constant.EntityConstant;
-import com.dusk.common.framework.entity.CreationEntity;
+import com.dusk.common.core.annotation.Tenant;
+import com.dusk.common.core.constant.EntityConstant;
+import com.dusk.common.core.entity.CreationEntity;
 import com.dusk.common.module.auth.enums.MenuTypeEnum;
 
 import javax.persistence.*;

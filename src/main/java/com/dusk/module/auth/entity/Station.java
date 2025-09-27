@@ -2,7 +2,7 @@ package com.dusk.module.auth.entity;
 
 import lombok.Data;
 import lombok.experimental.FieldNameConstants;
-import com.dusk.common.framework.entity.TreeEntity;
+import com.dusk.common.core.entity.TreeEntity;
 
 import javax.persistence.*;
 import java.util.ArrayList;

@@ -1,11 +1,11 @@
 package com.dusk.module.auth.common.syscode.impl;
 
 import com.github.dozermapper.core.Mapper;
-import com.dusk.common.framework.lock.annotation.Lock4j;
-import com.dusk.common.framework.redis.RedisCacheCondition;
-import com.dusk.common.framework.redis.RedisUtil;
-import com.dusk.common.framework.syscode.SysCodeData;
-import com.dusk.common.framework.syscode.SysCodeDefinitionDto;
+import com.dusk.common.core.lock.annotation.Lock4j;
+import com.dusk.common.core.redis.RedisCacheCondition;
+import com.dusk.common.core.redis.RedisUtil;
+import com.dusk.common.core.syscode.SysCodeData;
+import com.dusk.common.core.syscode.SysCodeDefinitionDto;
 import com.dusk.common.module.auth.dto.syscode.SysCodeTypeDto;
 import com.dusk.module.auth.common.syscode.ISysCodeCache;
 import com.dusk.module.auth.entity.SysCodeValue;

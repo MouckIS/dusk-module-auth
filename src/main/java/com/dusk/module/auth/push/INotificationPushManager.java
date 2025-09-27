@@ -1,6 +1,6 @@
 package com.dusk.module.auth.push;
 
-import com.dusk.common.framework.pusher.*;
+import com.dusk.common.core.pusher.*;
 
 /**
  * @author kefuming

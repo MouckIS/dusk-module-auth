@@ -1,6 +1,6 @@
 package com.dusk.module.auth.common.syscode;
 
-import com.dusk.common.framework.syscode.SysCodeDefinitionDto;
+import com.dusk.common.core.syscode.SysCodeDefinitionDto;
 import com.dusk.common.module.auth.dto.syscode.SysCodeTypeDto;
 
 import java.util.List;

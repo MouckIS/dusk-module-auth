@@ -1,9 +1,9 @@
 package com.dusk.module.auth.push;
 
 import lombok.extern.slf4j.Slf4j;
-import com.dusk.common.framework.pusher.*;
-import com.dusk.common.framework.rabbitmq.RabbitMQEnableCondition;
-import com.dusk.common.framework.utils.RabbitMQUtils;
+import com.dusk.common.core.pusher.*;
+import com.dusk.common.core.rabbitmq.RabbitMQEnableCondition;
+import com.dusk.common.core.utils.RabbitMQUtils;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.Queue;
 import org.springframework.beans.factory.annotation.Autowired;

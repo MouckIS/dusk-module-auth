@@ -1,10 +1,10 @@
 package com.dusk.module.auth.enums;
 
-import com.dusk.common.framework.entity.BaseEnum;
+import com.dusk.common.core.entity.BaseEnum;
 
 /**
  * 用户级别
- * @Author kefuming
+ * @author kefuming
  * @CreateTime 2022-11-08
  */
 public enum ELevel implements BaseEnum {

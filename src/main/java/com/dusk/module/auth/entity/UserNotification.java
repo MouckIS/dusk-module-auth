@@ -2,7 +2,7 @@ package com.dusk.module.auth.entity;
 
 import lombok.Data;
 import lombok.experimental.FieldNameConstants;
-import com.dusk.common.framework.entity.FullAuditedEntity;
+import com.dusk.common.core.entity.FullAuditedEntity;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -10,8 +10,8 @@ import javax.persistence.Table;
 /**
  * 用户消息
  *
- * @Author kefuming
- * @Date 2020/12/24 15:12
+ * @author kefuming
+ * @date 2020/12/24 15:12
  */
 @Data
 @Entity

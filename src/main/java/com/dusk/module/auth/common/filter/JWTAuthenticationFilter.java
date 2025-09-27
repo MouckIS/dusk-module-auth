@@ -7,7 +7,7 @@ import cn.hutool.extra.servlet.ServletUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import org.apache.commons.lang3.StringUtils;
-import com.dusk.common.framework.auditlog.SysLogEvent;
+import com.dusk.common.core.auditlog.SysLogEvent;
 import com.dusk.common.module.auth.dto.AuditLogDto;
 import com.dusk.module.auth.common.model.LoginRequest;
 import com.dusk.module.auth.enums.LoginLogType;

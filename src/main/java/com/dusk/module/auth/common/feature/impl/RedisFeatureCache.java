@@ -1,9 +1,9 @@
 package com.dusk.module.auth.common.feature.impl;
 
-import com.dusk.common.framework.feature.ui.TenantFeature;
-import com.dusk.common.framework.lock.annotation.Lock4j;
-import com.dusk.common.framework.redis.RedisCacheCondition;
-import com.dusk.common.framework.redis.RedisUtil;
+import com.dusk.common.core.feature.ui.TenantFeature;
+import com.dusk.common.core.lock.annotation.Lock4j;
+import com.dusk.common.core.redis.RedisCacheCondition;
+import com.dusk.common.core.redis.RedisUtil;
 import com.dusk.module.auth.common.feature.IFeatureCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;

@@ -3,7 +3,7 @@ package com.dusk.module.auth.entity;
 import lombok.Data;
 import lombok.ToString;
 import lombok.experimental.FieldNameConstants;
-import com.dusk.common.framework.entity.FullAuditedEntity;
+import com.dusk.common.core.entity.FullAuditedEntity;
 import com.dusk.common.module.auth.enums.EUnitType;
 import com.dusk.common.module.auth.enums.UserStatus;
 
