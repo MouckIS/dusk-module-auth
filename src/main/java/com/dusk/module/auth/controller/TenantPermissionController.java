@@ -1,6 +1,6 @@
 package com.dusk.module.auth.controller;
 
-import com.dusk.commom.rpc.auth.dto.role.RolePermissionDto;
+import com.dusk.common.rpc.auth.dto.role.RolePermissionDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import com.dusk.common.core.annotation.Authorize;

@@ -1,9 +1,9 @@
 package com.dusk.module.auth.service.impl;
 
 import cn.hutool.core.util.StrUtil;
-import com.dusk.commom.rpc.auth.dto.GenerateTokenForNonUserInput;
-import com.dusk.commom.rpc.auth.dto.RoleSimpleDto;
-import com.dusk.commom.rpc.auth.service.ITokenAuthRpcService;
+import com.dusk.common.rpc.auth.dto.GenerateTokenForNonUserInput;
+import com.dusk.common.rpc.auth.dto.RoleSimpleDto;
+import com.dusk.common.rpc.auth.service.ITokenAuthRpcService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.Service;
 import com.dusk.common.core.constant.AuthConstant;

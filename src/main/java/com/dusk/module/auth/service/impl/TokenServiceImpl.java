@@ -1,8 +1,8 @@
 package com.dusk.module.auth.service.impl;
 
-import com.dusk.commom.rpc.auth.dto.GenerateTokenForNonUserInput;
-import com.dusk.commom.rpc.auth.service.ISmRpcUtil;
-import com.dusk.commom.rpc.auth.service.ITokenAuthRpcService;
+import com.dusk.common.rpc.auth.dto.GenerateTokenForNonUserInput;
+import com.dusk.common.rpc.auth.service.ISmRpcUtil;
+import com.dusk.common.rpc.auth.service.ITokenAuthRpcService;
 import com.github.dozermapper.core.Mapper;
 import lombok.extern.slf4j.Slf4j;
 import com.dusk.module.auth.dto.token.TokenSign;

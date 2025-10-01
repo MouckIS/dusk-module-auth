@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
+
 /**
  * @author kefuming
  * @date 2021-07-26 10:16
@@ -30,7 +32,7 @@ public class FeaturePusher implements IFeaturePusher {
         try {
             featureService.updateFeature(appConfig.getApplicationName(), context.getFeatures());
         } catch (Exception ex) {
-            log.error("推送特性列表异常：" + ex.getMessage());
+            log.error("推送特性列表异常：{}", ex.getMessage());
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException iex) {

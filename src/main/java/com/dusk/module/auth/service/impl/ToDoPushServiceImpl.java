@@ -2,9 +2,9 @@ package com.dusk.module.auth.service.impl;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
-import com.dusk.commom.rpc.auth.dto.ToDoDto;
-import com.dusk.commom.rpc.auth.enums.ToDoTargetType;
-import com.dusk.commom.rpc.auth.service.IUserRpcService;
+import com.dusk.common.rpc.auth.dto.ToDoDto;
+import com.dusk.common.rpc.auth.enums.ToDoTargetType;
+import com.dusk.common.rpc.auth.service.IUserRpcService;
 import com.dusk.common.mqs.pusher.NotificationOption;
 import com.dusk.common.mqs.pusher.PushMessage;
 import com.dusk.common.mqs.utils.MqttUtils;

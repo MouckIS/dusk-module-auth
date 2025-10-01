@@ -2,7 +2,7 @@ package com.dusk.module.auth.service.impl;
 
 import cn.hutool.core.util.HexUtil;
 import cn.hutool.crypto.SmUtil;
-import com.dusk.commom.rpc.auth.service.ISmRpcUtil;
+import com.dusk.common.rpc.auth.service.ISmRpcUtil;
 import org.apache.dubbo.config.annotation.Service;
 import com.dusk.module.auth.common.config.AppAuthConfig;
 import org.springframework.beans.factory.annotation.Autowired;

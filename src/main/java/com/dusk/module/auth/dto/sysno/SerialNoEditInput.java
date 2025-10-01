@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.sysno;
 
-import com.dusk.commom.rpc.auth.enums.EnumResetType;
+import com.dusk.common.rpc.auth.enums.EnumResetType;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;

@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.user;
 
-import com.dusk.commom.rpc.auth.dto.BindRoleToUserInput;
+import com.dusk.common.rpc.auth.dto.BindRoleToUserInput;
 import lombok.Data;
 
 /**

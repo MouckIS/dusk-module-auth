@@ -2,7 +2,7 @@ package com.dusk.module.auth.controller;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.enums.CellExtraTypeEnum;
-import com.dusk.commom.rpc.auth.dto.BindRoleToUserInput;
+import com.dusk.common.rpc.auth.dto.BindRoleToUserInput;
 import com.github.dozermapper.core.Mapper;
 import io.swagger.annotations.*;
 import org.apache.commons.io.IOUtils;

@@ -1,8 +1,8 @@
 package com.dusk.module.auth.service.impl;
 
 import cn.hutool.core.util.StrUtil;
-import com.dusk.commom.rpc.auth.dto.ToDoDto;
-import com.dusk.commom.rpc.auth.enums.ToDoTargetType;
+import com.dusk.common.rpc.auth.dto.ToDoDto;
+import com.dusk.common.rpc.auth.enums.ToDoTargetType;
 import com.dusk.module.auth.entity.Todo;
 import com.dusk.module.auth.entity.TodoRead;
 import com.dusk.module.auth.entity.User;

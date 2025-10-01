@@ -1,8 +1,8 @@
 package com.dusk.module.auth.service.impl;
 
-import com.dusk.commom.rpc.auth.dto.ToDoDto;
-import com.dusk.commom.rpc.auth.enums.ToDoTargetType;
-import com.dusk.commom.rpc.auth.service.ITodoRpcService;
+import com.dusk.common.rpc.auth.dto.ToDoDto;
+import com.dusk.common.rpc.auth.enums.ToDoTargetType;
+import com.dusk.common.rpc.auth.service.ITodoRpcService;
 import com.dusk.module.auth.entity.TodoPermission;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;

@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.orga;
 
-import com.dusk.commom.rpc.auth.dto.orga.GetOrganizationUnitUsersInput;
+import com.dusk.common.rpc.auth.dto.orga.GetOrganizationUnitUsersInput;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;

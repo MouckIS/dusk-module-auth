@@ -1,6 +1,6 @@
 package com.dusk.module.auth.controller;
 
-import com.dusk.commom.rpc.auth.dto.orga.OrganizationUnitDto;
+import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitDto;
 import com.dusk.module.auth.dto.orga.*;
 import com.github.dozermapper.core.Mapper;
 import io.swagger.annotations.Api;
@@ -10,7 +10,6 @@ import com.dusk.common.core.controller.CruxBaseController;
 import com.dusk.common.core.dto.EntityDto;
 import com.dusk.common.core.dto.ListResultDto;
 import com.dusk.module.auth.authorization.ExternalManagerAuthProvider;
-import com.dusk.module.auth.dto.orga.*;
 import com.dusk.module.auth.entity.OrganizationUnit;
 import com.dusk.module.auth.service.IOrganizationUnitService;
 import org.springframework.beans.factory.annotation.Autowired;

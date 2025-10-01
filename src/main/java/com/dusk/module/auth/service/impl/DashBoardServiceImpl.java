@@ -1,11 +1,11 @@
 package com.dusk.module.auth.service.impl;
 
-import com.dusk.commom.rpc.auth.dto.RoleSimpleDto;
-import com.dusk.commom.rpc.auth.dto.UserFullListDto;
-import com.dusk.commom.rpc.auth.dto.UserRoleDto;
-import com.dusk.commom.rpc.auth.dto.role.RoleListDto;
-import com.dusk.commom.rpc.auth.service.IRoleRpcService;
-import com.dusk.commom.rpc.auth.service.IUserRpcService;
+import com.dusk.common.rpc.auth.dto.RoleSimpleDto;
+import com.dusk.common.rpc.auth.dto.UserFullListDto;
+import com.dusk.common.rpc.auth.dto.UserRoleDto;
+import com.dusk.common.rpc.auth.dto.role.RoleListDto;
+import com.dusk.common.rpc.auth.service.IRoleRpcService;
+import com.dusk.common.rpc.auth.service.IUserRpcService;
 import com.dusk.module.auth.entity.dashboard.*;
 import com.dusk.module.auth.repository.dashboard.*;
 import com.querydsl.core.types.QBean;

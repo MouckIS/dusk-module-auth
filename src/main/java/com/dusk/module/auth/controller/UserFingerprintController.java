@@ -1,7 +1,7 @@
 package com.dusk.module.auth.controller;
 
-import com.dusk.commom.rpc.auth.dto.fingerprint.GetAllInputDto;
-import com.dusk.commom.rpc.auth.dto.fingerprint.UserFingerprintDto;
+import com.dusk.common.rpc.auth.dto.fingerprint.GetAllInputDto;
+import com.dusk.common.rpc.auth.dto.fingerprint.UserFingerprintDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import com.dusk.common.core.annotation.Authorize;

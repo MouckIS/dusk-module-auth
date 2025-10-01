@@ -1,11 +1,9 @@
 package com.dusk.module.auth.dto.notification;
 
-import com.dusk.commom.rpc.auth.enums.NotificationType;
+import com.dusk.common.rpc.auth.enums.NotificationType;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * @author kefuming

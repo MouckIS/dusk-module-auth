@@ -1,8 +1,8 @@
 package com.dusk.module.auth.isc;
 
 import cn.hutool.core.util.StrUtil;
-import com.dusk.commom.rpc.auth.dto.CreateOrUpdateUserInput;
-import com.dusk.commom.rpc.auth.dto.UserEditDto;
+import com.dusk.common.rpc.auth.dto.CreateOrUpdateUserInput;
+import com.dusk.common.rpc.auth.dto.UserEditDto;
 import com.dusk.module.auth.entity.OrganizationUnit;
 import com.dusk.module.auth.entity.Role;
 import com.dusk.module.auth.entity.Tenant;

@@ -1,6 +1,6 @@
 package com.dusk.module.auth.service.impl;
 
-import com.dusk.commom.rpc.auth.service.ICommonFavoriteRpcService;
+import com.dusk.common.rpc.auth.service.ICommonFavoriteRpcService;
 import com.github.dozermapper.core.Mapper;
 import com.querydsl.core.types.QBean;
 import com.querydsl.jpa.impl.JPAQuery;

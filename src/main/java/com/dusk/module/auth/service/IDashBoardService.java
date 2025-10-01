@@ -1,10 +1,9 @@
 package com.dusk.module.auth.service;
 
-import com.dusk.commom.rpc.auth.dto.RoleSimpleDto;
+import com.dusk.common.rpc.auth.dto.RoleSimpleDto;
 import com.dusk.module.auth.dto.dashboard.*;
 import com.dusk.common.core.dto.PagedResultDto;
 import com.dusk.common.core.service.IBaseService;
-import com.dusk.module.auth.dto.dashboard.*;
 import com.dusk.module.auth.entity.dashboard.DashboardTheme;
 import com.dusk.module.auth.entity.dashboard.DashboardClassify;
 import com.dusk.module.auth.repository.dashboard.IDashBoardThemeRepository;
