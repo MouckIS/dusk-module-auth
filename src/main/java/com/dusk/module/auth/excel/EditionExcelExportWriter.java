@@ -1,5 +1,6 @@
 package com.dusk.module.auth.excel;
 
+import com.dusk.module.auth.dto.TenantFeature;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -8,7 +9,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import com.dusk.common.core.auth.permission.Permission;
-import com.dusk.common.core.feature.ui.*;
+import com.dusk.module.ddm.dto.ui.*;
 import com.dusk.module.auth.entity.SubscribableEdition;
 import org.springframework.cglib.beans.BeanCopier;
 

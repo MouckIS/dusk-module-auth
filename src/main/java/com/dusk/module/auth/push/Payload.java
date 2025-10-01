@@ -1,10 +1,14 @@
 package com.dusk.module.auth.push;
 
 import cn.hutool.json.JSONUtil;
+import com.dusk.common.mqs.enums.PushTarget;
+import com.dusk.common.mqs.enums.PushType;
+import com.dusk.common.mqs.pusher.Navigation;
+import com.dusk.common.mqs.pusher.NotificationOption;
+import com.dusk.common.mqs.pusher.PushMessage;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.common.core.pusher.*;
 
 import java.util.HashMap;
 import java.util.Map;
