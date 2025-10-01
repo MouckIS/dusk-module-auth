@@ -1,6 +1,10 @@
 package com.dusk.module.auth.push;
 
-import com.dusk.common.core.pusher.*;
+import com.dusk.common.mqs.enums.PushType;
+import com.dusk.common.mqs.pusher.Navigation;
+import com.dusk.common.mqs.pusher.NotificationOption;
+import com.dusk.common.mqs.pusher.PushMessage;
+import com.dusk.common.mqs.pusher.PushSMS;
 
 /**
  * @author kefuming

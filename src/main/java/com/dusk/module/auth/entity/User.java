@@ -1,11 +1,11 @@
 package com.dusk.module.auth.entity;
 
+import com.dusk.common.core.enums.EUnitType;
+import com.dusk.common.core.enums.UserStatus;
 import lombok.Data;
 import lombok.ToString;
 import lombok.experimental.FieldNameConstants;
 import com.dusk.common.core.entity.FullAuditedEntity;
-import com.dusk.common.module.auth.enums.EUnitType;
-import com.dusk.common.module.auth.enums.UserStatus;
 
 import javax.persistence.*;
 import java.time.LocalDate;

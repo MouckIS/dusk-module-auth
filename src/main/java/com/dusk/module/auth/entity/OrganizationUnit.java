@@ -1,11 +1,12 @@
 package com.dusk.module.auth.entity;
 
-import lombok.Data;
+import com.dusk.common.core.entity.TreeEntity;
+import com.dusk.common.core.enums.EUnitType;
+import com.dusk.module.auth.enums.OrgLabel;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.FieldNameConstants;
-import com.dusk.common.core.entity.TreeEntity;
-import com.dusk.common.module.auth.enums.EUnitType;
-import com.dusk.module.auth.enums.OrgLabel;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -15,9 +16,10 @@ import java.util.List;
  * @author kefuming
  * @date 2020-05-13 11:55
  */
+@Getter
+@Setter
 @Entity
 @Table(name = "sys_organization")
-@Data
 @FieldNameConstants
 @ToString(exclude = "users")
 public class OrganizationUnit extends TreeEntity {

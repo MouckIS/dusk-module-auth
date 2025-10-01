@@ -1,10 +1,9 @@
 package com.dusk.module.auth.push.local.dto;
 
-import cn.hutool.core.date.DateTime;
+import com.dusk.common.mqs.enums.PushDeviceType;
+import com.dusk.common.mqs.enums.PushTarget;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.common.core.pusher.PushDeviceType;
-import com.dusk.common.core.pusher.PushTarget;
 
 /**
  * @author kefuming
