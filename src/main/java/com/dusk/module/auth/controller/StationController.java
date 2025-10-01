@@ -1,6 +1,6 @@
 package com.dusk.module.auth.controller;
 
-import com.dusk.commom.rpc.auth.dto.station.StationDto;
+import com.dusk.common.rpc.auth.dto.station.StationDto;
 import com.dusk.module.auth.dto.station.*;
 import com.github.dozermapper.core.Mapper;
 import io.swagger.annotations.Api;
@@ -10,7 +10,6 @@ import com.dusk.common.core.controller.CruxBaseController;
 import com.dusk.common.core.dto.PagedResultDto;
 import com.dusk.common.core.utils.DozerUtils;
 import com.dusk.module.auth.authorization.StationAuthProvider;
-import com.dusk.module.auth.dto.station.*;
 import com.dusk.module.auth.entity.Station;
 import com.dusk.module.auth.service.IStationService;
 import org.springframework.beans.factory.annotation.Autowired;

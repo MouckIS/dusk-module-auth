@@ -1,11 +1,11 @@
 package com.dusk.module.auth.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.dusk.commom.rpc.auth.dto.*;
-import com.dusk.commom.rpc.auth.dto.orga.GetOrganizationUnitUsersInput;
-import com.dusk.commom.rpc.auth.dto.orga.OrganizationUnitDto;
-import com.dusk.commom.rpc.auth.dto.orga.OrganizationUnitUserDto;
-import com.dusk.commom.rpc.auth.service.IUserRpcService;
+import com.dusk.common.rpc.auth.dto.*;
+import com.dusk.common.rpc.auth.dto.orga.GetOrganizationUnitUsersInput;
+import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitDto;
+import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitUserDto;
+import com.dusk.common.rpc.auth.service.IUserRpcService;
 import com.dusk.module.auth.entity.OrganizationUnit;
 import com.dusk.module.auth.entity.Role;
 import com.dusk.module.auth.entity.User;

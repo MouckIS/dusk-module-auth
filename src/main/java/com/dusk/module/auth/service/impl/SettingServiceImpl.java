@@ -46,10 +46,6 @@ public class SettingServiceImpl implements ISettingRpcService, ISettingService {
     private ISettingsCache settingsCache;
     @Autowired
     private ISettingManager settingManager;
-    @Autowired
-    private SecurityUtils securityUtils;
-    //@Reference
-    //private IMinioRpcService minioRpcService;
 
     @Override
     public List<SettingDto> getApplicationSettings() {

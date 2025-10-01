@@ -5,7 +5,7 @@ import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
 import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.binarywang.wx.miniapp.bean.WxMaUserInfo;
 import cn.hutool.core.util.StrUtil;
-import com.dusk.commom.rpc.auth.service.IWxMaRpcService;
+import com.dusk.common.rpc.auth.service.IWxMaRpcService;
 import com.github.dozermapper.core.Mapper;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;

@@ -1,6 +1,6 @@
 package com.dusk.module.auth.controller;
 
-import com.dusk.commom.rpc.auth.enums.EnumResetType;
+import com.dusk.common.rpc.auth.enums.EnumResetType;
 import com.github.dozermapper.core.Mapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

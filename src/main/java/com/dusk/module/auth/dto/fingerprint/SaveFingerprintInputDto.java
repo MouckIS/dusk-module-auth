@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.fingerprint;
 
-import com.dusk.commom.rpc.auth.enums.FingerprintFromEnum;
+import com.dusk.common.rpc.auth.enums.FingerprintFromEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;

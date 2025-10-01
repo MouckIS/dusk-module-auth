@@ -2,8 +2,8 @@ package com.dusk.module.auth.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
-import com.dusk.commom.rpc.auth.enums.EnumResetType;
-import com.dusk.commom.rpc.auth.service.ISerialNoRpcService;
+import com.dusk.common.rpc.auth.enums.EnumResetType;
+import com.dusk.common.rpc.auth.service.ISerialNoRpcService;
 import com.github.dozermapper.core.Mapper;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;

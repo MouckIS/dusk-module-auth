@@ -1,6 +1,6 @@
 package com.dusk.module.auth.entity;
 
-import com.dusk.commom.rpc.auth.enums.NotificationType;
+import com.dusk.common.rpc.auth.enums.NotificationType;
 import lombok.Data;
 import lombok.experimental.FieldNameConstants;
 import com.dusk.common.core.entity.FullAuditedEntity;

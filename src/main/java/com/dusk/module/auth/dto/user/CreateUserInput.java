@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.user;
 
-import com.dusk.commom.rpc.auth.dto.CreateOrUpdateUserInput;
+import com.dusk.common.rpc.auth.dto.CreateOrUpdateUserInput;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;

@@ -1,7 +1,7 @@
 package com.dusk.module.auth.service;
 
 
-import com.dusk.commom.rpc.auth.service.IEmailRpcService;
+import com.dusk.common.rpc.auth.service.IEmailRpcService;
 
 /**
  * @author: pengmengjiang

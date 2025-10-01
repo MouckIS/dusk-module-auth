@@ -1,7 +1,7 @@
 package com.dusk.module.auth.service.impl;
 
-import com.dusk.commom.rpc.auth.dto.orga.OrganizationUnitDto;
-import com.dusk.commom.rpc.auth.service.ICustomerRpcService;
+import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitDto;
+import com.dusk.common.rpc.auth.service.ICustomerRpcService;
 import com.github.dozermapper.core.Mapper;
 import org.apache.dubbo.config.annotation.Service;
 import com.dusk.common.core.jpa.Specifications;

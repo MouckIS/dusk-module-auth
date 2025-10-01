@@ -1,6 +1,6 @@
 package com.dusk.module.auth.entity;
 
-import com.dusk.commom.rpc.auth.enums.EnumResetType;
+import com.dusk.common.rpc.auth.enums.EnumResetType;
 import lombok.Data;
 import lombok.experimental.FieldNameConstants;
 import com.dusk.common.core.entity.FullAuditedEntity;

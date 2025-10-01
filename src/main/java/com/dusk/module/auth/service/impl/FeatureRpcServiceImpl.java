@@ -1,4 +1,4 @@
-package com.dusk.module.auth.impl;
+package com.dusk.module.auth.service.impl;
 
 import com.dusk.module.auth.cache.IFeatureCache;
 import com.dusk.module.auth.dto.TenantFeature;

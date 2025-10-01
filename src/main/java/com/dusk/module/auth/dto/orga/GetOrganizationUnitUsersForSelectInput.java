@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
 import com.dusk.common.core.entity.BaseEntity;
 import com.dusk.common.core.entity.TreeEntity;
-import com.dusk.commom.rpc.auth.dto.orga.OrganizationUnitUserListDto;
+import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitUserListDto;
 import org.springframework.data.domain.Sort;
 
 /**

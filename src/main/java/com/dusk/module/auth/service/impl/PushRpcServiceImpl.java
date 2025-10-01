@@ -1,6 +1,6 @@
 package com.dusk.module.auth.service.impl;
 
-import com.dusk.commom.rpc.auth.service.IAuthPushRpcService;
+import com.dusk.common.rpc.auth.service.IAuthPushRpcService;
 import com.dusk.common.mqs.enums.PushType;
 import com.dusk.common.mqs.pusher.Navigation;
 import com.dusk.common.mqs.pusher.NotificationOption;

@@ -1,6 +1,6 @@
 package com.dusk.module.auth.service.impl;
 
-import com.dusk.commom.rpc.auth.dto.role.RolePermissionDto;
+import com.dusk.common.rpc.auth.dto.role.RolePermissionDto;
 import com.github.dozermapper.core.Mapper;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;

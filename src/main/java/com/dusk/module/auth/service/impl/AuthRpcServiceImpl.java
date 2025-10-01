@@ -3,7 +3,7 @@ package com.dusk.module.auth.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
-import com.dusk.commom.rpc.auth.service.IAuthRpcService;
+import com.dusk.common.rpc.auth.service.IAuthRpcService;
 import com.dusk.common.core.utils.UserContextUtils;
 import com.dusk.module.auth.service.IFeatureChecker;
 import lombok.extern.slf4j.Slf4j;

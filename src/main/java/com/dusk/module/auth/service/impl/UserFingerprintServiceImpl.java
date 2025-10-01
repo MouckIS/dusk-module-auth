@@ -1,10 +1,10 @@
 package com.dusk.module.auth.service.impl;
 
 import cn.hutool.core.util.StrUtil;
-import com.dusk.commom.rpc.auth.dto.fingerprint.GetAllInputDto;
-import com.dusk.commom.rpc.auth.dto.fingerprint.UserFingerprintDto;
-import com.dusk.commom.rpc.auth.enums.EnumResetType;
-import com.dusk.commom.rpc.auth.service.ISerialNoRpcService;
+import com.dusk.common.rpc.auth.dto.fingerprint.GetAllInputDto;
+import com.dusk.common.rpc.auth.dto.fingerprint.UserFingerprintDto;
+import com.dusk.common.rpc.auth.enums.EnumResetType;
+import com.dusk.common.rpc.auth.service.ISerialNoRpcService;
 import com.dusk.common.mqs.utils.MqttUtils;
 import com.dusk.module.auth.dto.fingerprint.*;
 import com.github.dozermapper.core.Mapper;
@@ -17,7 +17,6 @@ import com.dusk.common.core.utils.DozerUtils;
 import com.dusk.common.core.utils.SecurityUtils;
 import com.dusk.common.core.utils.UtBeanUtils;
 import com.dusk.module.auth.cache.IUserFingerprintCacheService;
-import com.dusk.module.auth.dto.fingerprint.*;
 import com.dusk.module.auth.entity.UserFingerprint;
 import com.dusk.module.auth.repository.IUserFingerprintRepository;
 import com.dusk.module.auth.service.IUserFingerprintService;

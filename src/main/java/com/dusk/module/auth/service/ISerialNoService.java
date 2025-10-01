@@ -1,6 +1,6 @@
 package com.dusk.module.auth.service;
 
-import com.dusk.commom.rpc.auth.service.ISerialNoRpcService;
+import com.dusk.common.rpc.auth.service.ISerialNoRpcService;
 import com.dusk.module.auth.dto.sysno.GetSerialNoInput;
 import com.dusk.module.auth.dto.sysno.SerialNoEditInput;
 import com.dusk.module.auth.entity.SerialNo;

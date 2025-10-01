@@ -1,6 +1,6 @@
 package com.dusk.module.auth.service.impl;
 
-import com.dusk.commom.rpc.auth.service.IAuditLogRpcService;
+import com.dusk.common.rpc.auth.service.IAuditLogRpcService;
 import com.dusk.common.core.dto.AuditLogDto;
 import com.github.dozermapper.core.Mapper;
 import org.apache.dubbo.config.annotation.Service;

@@ -1,6 +1,6 @@
 package com.dusk.module.auth.controller;
 
-import com.dusk.commom.rpc.auth.dto.ChangePwdInput;
+import com.dusk.common.rpc.auth.dto.ChangePwdInput;
 import com.dusk.module.auth.dto.user.*;
 import com.dusk.module.auth.service.IFeatureChecker;
 import com.github.dozermapper.core.Mapper;
@@ -17,7 +17,6 @@ import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.model.UserContext;
 import com.dusk.common.core.utils.DozerUtils;
 import com.dusk.module.auth.authorization.AdminUserAuthProvider;
-import com.dusk.module.auth.dto.user.*;
 import com.dusk.module.auth.entity.User;
 import com.dusk.module.auth.feature.UserFeatureProvider;
 import com.dusk.module.auth.service.IUserService;

@@ -1,9 +1,9 @@
 package com.dusk.module.auth.service;
 
-import com.dusk.commom.rpc.auth.dto.orga.GetOrganizationUnitUsersInput;
-import com.dusk.commom.rpc.auth.dto.orga.OrganizationUnitDto;
-import com.dusk.commom.rpc.auth.dto.orga.OrganizationUnitUserListDto;
-import com.dusk.commom.rpc.auth.service.IOrganizationUnitRpcService;
+import com.dusk.common.rpc.auth.dto.orga.GetOrganizationUnitUsersInput;
+import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitDto;
+import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitUserListDto;
+import com.dusk.common.rpc.auth.service.IOrganizationUnitRpcService;
 import com.dusk.common.core.dto.EntityDto;
 import com.dusk.common.core.dto.ListResultDto;
 import com.dusk.common.core.service.IBaseService;

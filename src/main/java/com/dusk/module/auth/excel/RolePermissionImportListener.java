@@ -2,7 +2,7 @@ package com.dusk.module.auth.excel;
 
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
-import com.dusk.commom.rpc.auth.dto.role.RolePermissionDto;
+import com.dusk.common.rpc.auth.dto.role.RolePermissionDto;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import com.dusk.module.auth.dto.role.RoleDto;

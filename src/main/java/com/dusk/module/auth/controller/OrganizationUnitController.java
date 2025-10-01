@@ -1,8 +1,8 @@
 package com.dusk.module.auth.controller;
 
-import com.dusk.commom.rpc.auth.dto.orga.GetOrganizationUnitUsersInput;
-import com.dusk.commom.rpc.auth.dto.orga.OrganizationUnitDto;
-import com.dusk.commom.rpc.auth.dto.station.StationDto;
+import com.dusk.common.rpc.auth.dto.orga.GetOrganizationUnitUsersInput;
+import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitDto;
+import com.dusk.common.rpc.auth.dto.station.StationDto;
 import com.dusk.module.auth.dto.orga.*;
 import com.github.dozermapper.core.Mapper;
 import io.swagger.annotations.*;
@@ -15,10 +15,9 @@ import com.dusk.common.core.dto.PagedResultDto;
 import com.dusk.common.core.entity.TreeEntity;
 import com.dusk.common.core.jpa.Specifications;
 import com.dusk.common.core.utils.DozerUtils;
-import com.dusk.commom.rpc.auth.dto.orga.OrganizationUnitUserListDto;
+import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitUserListDto;
 import com.dusk.common.core.enums.EUnitType;
 import com.dusk.module.auth.authorization.OrganizationUnitAuthProvider;
-import com.dusk.module.auth.dto.orga.*;
 import com.dusk.module.auth.dto.station.StationsOfLoginUserDto;
 import com.dusk.module.auth.entity.OrganizationManager;
 import com.dusk.module.auth.entity.OrganizationUnit;

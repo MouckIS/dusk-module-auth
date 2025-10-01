@@ -13,9 +13,9 @@ import com.dusk.module.auth.repository.IFeatureValueRepository;
 import com.dusk.module.auth.service.IFeatureService;
 import com.dusk.module.auth.service.ITenantService;
 import com.github.dozermapper.core.Mapper;
-import org.apache.dubbo.config.annotation.Service;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 

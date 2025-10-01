@@ -6,11 +6,11 @@ import cn.hutool.core.collection.IterUtil;
 import cn.hutool.core.util.HexUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SmUtil;
-import com.dusk.commom.rpc.auth.dto.ChangePwdInput;
-import com.dusk.commom.rpc.auth.dto.CreateOrUpdateUserInput;
-import com.dusk.commom.rpc.auth.dto.UserEditDto;
-import com.dusk.commom.rpc.auth.dto.UserFullListDto;
-import com.dusk.commom.rpc.auth.dto.orga.GetOrganizationUnitUsersInput;
+import com.dusk.common.rpc.auth.dto.ChangePwdInput;
+import com.dusk.common.rpc.auth.dto.CreateOrUpdateUserInput;
+import com.dusk.common.rpc.auth.dto.UserEditDto;
+import com.dusk.common.rpc.auth.dto.UserFullListDto;
+import com.dusk.common.rpc.auth.dto.orga.GetOrganizationUnitUsersInput;
 import com.dusk.common.core.utils.SecurityUtils;
 import com.dusk.common.mqs.pusher.PushSMS;
 import com.dusk.common.mqs.pusher.SmsPushConfig;
@@ -21,6 +21,7 @@ import com.dusk.module.auth.entity.*;
 import com.dusk.module.auth.repository.*;
 import com.dusk.module.auth.service.*;
 import com.dusk.module.ddm.service.ISettingChecker;
+import com.dusk.module.ddm.service.ISettingRpcService;
 import com.github.dozermapper.core.Mapper;
 import com.hankcs.hanlp.HanLP;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -43,7 +44,7 @@ import com.dusk.common.core.redis.RedisUtil;
 import com.dusk.common.core.service.impl.BaseService;
 import com.dusk.common.core.tenant.TenantContextHolder;
 import com.dusk.common.core.utils.DozerUtils;
-import com.dusk.commom.rpc.auth.dto.orga.OrganizationUnitUserListDto;
+import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitUserListDto;
 import com.dusk.common.core.enums.EUnitType;
 import com.dusk.common.core.enums.UserStatus;
 //import com.dusk.common.module.face.service.IUserFaceRpcService;
@@ -59,6 +60,7 @@ import com.dusk.module.auth.feature.LoginFeatureProvider;
 import com.dusk.module.auth.feature.UserFeatureProvider;
 import com.dusk.module.auth.manage.IUserManage;
 import com.dusk.module.auth.push.INotificationPushManager;
+import org.apache.dubbo.config.annotation.Reference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -131,8 +133,9 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     //private IUserFaceRpcService userFaceRpcService;
     @Autowired
     private IStationService stationService;
-    @Autowired
-    private ISettingChecker settingChecker;
+    
+    @Reference
+    private ISettingRpcService settingRpcService;
 
     @Autowired
     private IUserWxRelationRepository userWxRelationRepository;
@@ -1239,7 +1242,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
             // 校验手机号码格式
             checkMobilePhone(phoneNo);
         } else {
-            String value = settingChecker.getValue(PERSONNEL_CONTROL_CONFIRM_PHONE);
+            String value = settingRpcService.getValue(PERSONNEL_CONTROL_CONFIRM_PHONE);
             if (EUnitType.External.equals(type) && Boolean.TRUE.toString().equals(value)) {
                 throw new BusinessException("手机号码不能为空");
             }
@@ -1254,7 +1257,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
             // 校验身份证号码格式
             checkIdCard(idCard);
         } else {
-            String value = settingChecker.getValue(PERSONNEL_CONTROL_CONFIRM_ID_CARD);
+            String value = settingRpcService.getValue(PERSONNEL_CONTROL_CONFIRM_ID_CARD);
             if (EUnitType.External.equals(type) && Boolean.TRUE.toString().equals(value)) {
                 throw new BusinessException("身份证号码不能为空");
             }

@@ -1,9 +1,9 @@
 package com.dusk.module.auth.service;
 
 
-import com.dusk.commom.rpc.auth.dto.ChangePwdInput;
-import com.dusk.commom.rpc.auth.dto.CreateOrUpdateUserInput;
-import com.dusk.commom.rpc.auth.dto.UserFullListDto;
+import com.dusk.common.rpc.auth.dto.ChangePwdInput;
+import com.dusk.common.rpc.auth.dto.CreateOrUpdateUserInput;
+import com.dusk.common.rpc.auth.dto.UserFullListDto;
 import com.dusk.module.auth.dto.user.*;
 import com.dusk.common.core.dto.EntityDto;
 import com.dusk.common.core.dto.PagedResultDto;

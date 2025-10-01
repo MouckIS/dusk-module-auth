@@ -1,6 +1,6 @@
 package com.dusk.module.auth.controller;
 
-import com.dusk.commom.rpc.auth.dto.RoleSimpleDto;
+import com.dusk.common.rpc.auth.dto.RoleSimpleDto;
 import com.dusk.module.auth.dto.dashboard.*;
 import com.dusk.module.auth.entity.dashboard.DashboardClassify;
 import com.dusk.module.auth.entity.dashboard.DashboardTheme;
@@ -10,8 +10,6 @@ import com.dusk.common.core.annotation.Authorize;
 import com.dusk.common.core.controller.CruxBaseController;
 import com.dusk.common.core.dto.PagedResultDto;
 import com.dusk.module.auth.authorization.DashBoardAuthProvider;
-import com.dusk.module.auth.dto.dashboard.*;
-import com.dusk.module.auth.entity.dashboard.*;
 import com.dusk.module.auth.service.IDashBoardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;

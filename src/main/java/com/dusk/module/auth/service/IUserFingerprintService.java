@@ -1,7 +1,7 @@
 package com.dusk.module.auth.service;
 
-import com.dusk.commom.rpc.auth.dto.fingerprint.GetAllInputDto;
-import com.dusk.commom.rpc.auth.dto.fingerprint.UserFingerprintDto;
+import com.dusk.common.rpc.auth.dto.fingerprint.GetAllInputDto;
+import com.dusk.common.rpc.auth.dto.fingerprint.UserFingerprintDto;
 import com.dusk.common.core.service.IBaseService;
 import com.dusk.module.auth.dto.fingerprint.IdentifyInputDto;
 import com.dusk.module.auth.dto.fingerprint.RegisterFingerprintInputDto;

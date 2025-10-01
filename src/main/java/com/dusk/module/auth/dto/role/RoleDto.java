@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.role;
 
-import com.dusk.commom.rpc.auth.dto.role.RolePermissionDto;
+import com.dusk.common.rpc.auth.dto.role.RolePermissionDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.dozermapper.core.Mapping;
 import io.swagger.annotations.ApiModel;

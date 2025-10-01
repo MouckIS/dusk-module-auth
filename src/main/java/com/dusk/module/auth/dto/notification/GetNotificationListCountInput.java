@@ -1,10 +1,8 @@
 package com.dusk.module.auth.dto.notification;
 
-import com.dusk.commom.rpc.auth.enums.NotificationType;
+import com.dusk.common.rpc.auth.enums.NotificationType;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * 获取用户的消息数量的输入Dto

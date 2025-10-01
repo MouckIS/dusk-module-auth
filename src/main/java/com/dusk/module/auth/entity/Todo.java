@@ -1,6 +1,6 @@
 package com.dusk.module.auth.entity;
 
-import com.dusk.commom.rpc.auth.enums.ToDoTargetType;
+import com.dusk.common.rpc.auth.enums.ToDoTargetType;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
