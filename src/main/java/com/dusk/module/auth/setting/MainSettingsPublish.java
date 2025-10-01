@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Primary
 public class MainSettingsPublish implements ISettingsPublish {
-    @Autowired
+    @Autowired(required = false)
     private ISettingDefinitionManager settingDefinitionManager;
     @Autowired
     private ISettingsCache settingsCache;

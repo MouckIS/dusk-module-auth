@@ -9,7 +9,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootApplication(scanBasePackages = {
         "com.dusk.module.auth",
-        "com.dusk.common",
+        "com.dusk.common.core",
+        "com.dusk.common.rpc"
 })
 @EnableAsync
 public class DuskAuthApplication {
