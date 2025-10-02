@@ -3,17 +3,17 @@ package com.dusk.module.auth.dto.orga;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
-import com.dusk.common.framework.dto.PagedAndSortedInputDto;
-import com.dusk.common.framework.entity.BaseEntity;
-import com.dusk.common.framework.entity.TreeEntity;
-import com.dusk.common.module.auth.dto.orga.OrganizationUnitUserListDto;
+import com.dusk.common.core.dto.PagedAndSortedInputDto;
+import com.dusk.common.core.entity.BaseEntity;
+import com.dusk.common.core.entity.TreeEntity;
+import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitUserListDto;
 import org.springframework.data.domain.Sort;
 
 /**
  * 获取组织机构下拉用户列表的输入Dto
  *
- * @Author kefuming
- * @Date 2020/10/16 16:32
+ * @author kefuming
+ * @date 2020/10/16 16:32
  */
 @Data
 public class GetOrganizationUnitUsersForSelectInput extends PagedAndSortedInputDto {

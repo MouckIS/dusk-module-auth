@@ -1,9 +1,9 @@
 package com.dusk.module.auth.service.impl;
 
 import cn.hutool.core.util.StrUtil;
-import com.dusk.common.framework.jpa.Specifications;
-import com.dusk.common.framework.service.impl.BaseService;
-import com.dusk.common.framework.utils.UtBeanUtils;
+import com.dusk.common.core.jpa.Specifications;
+import com.dusk.common.core.service.impl.BaseService;
+import com.dusk.common.core.utils.UtBeanUtils;
 import com.dusk.module.auth.cache.IUserWxRelationCacheService;
 import com.dusk.module.auth.entity.UserWxRelation;
 import com.dusk.module.auth.repository.IUserWxRelationRepository;

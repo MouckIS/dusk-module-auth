@@ -2,9 +2,9 @@ package com.dusk.module.auth.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import com.dusk.common.framework.controller.CruxBaseController;
-import com.dusk.common.framework.exception.BusinessException;
-import com.dusk.common.framework.utils.SecurityUtils;
+import com.dusk.common.core.controller.CruxBaseController;
+import com.dusk.common.core.exception.BusinessException;
+import com.dusk.common.core.utils.SecurityUtils;
 import com.dusk.module.auth.service.IStationMigrationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;

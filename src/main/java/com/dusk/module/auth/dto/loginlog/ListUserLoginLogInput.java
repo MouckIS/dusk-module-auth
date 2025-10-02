@@ -4,7 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.common.framework.dto.PagedAndSortedInputDto;
+import com.dusk.common.core.dto.PagedAndSortedInputDto;
 import com.dusk.module.auth.entity.UserLoginLog;
 import com.dusk.module.auth.enums.LoginLogType;
 import org.springframework.data.domain.Sort;

@@ -2,7 +2,7 @@ package com.dusk.module.auth.dto.station;
 
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.common.framework.dto.TreeCreateOrUpdateInputDto;
+import com.dusk.common.core.dto.TreeCreateOrUpdateInputDto;
 
 /**
  * @author kefuming

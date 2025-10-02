@@ -6,8 +6,8 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * @Author zhuokangjun
- * @Date 2023/11/09 15:16
+ * @author zhuokangjun
+ * @date 2023/11/09 15:16
  */
 @Data
 public class WxCpTextMessage implements Serializable {

@@ -1,6 +1,6 @@
 package com.dusk.module.auth.repository.dashboard;
 
-import com.dusk.common.framework.repository.IBaseRepository;
+import com.dusk.common.core.repository.IBaseRepository;
 import com.dusk.module.auth.entity.dashboard.DashboardModuleItem;
 
 import java.util.List;

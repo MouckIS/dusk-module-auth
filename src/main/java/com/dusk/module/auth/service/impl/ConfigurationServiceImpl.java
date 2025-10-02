@@ -1,18 +1,19 @@
 package com.dusk.module.auth.service.impl;
 
+import com.dusk.common.core.service.impl.CruxBaseServiceImpl;
 import com.dusk.module.auth.dto.configuration.*;
+import com.dusk.module.auth.dto.feature.FeatureConfigDto;
 import com.dusk.module.auth.service.*;
+import com.dusk.module.ddm.dto.DynamicMenuDto;
+import com.dusk.module.ddm.service.IDynamicMenuRpcService;
 import com.github.dozermapper.core.Mapper;
 import lombok.extern.slf4j.Slf4j;
-import com.dusk.common.framework.dto.EntityDto;
-import com.dusk.common.framework.model.UserContext;
-import com.dusk.common.framework.service.CruxBaseServiceImpl;
-import com.dusk.common.framework.tenant.TenantContextHolder;
+import com.dusk.common.core.dto.EntityDto;
+import com.dusk.common.core.model.UserContext;
+import com.dusk.common.core.tenant.TenantContextHolder;
 import com.dusk.module.auth.common.config.AppAuthConfig;
 import com.dusk.module.auth.common.manage.TokenAuthManager;
 import com.dusk.module.auth.common.permission.IAuthPermissionManager;
-import com.dusk.module.auth.dto.configuration.*;
-import com.dusk.module.auth.dto.feature.FeatureConfigDto;
 import com.dusk.module.auth.dto.user.GetUserForEditOutput;
 import com.dusk.module.auth.dto.user.UserRoleDto;
 import com.dusk.module.auth.entity.GrantPermission;
@@ -21,7 +22,7 @@ import com.dusk.module.auth.entity.User;
 import com.dusk.module.auth.repository.IGrantPermissionRepository;
 import com.dusk.module.auth.repository.ITenantRepository;
 import com.dusk.module.auth.repository.IUserRepository;
-import com.dusk.module.auth.service.*;
+import org.apache.dubbo.config.annotation.Reference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -60,8 +61,8 @@ public class ConfigurationServiceImpl extends CruxBaseServiceImpl implements ICo
     private IUserService userService;
     @Autowired
     private TokenAuthManager tokenAuthManager;
-    @Autowired
-    IDynamicMenuService dynamicMenuService;
+    @Reference
+    private IDynamicMenuRpcService dynamicMenuRpcService;
 
     /**
      * 注意这个接口允许匿名访问 所以存在没有登陆人信息的情况
@@ -98,7 +99,7 @@ public class ConfigurationServiceImpl extends CruxBaseServiceImpl implements ICo
         if (userInfo != null) {
             List<Long> roleIds = userInfo.getRoles().stream().filter(UserRoleDto::isAssigned).map(UserRoleDto::getRoleId).collect(Collectors.toList());
             if (!roleIds.isEmpty()) {
-                return dynamicMenuService.getDynamicMenus(roleIds);
+                return dynamicMenuRpcService.getDynamicMenus(roleIds);
             }
         }
         return null;

@@ -1,7 +1,7 @@
 package com.dusk.module.auth.dto.edition;
 
 import lombok.Data;
-import com.dusk.common.framework.dto.NameValueDto;
+import com.dusk.common.core.dto.NameValueDto;
 
 import java.util.ArrayList;
 import java.util.List;

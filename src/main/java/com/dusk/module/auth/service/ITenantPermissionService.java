@@ -1,7 +1,7 @@
 package com.dusk.module.auth.service;
 
-import com.dusk.common.framework.service.IBaseService;
-import com.dusk.common.module.auth.dto.role.RolePermissionDto;
+import com.dusk.common.rpc.auth.dto.role.RolePermissionDto;
+import com.dusk.common.core.service.IBaseService;
 import com.dusk.module.auth.dto.permission.EditionPermissionInputDto;
 import com.dusk.module.auth.entity.TenantPermission;
 import com.dusk.module.auth.repository.ITenantPermissionRepository;

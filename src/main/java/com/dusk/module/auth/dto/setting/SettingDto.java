@@ -1,9 +1,9 @@
 package com.dusk.module.auth.dto.setting;
 
+import com.dusk.module.ddm.dto.ui.InputType;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.common.framework.feature.ui.InputType;
 
 /**
  * @author kefuming
@@ -17,21 +17,12 @@ public class SettingDto {
 
     private String parentName;
 
-    /**
-     * 显示的名称
-     */
     @ApiModelProperty("显示的名称")
     private String displayName;
 
-    /**
-     * 描述
-     */
     @ApiModelProperty("描述")
     private String description;
 
-    /**
-     * 默认值
-     */
     @ApiModelProperty("默认值")
     private String defaultValue;
 

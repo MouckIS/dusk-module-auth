@@ -4,8 +4,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
-import com.dusk.common.framework.dto.PagedAndSortedInputDto;
-import com.dusk.common.framework.entity.BaseEntity;
+import com.dusk.common.core.dto.PagedAndSortedInputDto;
+import com.dusk.common.core.entity.BaseEntity;
 import org.springframework.data.domain.Sort;
 
 import javax.validation.constraints.NotNull;

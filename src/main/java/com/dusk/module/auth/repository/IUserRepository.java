@@ -1,7 +1,7 @@
 package com.dusk.module.auth.repository;
 
-import com.dusk.common.framework.repository.IBaseRepository;
-import com.dusk.common.module.auth.enums.EUnitType;
+import com.dusk.common.core.repository.IBaseRepository;
+import com.dusk.common.core.enums.EUnitType;
 import com.dusk.module.auth.dto.user.UserIdAndPermissionDto;
 import com.dusk.module.auth.entity.User;
 import org.springframework.data.domain.Sort;

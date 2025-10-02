@@ -1,5 +1,6 @@
 package com.dusk.module.auth.service.impl;
 
+import com.dusk.common.rpc.auth.service.ICommonFavoriteRpcService;
 import com.github.dozermapper.core.Mapper;
 import com.querydsl.core.types.QBean;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -7,15 +8,14 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.Service;
-import com.dusk.common.framework.auth.authentication.LoginUserIdContextHolder;
-import com.dusk.common.framework.dto.CommonFavoriteDto;
-import com.dusk.common.framework.dto.PagedAndSortedInputDto;
-import com.dusk.common.framework.dto.PagedResultDto;
-import com.dusk.common.framework.exception.BusinessException;
-import com.dusk.common.framework.jpa.Sequence;
-import com.dusk.common.framework.jpa.querydsl.QBeanBuilder;
-import com.dusk.common.framework.service.impl.BaseService;
-import com.dusk.common.module.auth.service.ICommonFavoriteRpcService;
+import com.dusk.common.core.auth.authentication.LoginUserIdContextHolder;
+import com.dusk.common.core.dto.CommonFavoriteDto;
+import com.dusk.common.core.dto.PagedAndSortedInputDto;
+import com.dusk.common.core.dto.PagedResultDto;
+import com.dusk.common.core.exception.BusinessException;
+import com.dusk.common.core.jpa.Sequence;
+import com.dusk.common.core.jpa.querydsl.QBeanBuilder;
+import com.dusk.common.core.service.impl.BaseService;
 import com.dusk.module.auth.entity.CommonFavorite;
 import com.dusk.module.auth.entity.QCommonFavorite;
 import com.dusk.module.auth.repository.ICommonFavoriteRepository;
@@ -28,8 +28,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * @Author chenzhi1
- * @Date 2021/5/25 11:30
+ * @author chenzhi1
+ * @date 2021/5/25 11:30
  */
 @Service
 @Transactional

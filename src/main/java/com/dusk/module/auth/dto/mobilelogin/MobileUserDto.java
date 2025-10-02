@@ -5,7 +5,7 @@ import com.github.dozermapper.core.Mapping;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.FieldNameConstants;
-import com.dusk.common.framework.dto.EntityDto;
+import com.dusk.common.core.dto.EntityDto;
 
 /**
  * @author pengmengjiang

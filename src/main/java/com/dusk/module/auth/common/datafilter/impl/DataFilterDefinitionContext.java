@@ -1,7 +1,7 @@
 package com.dusk.module.auth.common.datafilter.impl;
 
-import com.dusk.common.framework.constant.EntityConstant;
-import com.dusk.common.framework.utils.SpringContextUtils;
+import com.dusk.common.core.constant.EntityConstant;
+import com.dusk.common.core.utils.SpringContextUtils;
 import com.dusk.module.auth.common.datafilter.IDataFilterDefinitionContext;
 import com.dusk.module.auth.entity.Station;
 import com.dusk.module.auth.repository.IStationRepository;

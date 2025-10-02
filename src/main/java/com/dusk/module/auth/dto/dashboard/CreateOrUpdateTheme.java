@@ -2,7 +2,7 @@ package com.dusk.module.auth.dto.dashboard;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import com.dusk.common.framework.dto.EntityDto;
+import com.dusk.common.core.dto.EntityDto;
 
 import javax.validation.constraints.NotBlank;
 

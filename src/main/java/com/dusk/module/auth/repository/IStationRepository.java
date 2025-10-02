@@ -1,12 +1,12 @@
 package com.dusk.module.auth.repository;
 
-import com.dusk.common.framework.annotation.DisableGlobalFilter;
-import com.dusk.common.framework.repository.IBaseRepository;
-import com.dusk.common.module.auth.enums.EUnitType;
-import com.dusk.module.auth.dto.station.StationUserDto;
-import com.dusk.module.auth.dto.station.StationUserListDto;
+import com.dusk.common.core.annotation.DisableGlobalFilter;
+import com.dusk.common.core.enums.EUnitType;
+import com.dusk.common.core.repository.IBaseRepository;
 import com.dusk.module.auth.entity.Station;
 import com.dusk.module.auth.entity.User;
+import com.dusk.module.auth.dto.station.StationUserDto;
+import com.dusk.module.auth.dto.station.StationUserListDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;

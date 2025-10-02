@@ -1,16 +1,16 @@
 package com.dusk.module.auth.service;
 
 
+import com.dusk.common.rpc.auth.dto.ChangePwdInput;
+import com.dusk.common.rpc.auth.dto.CreateOrUpdateUserInput;
+import com.dusk.common.rpc.auth.dto.UserFullListDto;
 import com.dusk.module.auth.dto.user.*;
-import com.dusk.common.framework.dto.EntityDto;
-import com.dusk.common.framework.dto.PagedResultDto;
-import com.dusk.common.framework.model.UserContext;
-import com.dusk.common.module.auth.dto.ChangePwdInput;
-import com.dusk.common.module.auth.dto.CreateOrUpdateUserInput;
-import com.dusk.common.module.auth.dto.UserFullListDto;
-import com.dusk.module.auth.dto.user.*;
+import com.dusk.common.core.dto.EntityDto;
+import com.dusk.common.core.dto.PagedResultDto;
+import com.dusk.common.core.model.UserContext;
 import com.dusk.module.auth.entity.Role;
 import com.dusk.module.auth.entity.User;
+import com.dusk.module.auth.dto.user.GetUsersInput;
 import org.springframework.data.domain.Page;
 
 import javax.servlet.http.HttpServletResponse;

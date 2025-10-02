@@ -1,13 +1,13 @@
 package com.dusk.module.auth.service.impl;
 
+import com.dusk.common.rpc.auth.dto.role.RolePermissionDto;
 import com.github.dozermapper.core.Mapper;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
-import com.dusk.common.framework.auth.permission.Permission;
-import com.dusk.common.framework.exception.BusinessException;
-import com.dusk.common.framework.service.impl.BaseService;
-import com.dusk.common.module.auth.dto.role.RolePermissionDto;
+import com.dusk.common.core.auth.permission.Permission;
+import com.dusk.common.core.exception.BusinessException;
+import com.dusk.common.core.service.impl.BaseService;
 import com.dusk.module.auth.common.config.AppAuthConfig;
 import com.dusk.module.auth.common.permission.IAuthPermissionManager;
 import com.dusk.module.auth.dto.permission.EditionPermissionInputDto;

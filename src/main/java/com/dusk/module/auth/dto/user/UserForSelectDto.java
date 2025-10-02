@@ -3,8 +3,8 @@ package com.dusk.module.auth.dto.user;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.common.framework.dto.EntityDto;
-import com.dusk.common.module.auth.enums.EUnitType;
+import com.dusk.common.core.dto.EntityDto;
+import com.dusk.common.core.enums.EUnitType;
 
 import java.util.List;
 

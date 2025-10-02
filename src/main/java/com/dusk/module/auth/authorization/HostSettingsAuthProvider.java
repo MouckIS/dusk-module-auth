@@ -1,9 +1,9 @@
 package com.dusk.module.auth.authorization;
 
-import com.dusk.common.framework.auth.permission.AuthorizationProvider;
-import com.dusk.common.framework.auth.permission.IPermissionDefinitionContext;
-import com.dusk.common.framework.auth.permission.MultiTenancySides;
-import com.dusk.common.framework.auth.permission.Permission;
+import com.dusk.common.core.auth.permission.AuthorizationProvider;
+import com.dusk.common.core.auth.permission.IPermissionDefinitionContext;
+import com.dusk.common.core.auth.permission.MultiTenancySides;
+import com.dusk.common.core.auth.permission.Permission;
 import com.dusk.module.auth.setting.config.MultiTenancyConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

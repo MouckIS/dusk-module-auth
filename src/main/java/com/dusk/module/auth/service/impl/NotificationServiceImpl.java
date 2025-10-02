@@ -3,6 +3,9 @@ package com.dusk.module.auth.service.impl;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.dusk.common.rpc.auth.dto.notification.CreateNotificationInput;
+import com.dusk.common.rpc.auth.service.INotificationRpcService;
+import com.dusk.common.mqs.utils.MqttUtils;
 import com.dusk.module.auth.dto.notification.*;
 import com.github.dozermapper.core.Mapper;
 import com.querydsl.core.QueryResults;
@@ -10,20 +13,16 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.Service;
-import com.dusk.common.framework.dto.EntityDto;
-import com.dusk.common.framework.dto.PagedResultDto;
-import com.dusk.common.framework.entity.BaseEntity;
-import com.dusk.common.framework.exception.BusinessException;
-import com.dusk.common.framework.jpa.Specifications;
-import com.dusk.common.framework.jpa.querydsl.QBeanBuilder;
-import com.dusk.common.framework.model.UserContext;
-import com.dusk.common.framework.service.impl.BaseService;
-import com.dusk.common.framework.utils.DozerUtils;
-import com.dusk.common.framework.utils.MqttUtils;
-import com.dusk.common.framework.utils.SecurityUtils;
-import com.dusk.common.module.auth.dto.notification.CreateNotificationInput;
-import com.dusk.common.module.auth.service.INotificationRpcService;
-import com.dusk.module.auth.dto.notification.*;
+import com.dusk.common.core.dto.EntityDto;
+import com.dusk.common.core.dto.PagedResultDto;
+import com.dusk.common.core.entity.BaseEntity;
+import com.dusk.common.core.exception.BusinessException;
+import com.dusk.common.core.jpa.Specifications;
+import com.dusk.common.core.jpa.querydsl.QBeanBuilder;
+import com.dusk.common.core.model.UserContext;
+import com.dusk.common.core.service.impl.BaseService;
+import com.dusk.common.core.utils.DozerUtils;
+import com.dusk.common.core.utils.SecurityUtils;
 import com.dusk.module.auth.entity.Notification;
 import com.dusk.module.auth.entity.QNotification;
 import com.dusk.module.auth.entity.QUserNotification;
@@ -49,9 +48,7 @@ import java.util.List;
 @Slf4j
 @Service
 @Transactional
-public class NotificationServiceImpl
-        extends BaseService<UserNotification, IUserNotificationRepository>
-        implements INotificationRpcService, INotificationService {
+public class NotificationServiceImpl extends BaseService<UserNotification, IUserNotificationRepository> implements INotificationRpcService, INotificationService {
 
 
     private final Mapper mapper;

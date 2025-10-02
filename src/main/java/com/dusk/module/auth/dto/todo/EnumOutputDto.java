@@ -2,8 +2,8 @@ package com.dusk.module.auth.dto.todo;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
-import com.dusk.common.framework.dto.SelectListOutputDto;
-import com.dusk.common.framework.utils.EnumUtils;
+import com.dusk.common.core.dto.SelectListOutputDto;
+import com.dusk.common.core.utils.EnumUtils;
 import com.dusk.module.auth.enums.ToDoMQTTTypeEnum;
 
 import java.util.List;

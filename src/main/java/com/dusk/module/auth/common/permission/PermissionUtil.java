@@ -2,8 +2,8 @@ package com.dusk.module.auth.common.permission;
 
 import com.github.dozermapper.core.Mapper;
 import lombok.experimental.UtilityClass;
-import com.dusk.common.framework.auth.permission.RoleInfo;
-import com.dusk.common.framework.auth.permission.UrlPermission;
+import com.dusk.common.core.auth.permission.RoleInfo;
+import com.dusk.common.core.auth.permission.UrlPermission;
 
 import java.util.ArrayList;
 import java.util.List;

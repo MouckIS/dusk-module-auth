@@ -1,10 +1,10 @@
 package com.dusk.module.auth.setting;
 
-import com.dusk.common.framework.lock.annotation.Lock4j;
-import com.dusk.common.framework.redis.RedisCacheCondition;
-import com.dusk.common.framework.redis.RedisUtil;
-import com.dusk.common.framework.setting.SettingDefinition;
-import com.dusk.common.framework.setting.SettingScopes;
+import com.dusk.common.core.lock.annotation.Lock4j;
+import com.dusk.common.core.redis.RedisCacheCondition;
+import com.dusk.common.core.redis.RedisUtil;
+import com.dusk.module.ddm.dto.SettingDefinition;
+import com.dusk.module.ddm.enums.SettingScopes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Primary;

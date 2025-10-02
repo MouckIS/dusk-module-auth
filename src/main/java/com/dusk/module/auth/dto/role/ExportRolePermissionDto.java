@@ -1,10 +1,10 @@
 package com.dusk.module.auth.dto.role;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.dusk.common.rpc.auth.dto.role.RolePermissionDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.dozermapper.core.Mapping;
 import lombok.Data;
-import com.dusk.common.module.auth.dto.role.RolePermissionDto;
 
 import java.util.ArrayList;
 import java.util.List;

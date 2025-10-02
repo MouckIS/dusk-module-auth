@@ -2,9 +2,9 @@ package com.dusk.module.auth.service.impl;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
-import com.dusk.common.framework.annotation.DisableTenantFilter;
-import com.dusk.common.framework.auth.permission.RoleInfo;
-import com.dusk.common.framework.service.impl.BaseService;
+import com.dusk.common.core.annotation.DisableTenantFilter;
+import com.dusk.common.core.auth.permission.RoleInfo;
+import com.dusk.common.core.service.impl.BaseService;
 import com.dusk.module.auth.common.permission.IAuthPermissionManager;
 import com.dusk.module.auth.entity.GrantPermission;
 import com.dusk.module.auth.entity.QGrantPermission;

@@ -2,7 +2,7 @@ package com.dusk.module.auth.service;
 
 
 import org.apache.poi.ss.usermodel.Workbook;
-import com.dusk.common.framework.service.IBaseService;
+import com.dusk.common.core.service.IBaseService;
 import com.dusk.module.auth.dto.edition.EditionEditDto;
 import com.dusk.module.auth.dto.edition.GetEditionInput;
 import com.dusk.module.auth.entity.SubscribableEdition;

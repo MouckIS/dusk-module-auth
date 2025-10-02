@@ -1,11 +1,11 @@
 package com.dusk.module.auth.controller;
 
+import com.dusk.common.rpc.auth.dto.fingerprint.GetAllInputDto;
+import com.dusk.common.rpc.auth.dto.fingerprint.UserFingerprintDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import com.dusk.common.framework.annotation.Authorize;
-import com.dusk.common.framework.controller.CruxBaseController;
-import com.dusk.common.module.auth.dto.fingerprint.GetAllInputDto;
-import com.dusk.common.module.auth.dto.fingerprint.UserFingerprintDto;
+import com.dusk.common.core.annotation.Authorize;
+import com.dusk.common.core.controller.CruxBaseController;
 import com.dusk.module.auth.authorization.UserFingerprintAuthProvider;
 import com.dusk.module.auth.dto.fingerprint.IdentifyInputDto;
 import com.dusk.module.auth.dto.fingerprint.RegisterFingerprintInputDto;

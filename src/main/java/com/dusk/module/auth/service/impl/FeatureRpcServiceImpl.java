@@ -1,10 +1,10 @@
 package com.dusk.module.auth.service.impl;
 
-import org.apache.dubbo.config.annotation.Service;
-import com.dusk.common.framework.feature.ui.TenantFeature;
-import com.dusk.common.module.auth.service.IFeatureRpcService;
-import com.dusk.module.auth.common.feature.IFeatureCache;
+import com.dusk.module.auth.cache.IFeatureCache;
+import com.dusk.module.auth.dto.TenantFeature;
+import com.dusk.module.auth.service.IFeatureRpcService;
 import com.dusk.module.auth.service.IFeatureService;
+import org.apache.dubbo.config.annotation.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;

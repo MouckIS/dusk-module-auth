@@ -1,10 +1,10 @@
 package com.dusk.module.auth.setting.provider;
 
-import com.dusk.common.framework.feature.ui.CheckBox;
-import com.dusk.common.framework.feature.ui.SingerLineString;
-import com.dusk.common.framework.setting.SettingDefinition;
-import com.dusk.common.framework.setting.SettingProvider;
-import com.dusk.common.framework.setting.SettingScopes;
+import com.dusk.module.ddm.dto.SettingDefinition;
+import com.dusk.module.ddm.dto.ui.CheckBox;
+import com.dusk.module.ddm.dto.ui.SingerLineString;
+import com.dusk.module.ddm.enums.SettingScopes;
+import com.dusk.module.ddm.provider.SettingProvider;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

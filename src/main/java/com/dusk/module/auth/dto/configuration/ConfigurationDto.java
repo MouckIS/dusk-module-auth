@@ -1,7 +1,8 @@
 package com.dusk.module.auth.dto.configuration;
 
+import com.dusk.module.ddm.dto.DynamicMenuDto;
 import lombok.Data;
-import com.dusk.common.framework.model.UserContext;
+import com.dusk.common.core.model.UserContext;
 import com.dusk.module.auth.dto.feature.FeatureConfigDto;
 import com.dusk.module.auth.dto.user.GetUserForEditOutput;
 

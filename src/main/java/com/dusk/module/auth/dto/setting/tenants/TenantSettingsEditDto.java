@@ -2,8 +2,8 @@ package com.dusk.module.auth.dto.setting.tenants;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import com.dusk.common.framework.exception.BusinessException;
-import com.dusk.common.framework.timing.Clock;
+import com.dusk.common.core.exception.BusinessException;
+import com.dusk.common.core.timing.Clock;
 import com.dusk.module.auth.dto.setting.host.EmailSettingsEditDto;
 import com.dusk.module.auth.dto.setting.host.GeneralSettingsEditDto;
 import com.dusk.module.auth.dto.setting.host.SecuritySettingsEditDto;

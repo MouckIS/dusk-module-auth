@@ -2,8 +2,8 @@ package com.dusk.module.auth.entity;
 
 import lombok.Data;
 import lombok.experimental.FieldNameConstants;
-import com.dusk.common.framework.annotation.DataPermission;
-import com.dusk.common.framework.entity.FullAuditedEntity;
+import com.dusk.common.core.annotation.DataPermission;
+import com.dusk.common.core.entity.FullAuditedEntity;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -11,8 +11,8 @@ import javax.persistence.Table;
 /**
  * 公用收藏夹
  *
- * @Author chenzhi1
- * @Date 2021/5/24 17:07
+ * @author chenzhi1
+ * @date 2021/5/24 17:07
  */
 @Entity
 @Table(name = "common_favorite")

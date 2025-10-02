@@ -1,6 +1,6 @@
 package com.dusk.module.auth.service;
 
-import com.dusk.common.framework.service.IBaseService;
+import com.dusk.common.core.service.IBaseService;
 import com.dusk.module.auth.dto.auditlog.AuditLogDetailDto;
 import com.dusk.module.auth.dto.auditlog.AuditLogListDto;
 import com.dusk.module.auth.dto.auditlog.ExportAuditLogsInput;

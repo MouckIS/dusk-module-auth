@@ -1,16 +1,14 @@
 package com.dusk.module.auth.dto.notification;
 
+import com.dusk.common.rpc.auth.enums.NotificationType;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import com.dusk.common.module.auth.enums.NotificationType;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * 获取用户的消息数量的输入Dto
  *
- * @Author kefuming
- * @Date 2021/1/5 11:04
+ * @author kefuming
+ * @date 2021/1/5 11:04
  */
 @Data
 public class GetNotificationListCountInput {

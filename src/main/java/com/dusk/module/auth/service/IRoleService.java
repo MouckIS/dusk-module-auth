@@ -1,15 +1,15 @@
 package com.dusk.module.auth.service;
 
 
-import com.dusk.common.framework.dto.EntityDto;
-import com.dusk.common.framework.service.IBaseService;
-import com.dusk.common.module.auth.service.IRoleRpcService;
+import com.dusk.common.rpc.auth.dto.BindRoleToUserInput;
+import com.dusk.common.rpc.auth.service.IRoleRpcService;
+import com.dusk.common.core.dto.EntityDto;
+import com.dusk.common.core.service.IBaseService;
 import com.dusk.module.auth.dto.orga.BindRoleToOrgInput;
 import com.dusk.module.auth.dto.role.GetRolesInput;
 import com.dusk.module.auth.dto.role.RoleCreateOrEditDto;
 import com.dusk.module.auth.dto.role.RoleDto;
 import com.dusk.module.auth.dto.role.UpdateRolePermissionDto;
-import com.dusk.module.auth.dto.user.BindRoleToUserInput;
 import com.dusk.module.auth.dto.user.GetUserByRoleDto;
 import com.dusk.module.auth.dto.user.UnbindRoleForUserDto;
 import com.dusk.module.auth.entity.Role;

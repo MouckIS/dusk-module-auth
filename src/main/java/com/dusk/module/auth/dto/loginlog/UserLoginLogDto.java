@@ -3,9 +3,9 @@ package com.dusk.module.auth.dto.loginlog;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.common.framework.dto.EntityDto;
-import com.dusk.common.framework.entity.BaseEntity;
-import com.dusk.common.framework.jpa.querydsl.QBeanMapper;
+import com.dusk.common.core.dto.EntityDto;
+import com.dusk.common.core.entity.BaseEntity;
+import com.dusk.common.core.jpa.querydsl.QBeanMapper;
 import com.dusk.module.auth.entity.QUser;
 import com.dusk.module.auth.enums.LoginLogType;
 

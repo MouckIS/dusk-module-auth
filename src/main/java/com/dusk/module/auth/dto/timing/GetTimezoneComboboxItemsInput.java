@@ -1,7 +1,7 @@
 package com.dusk.module.auth.dto.timing;
 
+import com.dusk.module.ddm.enums.SettingScopes;
 import lombok.Data;
-import com.dusk.common.framework.setting.SettingScopes;
 
 /**
  * @author kefuming

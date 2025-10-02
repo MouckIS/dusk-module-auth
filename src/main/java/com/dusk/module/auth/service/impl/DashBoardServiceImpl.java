@@ -1,6 +1,11 @@
 package com.dusk.module.auth.service.impl;
 
-import com.dusk.module.auth.dto.dashboard.*;
+import com.dusk.common.rpc.auth.dto.RoleSimpleDto;
+import com.dusk.common.rpc.auth.dto.UserFullListDto;
+import com.dusk.common.rpc.auth.dto.UserRoleDto;
+import com.dusk.common.rpc.auth.dto.role.RoleListDto;
+import com.dusk.common.rpc.auth.service.IRoleRpcService;
+import com.dusk.common.rpc.auth.service.IUserRpcService;
 import com.dusk.module.auth.entity.dashboard.*;
 import com.dusk.module.auth.repository.dashboard.*;
 import com.querydsl.core.types.QBean;
@@ -8,29 +13,18 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.Reference;
-import com.dusk.common.framework.dto.PagedResultDto;
-import com.dusk.common.framework.exception.BusinessException;
-import com.dusk.common.framework.jpa.querydsl.QBeanBuilder;
-import com.dusk.common.framework.utils.DozerUtils;
-import com.dusk.common.module.auth.dto.RoleSimpleDto;
-import com.dusk.common.module.auth.dto.UserFullListDto;
-import com.dusk.common.module.auth.dto.UserRoleDto;
-import com.dusk.common.module.auth.dto.role.RoleListDto;
-import com.dusk.common.module.auth.service.IRoleRpcService;
-import com.dusk.common.module.auth.service.IUserRpcService;
+import com.dusk.common.core.dto.PagedResultDto;
+import com.dusk.common.core.exception.BusinessException;
+import com.dusk.common.core.jpa.querydsl.QBeanBuilder;
+import com.dusk.common.core.utils.DozerUtils;
 import com.dusk.module.auth.dto.dashboard.*;
-import com.dusk.module.auth.entity.dashboard.*;
-import com.dusk.module.auth.repository.dashboard.*;
 import com.dusk.module.auth.service.IDashBoardModuleService;
 import com.dusk.module.auth.service.IDashBoardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -291,7 +285,7 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
         if(permissions.isEmpty()) {
             return new ArrayList<>();
         }
-        List<Long> roleIds = permissions.stream().filter((p)->p.getRoleId()!= null).map((p)->p.getRoleId()).collect(Collectors.toList());
+        List<Long> roleIds = permissions.stream().map(DashboardPermission::getRoleId).filter(Objects::nonNull).collect(Collectors.toList());
         if(roleIds.isEmpty()) {
             return new ArrayList<>();
         }
@@ -310,7 +304,7 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
         if(user == null) {
             throw new BusinessException("id为["+userId+"]的用户不存在！");
         }
-        if(user.getUserRoles() == null || user.getUserRoles().size() == 0) {
+        if(user.getUserRoles() == null || user.getUserRoles().isEmpty()) {
             return new UserMainDashBoardDto(null, false);
         }
         List<Long> roleIds = user.getUserRoles().stream().map(UserRoleDto::getId).collect(Collectors.toList());

@@ -1,7 +1,7 @@
 package com.dusk.module.auth.service;
 
-import com.dusk.common.framework.service.IBaseService;
-import com.dusk.common.module.auth.dto.ToDoDto;
+import com.dusk.common.rpc.auth.dto.ToDoDto;
+import com.dusk.common.core.service.IBaseService;
 import com.dusk.module.auth.dto.todo.GetTodosInput;
 import com.dusk.module.auth.dto.todo.TodoInfoDto;
 import com.dusk.module.auth.entity.Todo;

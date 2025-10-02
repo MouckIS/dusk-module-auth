@@ -1,11 +1,11 @@
 package com.dusk.module.auth.controller;
 
+import com.dusk.common.rpc.auth.dto.role.RolePermissionDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import com.dusk.common.framework.annotation.Authorize;
-import com.dusk.common.framework.controller.CruxBaseController;
-import com.dusk.common.framework.dto.EntityDto;
-import com.dusk.common.module.auth.dto.role.RolePermissionDto;
+import com.dusk.common.core.annotation.Authorize;
+import com.dusk.common.core.controller.CruxBaseController;
+import com.dusk.common.core.dto.EntityDto;
 import com.dusk.module.auth.authorization.EditionAuthProvider;
 import com.dusk.module.auth.dto.permission.EditionPermissionInputDto;
 import com.dusk.module.auth.service.ITenantPermissionService;

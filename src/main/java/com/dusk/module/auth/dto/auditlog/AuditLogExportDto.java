@@ -4,7 +4,7 @@ import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.common.framework.jpa.querydsl.QBeanMapper;
+import com.dusk.common.core.jpa.querydsl.QBeanMapper;
 import com.dusk.module.auth.entity.AuditLog;
 import com.dusk.module.auth.entity.QAuditLog;
 import com.dusk.module.auth.entity.QUser;

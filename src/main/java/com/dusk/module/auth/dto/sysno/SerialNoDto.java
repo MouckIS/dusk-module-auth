@@ -1,10 +1,10 @@
 package com.dusk.module.auth.dto.sysno;
 
+import com.dusk.common.rpc.auth.enums.EnumResetType;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.common.framework.dto.EntityDto;
-import com.dusk.common.module.auth.enums.EnumResetType;
+import com.dusk.common.core.dto.EntityDto;
 
 import java.time.LocalDateTime;
 

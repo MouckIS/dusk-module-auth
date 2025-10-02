@@ -1,6 +1,11 @@
 package com.dusk.module.auth.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.dusk.common.rpc.auth.dto.*;
+import com.dusk.common.rpc.auth.dto.orga.GetOrganizationUnitUsersInput;
+import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitDto;
+import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitUserDto;
+import com.dusk.common.rpc.auth.service.IUserRpcService;
 import com.dusk.module.auth.entity.OrganizationUnit;
 import com.dusk.module.auth.entity.Role;
 import com.dusk.module.auth.entity.User;
@@ -12,24 +17,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.Service;
-import com.dusk.common.framework.datafilter.DataFilterContextHolder;
-import com.dusk.common.framework.dto.EntityDto;
-import com.dusk.common.framework.dto.PagedAndSortedInputDto;
-import com.dusk.common.framework.dto.PagedResultDto;
-import com.dusk.common.framework.entity.BaseEntity;
-import com.dusk.common.framework.exception.BusinessException;
-import com.dusk.common.framework.jpa.Specifications;
-import com.dusk.common.framework.jpa.querydsl.QBeanBuilder;
-import com.dusk.common.framework.service.impl.BaseService;
-import com.dusk.common.framework.utils.DozerUtils;
-import com.dusk.common.framework.utils.UtBeanUtils;
-import com.dusk.common.module.auth.dto.*;
-import com.dusk.common.module.auth.dto.orga.GetOrganizationUnitUsersInput;
-import com.dusk.common.module.auth.dto.orga.OrganizationUnitDto;
-import com.dusk.common.module.auth.dto.orga.OrganizationUnitUserDto;
-import com.dusk.common.module.auth.enums.EUnitType;
-import com.dusk.common.module.auth.enums.UserStatus;
-import com.dusk.common.module.auth.service.IUserRpcService;
+import com.dusk.common.core.datafilter.DataFilterContextHolder;
+import com.dusk.common.core.dto.EntityDto;
+import com.dusk.common.core.dto.PagedAndSortedInputDto;
+import com.dusk.common.core.dto.PagedResultDto;
+import com.dusk.common.core.entity.BaseEntity;
+import com.dusk.common.core.exception.BusinessException;
+import com.dusk.common.core.jpa.Specifications;
+import com.dusk.common.core.jpa.querydsl.QBeanBuilder;
+import com.dusk.common.core.service.impl.BaseService;
+import com.dusk.common.core.utils.DozerUtils;
+import com.dusk.common.core.utils.UtBeanUtils;
+import com.dusk.common.core.enums.EUnitType;
+import com.dusk.common.core.enums.UserStatus;
 import com.dusk.module.auth.common.manage.TokenAuthManager;
 import com.dusk.module.auth.dto.user.GetUsersInput;
 import com.dusk.module.auth.dto.user.UserIdAndPermissionDto;
@@ -689,7 +689,8 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
             return new ArrayList<>();
         }
         List<UserFullListDto> users = DozerUtils.mapList(dozerMapper, role.getUserRoles(), UserFullListDto.class);
-        return users.stream().filter(dto -> userTypes.contains(dto.getType()) && UserStatus.OnJob.equals(dto.getUserStatus())).collect(Collectors.toList());
+
+        return users.stream().filter(dto -> userTypes.contains(dto.getUserType()) && UserStatus.OnJob.equals(dto.getUserStatus())).collect(Collectors.toList());
     }
 
     @Override

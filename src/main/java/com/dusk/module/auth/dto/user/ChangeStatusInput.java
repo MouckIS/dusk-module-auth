@@ -1,16 +1,16 @@
 package com.dusk.module.auth.dto.user;
 
+import com.dusk.common.core.enums.UserStatus;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.common.module.auth.enums.UserStatus;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
- * @Author kefuming
+ * @author kefuming
  * @CreateTime 2023/2/21
  */
 @Getter

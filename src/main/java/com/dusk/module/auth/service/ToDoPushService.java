@@ -1,6 +1,6 @@
 package com.dusk.module.auth.service;
 
-import com.dusk.common.module.auth.dto.ToDoDto;
+import com.dusk.common.rpc.auth.dto.ToDoDto;
 import com.dusk.module.auth.entity.Todo;
 import com.dusk.module.auth.enums.ToDoMQTTTypeEnum;
 

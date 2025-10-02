@@ -8,8 +8,8 @@ import java.util.List;
 /**
  * 批量删除用户消息的输入Dto
  *
- * @Author kefuming
- * @Date 2021/8/5 19:29
+ * @author kefuming
+ * @date 2021/8/5 19:29
  */
 @Data
 public class BatchDeleteNotificationInput {

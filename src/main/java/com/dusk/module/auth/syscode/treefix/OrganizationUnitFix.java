@@ -1,8 +1,8 @@
 package com.dusk.module.auth.syscode.treefix;
 
-import com.dusk.common.framework.repository.IBaseRepository;
-import com.dusk.common.framework.service.ITreeService;
-import com.dusk.common.tree.TreeFix;
+import com.dusk.common.core.repository.IBaseRepository;
+import com.dusk.common.core.service.ITreeService;
+import com.dusk.common.core.tree.TreeFix;
 import com.dusk.module.auth.entity.OrganizationUnit;
 import com.dusk.module.auth.service.IOrganizationUnitService;
 import org.springframework.beans.factory.annotation.Autowired;

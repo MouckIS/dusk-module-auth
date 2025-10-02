@@ -3,13 +3,13 @@ package com.dusk.module.auth.dto.user;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.common.framework.dto.EntityDto;
+import com.dusk.common.core.dto.EntityDto;
 
 import java.time.LocalDate;
 import java.util.List;
 
 /**
- * @Author kefuming
+ * @author kefuming
  * @CreateTime 2023/1/11
  */
 @Getter

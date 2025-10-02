@@ -1,10 +1,10 @@
 package com.dusk.module.auth.service.impl;
 
 import com.github.dozermapper.core.Mapper;
-import com.dusk.common.framework.entity.BaseEntity;
-import com.dusk.common.framework.exception.BusinessException;
-import com.dusk.common.framework.repository.IBaseRepository;
-import com.dusk.common.framework.service.impl.BaseService;
+import com.dusk.common.core.entity.BaseEntity;
+import com.dusk.common.core.exception.BusinessException;
+import com.dusk.common.core.repository.IBaseRepository;
+import com.dusk.common.core.service.impl.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.function.Consumer;

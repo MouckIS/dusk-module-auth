@@ -1,8 +1,8 @@
 package com.dusk.module.auth.common.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.dusk.common.framework.model.UserContext;
-import com.dusk.common.framework.response.BaseApiResult;
+import com.dusk.common.core.model.UserContext;
+import com.dusk.common.core.response.BaseApiResult;
 import com.dusk.module.auth.common.manage.TokenAuthManager;
 import com.dusk.module.auth.service.ICaptchaService;
 import org.springframework.beans.factory.annotation.Autowired;

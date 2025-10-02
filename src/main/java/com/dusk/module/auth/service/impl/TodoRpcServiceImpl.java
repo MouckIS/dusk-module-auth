@@ -1,13 +1,14 @@
 package com.dusk.module.auth.service.impl;
 
+import com.dusk.common.rpc.auth.dto.ToDoDto;
+import com.dusk.common.rpc.auth.enums.ToDoTargetType;
+import com.dusk.common.rpc.auth.service.ITodoRpcService;
+import com.dusk.module.auth.entity.TodoPermission;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.Service;
-import com.dusk.common.module.auth.dto.ToDoDto;
-import com.dusk.common.module.auth.enums.ToDoTargetType;
-import com.dusk.common.module.auth.service.ITodoRpcService;
 import com.dusk.module.auth.entity.QTodo;
 import com.dusk.module.auth.entity.QTodoPermission;
 import com.dusk.module.auth.entity.Todo;
@@ -103,7 +104,7 @@ public class TodoRpcServiceImpl implements ITodoRpcService {
         }
         query.where(subQuery.exists());
         return query.fetch().stream().map(s -> {
-            String[] targetData = s.getTodoPermissions().stream().map(i -> i.getPermission()).toArray(String[]::new);
+            String[] targetData = s.getTodoPermissions().stream().map(TodoPermission::getPermission).toArray(String[]::new);
             ToDoDto t = new ToDoDto(s.getType(), s.getTypeName(), s.getTitle(), s.getState(), s.getTargetType(), targetData, s.getBusinessId(), s.getExtensions());
             return t;
         }).collect(Collectors.toList());

@@ -1,6 +1,6 @@
 package com.dusk.module.auth.common.rabbitmq;
 
-import com.dusk.common.framework.rabbitmq.RabbitMQEnableCondition;
+import com.dusk.common.mqs.rabbitmq.RabbitMQEnableCondition;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.boot.ApplicationArguments;

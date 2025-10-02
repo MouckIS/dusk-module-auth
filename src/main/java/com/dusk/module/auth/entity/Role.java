@@ -4,9 +4,9 @@ import cn.hutool.core.util.StrUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
-import com.dusk.common.framework.entity.BaseEntity;
-import com.dusk.common.framework.entity.CreationEntity;
-import com.dusk.common.framework.entity.FullAuditedEntity;
+import com.dusk.common.core.entity.BaseEntity;
+import com.dusk.common.core.entity.CreationEntity;
+import com.dusk.common.core.entity.FullAuditedEntity;
 
 import javax.persistence.*;
 import java.util.ArrayList;

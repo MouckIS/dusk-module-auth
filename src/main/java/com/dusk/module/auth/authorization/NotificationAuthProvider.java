@@ -1,14 +1,14 @@
 package com.dusk.module.auth.authorization;
 
-import com.dusk.common.framework.auth.permission.AuthorizationProvider;
-import com.dusk.common.framework.auth.permission.IPermissionDefinitionContext;
-import com.dusk.common.framework.auth.permission.MultiTenancySides;
-import com.dusk.common.framework.auth.permission.Permission;
+import com.dusk.common.core.auth.permission.AuthorizationProvider;
+import com.dusk.common.core.auth.permission.IPermissionDefinitionContext;
+import com.dusk.common.core.auth.permission.MultiTenancySides;
+import com.dusk.common.core.auth.permission.Permission;
 import org.springframework.stereotype.Component;
 
 /**
- * @Author: pengmengjiang
- * @Date: 2021/9/15 9:41
+ * @author: pengmengjiang
+ * @date: 2021/9/15 9:41
  */
 @Component
 public class NotificationAuthProvider extends AuthorizationProvider {

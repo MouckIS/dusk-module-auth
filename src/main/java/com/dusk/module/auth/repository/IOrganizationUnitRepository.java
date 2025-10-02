@@ -1,10 +1,9 @@
 package com.dusk.module.auth.repository;
 
-import com.dusk.common.framework.annotation.DisableGlobalFilter;
-import com.dusk.common.framework.repository.IBaseRepository;
-import com.dusk.common.module.auth.dto.orga.OrganizationUnitUserListDto;
-
-import com.dusk.common.module.auth.enums.EUnitType;
+import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitUserListDto;
+import com.dusk.common.core.annotation.DisableGlobalFilter;
+import com.dusk.common.core.enums.EUnitType;
+import com.dusk.common.core.repository.IBaseRepository;
 import com.dusk.module.auth.dto.orga.OrganizationUnitUserForSelectDto;
 import com.dusk.module.auth.dto.orga.OrganizationUnitUserInfoListDto;
 import com.dusk.module.auth.entity.OrganizationUnit;
@@ -29,7 +28,7 @@ public interface IOrganizationUnitRepository extends IBaseRepository<Organizatio
      * @param pageable
      * @return
      */
-    @Query("select new com.dusk.common.module.auth.dto.orga.OrganizationUnitUserListDto(" +
+    @Query("select new com.dusk.common.rpc.auth.dto.orga.OrganizationUnitUserListDto(" +
             "u.id, u.name, u.userName, u.emailAddress, orga.id, orga.displayName) " +
             "from OrganizationUnit orga inner join orga.users u " +
             "where (-1L in (:queryOrgaIds) or orga.id in (:queryOrgaIds)) " +

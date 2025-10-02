@@ -1,8 +1,8 @@
 package com.dusk.module.auth.setting;
 
-import com.dusk.common.framework.config.AppConfig;
-import com.dusk.common.framework.setting.ISettingDefinitionManager;
-import com.dusk.common.framework.setting.ISettingsPublish;
+import com.dusk.common.mqs.config.AppConfig;
+import com.dusk.module.ddm.service.ISettingDefinitionManager;
+import com.dusk.module.ddm.service.ISettingsPublish;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Primary
 public class MainSettingsPublish implements ISettingsPublish {
-    @Autowired
+    @Autowired(required = false)
     private ISettingDefinitionManager settingDefinitionManager;
     @Autowired
     private ISettingsCache settingsCache;

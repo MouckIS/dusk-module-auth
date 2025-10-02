@@ -1,6 +1,8 @@
 package com.dusk.module.auth.service.impl;
 
 import cn.hutool.core.util.StrUtil;
+import com.dusk.common.rpc.auth.dto.ToDoDto;
+import com.dusk.common.rpc.auth.enums.ToDoTargetType;
 import com.dusk.module.auth.entity.Todo;
 import com.dusk.module.auth.entity.TodoRead;
 import com.dusk.module.auth.entity.User;
@@ -12,14 +14,12 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import com.dusk.common.framework.auth.authentication.LoginUserIdContextHolder;
-import com.dusk.common.framework.datafilter.DataFilterContextHolder;
-import com.dusk.common.framework.entity.CreationEntity;
-import com.dusk.common.framework.jpa.querydsl.QBeanBuilder;
-import com.dusk.common.framework.service.impl.BaseService;
-import com.dusk.common.framework.utils.SecurityUtils;
-import com.dusk.common.module.auth.dto.ToDoDto;
-import com.dusk.common.module.auth.enums.ToDoTargetType;
+import com.dusk.common.core.auth.authentication.LoginUserIdContextHolder;
+import com.dusk.common.core.datafilter.DataFilterContextHolder;
+import com.dusk.common.core.entity.CreationEntity;
+import com.dusk.common.core.jpa.querydsl.QBeanBuilder;
+import com.dusk.common.core.service.impl.BaseService;
+import com.dusk.common.core.utils.SecurityUtils;
 import com.dusk.module.auth.dto.todo.GetTodosInput;
 import com.dusk.module.auth.dto.todo.TodoInfoDto;
 import com.dusk.module.auth.entity.*;
@@ -89,7 +89,7 @@ public class ToDoServiceImpl extends BaseService<Todo, IToDoRepository> implemen
             data.setOrgId(DataFilterContextHolder.getDefaultOrgId());
         }
         Long id = save(data).getId();
-        log.info("成功添加一条待办 类型：" + input.getType() + ",数据id：" + input.getBusinessId());
+        log.info("成功添加一条待办 类型：{},数据id：{}", input.getType(), input.getBusinessId());
         toDoPushService.pushMsg(data, input, ToDoMQTTTypeEnum.ADD);
     }
 
@@ -153,8 +153,8 @@ public class ToDoServiceImpl extends BaseService<Todo, IToDoRepository> implemen
         QTodoPermission todoPermission = QTodoPermission.todoPermission;
         User currentUser = userManage.getCurrentUser();
         BooleanExpression permissionExpression = QTodo.todo.targetType.eq(ToDoTargetType.UserId).and(todoPermission.permission.eq(currentUser.getId().toString()));
-        List<String> roles = currentUser.getUserRoles().stream().map(p -> p.getRoleName()).collect(Collectors.toList());
-        if (roles.size() > 0) {
+        List<String> roles = currentUser.getUserRoles().stream().map(Role::getRoleName).collect(Collectors.toList());
+        if (!roles.isEmpty()) {
             permissionExpression = permissionExpression.or(QTodo.todo.targetType.eq(ToDoTargetType.Role).and(todoPermission.permission.in(roles)));
         }
 

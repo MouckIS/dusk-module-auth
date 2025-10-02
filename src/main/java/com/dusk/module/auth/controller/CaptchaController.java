@@ -2,8 +2,8 @@ package com.dusk.module.auth.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import com.dusk.common.framework.annotation.AllowAnonymous;
-import com.dusk.common.framework.controller.CruxBaseController;
+import com.dusk.common.core.annotation.AllowAnonymous;
+import com.dusk.common.core.controller.CruxBaseController;
 import com.dusk.module.auth.dto.captcha.CaptchaOutDto;
 import com.dusk.module.auth.service.ICaptchaService;
 import org.springframework.beans.factory.annotation.Autowired;

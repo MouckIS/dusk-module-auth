@@ -8,8 +8,8 @@ import lombok.experimental.FieldNameConstants;
 /**
  * 组织机构下拉选择用户的Dto
  *
- * @Author kefuming
- * @Date 2022/09/23 16:32
+ * @author kefuming
+ * @date 2022/09/23 16:32
  */
 @Data
 @NoArgsConstructor
