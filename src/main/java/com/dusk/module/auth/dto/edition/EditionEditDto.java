@@ -2,7 +2,7 @@ package com.dusk.module.auth.dto.edition;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import com.dusk.common.framework.dto.VersionDto;
+import com.dusk.common.core.dto.VersionDto;
 
 import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;

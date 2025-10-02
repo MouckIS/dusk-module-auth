@@ -6,7 +6,7 @@ import lombok.Setter;
 import java.util.List;
 
 /**
- * @Author kefuming
+ * @author kefuming
  * @CreateTime 2022-10-25
  */
 @Getter

@@ -4,7 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import lombok.Getter;
-import com.dusk.common.module.auth.enums.EUnitType;
+import com.dusk.common.core.enums.EUnitType;
 import com.dusk.module.auth.dto.orga.ImportOrganizationExcelDto;
 
 import java.util.HashMap;
@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * @Author kefuming
+ * @author kefuming
  * @CreateTime 2023/11/2
  */
 @Getter

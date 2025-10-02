@@ -4,13 +4,13 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
-import com.dusk.common.framework.dto.EntityDto;
+import com.dusk.common.core.dto.EntityDto;
 
 /**
  * 组织机构下拉选择用户的Dto
  *
- * @Author kefuming
- * @Date 2020/10/16 16:11
+ * @author kefuming
+ * @date 2020/10/16 16:11
  */
 @Data
 @NoArgsConstructor

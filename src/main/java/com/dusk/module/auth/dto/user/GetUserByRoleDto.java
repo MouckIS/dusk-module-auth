@@ -2,8 +2,8 @@ package com.dusk.module.auth.dto.user;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import com.dusk.common.framework.dto.PagedAndSortedInputDto;
-import com.dusk.common.module.auth.enums.EUnitType;
+import com.dusk.common.core.dto.PagedAndSortedInputDto;
+import com.dusk.common.core.enums.EUnitType;
 
 import javax.validation.constraints.NotNull;
 

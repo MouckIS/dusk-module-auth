@@ -1,9 +1,9 @@
 package com.dusk.module.auth.service;
 
 import com.dusk.module.auth.dto.notification.*;
-import com.dusk.common.framework.dto.EntityDto;
-import com.dusk.common.framework.dto.PagedResultDto;
-import com.dusk.common.framework.service.IBaseService;
+import com.dusk.common.core.dto.EntityDto;
+import com.dusk.common.core.dto.PagedResultDto;
+import com.dusk.common.core.service.IBaseService;
 import com.dusk.module.auth.dto.notification.*;
 import com.dusk.module.auth.entity.UserNotification;
 import com.dusk.module.auth.repository.IUserNotificationRepository;

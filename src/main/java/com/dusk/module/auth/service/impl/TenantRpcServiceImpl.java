@@ -1,10 +1,10 @@
 package com.dusk.module.auth.service.impl;
 
+import com.dusk.common.rpc.auth.dto.TenantInfoDto;
+import com.dusk.common.rpc.auth.service.ITenantRpcService;
 import com.github.dozermapper.core.Mapper;
 import org.apache.dubbo.config.annotation.Service;
-import com.dusk.common.framework.utils.DozerUtils;
-import com.dusk.common.module.auth.dto.TenantInfoDto;
-import com.dusk.common.module.auth.service.ITenantRpcService;
+import com.dusk.common.core.utils.DozerUtils;
 import com.dusk.module.auth.entity.Tenant;
 import com.dusk.module.auth.repository.ITenantRepository;
 import org.springframework.beans.factory.annotation.Autowired;

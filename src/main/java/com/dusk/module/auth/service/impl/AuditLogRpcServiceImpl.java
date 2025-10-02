@@ -1,9 +1,9 @@
 package com.dusk.module.auth.service.impl;
 
+import com.dusk.common.rpc.auth.service.IAuditLogRpcService;
+import com.dusk.common.core.dto.AuditLogDto;
 import com.github.dozermapper.core.Mapper;
 import org.apache.dubbo.config.annotation.Service;
-import com.dusk.common.module.auth.dto.AuditLogDto;
-import com.dusk.common.module.auth.service.IAuditLogRpcService;
 import com.dusk.module.auth.entity.AuditLog;
 import com.dusk.module.auth.repository.IAuditLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,15 +1,15 @@
 package com.dusk.module.auth.controller;
 
+import com.dusk.common.rpc.auth.enums.EnumResetType;
 import com.github.dozermapper.core.Mapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import com.dusk.common.framework.annotation.Authorize;
-import com.dusk.common.framework.controller.CruxBaseController;
-import com.dusk.common.framework.dto.PagedResultDto;
-import com.dusk.common.framework.dto.SelectListOutputDto;
-import com.dusk.common.framework.utils.DozerUtils;
-import com.dusk.common.framework.utils.EnumUtils;
-import com.dusk.common.module.auth.enums.EnumResetType;
+import com.dusk.common.core.annotation.Authorize;
+import com.dusk.common.core.controller.CruxBaseController;
+import com.dusk.common.core.dto.PagedResultDto;
+import com.dusk.common.core.dto.SelectListOutputDto;
+import com.dusk.common.core.utils.DozerUtils;
+import com.dusk.common.core.utils.EnumUtils;
 import com.dusk.module.auth.authorization.SerialNoAuthProvider;
 import com.dusk.module.auth.dto.sysno.GetSerialNoInput;
 import com.dusk.module.auth.dto.sysno.SerialNoDto;

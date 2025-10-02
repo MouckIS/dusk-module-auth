@@ -1,9 +1,9 @@
 package com.dusk.module.auth.setting.provider;
 
-import com.dusk.common.framework.feature.ui.CheckBox;
-import com.dusk.common.framework.setting.SettingDefinition;
-import com.dusk.common.framework.setting.SettingProvider;
-import com.dusk.common.framework.setting.SettingScopes;
+import com.dusk.module.ddm.dto.SettingDefinition;
+import com.dusk.module.ddm.dto.ui.CheckBox;
+import com.dusk.module.ddm.enums.SettingScopes;
+import com.dusk.module.ddm.provider.SettingProvider;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -12,8 +12,8 @@ import java.util.List;
 /**
  * Host站点的配置
  *
- * @Author kefuming
- * @Date 2022/1/12 10:38
+ * @author kefuming
+ * @date 2022/1/12 10:38
  */
 @Component
 public class HostSettingProvider extends SettingProvider {

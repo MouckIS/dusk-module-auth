@@ -1,7 +1,6 @@
 package com.dusk.module.auth.service;
 
-
-import com.dusk.common.framework.feature.ui.TenantFeature;
+import com.dusk.module.auth.dto.TenantFeature;
 import com.dusk.module.auth.dto.feature.FeatureValueInput;
 
 import java.util.List;

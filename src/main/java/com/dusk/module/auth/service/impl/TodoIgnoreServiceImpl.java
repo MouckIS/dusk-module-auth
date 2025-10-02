@@ -1,8 +1,8 @@
 package com.dusk.module.auth.service.impl;
 
 import com.querydsl.core.types.Predicate;
-import com.dusk.common.framework.auth.authentication.LoginUserIdContextHolder;
-import com.dusk.common.framework.service.impl.BaseService;
+import com.dusk.common.core.auth.authentication.LoginUserIdContextHolder;
+import com.dusk.common.core.service.impl.BaseService;
 import com.dusk.module.auth.entity.QTodoIgnore;
 import com.dusk.module.auth.entity.TodoIgnore;
 import com.dusk.module.auth.repository.ITodoIgnoreRepository;

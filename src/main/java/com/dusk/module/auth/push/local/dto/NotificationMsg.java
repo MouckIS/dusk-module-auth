@@ -1,9 +1,9 @@
 package com.dusk.module.auth.push.local.dto;
 
+import com.dusk.common.mqs.enums.NoticationLevel;
+import com.dusk.common.mqs.pusher.Navigation;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.common.framework.pusher.Navigation;
-import com.dusk.common.framework.pusher.NoticationLevel;
 
 /**
  * @author kefuming

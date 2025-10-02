@@ -1,7 +1,7 @@
 package com.dusk.module.auth.service.impl;
 
-import com.dusk.common.framework.auth.authentication.LoginUserIdContextHolder;
-import com.dusk.common.framework.service.impl.BaseService;
+import com.dusk.common.core.auth.authentication.LoginUserIdContextHolder;
+import com.dusk.common.core.service.impl.BaseService;
 import com.dusk.module.auth.entity.TodoRead;
 import com.dusk.module.auth.repository.ITodoReadRepository;
 import com.dusk.module.auth.service.ITodoReadService;

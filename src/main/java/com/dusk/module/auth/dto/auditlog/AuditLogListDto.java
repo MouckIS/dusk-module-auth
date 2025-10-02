@@ -2,8 +2,8 @@ package com.dusk.module.auth.dto.auditlog;
 
 import lombok.Data;
 import lombok.experimental.FieldNameConstants;
-import com.dusk.common.framework.dto.EntityDto;
-import com.dusk.common.framework.jpa.querydsl.QBeanMapper;
+import com.dusk.common.core.dto.EntityDto;
+import com.dusk.common.core.jpa.querydsl.QBeanMapper;
 import com.dusk.module.auth.entity.AuditLog;
 import com.dusk.module.auth.entity.QAuditLog;
 import com.dusk.module.auth.entity.QUser;

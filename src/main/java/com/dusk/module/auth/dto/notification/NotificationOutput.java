@@ -5,8 +5,8 @@ import lombok.Data;
 /**
  * 用户消息输出的Dto
  *
- * @Author kefuming
- * @Date 2020/12/24 15:51
+ * @author kefuming
+ * @date 2020/12/24 15:51
  */
 @Data
 public class NotificationOutput extends NotificationListOutput { }

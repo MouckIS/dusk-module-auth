@@ -1,9 +1,9 @@
 package com.dusk.module.auth.dto.sysno;
 
+import com.dusk.common.rpc.auth.enums.EnumResetType;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.common.module.auth.enums.EnumResetType;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;

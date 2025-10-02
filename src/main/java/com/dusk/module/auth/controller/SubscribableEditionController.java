@@ -1,17 +1,17 @@
 package com.dusk.module.auth.controller;
 
+import com.dusk.common.core.annotation.Authorize;
 import com.github.dozermapper.core.Mapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
-import com.dusk.common.framework.annotation.Authorize;
-import com.dusk.common.framework.controller.CruxBaseController;
-import com.dusk.common.framework.dto.EntityDto;
-import com.dusk.common.framework.dto.PagedResultDto;
-import com.dusk.common.framework.exception.BusinessException;
-import com.dusk.common.framework.utils.DozerUtils;
+import com.dusk.common.core.controller.CruxBaseController;
+import com.dusk.common.core.dto.EntityDto;
+import com.dusk.common.core.dto.PagedResultDto;
+import com.dusk.common.core.exception.BusinessException;
+import com.dusk.common.core.utils.DozerUtils;
 import com.dusk.module.auth.authorization.EditionAuthProvider;
 import com.dusk.module.auth.dto.edition.EditionEditDto;
 import com.dusk.module.auth.dto.edition.EditionListDto;

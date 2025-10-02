@@ -1,10 +1,10 @@
 package com.dusk.module.auth.entity;
 
+import com.dusk.common.rpc.auth.enums.ToDoTargetType;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
-import com.dusk.common.framework.entity.FullAuditedEntity;
-import com.dusk.common.module.auth.enums.ToDoTargetType;
+import com.dusk.common.core.entity.FullAuditedEntity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;

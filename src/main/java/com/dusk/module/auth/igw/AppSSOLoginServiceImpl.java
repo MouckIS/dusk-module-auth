@@ -7,7 +7,7 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-import com.dusk.common.framework.exception.BusinessException;
+import com.dusk.common.core.exception.BusinessException;
 import com.dusk.module.auth.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

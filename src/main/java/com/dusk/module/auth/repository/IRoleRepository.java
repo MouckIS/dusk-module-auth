@@ -1,7 +1,7 @@
 package com.dusk.module.auth.repository;
 
 
-import com.dusk.common.framework.repository.IBaseRepository;
+import com.dusk.common.core.repository.IBaseRepository;
 import com.dusk.module.auth.entity.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

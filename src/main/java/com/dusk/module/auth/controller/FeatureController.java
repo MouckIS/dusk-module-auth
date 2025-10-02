@@ -1,17 +1,17 @@
 package com.dusk.module.auth.controller;
 
+import com.dusk.common.core.annotation.Authorize;
+import com.dusk.module.auth.authorization.EditionAuthProvider;
+import com.dusk.module.auth.authorization.TenantAuthProvider;
+import com.dusk.module.auth.dto.TenantFeature;
+import com.dusk.module.auth.dto.configuration.TenantFeatureInputDto;
+import com.dusk.module.auth.dto.feature.EditionFeatureInputDto;
+import com.dusk.module.auth.service.IFeatureService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import com.dusk.common.framework.annotation.Authorize;
-import com.dusk.common.framework.controller.CruxBaseController;
-import com.dusk.common.framework.dto.EntityDto;
-import com.dusk.common.framework.feature.ui.TenantFeature;
-import com.dusk.module.auth.authorization.EditionAuthProvider;
-import com.dusk.module.auth.authorization.TenantAuthProvider;
-import com.dusk.module.auth.dto.feature.EditionFeatureInputDto;
-import com.dusk.module.auth.dto.configuration.TenantFeatureInputDto;
-import com.dusk.module.auth.service.IFeatureService;
+import com.dusk.common.core.controller.CruxBaseController;
+import com.dusk.common.core.dto.EntityDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

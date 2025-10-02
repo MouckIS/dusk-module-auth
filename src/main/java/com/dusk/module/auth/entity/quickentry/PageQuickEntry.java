@@ -3,7 +3,7 @@ package com.dusk.module.auth.entity.quickentry;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.FieldNameConstants;
-import com.dusk.common.framework.entity.FullAuditedEntity;
+import com.dusk.common.core.entity.FullAuditedEntity;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;

@@ -4,10 +4,10 @@ import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.common.module.auth.enums.EUnitType;
+import com.dusk.common.core.enums.EUnitType;
 
 /**
- * @Author kefuming
+ * @author kefuming
  * @CreateTime 2023/11/2
  */
 @Getter

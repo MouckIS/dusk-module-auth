@@ -3,7 +3,7 @@ package com.dusk.module.auth.dto.face;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.common.framework.dto.ImgBase64Dto;
+import com.dusk.common.core.dto.ImgBase64Dto;
 
 import javax.validation.constraints.NotNull;
 

@@ -1,19 +1,18 @@
 package com.dusk.module.auth.setting;
 
-import com.github.dozermapper.core.Mapper;
-import io.seata.common.util.StringUtils;
-import com.dusk.common.framework.auth.authentication.LoginUserIdContextHolder;
-import com.dusk.common.framework.datafilter.DataFilterContextHolder;
-import com.dusk.common.framework.jpa.Specifications;
-import com.dusk.common.framework.setting.SettingInfo;
-import com.dusk.common.framework.setting.SettingScopes;
-import com.dusk.common.framework.tenant.TenantContextHolder;
-import com.dusk.common.framework.utils.DozerUtils;
-import com.dusk.common.framework.utils.SecurityUtils;
 import com.dusk.module.auth.entity.Setting;
 import com.dusk.module.auth.repository.ISettingRepository;
 import com.dusk.module.auth.service.ITenantService;
 import com.dusk.module.auth.setting.config.MultiTenancyConfig;
+import com.dusk.module.ddm.enums.SettingScopes;
+import com.github.dozermapper.core.Mapper;
+import io.seata.common.util.StringUtils;
+import com.dusk.common.core.auth.authentication.LoginUserIdContextHolder;
+import com.dusk.common.core.datafilter.DataFilterContextHolder;
+import com.dusk.common.core.jpa.Specifications;
+import com.dusk.common.core.tenant.TenantContextHolder;
+import com.dusk.common.core.utils.DozerUtils;
+import com.dusk.common.core.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
@@ -114,7 +113,7 @@ public class SettingManagerDefault implements ISettingManager {
 
         //Get for user if defined
         if (settingDefinition.hasScopes(SettingScopes.User) && userId != null) {
-            var settingValue = getSettingValueForUserOrNull(name);
+            SettingInfo settingValue = getSettingValueForUserOrNull(name);
             if (settingValue != null) {
                 return settingValue.getValue();
             }

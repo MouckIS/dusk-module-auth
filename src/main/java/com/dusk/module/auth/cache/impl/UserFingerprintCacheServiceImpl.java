@@ -1,7 +1,7 @@
 package com.dusk.module.auth.cache.impl;
 
 import cn.hutool.core.util.StrUtil;
-import com.dusk.common.framework.redis.RedisUtil;
+import com.dusk.common.core.redis.RedisUtil;
 import com.dusk.module.auth.cache.IUserFingerprintCacheService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

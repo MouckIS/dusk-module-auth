@@ -1,7 +1,7 @@
 package com.dusk.module.auth.service;
 
-import com.dusk.common.framework.auth.permission.RoleInfo;
-import com.dusk.common.framework.service.IBaseService;
+import com.dusk.common.core.auth.permission.RoleInfo;
+import com.dusk.common.core.service.IBaseService;
 import com.dusk.module.auth.entity.GrantPermission;
 import com.dusk.module.auth.repository.IGrantPermissionRepository;
 

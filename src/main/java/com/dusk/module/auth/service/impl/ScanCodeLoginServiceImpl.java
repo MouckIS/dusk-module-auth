@@ -2,11 +2,11 @@ package com.dusk.module.auth.service.impl;
 
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import com.dusk.common.framework.exception.BusinessException;
-import com.dusk.common.framework.model.UserContext;
-import com.dusk.common.framework.redis.RedisUtil;
-import com.dusk.common.framework.response.BaseApiResult;
-import com.dusk.common.framework.utils.SecurityUtils;
+import com.dusk.common.core.exception.BusinessException;
+import com.dusk.common.core.model.UserContext;
+import com.dusk.common.core.redis.RedisUtil;
+import com.dusk.common.core.response.BaseApiResult;
+import com.dusk.common.core.utils.SecurityUtils;
 import com.dusk.module.auth.common.manage.TokenAuthManager;
 import com.dusk.module.auth.service.IScanCodeLoginService;
 import org.springframework.beans.factory.annotation.Autowired;

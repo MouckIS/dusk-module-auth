@@ -2,9 +2,9 @@ package com.dusk.module.auth.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import com.dusk.common.framework.annotation.Authorize;
-import com.dusk.common.framework.controller.CruxBaseController;
-import com.dusk.common.framework.dto.PagedResultDto;
+import com.dusk.common.core.annotation.Authorize;
+import com.dusk.common.core.controller.CruxBaseController;
+import com.dusk.common.core.dto.PagedResultDto;
 import com.dusk.module.auth.authorization.PageQuickEntryAuthProvider;
 import com.dusk.module.auth.dto.quickentry.GetQuickSetListDto;
 import com.dusk.module.auth.dto.quickentry.QuickEntryListDto;

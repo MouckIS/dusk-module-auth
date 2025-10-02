@@ -3,12 +3,12 @@ package com.dusk.module.auth.controller;
 import com.dusk.module.auth.dto.user.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import com.dusk.common.framework.annotation.Authorize;
-import com.dusk.common.framework.controller.CruxBaseController;
-import com.dusk.common.framework.dto.EntityDto;
-import com.dusk.common.framework.dto.PagedResultDto;
-import com.dusk.common.framework.exception.BusinessException;
-import com.dusk.common.framework.model.UserContext;
+import com.dusk.common.core.annotation.Authorize;
+import com.dusk.common.core.controller.CruxBaseController;
+import com.dusk.common.core.dto.EntityDto;
+import com.dusk.common.core.dto.PagedResultDto;
+import com.dusk.common.core.exception.BusinessException;
+import com.dusk.common.core.model.UserContext;
 import com.dusk.module.auth.authorization.ExternalManagerAuthProvider;
 import com.dusk.module.auth.dto.user.*;
 import com.dusk.module.auth.service.IUserService;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 /**
- * @Author kefuming
+ * @author kefuming
  * @CreateTime 2022-10-28
  */
 @RestController

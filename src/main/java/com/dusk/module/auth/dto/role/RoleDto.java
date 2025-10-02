@@ -1,12 +1,12 @@
 package com.dusk.module.auth.dto.role;
 
+import com.dusk.common.rpc.auth.dto.role.RolePermissionDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.dozermapper.core.Mapping;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import com.dusk.common.framework.dto.EntityDto;
-import com.dusk.common.module.auth.dto.role.RolePermissionDto;
+import com.dusk.common.core.dto.EntityDto;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
 package com.dusk.module.auth.setting;
 
-import com.dusk.common.framework.setting.SettingDefinition;
+import com.dusk.module.ddm.dto.SettingDefinition;
 
 import java.util.List;
 import java.util.Map;

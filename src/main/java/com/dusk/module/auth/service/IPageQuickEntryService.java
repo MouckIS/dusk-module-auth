@@ -1,7 +1,7 @@
 package com.dusk.module.auth.service;
 
-import com.dusk.common.framework.dto.PagedResultDto;
-import com.dusk.common.framework.service.IBaseService;
+import com.dusk.common.core.dto.PagedResultDto;
+import com.dusk.common.core.service.IBaseService;
 import com.dusk.module.auth.dto.quickentry.GetQuickSetListDto;
 import com.dusk.module.auth.dto.quickentry.QuickEntryListDto;
 import com.dusk.module.auth.dto.quickentry.UpdatePageQuickSetDto;

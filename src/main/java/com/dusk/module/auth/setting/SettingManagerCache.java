@@ -1,8 +1,7 @@
 package com.dusk.module.auth.setting;
 
-import com.dusk.common.framework.redis.RedisCacheCondition;
-import com.dusk.common.framework.redis.RedisUtil;
-import com.dusk.common.framework.setting.SettingInfo;
+import com.dusk.common.core.redis.RedisCacheCondition;
+import com.dusk.common.core.redis.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Primary;

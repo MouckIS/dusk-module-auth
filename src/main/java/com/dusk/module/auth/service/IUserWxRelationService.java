@@ -1,6 +1,6 @@
 package com.dusk.module.auth.service;
 
-import com.dusk.common.framework.service.IBaseService;
+import com.dusk.common.core.service.IBaseService;
 import com.dusk.module.auth.entity.UserWxRelation;
 import com.dusk.module.auth.repository.IUserWxRelationRepository;
 

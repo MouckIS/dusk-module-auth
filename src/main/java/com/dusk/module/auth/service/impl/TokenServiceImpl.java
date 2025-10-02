@@ -1,10 +1,10 @@
 package com.dusk.module.auth.service.impl;
 
+import com.dusk.common.rpc.auth.dto.GenerateTokenForNonUserInput;
+import com.dusk.common.rpc.auth.service.ISmRpcUtil;
+import com.dusk.common.rpc.auth.service.ITokenAuthRpcService;
 import com.github.dozermapper.core.Mapper;
 import lombok.extern.slf4j.Slf4j;
-import com.dusk.common.module.auth.dto.GenerateTokenForNonUserInput;
-import com.dusk.common.module.auth.service.ISmRpcUtil;
-import com.dusk.common.module.auth.service.ITokenAuthRpcService;
 import com.dusk.module.auth.dto.token.TokenSign;
 import com.dusk.module.auth.service.ITokenService;
 import org.springframework.stereotype.Component;

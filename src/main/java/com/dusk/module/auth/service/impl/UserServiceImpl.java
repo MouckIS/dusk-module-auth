@@ -6,10 +6,22 @@ import cn.hutool.core.collection.IterUtil;
 import cn.hutool.core.util.HexUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SmUtil;
+import com.dusk.common.rpc.auth.dto.ChangePwdInput;
+import com.dusk.common.rpc.auth.dto.CreateOrUpdateUserInput;
+import com.dusk.common.rpc.auth.dto.UserEditDto;
+import com.dusk.common.rpc.auth.dto.UserFullListDto;
+import com.dusk.common.rpc.auth.dto.orga.GetOrganizationUnitUsersInput;
+import com.dusk.common.core.utils.SecurityUtils;
+import com.dusk.common.mqs.pusher.PushSMS;
+import com.dusk.common.mqs.pusher.SmsPushConfig;
+import com.dusk.common.mqs.pusher.SmsTemplateParam;
+import com.dusk.common.mqs.utils.RabbitMQUtils;
 import com.dusk.module.auth.dto.user.*;
 import com.dusk.module.auth.entity.*;
 import com.dusk.module.auth.repository.*;
 import com.dusk.module.auth.service.*;
+import com.dusk.module.ddm.service.ISettingChecker;
+import com.dusk.module.ddm.service.ISettingRpcService;
 import com.github.dozermapper.core.Mapper;
 import com.hankcs.hanlp.HanLP;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -18,62 +30,42 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.dubbo.config.annotation.Reference;
-import com.dusk.common.framework.annotation.DisableTenantFilter;
-import com.dusk.common.framework.auth.authentication.LoginUserIdContextHolder;
-import com.dusk.common.framework.dto.EntityDto;
-import com.dusk.common.framework.dto.PagedResultDto;
-import com.dusk.common.framework.entity.BaseEntity;
-import com.dusk.common.framework.entity.FullAuditedEntity;
-import com.dusk.common.framework.excel.CruxExcelUtils;
-import com.dusk.common.framework.exception.BusinessException;
-import com.dusk.common.framework.exception.UserLoginException;
-import com.dusk.common.framework.feature.IFeatureChecker;
-import com.dusk.common.framework.jpa.Specifications;
-import com.dusk.common.framework.model.UserContext;
-import com.dusk.common.framework.pusher.PushSMS;
-import com.dusk.common.framework.pusher.SmsPushConfig;
-import com.dusk.common.framework.pusher.SmsTemplateParam;
-import com.dusk.common.framework.redis.RedisUtil;
-import com.dusk.common.framework.service.impl.BaseService;
-import com.dusk.common.framework.setting.ISettingChecker;
-import com.dusk.common.framework.tenant.TenantContextHolder;
-import com.dusk.common.framework.utils.DozerUtils;
-import com.dusk.common.framework.utils.RabbitMQUtils;
-import com.dusk.common.framework.utils.SecurityUtils;
-import com.dusk.common.module.auth.dto.ChangePwdInput;
-import com.dusk.common.module.auth.dto.CreateOrUpdateUserInput;
-import com.dusk.common.module.auth.dto.UserEditDto;
-import com.dusk.common.module.auth.dto.UserFullListDto;
-import com.dusk.common.module.auth.dto.orga.GetOrganizationUnitUsersInput;
-import com.dusk.common.module.auth.dto.orga.OrganizationUnitUserListDto;
-import com.dusk.common.module.auth.enums.EUnitType;
-import com.dusk.common.module.auth.enums.UserStatus;
+import com.dusk.common.core.annotation.DisableTenantFilter;
+import com.dusk.common.core.auth.authentication.LoginUserIdContextHolder;
+import com.dusk.common.core.dto.EntityDto;
+import com.dusk.common.core.dto.PagedResultDto;
+import com.dusk.common.core.entity.BaseEntity;
+import com.dusk.common.core.entity.FullAuditedEntity;
+import com.dusk.common.core.exception.BusinessException;
+import com.dusk.common.core.exception.UserLoginException;
+import com.dusk.common.core.jpa.Specifications;
+import com.dusk.common.core.model.UserContext;
+import com.dusk.common.core.redis.RedisUtil;
+import com.dusk.common.core.service.impl.BaseService;
+import com.dusk.common.core.tenant.TenantContextHolder;
+import com.dusk.common.core.utils.DozerUtils;
+import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitUserListDto;
+import com.dusk.common.core.enums.EUnitType;
+import com.dusk.common.core.enums.UserStatus;
 //import com.dusk.common.module.face.service.IUserFaceRpcService;
 import com.dusk.module.auth.common.config.AppAuthConfig;
 import com.dusk.module.auth.common.manage.TokenAuthManager;
 import com.dusk.module.auth.common.rabbitmq.RabbitConstant;
-import com.dusk.module.auth.common.util.DubboCustomUtils;
 import com.dusk.module.auth.common.util.LoginUtils;
 import com.dusk.module.auth.dto.station.AddUsersToStationInput;
 import com.dusk.module.auth.dto.station.RemoveUserFromStationInput;
 import com.dusk.module.auth.dto.station.StationsOfLoginUserDto;
-import com.dusk.module.auth.dto.user.*;
-import com.dusk.module.auth.entity.*;
 import com.dusk.module.auth.enums.ELevel;
 import com.dusk.module.auth.feature.LoginFeatureProvider;
 import com.dusk.module.auth.feature.UserFeatureProvider;
 import com.dusk.module.auth.manage.IUserManage;
 import com.dusk.module.auth.push.INotificationPushManager;
-import com.dusk.module.auth.repository.*;
-import com.dusk.module.auth.service.*;
-import com.dusk.module.auth.setting.provider.PersonnelControlSettingProvider;
+import org.apache.dubbo.config.annotation.Reference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -141,8 +133,9 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     //private IUserFaceRpcService userFaceRpcService;
     @Autowired
     private IStationService stationService;
-    @Autowired
-    private ISettingChecker settingChecker;
+    
+    @Reference
+    private ISettingRpcService settingRpcService;
 
     @Autowired
     private IUserWxRelationRepository userWxRelationRepository;
@@ -192,6 +185,9 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
 
     private static final String USER_IMAGE_TYPE_SIGNATURE = "signature";
     private static final String USER_IMAGE_TYPE_PROFILE = "profile";
+
+    public static final String PERSONNEL_CONTROL_CONFIRM_ID_CARD = "Personnel.Control.Confirm.idCard";
+    public static final String PERSONNEL_CONTROL_CONFIRM_PHONE = "Personnel.Control.Confirm.phone";
 
     private static final QOrganizationManager qOrganizationManager = QOrganizationManager.organizationManager;
     private static final QOrganizationUnit qOrganizationUnit = QOrganizationUnit.organizationUnit;
@@ -392,7 +388,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
             }
             t.setUserType(s.getUserType().getDisplayName());
         });
-        CruxExcelUtils.exportSimpleExcel(response, fileName, outUserList, UserExcellDto.class);
+        //CruxExcelUtils.exportSimpleExcel(response, fileName, outUserList, UserExcellDto.class);
     }
 
     @Override
@@ -1246,7 +1242,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
             // 校验手机号码格式
             checkMobilePhone(phoneNo);
         } else {
-            String value = settingChecker.getValue(PersonnelControlSettingProvider.PERSONNEL_CONTROL_CONFIRM_PHONE);
+            String value = settingRpcService.getValue(PERSONNEL_CONTROL_CONFIRM_PHONE);
             if (EUnitType.External.equals(type) && Boolean.TRUE.toString().equals(value)) {
                 throw new BusinessException("手机号码不能为空");
             }
@@ -1261,7 +1257,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
             // 校验身份证号码格式
             checkIdCard(idCard);
         } else {
-            String value = settingChecker.getValue(PersonnelControlSettingProvider.PERSONNEL_CONTROL_CONFIRM_ID_CARD);
+            String value = settingRpcService.getValue(PERSONNEL_CONTROL_CONFIRM_ID_CARD);
             if (EUnitType.External.equals(type) && Boolean.TRUE.toString().equals(value)) {
                 throw new BusinessException("身份证号码不能为空");
             }

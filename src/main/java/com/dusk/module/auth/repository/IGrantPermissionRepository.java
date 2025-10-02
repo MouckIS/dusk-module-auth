@@ -1,7 +1,7 @@
 package com.dusk.module.auth.repository;
 
-import com.dusk.common.framework.annotation.DisableGlobalFilter;
-import com.dusk.common.framework.repository.IBaseRepository;
+import com.dusk.common.core.annotation.DisableGlobalFilter;
+import com.dusk.common.core.repository.IBaseRepository;
 import com.dusk.module.auth.entity.GrantPermission;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;

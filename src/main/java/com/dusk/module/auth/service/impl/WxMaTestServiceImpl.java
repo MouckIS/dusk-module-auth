@@ -2,9 +2,9 @@ package com.dusk.module.auth.service.impl;
 
 import com.github.dozermapper.core.Mapper;
 import lombok.extern.slf4j.Slf4j;
-import com.dusk.common.framework.annotation.DisableTenantFilter;
-import com.dusk.common.framework.model.UserContext;
-import com.dusk.common.framework.tenant.TenantContextHolder;
+import com.dusk.common.core.annotation.DisableTenantFilter;
+import com.dusk.common.core.model.UserContext;
+import com.dusk.common.core.tenant.TenantContextHolder;
 import com.dusk.module.auth.common.manage.TokenAuthManager;
 import com.dusk.module.auth.common.util.LoginUtils;
 import com.dusk.module.auth.dto.mobilelogin.MobileUserDto;

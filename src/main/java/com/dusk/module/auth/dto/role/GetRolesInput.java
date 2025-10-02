@@ -3,7 +3,7 @@ package com.dusk.module.auth.dto.role;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import com.dusk.common.framework.dto.PagedAndSortedInputDto;
+import com.dusk.common.core.dto.PagedAndSortedInputDto;
 
 
 @Data

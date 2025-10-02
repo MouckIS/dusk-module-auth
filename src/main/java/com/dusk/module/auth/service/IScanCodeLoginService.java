@@ -1,6 +1,6 @@
 package com.dusk.module.auth.service;
 
-import com.dusk.common.framework.response.BaseApiResult;
+import com.dusk.common.core.response.BaseApiResult;
 
 /**
  * @author kefuming

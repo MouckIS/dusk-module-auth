@@ -9,8 +9,8 @@ import java.util.List;
 /**
  * 将用户消息的状态标记为已读的输入Dto
  *
- * @Author kefuming
- * @Date 2021/1/5 9:53
+ * @author kefuming
+ * @date 2021/1/5 9:53
  */
 @Data
 public class SetNotificationAsReadInput {

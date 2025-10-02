@@ -1,15 +1,13 @@
 package com.dusk.module.auth.dto.notification;
 
+import com.dusk.common.rpc.auth.enums.NotificationType;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import com.dusk.common.framework.dto.PagedAndSortedInputDto;
-import com.dusk.common.module.auth.enums.NotificationType;
-
-import javax.validation.constraints.NotNull;
+import com.dusk.common.core.dto.PagedAndSortedInputDto;
 
 /**
- * @Author kefuming
- * @Date 2020/12/24 15:50
+ * @author kefuming
+ * @date 2020/12/24 15:50
  */
 @Data
 public class GetNotificationListInput extends PagedAndSortedInputDto {

@@ -2,7 +2,7 @@ package com.dusk.module.auth.dto.datadisplay;
 
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.common.framework.dto.PagedAndSortedInputDto;
+import com.dusk.common.core.dto.PagedAndSortedInputDto;
 
 /**
  * 〈数据展示设置项的查询条件〉

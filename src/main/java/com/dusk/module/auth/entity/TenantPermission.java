@@ -1,7 +1,7 @@
 package com.dusk.module.auth.entity;
 
 import lombok.Data;
-import com.dusk.common.framework.entity.CreationEntity;
+import com.dusk.common.core.entity.CreationEntity;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;

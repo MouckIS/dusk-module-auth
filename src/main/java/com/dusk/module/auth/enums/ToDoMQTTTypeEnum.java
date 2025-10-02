@@ -1,6 +1,6 @@
 package com.dusk.module.auth.enums;
 
-import com.dusk.common.framework.entity.BaseEnum;
+import com.dusk.common.core.entity.BaseEnum;
 
 /**
  * @author kefuming

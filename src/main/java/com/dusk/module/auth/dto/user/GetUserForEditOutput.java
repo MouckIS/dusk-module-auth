@@ -1,7 +1,7 @@
 package com.dusk.module.auth.dto.user;
 
+import com.dusk.common.rpc.auth.dto.UserEditDto;
 import lombok.Data;
-import com.dusk.common.module.auth.dto.UserEditDto;
 import com.dusk.module.auth.dto.station.StationsOfLoginUserDto;
 import com.dusk.module.auth.enums.ELevel;
 

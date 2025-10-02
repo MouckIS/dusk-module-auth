@@ -1,9 +1,9 @@
 package com.dusk.module.auth.common.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.dusk.common.framework.exception.UserLoginException;
-import com.dusk.common.framework.jwt.exception.JwtExpiredTokenException;
-import com.dusk.common.framework.response.BaseApiResult;
+import com.dusk.common.core.exception.UserLoginException;
+import com.dusk.common.core.jwt.exception.JwtExpiredTokenException;
+import com.dusk.common.core.response.BaseApiResult;
 import com.dusk.module.auth.service.ICaptchaService;
 import com.dusk.module.auth.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;

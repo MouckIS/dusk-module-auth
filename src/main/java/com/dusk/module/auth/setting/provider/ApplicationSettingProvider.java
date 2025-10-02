@@ -1,16 +1,16 @@
 package com.dusk.module.auth.setting.provider;
 
-import com.dusk.common.framework.setting.SettingDefinition;
-import com.dusk.common.framework.setting.SettingProvider;
-import com.dusk.common.framework.setting.SettingScopes;
+import com.dusk.module.ddm.dto.SettingDefinition;
+import com.dusk.module.ddm.enums.SettingScopes;
+import com.dusk.module.ddm.provider.SettingProvider;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @Author: kefuming
- * @Date: 2022-06-07 9:32
+ * @author: kefuming
+ * @date: 2022-06-07 9:32
  */
 @Component
 public class ApplicationSettingProvider extends SettingProvider {

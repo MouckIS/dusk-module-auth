@@ -1,11 +1,11 @@
 package com.dusk.module.auth.dto.user;
 
+import com.dusk.common.rpc.auth.dto.CreateOrUpdateUserInput;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import com.dusk.common.module.auth.dto.CreateOrUpdateUserInput;
 import com.dusk.module.auth.enums.ELevel;
 
 import javax.validation.constraints.NotNull;
@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * @Author kefuming
+ * @author kefuming
  * @CreateTime 2022-11-08
  */
 @Getter

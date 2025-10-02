@@ -1,11 +1,11 @@
 package com.dusk.module.auth.service.impl;
 
+import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitDto;
+import com.dusk.common.rpc.auth.service.ICustomerRpcService;
 import com.github.dozermapper.core.Mapper;
 import org.apache.dubbo.config.annotation.Service;
-import com.dusk.common.framework.jpa.Specifications;
-import com.dusk.common.framework.utils.DozerUtils;
-import com.dusk.common.module.auth.dto.orga.OrganizationUnitDto;
-import com.dusk.common.module.auth.service.ICustomerRpcService;
+import com.dusk.common.core.jpa.Specifications;
+import com.dusk.common.core.utils.DozerUtils;
 import com.dusk.module.auth.dto.orga.CreateOrganizationUnitInput;
 import com.dusk.module.auth.dto.orga.UpdateOrganizationUnitInput;
 import com.dusk.module.auth.entity.OrganizationUnit;

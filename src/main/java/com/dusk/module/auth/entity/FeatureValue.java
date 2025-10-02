@@ -1,13 +1,15 @@
 package com.dusk.module.auth.entity;
 
-import lombok.Data;
-import com.dusk.common.framework.constant.EntityConstant;
-import com.dusk.common.framework.entity.CreationEntity;
+import com.dusk.common.core.constant.EntityConstant;
+import com.dusk.common.core.entity.CreationEntity;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Version;
+import java.io.Serial;
 import java.time.LocalDateTime;
 
 /**
@@ -17,8 +19,10 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "sys_feature_value")
-@Data
+@Getter
+@Setter
 public class FeatureValue extends CreationEntity {
+    @Serial
     private static final long serialVersionUID = 7849706988482664358L;
 
     /**

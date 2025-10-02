@@ -1,29 +1,26 @@
 package com.dusk.module.auth.service.impl;
 
+import com.dusk.module.auth.setting.ISettingManager;
+import com.dusk.module.auth.setting.ISettingsCache;
+import com.dusk.module.ddm.dto.SettingDefinition;
+import com.dusk.module.ddm.dto.ui.FileInput;
+import com.dusk.module.ddm.dto.ui.InputType;
+import com.dusk.module.ddm.enums.SettingAccessLevel;
+import com.dusk.module.ddm.service.ISettingRpcService;
 import com.github.dozermapper.core.Mapper;
 import io.seata.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.Reference;
 import org.apache.dubbo.config.annotation.Service;
-import com.dusk.common.framework.auth.authentication.LoginUserIdContextHolder;
-import com.dusk.common.framework.datafilter.DataFilterContextHolder;
-import com.dusk.common.framework.dto.NameValueDto;
-import com.dusk.common.framework.exception.BusinessException;
-import com.dusk.common.framework.feature.ui.FileInput;
-import com.dusk.common.framework.feature.ui.InputType;
-import com.dusk.common.framework.setting.SettingAccessLevel;
-import com.dusk.common.framework.setting.SettingDefinition;
-import com.dusk.common.framework.utils.SecurityUtils;
-import com.dusk.common.module.auth.service.ISettingRpcService;
-import com.dusk.common.module.minio.dto.GetDownloadUrlOutput;
-import com.dusk.common.module.minio.service.IMinioRpcService;
+import com.dusk.common.core.auth.authentication.LoginUserIdContextHolder;
+import com.dusk.common.core.datafilter.DataFilterContextHolder;
+import com.dusk.common.core.dto.NameValueDto;
+import com.dusk.common.core.exception.BusinessException;
+import com.dusk.common.core.utils.SecurityUtils;
 import com.dusk.module.auth.dto.setting.SettingDto;
 import com.dusk.module.auth.dto.setting.UpdateSettingInput;
 import com.dusk.module.auth.entity.Setting;
 import com.dusk.module.auth.repository.ISettingRepository;
 import com.dusk.module.auth.service.ISettingService;
-import com.dusk.module.auth.setting.ISettingManager;
-import com.dusk.module.auth.setting.ISettingsCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,10 +46,6 @@ public class SettingServiceImpl implements ISettingRpcService, ISettingService {
     private ISettingsCache settingsCache;
     @Autowired
     private ISettingManager settingManager;
-    @Autowired
-    private SecurityUtils securityUtils;
-    @Reference
-    private IMinioRpcService minioRpcService;
 
     @Override
     public List<SettingDto> getApplicationSettings() {
@@ -195,24 +188,24 @@ public class SettingServiceImpl implements ISettingRpcService, ISettingService {
     }
 
     private void handlerFileInput(List<SettingDto> settings) {
-        List<SettingDto> fileSettings = settings.stream()
-                .filter(e -> e.getInputType() != null && FileInput.NAME.equals(e.getInputType().getName()) && StringUtils.isNotBlank(e.getValue())).collect(Collectors.toList());
-        if (fileSettings.size() > 0) {
-            try {
-                List<GetDownloadUrlOutput> downloadUrls = minioRpcService
-                        .getDownloadUrls(fileSettings.stream().map(e -> Long.parseLong(e.getValue())).collect(Collectors.toList()));
-                fileSettings.forEach(e -> {
-                    downloadUrls.stream().filter(d -> d.getId().toString().equals(e.getValue())).findFirst().ifPresent(d -> {
-                        e.setFileName(d.getFileName());
-                        e.setDownloadUrl(d.getDownloadUrl());
-                    });
-                });
-            } catch (Exception e) {
-                fileSettings.forEach(m -> {
-                    m.setFileName("minio服务异常");
-                });
-            }
-        }
+        //List<SettingDto> fileSettings = settings.stream()
+        //        .filter(e -> e.getInputType() != null && FileInput.NAME.equals(e.getInputType().getName()) && StringUtils.isNotBlank(e.getValue())).collect(Collectors.toList());
+        //if (fileSettings.size() > 0) {
+        //    try {
+        //        List<GetDownloadUrlOutput> downloadUrls = minioRpcService
+        //                .getDownloadUrls(fileSettings.stream().map(e -> Long.parseLong(e.getValue())).collect(Collectors.toList()));
+        //        fileSettings.forEach(e -> {
+        //            downloadUrls.stream().filter(d -> d.getId().toString().equals(e.getValue())).findFirst().ifPresent(d -> {
+        //                e.setFileName(d.getFileName());
+        //                e.setDownloadUrl(d.getDownloadUrl());
+        //            });
+        //        });
+        //    } catch (Exception e) {
+        //        fileSettings.forEach(m -> {
+        //            m.setFileName("minio服务异常");
+        //        });
+        //    }
+        //}
     }
 
     private boolean valueChanged(SettingDto setting, String newValue) {
@@ -259,18 +252,18 @@ public class SettingServiceImpl implements ISettingRpcService, ISettingService {
         });
         if (!fileMapList.isEmpty()) {
             List<Long> fileIds = fileMapList.stream().map(temMap -> Long.valueOf(temMap.get("value"))).collect(Collectors.toList());
-            try {
-                List<GetDownloadUrlOutput> downloadUrls = minioRpcService.getDownloadUrls(fileIds);
-                fileMapList.forEach(temMap -> {
-                    Long id = Long.valueOf(temMap.get("value"));
-                    downloadUrls.stream().filter(url -> id.equals(url.getId())).findAny().ifPresent(url -> {
-                        temMap.put("fileName", url.getFileName());
-                        temMap.put("downloadUrl", url.getDownloadUrl());
-                    });
-                });
-            } catch (Exception ex) {
-                log.error("获取关联minio文件出错:{}", ex.toString());
-            }
+            //try {
+            //    List<GetDownloadUrlOutput> downloadUrls = minioRpcService.getDownloadUrls(fileIds);
+            //    fileMapList.forEach(temMap -> {
+            //        Long id = Long.valueOf(temMap.get("value"));
+            //        downloadUrls.stream().filter(url -> id.equals(url.getId())).findAny().ifPresent(url -> {
+            //            temMap.put("fileName", url.getFileName());
+            //            temMap.put("downloadUrl", url.getDownloadUrl());
+            //        });
+            //    });
+            //} catch (Exception ex) {
+            //    log.error("获取关联minio文件出错:{}", ex.toString());
+            //}
 
         }
         return resultMap;

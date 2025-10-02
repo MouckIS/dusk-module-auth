@@ -36,7 +36,7 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: ${spring.cloud.nacos.server-addr:172.17.131.115:8848}
+        server-addr: ${spring.cloud.nacos.server-addr:localhost:8848}
         username: ${spring.cloud.nacos.username:nacos}
         password: ${spring.cloud.nacos.password:dusk}
         namespace: dev
@@ -84,7 +84,7 @@ seata:
     vgroup-mapping:
       dusk-module-auth-seata-service-group: default
     grouplist:
-      default: 192.168.105.183:8091
+      default: localhost:8091
 
 wx:
   #  是否允许测试模式 测试模式的话 不存在的手机号登陆会指向帐户名为  key 为account的帐户名来登陆

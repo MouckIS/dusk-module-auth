@@ -5,13 +5,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
-import com.dusk.common.framework.entity.FullAuditedEntity;
+import com.dusk.common.core.entity.FullAuditedEntity;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
 /**
- * @Author kefuming
+ * @author kefuming
  * @CreateTime 2022-11-08
  */
 @Entity

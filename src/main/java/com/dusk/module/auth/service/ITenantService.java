@@ -1,7 +1,6 @@
 package com.dusk.module.auth.service;
 
-import com.dusk.module.auth.dto.tenant.*;
-import com.dusk.common.framework.service.IBaseService;
+import com.dusk.common.core.service.IBaseService;
 import com.dusk.module.auth.dto.tenant.*;
 import com.dusk.module.auth.entity.Tenant;
 import com.dusk.module.auth.repository.ITenantRepository;
