@@ -2,8 +2,8 @@ package com.dusk.module.auth.controller;
 
 import com.dusk.common.rpc.auth.enums.EnumResetType;
 import com.github.dozermapper.core.Mapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import com.dusk.common.core.annotation.Authorize;
 import com.dusk.common.core.controller.CruxBaseController;
 import com.dusk.common.core.dto.PagedResultDto;
@@ -30,7 +30,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/serialNo")
-@Api(description = "序列号", tags = "SerialNo")
+@Tag(name = "序列号", description = "SerialNo")
 public class SerialNoController extends CruxBaseController {
     @Autowired
     ISerialNoService serialNoService;
@@ -38,7 +38,7 @@ public class SerialNoController extends CruxBaseController {
     Mapper dozerMapper;
 
     @GetMapping("/getPageData")
-    @ApiOperation(value = "分页查询序列号（需要权限）")
+    @Operation(summary = "分页查询序列号（需要权限）")
     @Authorize(SerialNoAuthProvider.PAGES_SERIAL_NO)
     public PagedResultDto<SerialNoDto> getPageData(GetSerialNoInput input) {
         Page<SerialNo> pages = serialNoService.getSerialNos(input);
@@ -46,28 +46,28 @@ public class SerialNoController extends CruxBaseController {
     }
 
     @PostMapping("/update")
-    @ApiOperation(value = "更新序列号配置")
+    @Operation(summary = "更新序列号配置")
     @Authorize(SerialNoAuthProvider.PAGES_SERIAL_NO_EDIT)
     public void update(@RequestBody @Valid SerialNoEditInput input) {
         serialNoService.update(input);
     }
 
     @GetMapping("/testNo")
-    @ApiOperation(value = "测试票号配置，获取当前配置的序列号结果")
+    @Operation(summary = "测试票号配置，获取当前配置的序列号结果")
     public String testNo(String noFormat, int serialLength) {
         return serialNoService.getCurrentNo(LocalDateTime.now(), noFormat, 1, serialLength);
     }
 
 
     @GetMapping("/testNextNo/{id}")
-    @ApiOperation(value = "测试获取下一个票号（不占用序列号）")
+    @Operation(summary = "测试获取下一个票号（不占用序列号）")
     public String testNextNo(@PathVariable Long id) {
         SerialNo data = serialNoService.getOneById(id);
         return serialNoService.getCurrentNo(LocalDateTime.now(), data.getDateFormat(), data.getCurrentNo() + 1, data.getNoLength());
     }
 
     @GetMapping("/getEnum")
-    @ApiOperation(value = "获取重置规则下拉数据源")
+    @Operation(summary = "获取重置规则下拉数据源")
     public List<SelectListOutputDto> getEnum() {
         return EnumUtils.ConvertToList(EnumResetType.class);
     }

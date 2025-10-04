@@ -1,7 +1,7 @@
 package com.dusk.module.auth.dto.dashboard;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
 
@@ -10,11 +10,11 @@ import com.dusk.common.core.dto.PagedAndSortedInputDto;
  * @date 2021/7/27
  */
 @Data
-@ApiModel(description = "统计模块查询条件数据")
+@Schema(description = "统计模块查询条件数据")
 public class GetModuleInput extends PagedAndSortedInputDto {
-    @ApiModelProperty("模块名称")
+    @Schema(description = "模块名称")
     private String name;
 
-    @ApiModelProperty("模块编码")
+    @Schema(description = "模块编码")
     private String code;
 }

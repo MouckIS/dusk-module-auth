@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.station;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import com.dusk.common.core.dto.NameValueDefaultByDto;
@@ -12,10 +12,10 @@ import com.dusk.common.core.dto.NameValueDefaultByDto;
 @Getter
 @Setter
 public class StationsOfLoginUserDto extends NameValueDefaultByDto<Long> {
-    @ApiModelProperty("是否为集控站-该厂站下有子站则认为该厂站为集控站")
+    @Schema(description = "是否为集控站-该厂站下有子站则认为该厂站为集控站")
     private boolean mainStation;
-    @ApiModelProperty("父id")
+    @Schema(description = "父id")
     private Long parentId;
-    @ApiModelProperty("序号")
+    @Schema(description = "序号")
     private int sortIndex;
 }

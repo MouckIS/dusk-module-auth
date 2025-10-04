@@ -1,8 +1,8 @@
 package com.dusk.module.auth.dto.user;
 
 import com.dusk.common.core.enums.EUnitType;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
@@ -14,23 +14,23 @@ import org.springframework.data.domain.Sort;
  * @date 2020/5/15 11:26
  */
 @Data
-@ApiModel(value = "GetUsersInput", description = "查询用户列表的实体类")
+@Schema(description = "查询用户列表的实体类")
 public class GetUsersInput extends PagedAndSortedInputDto {
-    @ApiModelProperty("模糊查找[姓名、账号、电子邮箱、手机号、角色名、工号]")
+    @Schema(description = "模糊查找[姓名、账号、电子邮箱、手机号、角色名、工号]")
     public String filter;
-    @ApiModelProperty("角色id")
+    @Schema(description = "角色id")
     public Long roleId;
-    @ApiModelProperty("角色code")
+    @Schema(description = "角色code")
     public String roleCode;
-    @ApiModelProperty("角色 name")
+    @Schema(description = "角色 name")
     public String roleName;
-    @ApiModelProperty("权限代码")
+    @Schema(description = "权限代码")
     public String permission;
-    @ApiModelProperty("只显示锁定用户")
+    @Schema(description = "只显示锁定用户")
     private boolean onlyLockedUsers;
-    @ApiModelProperty("账号类型")
+    @Schema(description = "账号类型")
     private EUnitType userType = EUnitType.Inner;
-    @ApiModelProperty("显示离职账号")
+    @Schema(description = "显示离职账号")
     private boolean displayDimissionUsers;
     @Override
     protected Sort getSort() {

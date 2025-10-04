@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.user;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import com.dusk.common.core.enums.EUnitType;
 import com.dusk.module.auth.enums.OrgLabel;
@@ -11,27 +11,27 @@ import com.dusk.module.auth.enums.OrgLabel;
  */
 @Data
 public class UserOrgaDto {
-    @ApiModelProperty("id")
+    @Schema(description = "id")
     private Long id;
 
-    @ApiModelProperty("父组织机构id")
+    @Schema(description = "父组织机构id")
     private String parentId;
 
-    @ApiModelProperty("编码")
+    @Schema(description = "编码")
     private String code;
 
-    @ApiModelProperty("名称")
+    @Schema(description = "名称")
     private String displayName;
 
-    @ApiModelProperty("是否为厂站")
+    @Schema(description = "是否为厂站")
     private boolean station = false;
 
-    @ApiModelProperty("序号")
+    @Schema(description = "序号")
     private int sortIndex;
 
-    @ApiModelProperty("组织的类型")
+    @Schema(description = "组织的类型")
     private EUnitType type;
 
-    @ApiModelProperty("组织标签")
+    @Schema(description = "组织标签")
     private OrgLabel label;
 }

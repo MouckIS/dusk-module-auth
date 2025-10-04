@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.setting.tenants;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.timing.Clock;
@@ -32,7 +32,7 @@ public class TenantSettingsEditDto {
 
     private TenantTicketSettingsEditDto ticket;
 
-    @ApiModelProperty("外观配置")
+    @Schema(description = "外观配置")
     private FacadeSettingEditDto facadeSetting;
 
     /**

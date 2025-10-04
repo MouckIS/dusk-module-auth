@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.quickentry;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import com.dusk.common.core.dto.EntityDto;
@@ -16,6 +16,6 @@ import com.dusk.common.core.dto.EntityDto;
 @Setter
 public class QuickEntryListDto extends EntityDto {
 
-    @ApiModelProperty("前端路由的name")
+    @Schema(description = "前端路由的name")
     private String routeName;
 }

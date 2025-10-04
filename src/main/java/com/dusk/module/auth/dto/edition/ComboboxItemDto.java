@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.edition;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,11 +11,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class ComboboxItemDto {
-    @ApiModelProperty("值")
+    @Schema(description = "值")
     protected String value;
-    @ApiModelProperty("显示名")
+    @Schema(description = "显示名")
     protected String displayText;
-    @ApiModelProperty("是否选中")
+    @Schema(description = "是否选中")
     protected boolean isSelected;
 
     public ComboboxItemDto(String value, String displayText){

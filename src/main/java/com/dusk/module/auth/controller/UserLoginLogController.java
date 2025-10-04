@@ -1,7 +1,7 @@
 package com.dusk.module.auth.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import com.dusk.common.core.annotation.Authorize;
 import com.dusk.common.core.controller.CruxBaseController;
 import com.dusk.common.core.dto.PagedResultDto;
@@ -21,14 +21,14 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("userLoginLog")
-@Api(description = "用户日志管理", tags = "UserLoginLog")
+@Tag(name = "用户日志管理", description = "UserLoginLog")
 @Authorize(UserLoginLogAuthProvider.PAGES_USER_LOGIN_LOG)
 public class UserLoginLogController extends CruxBaseController {
     @Autowired
     private IUserLoginLogService userLoginLogService;
 
     @GetMapping("listLog")
-    @ApiOperation(value = "查询用户日志")
+    @Operation(summary = "查询用户日志")
     @Authorize(UserLoginLogAuthProvider.PAGES_USER_LOGIN_LOG)
     public PagedResultDto<UserLoginLogDto> listLog(ListUserLoginLogInput input) {
         return userLoginLogService.listLog(input);

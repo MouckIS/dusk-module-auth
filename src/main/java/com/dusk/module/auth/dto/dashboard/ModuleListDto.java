@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.dashboard;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import com.dusk.common.core.dto.EntityDto;
 
@@ -13,18 +13,18 @@ public class ModuleListDto extends EntityDto {
     /**
      * 名称
      */
-    @ApiModelProperty("名称")
+    @Schema(description = "名称")
     private String name;
 
     /**
      * code
      */
-    @ApiModelProperty("code")
+    @Schema(description = "code")
     private String code;
 
     /**
      * 是否中心模块
      */
-    @ApiModelProperty("是否中心模块")
+    @Schema(description = "是否中心模块")
     private Boolean centerModule = false;
 }

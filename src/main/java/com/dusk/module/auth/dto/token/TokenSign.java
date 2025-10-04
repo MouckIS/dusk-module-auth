@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.token;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,15 +20,15 @@ public class TokenSign implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @NotBlank(message = "唯一标识不能为空")
-    @ApiModelProperty("唯一标识")
+    @Schema(description = "唯一标识")
     private String identify;
 
     @NotEmpty(message = "角色不能为空")
-    @ApiModelProperty("角色")
+    @Schema(description = "角色")
     private List<String> roles;
 
     @NotNull(message = "授权时长不能为空")
-    @ApiModelProperty("授权时长（单位：天）")
+    @Schema(description = "授权时长（单位：天）")
     private Long time;
 
 }

@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.station;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,17 +17,17 @@ import java.io.Serializable;
 @FieldNameConstants
 @NoArgsConstructor
 public class StationUserListDto implements Serializable {
-    @ApiModelProperty("用户id")
+    @Schema(description = "用户id")
     private Long id;
-    @ApiModelProperty("姓名")
+    @Schema(description = "姓名")
     private String name;
-    @ApiModelProperty("账号")
+    @Schema(description = "账号")
     private String userName;
-    @ApiModelProperty("邮箱地址")
+    @Schema(description = "邮箱地址")
     private String emailAddress;
-    @ApiModelProperty("所属厂站id")
+    @Schema(description = "所属厂站id")
     private Long stationId;
-    @ApiModelProperty("所属厂站名称")
+    @Schema(description = "所属厂站名称")
     private String stationName;
 
     public StationUserListDto(Long id, String name, String userName, String emailAddress, Long stationId, String stationName) {

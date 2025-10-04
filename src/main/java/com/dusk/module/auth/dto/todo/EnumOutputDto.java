@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.todo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import com.dusk.common.core.dto.SelectListOutputDto;
 import com.dusk.common.core.utils.EnumUtils;
@@ -14,7 +14,7 @@ import java.util.List;
  */
 @Getter
 public class EnumOutputDto {
-    @ApiModelProperty("代办MQTT消息类型")
+    @Schema(description = "代办MQTT消息类型")
     private final List<SelectListOutputDto> toDoMQTTTypeEnumList = EnumUtils.ConvertToList(ToDoMQTTTypeEnum.class);
 
 

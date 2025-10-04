@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.user;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -9,6 +9,6 @@ import lombok.Data;
  */
 @Data
 public class SendVerificationCodeForUpdatingMobileOutput {
-    @ApiModelProperty("验证码")
+    @Schema(description = "验证码")
     public String verificationCode;
 }

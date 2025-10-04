@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.feature;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -13,12 +13,12 @@ public class FeatureValueInput{
     /**
      * 特性名称
      */
-    @ApiModelProperty(value = "特性名称")
+    @Schema(description = "特性名称")
     private String name;
 
     /**
      * 特性值
      */
-    @ApiModelProperty(value = "特性值")
+    @Schema(description = "特性值")
     private String value;
 }

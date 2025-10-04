@@ -2,7 +2,6 @@ package com.dusk.module.auth.controller;
 
 import com.dusk.module.auth.dto.tenant.*;
 import com.github.dozermapper.core.Mapper;
-import io.swagger.annotations.*;
 import com.dusk.common.core.annotation.AllowAnonymous;
 import com.dusk.common.core.annotation.Authorize;
 import com.dusk.common.core.auth.authentication.LoginUserIdContextHolder;
@@ -24,6 +23,10 @@ import com.dusk.module.auth.entity.Tenant;
 import com.dusk.module.auth.entity.User;
 import com.dusk.module.auth.service.ITenantService;
 import com.dusk.module.auth.service.IUserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +42,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("tenant")
-@Api(description = "租户", tags = "Tenant")
+@Tag(name = "租户", description = "Tenant")
 @Authorize(TenantAuthProvider.PAGES_TENANTS)
 public class TenantController extends CruxBaseController {
     @Autowired
@@ -57,7 +60,7 @@ public class TenantController extends CruxBaseController {
      * @param input
      * @return
      */
-    @ApiOperation(value = "查询租户列表")
+    @Operation(summary = "查询租户列表")
     @GetMapping("getTenants")
     public PagedResultDto<TenantListDto> getTenants(GetTenantsInput input) {
         Page<Tenant> page = tenantService.getTenants(input);
@@ -71,7 +74,7 @@ public class TenantController extends CruxBaseController {
      * @return
      */
     @PostMapping("createTenant")
-    @ApiOperation(value = "创建租户")
+    @Operation(summary = "创建租户")
     @Authorize(TenantAuthProvider.PAGES_TENANTS_CREATE)
     public void createTenant(@Valid @RequestBody CreateTenantInput input) {
         tenantService.createTenantWithDefaultSettings(input);
@@ -84,7 +87,7 @@ public class TenantController extends CruxBaseController {
      * @return
      */
     @GetMapping("getTenantForEdit")
-    @ApiOperation(value = "获取租户信息进行编辑")
+    @Operation(summary = "获取租户信息进行编辑")
     @Authorize(TenantAuthProvider.PAGES_TENANTS_EDIT)
     public TenantEditDto getTenantForEdit(EntityDto entityDto) {
         Tenant tenant = tenantService.findById(entityDto.getId()).orElseThrow(() -> new BusinessException("未找到相应的租户信息！"));
@@ -98,7 +101,7 @@ public class TenantController extends CruxBaseController {
      * @return
      */
     @PutMapping("updateTenant")
-    @ApiOperation(value = "更新租户")
+    @Operation(summary = "更新租户")
     @Authorize(TenantAuthProvider.PAGES_TENANTS_EDIT)
     public void updateTenant(@Valid @RequestBody TenantEditDto editDto) {
         tenantService.updateTenant(editDto);
@@ -111,22 +114,22 @@ public class TenantController extends CruxBaseController {
      * @return
      */
     @DeleteMapping("deleteTenant")
-    @ApiOperation(value = "删除租户")
+    @Operation(summary = "删除租户")
     @Authorize(TenantAuthProvider.PAGES_TENANTS_DELETE)
     public void deleteTenant(@RequestBody EntityDto entityDto) {
         tenantService.deleteTenant(entityDto.getId());
     }
 
     @GetMapping("isTenantAvailable")
-    @ApiOperation(value = "租户是否可用")
+    @Operation(summary = "租户是否可用")
     @AllowAnonymous
     public IsTenantAvailableOutput isTenantAvailable(IsTenantAvailableInput input) {
         return tenantService.isTenantAvailable(input);
     }
 
     @GetMapping("{tenantId}/user/list")
-    @ApiOperation("获取指定租户用户列表")
-    @ApiImplicitParams({@ApiImplicitParam(name = "filter", value = "模糊查找[姓名、账号、电子邮箱、手机号、角色名]")})
+    @Operation(summary = "获取指定租户用户列表")
+    @Parameters({@Parameter(name = "filter", description = "模糊查找[姓名、账号、电子邮箱、手机号、角色名]")})
     public PagedResultDto<UserListDto> getTenantUserList(@PathVariable Long tenantId, String filter, PagedAndSortedInputDto pageReq) {
         GetUsersInput input = dozerMapper.map(pageReq, GetUsersInput.class);
         input.setFilter(filter);
@@ -145,10 +148,10 @@ public class TenantController extends CruxBaseController {
     }
 
     @PostMapping("host/impersonation")
-    @ApiOperation("宿主以租户用户登录")
+    @Operation(summary = "宿主以租户用户登录")
     @Authorize(TenantAuthProvider.PAGES_TENANTS_IMPERSONATION)
-    public String hostTenantImpersonation(@ApiParam(value = "租户ID", required = true) @RequestParam @NotNull(message = "租户ID不能为空") Long tenantId,
-                                          @ApiParam(value = "租户用户ID", required = true) @RequestParam @NotNull(message = "租户用户ID不能为空") Long userId) {
+    public String hostTenantImpersonation(@Parameter(description = "租户ID", required = true) @RequestParam @NotNull(message = "租户ID不能为空") Long tenantId,
+                                          @Parameter(description = "租户用户ID", required = true) @RequestParam @NotNull(message = "租户用户ID不能为空") Long userId) {
         Long hostUserId = LoginUserIdContextHolder.getUserId();
         TenantContextHolder.setTenantId(tenantId);
         try {
@@ -163,8 +166,8 @@ public class TenantController extends CruxBaseController {
     }
 
     @PostMapping("host/impersonation-other")
-    @ApiOperation("宿主以租户用户登录时-切换至其他用户登录")
-    public String hostTenantImpersonationOther(@ApiParam(value = "租户用户ID", required = true) @RequestParam @NotNull(message = "租户用户ID不能为空") Long userId) {
+    @Operation(summary = "宿主以租户用户登录时-切换至其他用户登录")
+    public String hostTenantImpersonationOther(@Parameter(description = "租户用户ID", required = true) @RequestParam @NotNull(message = "租户用户ID不能为空") Long userId) {
         UserContext context = getCurrentUser();
         if (context.isHostImpersonation()) {
             User user = userService.getUserById(userId);
@@ -179,7 +182,7 @@ public class TenantController extends CruxBaseController {
 
 
     @GetMapping("host/impersonation-back")
-    @ApiOperation("宿主以租户用户登录后返回到宿主")
+    @Operation(summary = "宿主以租户用户登录后返回到宿主")
     public String backToHost() {
         UserContext context = getCurrentUser();
         if (context.isHostImpersonation()) {
@@ -195,10 +198,10 @@ public class TenantController extends CruxBaseController {
     }
 
     @PostMapping("host/change-password")
-    @ApiOperation("宿主修改租户管理员密码")
+    @Operation(summary = "宿主修改租户管理员密码")
     @Authorize(TenantAuthProvider.PAGES_TENANTS_CHANGEPASSWORD)
-    public void changeTenantAdminPasswordByHost(@ApiParam(value = "租户ID", required = true) @RequestParam @NotNull(message = "租户ID不能为空") Long tenantId,
-                                                @ApiParam(value = "租户管理员重置密码", required = true) @RequestParam @NotNull(message = "密码不能为空") String newPwd) {
+    public void changeTenantAdminPasswordByHost(@Parameter(description = "租户ID", required = true) @RequestParam @NotNull(message = "租户ID不能为空") Long tenantId,
+                                                @Parameter(description = "租户管理员重置密码", required = true) @RequestParam @NotNull(message = "密码不能为空") String newPwd) {
         userService.changeAdminPasswordByHost(tenantId, newPwd);
     }
 }

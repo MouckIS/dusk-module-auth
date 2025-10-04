@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.orga;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import com.dusk.common.core.dto.EntityDto;
 
@@ -10,6 +10,6 @@ import com.dusk.common.core.dto.EntityDto;
  */
 @Data
 public class MoveOrganizationUnitInput extends EntityDto {
-    @ApiModelProperty("新父组织机构id")
+    @Schema(description = "新父组织机构id")
     private Long newParentId;
 }

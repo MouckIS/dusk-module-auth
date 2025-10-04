@@ -1,7 +1,7 @@
 package com.dusk.module.auth.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import com.dusk.common.core.annotation.Authorize;
 import com.dusk.common.core.controller.CruxBaseController;
 import com.dusk.common.core.dto.PagedResultDto;
@@ -26,7 +26,7 @@ import java.util.List;
  * @since 1.0.0
  */
 @RestController("/dataDisplay")
-@Api(tags = "DataDisplay", description = "数据展示设置")
+@Tag(name = "DataDisplay", description = "数据展示设置")
 @Authorize(DataDisplaySetAuthProvider.PAGES_DATA_DISPLAY_SET)
 public class DataDisplaySetController extends CruxBaseController {
 
@@ -34,14 +34,14 @@ public class DataDisplaySetController extends CruxBaseController {
     IDataDisplaySetService dataDisplaySetService;
 
     @PostMapping("/updateDisplaySetItem")
-    @ApiOperation("数据展示设置的更新")
+    @Operation(summary = "数据展示设置的更新")
     @Authorize(DataDisplaySetAuthProvider.PAGES_DATA_DISPLAY_SET_SAVE)
     public void updateDisplaySetItem(@RequestBody List<UpdateDataDisplaySetDto> input){
         dataDisplaySetService.updateDisplaySetItem(input);
     }
 
     @GetMapping("/getDisplayList")
-    @ApiOperation("获取数据展示设置的列表信息")
+    @Operation(summary = "获取数据展示设置的列表信息")
     public PagedResultDto<DataDisplayItemDto> getDisplayList(GetDisplaySetInputDto input) {
         return dataDisplaySetService.getList(input);
     }

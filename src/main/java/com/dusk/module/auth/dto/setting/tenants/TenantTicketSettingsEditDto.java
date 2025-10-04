@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.setting.tenants;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -9,9 +9,9 @@ import lombok.Data;
  */
 @Data
 public class TenantTicketSettingsEditDto {
-    @ApiModelProperty("不解析挂拆牌术语")
+    @Schema(description = "不解析挂拆牌术语")
     private boolean unAnalyzeDeviceBoardTerm;
     
-    @ApiModelProperty("过滤备品备件")
+    @Schema(description = "过滤备品备件")
     private boolean filterSpareParts;
 }

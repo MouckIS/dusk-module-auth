@@ -1,7 +1,7 @@
 package com.dusk.module.auth.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import com.dusk.module.auth.dto.administrativeregions.RegionsDto;
 import com.dusk.module.auth.service.IAdministrativeRegionsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,19 +19,19 @@ import java.util.List;
  **/
 @RestController
 @RequestMapping("administrativeRegions")
-@Api(tags = "AdministrativeRegions", description = "中国行政区域")
+@Tag(name = "AdministrativeRegions", description = "中国行政区域")
 public class AdministrativeRegionsController {
     @Autowired
     IAdministrativeRegionsService administrativeRegionsService;
 
     @GetMapping("getRegions")
-    @ApiOperation("获取省市区")
+    @Operation(summary = "获取省市区")
     public List<RegionsDto> getRegions() {
         return administrativeRegionsService.getRegions();
     }
 
     @GetMapping("getStreet/{id}")
-    @ApiOperation("获取街道")
+    @Operation(summary = "获取街道")
     public List<RegionsDto> getStreet(@PathVariable String id) {
         return administrativeRegionsService.getStreet(id);
     }
