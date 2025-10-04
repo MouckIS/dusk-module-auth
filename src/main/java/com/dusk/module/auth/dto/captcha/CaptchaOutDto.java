@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.captcha;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,8 +11,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CaptchaOutDto {
-    @ApiModelProperty("获取验证码的key，登陆的时候需要返回回来")
+    @Schema(description = "获取验证码的key，登陆的时候需要返回回来")
     private String key;
-    @ApiModelProperty("验证码图片base64")
+    @Schema(description = "验证码图片base64")
     private String imageBase64;
 }

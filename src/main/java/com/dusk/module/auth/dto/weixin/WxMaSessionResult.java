@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.weixin;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import com.dusk.module.auth.dto.mobilelogin.MobileUserDto;
@@ -19,6 +19,6 @@ public class WxMaSessionResult {
 
     private String unionid;
 
-    @ApiModelProperty("登陆token列表")
+    @Schema(description = "登陆token列表")
     private List<MobileUserDto> loginData;
 }

@@ -4,7 +4,10 @@ import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.enums.CellExtraTypeEnum;
 import com.dusk.common.rpc.auth.dto.BindRoleToUserInput;
 import com.github.dozermapper.core.Mapper;
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import com.dusk.common.core.annotation.Authorize;
@@ -35,13 +38,14 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 
 @RestController
 @RequestMapping("/role")
-@Api(description = "角色", tags = "Role")
+@Tag(name = "角色", description = "Role")
 @Authorize(RoleAuthProvider.PAGES_ROLES)
 public class RoleController extends CruxBaseController {
 
@@ -52,28 +56,28 @@ public class RoleController extends CruxBaseController {
     private Mapper dozerMapper;
 
     @GetMapping("/getAllRoles")
-    @ApiOperation(value = "获取所有角色")
+    @Operation(summary = "获取所有角色")
     public List<RoleDto> getAllRoles() {
         List<Role> list = roleService.getRoles();
         return DozerUtils.mapList(dozerMapper,list,RoleDto.class);
     }
 
     @GetMapping("/getRoles")
-    @ApiOperation(value = "查询角色列表")
+    @Operation(summary = "查询角色列表")
     @Authorize(RoleAuthProvider.PAGES_ROLES)
     public PagedResultDto<RoleDto> getRoles(GetRolesInput input) {
         Page<Role> pages = roleService.getRoles(input);
         return DozerUtils.mapToPagedResultDto(dozerMapper,pages,RoleDto.class);
     }
 
-    @ApiOperation(value = "查看某个角色详情")
+    @Operation(summary = "查看某个角色详情")
     @GetMapping("/getRoleDetails")
     @Authorize(RoleAuthProvider.PAGES_ROLES)
     public RoleDto getRoleDetails(EntityDto dto) {
         return roleService.getRoleDetails(dto);
     }
 
-    @ApiOperation(value = "创建或修改角色")
+    @Operation(summary = "创建或修改角色")
     @PostMapping("/createOrUpdateRole")
     @Authorize(RoleAuthProvider.PAGES_ROLES_CREATEOREDIT)
     public Long createOrUpdateRole(@Valid @RequestBody RoleCreateOrEditDto input) {
@@ -81,7 +85,7 @@ public class RoleController extends CruxBaseController {
         return entity.getId();
     }
 
-    @ApiOperation(value = "修改角色下的权限")
+    @Operation(summary = "修改角色下的权限")
     @PostMapping("/updateRolePermission")
     @Authorize(RoleAuthProvider.PAGES_ROLES_MANAGEPERMISSIONS)
     public Long UpdateRolePermission(@Valid @RequestBody UpdateRolePermissionDto input) {
@@ -89,7 +93,7 @@ public class RoleController extends CruxBaseController {
         return entity.getId();
     }
 
-    @ApiOperation(value = "删除角色")
+    @Operation(summary = "删除角色")
     @DeleteMapping("/deleteRole")
     @Authorize(RoleAuthProvider.PAGES_ROLES_DELETE)
     public Long deleteRole(EntityDto dto) throws BusinessException {
@@ -97,20 +101,20 @@ public class RoleController extends CruxBaseController {
         return dto.getId();
     }
 
-    @ApiOperation(value = "导出角色")
+    @Operation(summary = "导出角色")
     @GetMapping("export/{id}")
-    public void exportRole(@ApiParam(value = "角色ID")  @PathVariable long id, HttpServletResponse response)throws IOException {
+    public void exportRole(@Parameter(description = "角色ID")  @PathVariable long id, HttpServletResponse response)throws IOException {
         response.setContentType("application/vnd.ms-excel;charset=utf-8");
         response.setCharacterEncoding("utf-8");
-        String fileName = URLEncoder.encode("角色信息导出", "UTF-8").replaceAll("\\+", "%20");
+        String fileName = URLEncoder.encode("角色信息导出", StandardCharsets.UTF_8).replaceAll("\\+", "%20");
         response.setHeader("Content-Disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
         roleService.exportRole(id,response.getOutputStream());
     }
 
-    @ApiOperation(value = "导入角色")
+    @Operation(summary = "导入角色")
     @PostMapping("import")
     @Authorize(RoleAuthProvider.PAGES_ROLES_CREATEOREDIT)
-    public void importRole(@ApiParam(value = "Excel文件",required = true) MultipartFile file){
+    public void importRole(@Parameter(description = "Excel文件",required = true) MultipartFile file){
         InputStream stream = null;
         RoleDto roleDto = null;
         try{
@@ -134,13 +138,10 @@ public class RoleController extends CruxBaseController {
         roleService.importRole(roleDto);
     }
 
-    @ApiOperation(value = "批量导入角色")
+    @Operation(summary = "批量导入角色")
     @PostMapping(value = "import/batch",headers = "Content-Type=multipart/form-data")
     @Authorize(RoleAuthProvider.PAGES_ROLES_CREATEOREDIT)
-    @ApiImplicitParams({
-            @ApiImplicitParam(paramType = "form", name = "files", value = "Excel文件", allowMultiple = true, dataType = "__file")
-    })
-    public void batchImportRole(@RequestParam("files") MultipartFile[] files){
+    public void batchImportRole(@Parameter(description = "Excel文件", schema = @Schema(type = "string", format = "binary")) @RequestParam("files") MultipartFile[] files){
         List<RoleDto> roleDtoList = new ArrayList<>();
         InputStream stream = null;
         try{
@@ -174,27 +175,27 @@ public class RoleController extends CruxBaseController {
         return "";
     }
 
-    @ApiOperation(value = "角色批量绑定用户")
+    @Operation(summary = "角色批量绑定用户")
     @PostMapping(value = "/bindRoleToUsers")
     @Authorize(RoleAuthProvider.PAGES_ADMINISTRATION_USERS_BIND_ROLE)
     public void bindRoleToUsers(@RequestBody BindRoleToUserInput roleToUserInput) {
         roleService.bindRoleToUsers(roleToUserInput);
     }
 
-    @ApiOperation(value = "角色批量绑定组织中的用户")
+    @Operation(summary = "角色批量绑定组织中的用户")
     @PostMapping(value = "/bindRoleToOrgans")
     @Authorize(RoleAuthProvider.PAGES_ADMINISTRATION_USERS_BIND_ROLE)
     public void bindRoleToOrgans(@RequestBody @Valid BindRoleToOrgInput orgaUsersInput) {
         roleService.bindRoleToOrgans(orgaUsersInput);
     }
 
-    @ApiOperation(value = "查找有某角色的用户列表")
+    @Operation(summary = "查找有某角色的用户列表")
     @GetMapping(value = "/getUserByRoleId")
     public PagedResultDto<UserListDto> getUsersByRoleId(@Valid GetUserByRoleDto getUserByRoleDto) {
         return DozerUtils.mapToPagedResultDto(dozerMapper, roleService.getUserByRoleId(getUserByRoleDto), UserListDto.class);
     }
 
-    @ApiOperation(value = "取消用户的角色")
+    @Operation(summary = "取消用户的角色")
     @PostMapping(value = "/unbindRoleForUsers")
     @Authorize(RoleAuthProvider.PAGES_ADMINISTRATION_USERS_BIND_ROLE)
     public void unbindRoleForUsers(@RequestBody @Valid UnbindRoleForUserDto roleForUserDto) {

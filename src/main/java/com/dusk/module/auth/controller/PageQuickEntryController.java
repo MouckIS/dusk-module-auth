@@ -1,7 +1,7 @@
 package com.dusk.module.auth.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import com.dusk.common.core.annotation.Authorize;
 import com.dusk.common.core.controller.CruxBaseController;
 import com.dusk.common.core.dto.PagedResultDto;
@@ -26,7 +26,7 @@ import java.util.List;
  * @since 1.0.0
  */
 @RestController("/quickEntry")
-@Api(tags = "PageQuickEntry", description = "页面快捷入口")
+@Tag(name = "PageQuickEntry", description = "页面快捷入口")
 @Authorize(PageQuickEntryAuthProvider.PAGES_QUICK_ENTRY)
 public class PageQuickEntryController extends CruxBaseController {
 
@@ -34,14 +34,14 @@ public class PageQuickEntryController extends CruxBaseController {
     IPageQuickEntryService quickEntryService;
 
     @PostMapping("/updateQuickSet")
-    @ApiOperation("更新设置项")
+    @Operation(summary = "更新设置项")
     @Authorize(PageQuickEntryAuthProvider.PAGES_QUICK_ENTRY_SAVE)
     public void updateQuickSet(@RequestBody List<UpdatePageQuickSetDto> input) {
         quickEntryService.updateQuickSet(input);
     }
 
     @GetMapping("/getQuickSetList")
-    @ApiOperation("获取设置项列表")
+    @Operation(summary = "获取设置项列表")
     public PagedResultDto<QuickEntryListDto> getQuickSetList(GetQuickSetListDto input) {
         return quickEntryService.getQuickSetList(input);
     }

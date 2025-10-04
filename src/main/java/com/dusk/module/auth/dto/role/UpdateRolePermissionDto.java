@@ -1,17 +1,20 @@
 package com.dusk.module.auth.dto.role;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import com.dusk.common.core.dto.EntityDto;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
-@ApiModel
+@Getter
+@Setter
+@Schema
 public class UpdateRolePermissionDto extends EntityDto {
-    @ApiModelProperty("权限列表")
+    @Schema(description = "权限列表")
     private List<CreateOrEditRolePermissionDto> permissions;
 
     public UpdateRolePermissionDto(){

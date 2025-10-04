@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.tenant;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class IsTenantAvailableOutput {
-    @ApiModelProperty("租户状态")
+    @Schema(description = "租户状态")
     public TenantAvailabilityState state;
 
-    @ApiModelProperty("租户id")
+    @Schema(description = "租户id")
     public Long tenantId;
 
     public IsTenantAvailableOutput(TenantAvailabilityState state)

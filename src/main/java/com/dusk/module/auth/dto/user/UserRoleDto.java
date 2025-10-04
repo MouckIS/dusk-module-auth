@@ -1,7 +1,7 @@
 package com.dusk.module.auth.dto.user;
 
 import com.github.dozermapper.core.Mapping;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -11,13 +11,13 @@ import lombok.Data;
 @Data
 public class UserRoleDto {
 
-    @ApiModelProperty("角色id")
+    @Schema(description = "角色id")
     @Mapping("id")
     private Long roleId;
-    @ApiModelProperty("角色名称")
+    @Schema(description = "角色名称")
     private String roleName;
-    @ApiModelProperty("角色代码")
+    @Schema(description = "角色代码")
     private String roleCode;
-    @ApiModelProperty("是否分配")
+    @Schema(description = "是否分配")
     private boolean isAssigned;
 }

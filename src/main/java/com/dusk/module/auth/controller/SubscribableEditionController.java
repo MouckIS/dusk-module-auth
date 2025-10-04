@@ -2,8 +2,8 @@ package com.dusk.module.auth.controller;
 
 import com.dusk.common.core.annotation.Authorize;
 import com.github.dozermapper.core.Mapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("edition")
-@Api(description = "版本", tags = "Edition")
+@Tag(name = "版本", description = "Edition")
 @Authorize(EditionAuthProvider.PAGES_EDITIONS)
 public class SubscribableEditionController  extends CruxBaseController {
     @Autowired
@@ -53,7 +53,7 @@ public class SubscribableEditionController  extends CruxBaseController {
      * @return
      */
     @GetMapping("getEditions")
-    @ApiOperation(value = "查询版本列表")
+    @Operation(summary = "查询版本列表")
     public PagedResultDto<EditionListDto> getEditions(GetEditionInput input){
         Page<SubscribableEdition> page = editionService.getEditions(input);
         List<EditionListDto> list = DozerUtils.mapList(dozerMapper, page.getContent(), EditionListDto.class);
@@ -61,7 +61,7 @@ public class SubscribableEditionController  extends CruxBaseController {
     }
 
     @GetMapping("export/{id}")
-    @ApiOperation("导出版本")
+    @Operation(summary = "导出版本")
     public void exportEdition(@PathVariable Long id, HttpServletResponse response) throws Exception{
         response.setContentType("application/vnd.ms-excel;charset=utf-8");
         response.setCharacterEncoding("utf-8");
@@ -72,7 +72,7 @@ public class SubscribableEditionController  extends CruxBaseController {
     }
 
     @PostMapping("import")
-    @ApiOperation("导入版本")
+    @Operation(summary = "导入版本")
     public void importEdition(@RequestParam MultipartFile file){
         InputStream in = null;
         try{
@@ -95,7 +95,7 @@ public class SubscribableEditionController  extends CruxBaseController {
      * @return
      */
     @GetMapping("getEditionForEdit")
-    @ApiOperation(value = "获取版本信息进行编辑")
+    @Operation(summary = "获取版本信息进行编辑")
     @Authorize(EditionAuthProvider.PAGES_EDITIONS_EDIT)
     public EditionEditDto getEditionForEdit(EntityDto input){
         EditionEditDto editionEditDto;
@@ -112,7 +112,7 @@ public class SubscribableEditionController  extends CruxBaseController {
     }
 
     @PostMapping("createOrUpdateEdition")
-    @ApiOperation(value = "新增或编辑版本信息")
+    @Operation(summary = "新增或编辑版本信息")
     @Authorize(EditionAuthProvider.PAGES_EDITIONS_EDIT)
     public void createOrUpdateEdition(@Valid @RequestBody EditionEditDto input){
         if (input.getId()==null){
@@ -123,14 +123,14 @@ public class SubscribableEditionController  extends CruxBaseController {
     }
 
     @DeleteMapping("deleteEdition")
-    @ApiOperation(value = "删除版本")
+    @Operation(summary = "删除版本")
     @Authorize(EditionAuthProvider.PAGES_EDITIONS_DELETE)
     public void deleteEdition(@Valid @RequestBody EntityDto input){
         editionService.deleteEdition(input.getId());
     }
 
     @GetMapping("getEditionComboboxItems")
-    @ApiOperation(value = "获取版本选择列表")
+    @Operation(summary = "获取版本选择列表")
     public List<SubscribableEditionComboboxItemDto> getEditionComboboxItems(
             @RequestParam(required = false) String selectedEditionId,
             @RequestParam(defaultValue = "false")Boolean addAllItem,

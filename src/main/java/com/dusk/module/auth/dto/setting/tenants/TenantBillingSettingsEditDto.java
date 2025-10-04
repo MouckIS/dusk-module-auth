@@ -1,7 +1,7 @@
 package com.dusk.module.auth.dto.setting.tenants;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -9,15 +9,15 @@ import lombok.Data;
  * @date 2020-06-16 8:10
  */
 @Data
-@ApiModel("发票")
+@Schema(description = "发票")
 public class TenantBillingSettingsEditDto{
-    @ApiModelProperty("法定名称")
+    @Schema(description = "法定名称")
     public String legalName;
 
-    @ApiModelProperty("地址")
+    @Schema(description = "地址")
     public String address;
 
-    @ApiModelProperty("税务代码")
+    @Schema(description = "税务代码")
     private String taxVatNo;
 }
 

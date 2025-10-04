@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.station;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,11 +13,11 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Setter
 public class RemoveUserFromStationInput {
-    @ApiModelProperty("用户id")
+    @Schema(description = "用户id")
     @NotNull(message = "用户id不能为空")
     private Long userId;
     
-    @ApiModelProperty("厂站id")
+    @Schema(description = "厂站id")
     @NotNull(message = "厂站id不能为空")
     private Long stationId;
 }

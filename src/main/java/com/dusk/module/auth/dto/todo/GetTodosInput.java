@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.todo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
@@ -14,12 +14,12 @@ import java.util.List;
 @Getter
 @Setter
 public class GetTodosInput extends PagedAndSortedInputDto {
-    @ApiModelProperty("类型名称模糊查询")
+    @Schema(description = "类型名称模糊查询")
     private String typeName;
 
-    @ApiModelProperty("类型标题模糊查询")
+    @Schema(description = "类型标题模糊查询")
     private String title;
 
-    @ApiModelProperty("待办类型编码，in 查询，也就是满足其一即可")
+    @Schema(description = "待办类型编码，in 查询，也就是满足其一即可")
     private List<String> type;
 }

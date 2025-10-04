@@ -1,7 +1,7 @@
 package com.dusk.module.auth.dto.user;
 
 import com.dusk.common.rpc.auth.dto.CreateOrUpdateUserInput;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,21 +22,21 @@ import java.util.List;
 @AllArgsConstructor
 public class CreateOrUpdateUserInfoInput extends CreateOrUpdateUserInput {
     @NotNull
-    @ApiModelProperty("员工级别")
+    @Schema(description = "员工级别")
     private ELevel level;
 
-    @ApiModelProperty("所属厂站列表")
+    @Schema(description = "所属厂站列表")
     private List<Long> stationIds;
 
-    @ApiModelProperty("岗位")
+    @Schema(description = "岗位")
     private String job;
 
-    @ApiModelProperty("卡号")
+    @Schema(description = "卡号")
     private String accessCard;
 
-    @ApiModelProperty("入厂时间")
+    @Schema(description = "入厂时间")
     private LocalDate enterDate;
 
-    @ApiModelProperty("管理的组织id")
+    @Schema(description = "管理的组织id")
     private List<Long> managerOrgIds;
 }

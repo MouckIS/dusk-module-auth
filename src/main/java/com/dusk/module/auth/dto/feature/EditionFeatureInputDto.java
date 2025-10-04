@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.feature;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.util.List;
@@ -11,8 +11,8 @@ import java.util.List;
  */
 @Data
 public class EditionFeatureInputDto {
-    @ApiModelProperty("版本id")
+    @Schema(description = "版本id")
     Long editionId;
-    @ApiModelProperty("特性")
+    @Schema(description = "特性")
     List<FeatureValueInput> featureList;
 }

@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.user;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -12,9 +12,9 @@ import java.util.List;
  */
 @Data
 public class UpdateUserPermissionsInput {
-    @ApiModelProperty("用户id")
+    @Schema(description = "用户id")
     public String userId;
     @NotBlank
-    @ApiModelProperty("权限名称列表")
+    @Schema(description = "权限名称列表")
     public List<String> GrantedPermissionNames;
 }

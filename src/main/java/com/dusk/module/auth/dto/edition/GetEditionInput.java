@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.edition;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
 
@@ -10,6 +10,6 @@ import com.dusk.common.core.dto.PagedAndSortedInputDto;
  */
 @Data
 public class GetEditionInput extends PagedAndSortedInputDto {
-    @ApiModelProperty("根据版本名进行模糊查找")
+    @Schema(description = "根据版本名进行模糊查找")
     private String filter;
 }

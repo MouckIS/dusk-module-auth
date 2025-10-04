@@ -1,7 +1,7 @@
 package com.dusk.module.auth.dto.setting.host;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -9,32 +9,32 @@ import lombok.Data;
  * @date 2020-05-21 15:47
  */
 @Data
-@ApiModel("邮箱")
+@Schema(description = "邮箱")
 public class EmailSettingsEditDto {
-    @ApiModelProperty("默认发送邮箱地址")
+    @Schema(description = "默认发送邮箱地址")
     public String defaultFromAddress;
 
-    @ApiModelProperty("默认发送人名字")
+    @Schema(description = "默认发送人名字")
     public String defaultFromDisplayName;
 
-    @ApiModelProperty("SMTP服务器")
+    @Schema(description = "SMTP服务器")
     public String smtpHost;
 
-    @ApiModelProperty(value = "SMTP端口", example = "25")
+    @Schema(description = "SMTP端口", example = "25")
     public int smtpPort;
 
-    @ApiModelProperty("用户名")
+    @Schema(description = "用户名")
     public String smtpUserName;
 
-    @ApiModelProperty("密码")
+    @Schema(description = "密码")
     public String smtpPassword;
 
-    @ApiModelProperty("域名")
+    @Schema(description = "域名")
     public String smtpDomain;
 
-    @ApiModelProperty("使用SSL")
+    @Schema(description = "使用SSL")
     public boolean smtpEnableSsl;
 
-    @ApiModelProperty("默认身份验证")
+    @Schema(description = "默认身份验证")
     public boolean smtpUseDefaultCredentials;
 }

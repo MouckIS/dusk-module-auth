@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.notification;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import com.dusk.common.core.dto.EntityDto;
 import com.dusk.common.core.dto.VersionDto;
@@ -17,7 +17,7 @@ public class GetNotificationInput extends EntityDto {
     /**
      * 消息Id
      */
-    @ApiModelProperty("消息Id")
+    @Schema(description = "消息Id")
     @NotNull(message = "消息Id不能为空")
     private Long id;
 

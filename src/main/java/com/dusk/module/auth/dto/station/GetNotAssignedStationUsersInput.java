@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.station;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
@@ -18,14 +18,14 @@ import javax.validation.constraints.NotNull;
 @Data
 public class GetNotAssignedStationUsersInput extends PagedAndSortedInputDto {
 
-    @ApiModelProperty("厂站id")
+    @Schema(description = "厂站id")
     @NotNull(message = "厂站id不能为空")
     private Long stationId;
 
-    @ApiModelProperty("搜索关键字(姓名/账号)")
+    @Schema(description = "搜索关键字(姓名/账号)")
     private String filter;
 
-    @ApiModelProperty("用户类型")
+    @Schema(description = "用户类型")
     private EUnitType userType;
 
     @Override

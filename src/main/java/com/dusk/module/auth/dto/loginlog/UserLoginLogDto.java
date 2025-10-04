@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.loginlog;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import com.dusk.common.core.dto.EntityDto;
@@ -19,15 +19,15 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 public class UserLoginLogDto extends EntityDto {
-    @ApiModelProperty("用户id")
+    @Schema(description = "用户id")
     @QBeanMapper(target = QUser.class, field = BaseEntity.Fields.id)
     private Long userId;
-    @ApiModelProperty("用户名称")
+    @Schema(description = "用户名称")
     private String userName;
-    @ApiModelProperty("登录日志类型")
+    @Schema(description = "登录日志类型")
     private LoginLogType logType;
-    @ApiModelProperty("登录日志类型名称")
+    @Schema(description = "登录日志类型名称")
     private String logTypeName;
-    @ApiModelProperty("操作时间")
+    @Schema(description = "操作时间")
     private LocalDateTime operationTime;
 }

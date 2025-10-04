@@ -1,7 +1,7 @@
 package com.dusk.module.auth.dto.orga;
 
 import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitDto;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import com.dusk.common.core.enums.EUnitType;
@@ -13,12 +13,12 @@ import com.dusk.common.core.enums.EUnitType;
 @Getter
 @Setter
 public class OrganizationStationUnitDto  extends OrganizationUnitDto {
-    @ApiModelProperty("厂站是否可用")
+    @Schema(description = "厂站是否可用")
     private boolean stationEnabled = false;
-    @ApiModelProperty("组织类型")
+    @Schema(description = "组织类型")
     private EUnitType type;
-    @ApiModelProperty("组织机构的描述")
+    @Schema(description = "组织机构的描述")
     private String description;
-    @ApiModelProperty("管理层id")
+    @Schema(description = "管理层id")
     private Long managerId;
 }

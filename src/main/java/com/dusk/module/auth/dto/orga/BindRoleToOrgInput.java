@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.orga;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.Getter;
 import org.w3c.dom.stylesheets.LinkStyle;
@@ -16,13 +16,13 @@ import java.util.List;
 @Getter
 public class BindRoleToOrgInput {
 
-    @ApiModelProperty("角色id")
+    @Schema(description = "角色id")
     @NotNull(message = "roleId不能为空")
     private Long roleId;
 
-    @ApiModelProperty("组织id列表")
+    @Schema(description = "组织id列表")
     private List<Long> orgIds = new ArrayList<>();
 
-    @ApiModelProperty("是否包含子区域")
+    @Schema(description = "是否包含子区域")
     private boolean includeChild;
 }

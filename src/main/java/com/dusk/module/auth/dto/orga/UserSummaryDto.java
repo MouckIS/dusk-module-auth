@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.orga;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -9,15 +9,15 @@ import lombok.Data;
  */
 @Data
 public class UserSummaryDto {
-    @ApiModelProperty("用户id")
+    @Schema(description = "用户id")
     private String userId;
 
-    @ApiModelProperty("姓名")
+    @Schema(description = "姓名")
     private String name;
 
-    @ApiModelProperty("账号")
+    @Schema(description = "账号")
     private String userName;
 
-    @ApiModelProperty("组织机构id")
+    @Schema(description = "组织机构id")
     private String organizationUnitId;
 }
