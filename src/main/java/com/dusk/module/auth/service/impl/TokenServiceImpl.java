@@ -9,7 +9,7 @@ import com.dusk.module.auth.dto.token.TokenSign;
 import com.dusk.module.auth.service.ITokenService;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.concurrent.TimeUnit;
 
 /**

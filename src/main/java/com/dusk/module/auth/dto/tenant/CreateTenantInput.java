@@ -1,16 +1,18 @@
 package com.dusk.module.auth.dto.tenant;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 /**
  * @author kefuming
  * @date 2020-04-30 10:01
  */
-@Data
+@Getter
+@Setter
 public class CreateTenantInput {
     /**
      * 是否公用数据库

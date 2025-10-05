@@ -1,7 +1,8 @@
 package com.dusk.module.auth.dto.edition;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import com.dusk.common.core.dto.EntityDto;
 import com.dusk.module.auth.enums.SubscriptionPaymentGatewayType;
 
@@ -13,7 +14,8 @@ import java.util.Map;
  * @author kefuming
  * @date 2020-05-08 10:18
  */
-@Data
+@Getter
+@Setter
 public class EditionSelectDto extends EntityDto {
     @ApiModelProperty("名称")
     private String name;

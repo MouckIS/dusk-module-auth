@@ -3,7 +3,8 @@ package com.dusk.module.auth.dto.mobilelogin;
 import cn.hutool.core.util.StrUtil;
 import com.github.dozermapper.core.Mapping;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 import com.dusk.common.core.dto.EntityDto;
 
@@ -11,7 +12,8 @@ import com.dusk.common.core.dto.EntityDto;
  * @author pengmengjiang
  * @date 2020/10/14 11:20
  */
-@Data
+@Getter
+@Setter
 @FieldNameConstants
 public class MobileUserDto extends EntityDto {
     @ApiModelProperty("姓名")

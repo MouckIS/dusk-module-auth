@@ -1,6 +1,7 @@
 package com.dusk.module.auth.dto.weixin;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 /**
@@ -8,7 +9,8 @@ import lombok.NoArgsConstructor;
  * @date 2023/11/22
  */
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 public class WxCpUserDetail {
 
     private Integer errcode;

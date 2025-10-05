@@ -1,6 +1,7 @@
 package com.dusk.module.auth.setting.config;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -10,17 +11,20 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConfigurationProperties(prefix = "app.setting.push")
-@Data
+@Getter
+@Setter
 public class PushManagementConfig {
     private Mobile mobile = new Mobile();
-    @Data
+    @Getter
+@Setter
     public static class Mobile{
         private String iosAppKey;
         private String androidAppKey;
         private String secret;
         private Pages pages = new Pages();
 
-        @Data
+        @Getter
+@Setter
         public static class Pages{
             private String keyCabinetDetail;
             private String wireCabinetDetail;

@@ -1,7 +1,8 @@
 package com.dusk.module.auth.dto.orga;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
 import com.dusk.common.core.entity.BaseEntity;
@@ -15,7 +16,8 @@ import org.springframework.data.domain.Sort;
  * @author kefuming
  * @date 2020/10/16 16:32
  */
-@Data
+@Getter
+@Setter
 public class GetOrganizationUnitUsersForSelectInput extends PagedAndSortedInputDto {
 
     @ApiModelProperty("组织机构id")

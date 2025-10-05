@@ -1,7 +1,8 @@
 package com.dusk.module.auth.dto.orga;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import com.dusk.common.core.dto.EntityDto;
 import com.dusk.module.auth.enums.OrgLabel;
 
@@ -9,7 +10,8 @@ import com.dusk.module.auth.enums.OrgLabel;
  * @author kefuming
  * @date 2020-05-13 15:22
  */
-@Data
+@Getter
+@Setter
 public class UpdateOrganizationUnitInput extends EntityDto {
     @ApiModelProperty("父组织机构id")
     private Long parentId;

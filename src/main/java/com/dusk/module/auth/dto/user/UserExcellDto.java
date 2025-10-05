@@ -1,12 +1,14 @@
 package com.dusk.module.auth.dto.user;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author kefuming
  * @date 2020/5/28 10:59
  */
-@Data
+@Getter
+@Setter
 public class UserExcellDto {
     // todo: 文件导出
     //@ExcelHeader(value="姓名",sort=1)

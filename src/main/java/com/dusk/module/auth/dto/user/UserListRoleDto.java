@@ -1,7 +1,8 @@
 package com.dusk.module.auth.dto.user;
 
 import com.github.dozermapper.core.Mapping;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 
@@ -9,7 +10,8 @@ import java.io.Serializable;
  * @author kefuming
  * @date 2020/5/15 12:01
  */
-@Data
+@Getter
+@Setter
 public class UserListRoleDto implements Serializable {
     private String id;
     public String roleName;

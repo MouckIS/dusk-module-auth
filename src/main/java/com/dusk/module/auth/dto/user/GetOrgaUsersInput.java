@@ -2,19 +2,21 @@ package com.dusk.module.auth.dto.user;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
 import com.dusk.common.core.entity.BaseEntity;
 import org.springframework.data.domain.Sort;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * @author kefuming
  * @date 2020/5/15 11:26
  */
-@Data
+@Getter
+@Setter
 @ApiModel(value = "GetUsersInput", description = "查询用户列表的实体类")
 public class GetOrgaUsersInput extends PagedAndSortedInputDto {
     @ApiModelProperty("组织机构Id")

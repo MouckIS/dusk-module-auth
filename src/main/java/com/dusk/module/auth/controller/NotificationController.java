@@ -13,7 +13,7 @@ import com.dusk.module.auth.service.INotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * 用户消息的controller

@@ -2,11 +2,12 @@ package com.dusk.module.auth.dto.user;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import com.dusk.module.auth.enums.UserPrintType;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import java.util.List;
 
 /**
@@ -14,7 +15,8 @@ import java.util.List;
  * @author caiwenjun
  * @date 2024/1/5 11:07
  */
-@Data
+@Getter
+@Setter
 @ApiModel(value = "UsersPrintInput", description = "用户信息打印实体类")
 public class UsersPrintInput {
     @ApiModelProperty("人员id")

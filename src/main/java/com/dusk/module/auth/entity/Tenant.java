@@ -1,6 +1,7 @@
 package com.dusk.module.auth.entity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 import org.apache.commons.lang3.StringUtils;
 import com.dusk.common.core.annotation.LogicDelete;
@@ -10,7 +11,7 @@ import com.dusk.common.core.exception.BusinessException;
 import com.dusk.module.auth.enums.EditionPaymentType;
 import com.dusk.module.auth.enums.PaymentPeriodType;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
@@ -22,7 +23,8 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "sys_tenant")
-@Data
+@Getter
+@Setter
 @FieldNameConstants
 public class Tenant extends CreationEntity {
     private static final long serialVersionUID = -5505009888989512074L;

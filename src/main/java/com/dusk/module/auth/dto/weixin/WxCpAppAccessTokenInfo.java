@@ -1,6 +1,7 @@
 package com.dusk.module.auth.dto.weixin;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
@@ -10,7 +11,8 @@ import java.util.List;
  * @date 2023/11/12
  */
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 public class WxCpAppAccessTokenInfo {
 
     private Integer errcode;
@@ -23,14 +25,16 @@ public class WxCpAppAccessTokenInfo {
     private String state;
 
     @NoArgsConstructor
-    @Data
+    @Getter
+@Setter
     public static class DealerCorpInfoDTO {
         private String corpid;
         private String corp_name;
     }
 
     @NoArgsConstructor
-    @Data
+    @Getter
+@Setter
     public static class AuthCorpInfoDTO {
         private String corpid;
         private String corp_name;
@@ -47,12 +51,14 @@ public class WxCpAppAccessTokenInfo {
     }
 
     @NoArgsConstructor
-    @Data
+    @Getter
+@Setter
     public static class AuthInfoDTO {
         private List<AgentDTO> agent;
 
         @NoArgsConstructor
-        @Data
+        @Getter
+@Setter
         public static class AgentDTO {
             private Integer agentid;
             private String name;
@@ -65,7 +71,8 @@ public class WxCpAppAccessTokenInfo {
             private SharedFromDTO shared_from;
 
             @NoArgsConstructor
-            @Data
+            @Getter
+@Setter
             public static class PrivilegeDTO {
                 private Integer level;
                 private List<Integer> allow_party;
@@ -74,7 +81,8 @@ public class WxCpAppAccessTokenInfo {
             }
 
             @NoArgsConstructor
-            @Data
+            @Getter
+@Setter
             public static class SharedFromDTO {
                 private String corpid;
                 private Integer share_type;
@@ -83,7 +91,8 @@ public class WxCpAppAccessTokenInfo {
     }
 
     @NoArgsConstructor
-    @Data
+    @Getter
+@Setter
     public static class AuthUserInfoDTO {
         private String userid;
         private String open_userid;

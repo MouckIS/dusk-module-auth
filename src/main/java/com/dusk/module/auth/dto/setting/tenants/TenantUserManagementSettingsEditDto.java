@@ -2,13 +2,15 @@ package com.dusk.module.auth.dto.setting.tenants;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author kefuming
  * @date 2020-06-16 8:17
  */
-@Data
+@Getter
+@Setter
 @ApiModel("用户管理")
 public class TenantUserManagementSettingsEditDto {
     @ApiModelProperty("允许用户注册")

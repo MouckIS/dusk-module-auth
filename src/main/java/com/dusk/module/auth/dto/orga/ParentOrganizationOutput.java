@@ -1,13 +1,15 @@
 package com.dusk.module.auth.dto.orga;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author kefuming
  * @date 2020-05-13 17:23
  */
-@Data
+@Getter
+@Setter
 public class ParentOrganizationOutput {
     @ApiModelProperty("组织机构id")
     private String id;

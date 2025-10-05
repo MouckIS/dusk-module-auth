@@ -1,7 +1,8 @@
 package com.dusk.module.auth.utils.okhttp;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 import okhttp3.MediaType;
 
@@ -12,7 +13,8 @@ import java.util.Map;
  * @author jianjianhong
  * @date 2022/8/1
  */
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class OkHttpTaskParam {

@@ -1,12 +1,13 @@
 package com.dusk.module.auth.entity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 import com.dusk.common.core.annotation.DataPermission;
 import com.dusk.common.core.entity.FullAuditedEntity;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 /**
  * 公用收藏夹
@@ -16,7 +17,8 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "common_favorite")
-@Data
+@Getter
+@Setter
 @FieldNameConstants
 public class CommonFavorite extends FullAuditedEntity {
     /**

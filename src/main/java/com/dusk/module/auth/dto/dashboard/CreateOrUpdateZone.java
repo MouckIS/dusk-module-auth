@@ -1,18 +1,20 @@
 package com.dusk.module.auth.dto.dashboard;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import com.dusk.common.core.entity.BaseEntity;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 /**
  * @author jianjianhong
  * @date 2021-07-26 10:10
  */
-@Data
+@Getter
+@Setter
 public class CreateOrUpdateZone extends BaseEntity {
     /**
      * 名称

@@ -1,17 +1,19 @@
 package com.dusk.module.auth.dto.edition;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import com.dusk.common.core.dto.VersionDto;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 
 /**
  * @author kefuming
  * @date 2020-05-08 10:13
  */
-@Data
+@Getter
+@Setter
 public class EditionEditDto extends VersionDto {
     @NotBlank(message = "名称不能为空")
     @ApiModelProperty("显示的名称")

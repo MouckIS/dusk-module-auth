@@ -1,10 +1,11 @@
 package com.dusk.module.auth.entity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import com.dusk.common.core.entity.CreationEntity;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 /**
  * 租户和版本权限公用的表
@@ -14,7 +15,8 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "sys_tenant_permissions")
-@Data
+@Getter
+@Setter
 public class TenantPermission extends CreationEntity {
     /**
      * 版本id

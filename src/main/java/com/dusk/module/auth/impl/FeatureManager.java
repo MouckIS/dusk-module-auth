@@ -1,16 +1,15 @@
-package com.dusk.module.ddm.feature.impl;
+package com.dusk.module.auth.impl;
 
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.utils.SpringContextUtils;
 import com.dusk.module.auth.dto.TenantFeature;
-import com.dusk.module.auth.impl.FeatureProvider;
 import com.dusk.module.auth.service.IFeatureDefinitionContext;
 import com.dusk.module.auth.service.IFeatureManager;
 import com.dusk.module.auth.service.IFeaturePusher;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

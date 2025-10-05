@@ -1,12 +1,14 @@
 package com.dusk.module.auth.dto.user;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author kefuming
  * @date 2020/5/18 9:59
  */
-@Data
+@Getter
+@Setter
 public class FlatPermissionDto {
     private String parentName;
 

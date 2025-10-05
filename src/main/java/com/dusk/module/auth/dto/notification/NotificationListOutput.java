@@ -3,7 +3,8 @@ package com.dusk.module.auth.dto.notification;
 import com.dusk.common.rpc.auth.enums.NotificationType;
 import com.dusk.common.core.dto.VersionDto;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -13,7 +14,8 @@ import java.time.LocalDateTime;
  * @author kefuming
  * @date 2021/1/4 10:32
  */
-@Data
+@Getter
+@Setter
 public class NotificationListOutput extends VersionDto {
 
     @ApiModelProperty("消息标题")

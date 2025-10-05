@@ -1,7 +1,8 @@
 package com.dusk.module.auth.dto.orga;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import com.dusk.common.core.dto.EntityDto;
@@ -12,7 +13,8 @@ import com.dusk.common.core.dto.EntityDto;
  * @author kefuming
  * @date 2020/10/16 16:11
  */
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @FieldNameConstants
 public class OrganizationUnitUserForSelectDto {

@@ -2,7 +2,8 @@ package com.dusk.module.auth.dto.fingerprint;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 
@@ -10,7 +11,8 @@ import java.io.Serializable;
  * @author kefuming
  * @date 2021-05-12 8:19
  */
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class RegisterFingerprintStartPayload implements Serializable {

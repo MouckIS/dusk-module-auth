@@ -2,13 +2,15 @@ package com.dusk.module.auth.dto.user;
 
 import com.github.dozermapper.core.Mapping;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author kefuming
  * @date 2020/5/18 8:20
  */
-@Data
+@Getter
+@Setter
 public class UserRoleDto {
 
     @ApiModelProperty("角色id")

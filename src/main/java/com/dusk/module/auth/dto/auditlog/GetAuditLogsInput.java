@@ -1,7 +1,8 @@
 package com.dusk.module.auth.dto.auditlog;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
 import com.dusk.common.core.entity.BaseEntity;
@@ -15,7 +16,8 @@ import java.time.LocalDateTime;
  * @author kefuming
  * @date 2020-05-15 11:10
  */
-@Data
+@Getter
+@Setter
 public class GetAuditLogsInput extends PagedAndSortedInputDto {
     @ApiModelProperty("开始时间")
     public LocalDateTime startDate;

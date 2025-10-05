@@ -1,7 +1,8 @@
 package com.dusk.module.auth.dto.administrativeregions;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 /**
@@ -9,7 +10,8 @@ import lombok.NoArgsConstructor;
  * @author: 黄辉鸿
  * @create: 2022-04-27 11:41
  **/
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class RegionsDto {

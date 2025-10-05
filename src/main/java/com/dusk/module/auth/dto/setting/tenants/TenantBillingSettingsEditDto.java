@@ -2,13 +2,15 @@ package com.dusk.module.auth.dto.setting.tenants;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author kefuming
  * @date 2020-06-16 8:10
  */
-@Data
+@Getter
+@Setter
 @ApiModel("发票")
 public class TenantBillingSettingsEditDto{
     @ApiModelProperty("法定名称")

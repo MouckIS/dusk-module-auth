@@ -1,14 +1,15 @@
 package com.dusk.module.auth.entity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 import com.dusk.common.core.constant.EntityConstant;
 import com.dusk.common.core.entity.CreationEntity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Version;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import java.time.LocalDateTime;
 
 /**
@@ -17,7 +18,8 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "sys_setting")
-@Data
+@Getter
+@Setter
 @FieldNameConstants
 public class Setting extends CreationEntity {
     @Column(name = EntityConstant.LAST_MODIFY_ID)

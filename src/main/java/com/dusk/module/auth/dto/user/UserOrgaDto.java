@@ -1,7 +1,8 @@
 package com.dusk.module.auth.dto.user;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import com.dusk.common.core.enums.EUnitType;
 import com.dusk.module.auth.enums.OrgLabel;
 
@@ -9,7 +10,8 @@ import com.dusk.module.auth.enums.OrgLabel;
  * @author kefuming
  * @date 2020/11/17
  */
-@Data
+@Getter
+@Setter
 public class UserOrgaDto {
     @ApiModelProperty("id")
     private Long id;

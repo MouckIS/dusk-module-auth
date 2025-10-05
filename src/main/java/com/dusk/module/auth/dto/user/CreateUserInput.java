@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import com.dusk.common.core.enums.EUnitType;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * @author kefuming

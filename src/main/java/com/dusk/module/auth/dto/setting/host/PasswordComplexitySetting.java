@@ -1,14 +1,16 @@
 package com.dusk.module.auth.dto.setting.host;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.EqualsAndHashCode;
 
 /**
  * @author kefuming
  * @date 2020-05-21 16:07
  */
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode
 public class PasswordComplexitySetting {
     @ApiModelProperty("包含数字")

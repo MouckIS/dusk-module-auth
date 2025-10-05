@@ -1,24 +1,24 @@
 package com.dusk.module.auth.aspect;
 
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.servlet.ServletUtil;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
+import cn.hutool.extra.servlet.JakartaServletUtil;
 import com.dusk.common.core.model.UserContext;
 import com.dusk.common.core.utils.UserContextUtils;
 import com.dusk.module.auth.enums.LoginLogType;
 import com.dusk.module.auth.listener.LogInOutEvent;
 import com.dusk.module.auth.repository.IUserRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 
 /**
@@ -86,7 +86,7 @@ public class UserLogAspect {
         }
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
         HttpServletRequest request = servletRequestAttributes.getRequest();
-        logInOutEvent.setIp(ServletUtil.getClientIP(request));
+        logInOutEvent.setIp(JakartaServletUtil.getClientIP(request));
         logInOutEvent.setBrowserInfo(request.getHeader("User-Agent"));
     }
 }

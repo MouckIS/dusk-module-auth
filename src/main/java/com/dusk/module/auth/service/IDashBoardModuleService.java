@@ -9,7 +9,7 @@ import com.dusk.module.auth.entity.dashboard.DashboardModuleItem;
 import com.dusk.module.auth.repository.dashboard.IDashBoardModuleRepository;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author jianjianhong

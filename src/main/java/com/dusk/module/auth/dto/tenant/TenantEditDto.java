@@ -1,17 +1,19 @@
 package com.dusk.module.auth.dto.tenant;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import com.dusk.common.core.dto.VersionDto;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 /**
  * @author kefuming
  * @date 2020-04-30 15:26
  */
-@Data
+@Getter
+@Setter
 public class TenantEditDto extends VersionDto {
     /**
      * 租户代码
