@@ -1,14 +1,16 @@
 package com.dusk.module.auth.dto.user;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 
 /**
  * @author kefuming
  * @date 2020/5/18 11:54
  */
-@Data
+@Getter
+@Setter
 public class FileDto {
     @ApiModelProperty("文件名")
     private String fileName;

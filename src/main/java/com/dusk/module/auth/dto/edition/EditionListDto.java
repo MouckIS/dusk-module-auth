@@ -1,7 +1,8 @@
 package com.dusk.module.auth.dto.edition;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import com.dusk.common.core.dto.EntityDto;
 
 import java.time.LocalDateTime;
@@ -10,7 +11,8 @@ import java.time.LocalDateTime;
  * @author kefuming
  * @date 2020-05-08 10:16
  */
-@Data
+@Getter
+@Setter
 public class EditionListDto extends EntityDto {
     @ApiModelProperty("名称")
     private String name;

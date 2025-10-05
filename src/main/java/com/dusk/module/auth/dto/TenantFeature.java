@@ -1,7 +1,8 @@
 package com.dusk.module.auth.dto;
 
 import com.dusk.module.ddm.dto.ui.InputType;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -11,7 +12,8 @@ import java.io.Serializable;
  * @version 0.0.1
  * @date 2020/4/30 9:02
  */
-@Data
+@Getter
+@Setter
 public class TenantFeature implements Serializable {
     @Serial
     private static final long serialVersionUID = -7653253401033370895L;

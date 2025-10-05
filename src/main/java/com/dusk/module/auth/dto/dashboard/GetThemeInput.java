@@ -2,14 +2,16 @@ package com.dusk.module.auth.dto.dashboard;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
 
 /**
  * @author jianjianhong
  * @date 2021/7/27
  */
-@Data
+@Getter
+@Setter
 @ApiModel(description = "统计模块查询条件数据")
 public class GetThemeInput extends PagedAndSortedInputDto {
     @ApiModelProperty("主题名称")

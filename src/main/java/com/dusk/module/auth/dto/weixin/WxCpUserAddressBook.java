@@ -1,6 +1,7 @@
 package com.dusk.module.auth.dto.weixin;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
@@ -10,7 +11,8 @@ import java.util.List;
  * @date 2023/11/23
  */
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 public class WxCpUserAddressBook {
 
     private Integer errcode;

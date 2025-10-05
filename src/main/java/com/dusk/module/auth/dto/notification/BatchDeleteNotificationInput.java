@@ -1,8 +1,9 @@
 package com.dusk.module.auth.dto.notification;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -11,7 +12,8 @@ import java.util.List;
  * @author kefuming
  * @date 2021/8/5 19:29
  */
-@Data
+@Getter
+@Setter
 public class BatchDeleteNotificationInput {
 
     /**

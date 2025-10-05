@@ -1,24 +1,27 @@
 package com.dusk.module.auth.common.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import com.dusk.module.auth.common.filter.JWTAuthenticationFilter;
 import com.dusk.module.auth.common.handler.DefaultAuthenticationFailureHandler;
 import com.dusk.module.auth.common.handler.DefaultAuthenticationSuccessHandler;
 import com.dusk.module.auth.common.provider.DefaultAuthenticationProvider;
 import com.dusk.module.auth.service.ICaptchaService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
@@ -28,7 +31,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Slf4j
 @Configuration
 @EnableWebSecurity
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class SecurityConfiguration {
 
     private static final String AUTHENTICATION_URL = "/login";
 
@@ -50,46 +53,48 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     private DefaultAuthenticationFailureHandler authenticationFailureHandler;
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-                .cors().and().csrf().disable()
-                .requestMatchers().anyRequest()
-                .and()
-                .authorizeRequests()
-                //拦截请求路由
-                .anyRequest()
-                .permitAll()
-                .and()
-                .addFilterBefore(buildJWTAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        return http
+                .cors(cors -> {})
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(req -> req.requestMatchers("").permitAll())
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .sessionManagement(sm -> sm
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .build();
     }
 
-    @Override
-    public void configure(WebSecurity web) {
-        //忽略路由，不进入spring security 拦截链
-        //TODO:做成配置
-        web.ignoring().antMatchers("/actuator/**", "/error/**");
+    /* ================ 2. WebSecurity 忽略静态路由 ================ */
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return web -> web.ignoring()
+                .requestMatchers("/actuator/**", "/error/**");
     }
 
-    @SneakyThrows
-    private JWTAuthenticationFilter buildJWTAuthenticationFilter() {
-        JWTAuthenticationFilter filter = new JWTAuthenticationFilter(AUTHENTICATION_URL, authenticationSuccessHandler, authenticationFailureHandler, objectMapper, captchaService, publisher);
-        filter.setAuthenticationManager(authenticationManagerBean());
+    /* ================ 3. 自定义 JWT 过滤器 ================ */
+    private JWTAuthenticationFilter jwtAuthenticationFilter() {
+        JWTAuthenticationFilter filter = new JWTAuthenticationFilter(
+                AUTHENTICATION_URL,
+                authenticationSuccessHandler,
+                authenticationFailureHandler,
+                objectMapper,
+                captchaService,
+                publisher);
+        filter.setAuthenticationManager(authenticationManager());
         return filter;
     }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(authenticationProvider);
+    /* ================ 4. AuthenticationManager ================ */
+    @Bean
+    public AuthenticationManager authenticationManager() {
+        return new ProviderManager(authenticationProvider);
     }
 
-    /**
-     * 将 AuthenticationManager 注册为 bean , 方便配置 oauth server 的时候使用
-     */
+    /* ================ 5. 密码编码器 ================ */
     @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+    public PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 }

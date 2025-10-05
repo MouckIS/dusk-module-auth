@@ -1,7 +1,8 @@
 package com.dusk.module.auth.dto.tenant;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import com.dusk.common.core.dto.EntityDto;
 
 import java.time.LocalDateTime;
@@ -10,7 +11,8 @@ import java.time.LocalDateTime;
  * @author kefuming
  * @date 2020-05-06 15:56
  */
-@Data
+@Getter
+@Setter
 public class TenantListDto extends EntityDto {
 
     @ApiModelProperty("租户代码")

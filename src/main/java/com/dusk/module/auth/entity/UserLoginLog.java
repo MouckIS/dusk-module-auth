@@ -1,13 +1,14 @@
 package com.dusk.module.auth.entity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 import com.dusk.common.core.annotation.Tenant;
 import com.dusk.common.core.constant.EntityConstant;
 import com.dusk.common.core.entity.BaseEntity;
 import com.dusk.module.auth.enums.LoginLogType;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 /**
@@ -17,7 +18,8 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "sys_user_login_log")
-@Data
+@Getter
+@Setter
 @FieldNameConstants
 public class UserLoginLog extends BaseEntity {
     @Tenant

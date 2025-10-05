@@ -1,7 +1,8 @@
 package com.dusk.module.auth.setting;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
@@ -10,7 +11,8 @@ import java.io.Serializable;
  * @author kefuming
  * @date 2020-05-21 8:20
  */
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class SettingInfo implements Serializable {

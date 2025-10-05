@@ -6,7 +6,7 @@ import lombok.experimental.FieldNameConstants;
 import com.dusk.common.core.entity.BaseEntity;
 import com.dusk.common.core.entity.CreationEntity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 /**
  * @author kefuming

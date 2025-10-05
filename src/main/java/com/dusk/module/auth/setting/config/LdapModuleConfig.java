@@ -1,6 +1,7 @@
 package com.dusk.module.auth.setting.config;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -12,7 +13,8 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConfigurationProperties(prefix = "app.setting.ldap-module")
-@Data
+@Getter
+@Setter
 @RefreshScope
 public class LdapModuleConfig {
     @Value("${enable:true}")

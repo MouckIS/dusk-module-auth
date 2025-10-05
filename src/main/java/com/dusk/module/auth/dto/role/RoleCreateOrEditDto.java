@@ -2,14 +2,16 @@ package com.dusk.module.auth.dto.role;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import com.dusk.common.core.dto.EntityDto;
 
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 @ApiModel
-@Data
+@Getter
+@Setter
 public class RoleCreateOrEditDto extends EntityDto {
 
     //code

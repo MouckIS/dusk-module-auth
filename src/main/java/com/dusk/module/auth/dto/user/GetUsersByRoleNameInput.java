@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
 
 /**

@@ -1,7 +1,8 @@
 package com.dusk.module.auth.dto.setting.tenants;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.timing.Clock;
 import com.dusk.module.auth.dto.setting.host.EmailSettingsEditDto;
@@ -16,7 +17,8 @@ import java.util.List;
  * @author kefuming
  * @date 2020-06-16 8:15
  */
-@Data
+@Getter
+@Setter
 public class TenantSettingsEditDto {
     private GeneralSettingsEditDto general;
 

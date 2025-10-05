@@ -1,7 +1,8 @@
 package com.dusk.module.auth.dto.orga;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +11,8 @@ import java.util.List;
  * @author kefuming
  * @date 2020-05-13 16:12
  */
-@Data
+@Getter
+@Setter
 public class UsersToOrganizationUnitInput {
     @ApiModelProperty("用户id列表")
     private List<Long> userIds = new ArrayList<>();

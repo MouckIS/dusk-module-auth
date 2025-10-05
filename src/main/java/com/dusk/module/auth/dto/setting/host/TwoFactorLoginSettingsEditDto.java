@@ -2,13 +2,15 @@ package com.dusk.module.auth.dto.setting.host;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author kefuming
  * @date 2020-05-21 16:30
  */
-@Data
+@Getter
+@Setter
 @ApiModel("两步认证登录")
 public class TwoFactorLoginSettingsEditDto {
     @ApiModelProperty("启用两步认证登录")

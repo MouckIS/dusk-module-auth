@@ -1,6 +1,7 @@
 package com.dusk.module.auth.common.permission.impl;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import com.dusk.common.core.auth.permission.MultiTenancySides;
 import com.dusk.common.core.auth.permission.Permission;
 import com.dusk.common.core.auth.permission.UrlPermission;
@@ -19,7 +20,8 @@ import java.util.stream.Collectors;
  * @date 2020-05-25 9:44
  */
 @Component
-@Data
+@Getter
+@Setter
 public class AuthPermissionManager implements IAuthPermissionManager {
 
     @Autowired

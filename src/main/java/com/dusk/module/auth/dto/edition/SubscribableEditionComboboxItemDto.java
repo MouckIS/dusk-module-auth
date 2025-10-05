@@ -1,13 +1,15 @@
 package com.dusk.module.auth.dto.edition;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 /**
  * @author kefuming
  * @date 2020-05-08 17:58
  */
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class SubscribableEditionComboboxItemDto extends ComboboxItemDto{
     private Boolean isFree;

@@ -1,13 +1,15 @@
 package com.dusk.module.auth.dto.setting.host;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author kefuming
  * @date 2020-05-21 15:47
  */
-@Data
+@Getter
+@Setter
 public class HostUserManagementSettingsEditDto {
     @ApiModelProperty("必须验证邮箱地址后才能登录")
     public boolean emailConfirmationRequiredForLogin;

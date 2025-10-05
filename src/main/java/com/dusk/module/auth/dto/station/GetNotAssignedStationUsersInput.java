@@ -1,13 +1,14 @@
 package com.dusk.module.auth.dto.station;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
 import com.dusk.common.core.enums.EUnitType;
 import org.springframework.data.domain.Sort;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * 获取未分配的厂站用户
@@ -15,7 +16,8 @@ import javax.validation.constraints.NotNull;
  * @author kefuming
  * @date 2022/09/23 16:32
  */
-@Data
+@Getter
+@Setter
 public class GetNotAssignedStationUsersInput extends PagedAndSortedInputDto {
 
     @ApiModelProperty("厂站id")

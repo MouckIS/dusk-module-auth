@@ -1,9 +1,10 @@
 package com.dusk.module.auth.dto.notification;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
 
 /**
@@ -12,7 +13,8 @@ import java.util.List;
  * @author kefuming
  * @date 2021/1/5 9:53
  */
-@Data
+@Getter
+@Setter
 public class SetNotificationAsReadInput {
 
     /**

@@ -1,18 +1,20 @@
 package com.dusk.module.auth.dto.user;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
 import com.dusk.common.core.enums.EUnitType;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * @author kefuming
  * @date 2021/8/4 16:00
  */
 
-@Data
+@Getter
+@Setter
 public class GetUserByRoleDto extends PagedAndSortedInputDto {
     @ApiModelProperty("角色id")
     @NotNull(message = "角色id不能为空")

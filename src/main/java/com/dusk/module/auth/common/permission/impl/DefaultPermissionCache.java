@@ -1,7 +1,8 @@
 package com.dusk.module.auth.common.permission.impl;
 
 import com.github.dozermapper.core.Mapper;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import com.dusk.common.core.auth.permission.Permission;
 import com.dusk.common.core.auth.permission.RoleInfo;
 import com.dusk.common.core.auth.permission.UrlPermission;
@@ -13,6 +14,7 @@ import com.dusk.module.auth.service.ITenantPermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,13 +22,14 @@ import java.util.Map;
  * @author kefuming
  * @date 2020-05-26 16:32
  */
-@Data
+@Getter
+@Setter
 @Component
 public class DefaultPermissionCache implements IPermissionCache {
 
-    private final Map<String, List<String>> allowAnonymousPath;
-    private final Map<String, Map<String, List<UrlPermission>>> urlPermission;
-    private final Map<String, Map<String, Permission>> definitionPermission;
+    private final Map<String, List<String>> allowAnonymousPath = new HashMap<>();
+    private final Map<String, Map<String, List<UrlPermission>>> urlPermission = new HashMap<>();
+    private final Map<String, Map<String, Permission>> definitionPermission = new HashMap<>();
 
     @Autowired
     private IGrantPermissionRepository grantPermissionRepository;

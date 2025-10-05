@@ -1,10 +1,11 @@
 package com.dusk.module.auth.common.model;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import com.dusk.module.auth.dto.captcha.CaptchaInputDto;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 /**
@@ -13,7 +14,8 @@ import java.io.Serializable;
  * @author kefuming
  * @date 2020-04-23 9:00
  */
-@Data
+@Getter
+@Setter
 public class LoginRequest extends CaptchaInputDto implements Serializable {
     @ApiModelProperty(value = "帐户名", position = 0)
     @NotBlank(message = "帐户名不能为空")

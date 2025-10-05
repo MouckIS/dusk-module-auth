@@ -1,7 +1,8 @@
 package com.dusk.module.auth.dto.edition;
 
 import com.dusk.module.auth.dto.TenantFeature;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import com.dusk.module.auth.dto.feature.FeatureValueInput;
 
 import java.util.List;
@@ -10,7 +11,8 @@ import java.util.List;
  * @author kefuming
  * @date 2020-05-08 13:51
  */
-@Data
+@Getter
+@Setter
 public class GetEditionEditOutput {
     private EditionEditDto edition;
 

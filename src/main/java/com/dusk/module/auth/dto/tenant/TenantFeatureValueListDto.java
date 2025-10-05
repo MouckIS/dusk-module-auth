@@ -2,10 +2,11 @@ package com.dusk.module.auth.dto.tenant;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import com.dusk.module.auth.dto.feature.FeatureValueInput;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.List;
 
@@ -14,7 +15,8 @@ import java.util.List;
  * @version 0.0.1
  * @date 2020/5/6 16:00
  */
-@Data
+@Getter
+@Setter
 @ApiModel(description = "版本特性列表")
 public class TenantFeatureValueListDto implements Serializable {
     @NotBlank(message = "tenantId不能为空")

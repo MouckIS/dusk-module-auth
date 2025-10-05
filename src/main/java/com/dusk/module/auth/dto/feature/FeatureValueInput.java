@@ -1,14 +1,16 @@
 package com.dusk.module.auth.dto.feature;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author kefuming
  * @version 0.0.1
  * @date 2020/4/29 14:20
  */
-@Data
+@Getter
+@Setter
 public class FeatureValueInput{
     /**
      * 特性名称

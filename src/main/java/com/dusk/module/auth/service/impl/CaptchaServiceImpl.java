@@ -2,10 +2,7 @@ package com.dusk.module.auth.service.impl;
 
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.servlet.ServletUtil;
-import com.dusk.module.auth.service.IFeatureChecker;
-import com.wf.captcha.SpecCaptcha;
-import lombok.extern.slf4j.Slf4j;
+import cn.hutool.extra.servlet.JakartaServletUtil;
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.redis.RedisUtil;
 import com.dusk.common.core.response.BaseApiResult;
@@ -14,10 +11,13 @@ import com.dusk.module.auth.dto.captcha.CaptchaInputDto;
 import com.dusk.module.auth.dto.captcha.CaptchaOutDto;
 import com.dusk.module.auth.feature.LoginFeatureProvider;
 import com.dusk.module.auth.service.ICaptchaService;
+import com.dusk.module.auth.service.IFeatureChecker;
+import com.wf.captcha.SpecCaptcha;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -66,7 +66,7 @@ public class CaptchaServiceImpl implements ICaptchaService {
 
     @Override
     public boolean verifyCaptcha(CaptchaInputDto loginRequest, HttpServletRequest request) {
-        Object cache = redisUtil.getCache(REDIS_KEY_NEED_CAPTCHA_PREFIX + ServletUtil.getClientIP(request));
+        Object cache = redisUtil.getCache(REDIS_KEY_NEED_CAPTCHA_PREFIX + JakartaServletUtil.getClientIP(request));
         if (cache != null) {
             return verifyCaptcha(loginRequest);
         } else {
@@ -76,7 +76,7 @@ public class CaptchaServiceImpl implements ICaptchaService {
 
     @Override
     public boolean verifyCaptchaSendMobile(CaptchaInputDto loginRequest, HttpServletRequest request) {
-        Object cache = redisUtil.getCache(REDIS_KEY_IP_SEND_KEY_PREFIX + ServletUtil.getClientIP(request));
+        Object cache = redisUtil.getCache(REDIS_KEY_IP_SEND_KEY_PREFIX + JakartaServletUtil.getClientIP(request));
         if (cache != null) {
             int sendCount = Integer.parseInt(cache.toString());
             if (sendCount > IP_MAX_SEND_COUNT) {
@@ -95,7 +95,7 @@ public class CaptchaServiceImpl implements ICaptchaService {
 
     @Override
     public void setMobileSendCaptchaCount(HttpServletRequest request) {
-        String key = REDIS_KEY_IP_SEND_KEY_PREFIX + ServletUtil.getClientIP(request);
+        String key = REDIS_KEY_IP_SEND_KEY_PREFIX + JakartaServletUtil.getClientIP(request);
         redisUtil.increment(key, 1);
         redisUtil.setExpire(key, 60, TimeUnit.SECONDS);
     }
@@ -117,7 +117,7 @@ public class CaptchaServiceImpl implements ICaptchaService {
 
     @Override
     public boolean checkAndWriteError(HttpServletRequest request) {
-        String clientIP = ServletUtil.getClientIP(request);
+        String clientIP = JakartaServletUtil.getClientIP(request);
         log.info("帐户名或者密码输入异常，进入验证码流程,ip:{},", clientIP);
         String needKey = REDIS_KEY_NEED_CAPTCHA_PREFIX + clientIP;
         //首先查看下ip是否需要验证码
@@ -146,16 +146,16 @@ public class CaptchaServiceImpl implements ICaptchaService {
 
     @Override
     public boolean checkNeedCaptcha(HttpServletRequest request) {
-        String needKey = REDIS_KEY_NEED_CAPTCHA_PREFIX + ServletUtil.getClientIP(request);
+        String needKey = REDIS_KEY_NEED_CAPTCHA_PREFIX + JakartaServletUtil.getClientIP(request);
         Object need = redisUtil.getCache(needKey);
         return need != null;
     }
 
     @Override
     public void clearBuffer(HttpServletRequest request) {
-        String countKey = REDIS_KEY_CAPTCHA_ERROR_COUNT_PREFIX + ServletUtil.getClientIP(request);
+        String countKey = REDIS_KEY_CAPTCHA_ERROR_COUNT_PREFIX + JakartaServletUtil.getClientIP(request);
         redisUtil.deleteCache(countKey);
-        String needKey = REDIS_KEY_NEED_CAPTCHA_PREFIX + ServletUtil.getClientIP(request);
+        String needKey = REDIS_KEY_NEED_CAPTCHA_PREFIX + JakartaServletUtil.getClientIP(request);
         redisUtil.deleteCache(needKey);
     }
 }

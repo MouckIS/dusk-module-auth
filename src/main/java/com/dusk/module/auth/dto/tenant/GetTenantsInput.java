@@ -2,7 +2,8 @@ package com.dusk.module.auth.dto.tenant;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
 
 import java.time.LocalDateTime;
@@ -11,7 +12,8 @@ import java.time.LocalDateTime;
  * @author kefuming
  * @date 2020-05-06 16:38
  */
-@Data
+@Getter
+@Setter
 @ApiModel(value = "GetTenantsInput", description = "查询租户列表实体类")
 public class GetTenantsInput extends PagedAndSortedInputDto {
     @ApiModelProperty("根据租户名模糊查找")

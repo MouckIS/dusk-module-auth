@@ -3,16 +3,20 @@ package com.dusk.module.auth.common.filter;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.servlet.ServletUtil;
-import com.dusk.common.core.dto.AuditLogDto;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.exc.MismatchedInputException;
-import org.apache.commons.lang3.StringUtils;
+import cn.hutool.extra.servlet.JakartaServletUtil;
 import com.dusk.common.core.auditlog.SysLogEvent;
+import com.dusk.common.core.dto.AuditLogDto;
 import com.dusk.module.auth.common.model.LoginRequest;
 import com.dusk.module.auth.enums.LoginLogType;
 import com.dusk.module.auth.listener.LogInOutEvent;
 import com.dusk.module.auth.service.ICaptchaService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,10 +28,6 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.util.StopWatch;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
@@ -68,12 +68,12 @@ public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFil
         sw.start();
         auditLog.setExecutionTime(LocalDateTime.now());
         auditLog.setBrowserInfo(request.getHeader("User-Agent"));
-        auditLog.setClientIpAddress(ServletUtil.getClientIP(request));
+        auditLog.setClientIpAddress(JakartaServletUtil.getClientIP(request));
         auditLog.setMethodName("login");
         auditLog.setServiceName("login");
 
         LogInOutEvent logInOutEvent = new LogInOutEvent(LoginLogType.LOGIN_IN, LocalDateTime.now(), false);
-        logInOutEvent.setIp(ServletUtil.getClientIP(request));
+        logInOutEvent.setIp(JakartaServletUtil.getClientIP(request));
         logInOutEvent.setBrowserInfo(request.getHeader("User-Agent"));
         try {
             try {

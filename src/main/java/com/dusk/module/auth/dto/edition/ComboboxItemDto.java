@@ -1,14 +1,16 @@
 package com.dusk.module.auth.dto.edition;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 /**
  * @author kefuming
  * @date 2020-05-08 17:56
  */
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class ComboboxItemDto {
     @ApiModelProperty("值")

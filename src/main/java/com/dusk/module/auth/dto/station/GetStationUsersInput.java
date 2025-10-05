@@ -2,7 +2,8 @@ package com.dusk.module.auth.dto.station;
 
 import com.dusk.common.core.enums.EUnitType;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
 import com.dusk.common.core.entity.BaseEntity;
@@ -16,7 +17,8 @@ import java.util.List;
  * @author kefuming
  * @date  2022/9/21 20:46
  */
-@Data
+@Getter
+@Setter
 public class GetStationUsersInput extends PagedAndSortedInputDto {
     @ApiModelProperty("厂站id")
     private List<Long> stationIds = new ArrayList<>();

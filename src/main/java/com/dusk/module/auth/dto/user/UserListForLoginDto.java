@@ -1,14 +1,16 @@
 package com.dusk.module.auth.dto.user;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import com.dusk.common.core.dto.EntityDto;
 
 /**
  * @author kefuming
  * @date 2020/5/18 11:12
  */
-@Data
+@Getter
+@Setter
 public class UserListForLoginDto extends EntityDto {
 
     @ApiModelProperty("姓名")

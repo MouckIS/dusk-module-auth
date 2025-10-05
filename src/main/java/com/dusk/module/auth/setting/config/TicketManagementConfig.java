@@ -1,6 +1,7 @@
 package com.dusk.module.auth.setting.config;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -10,7 +11,8 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConfigurationProperties(prefix = "app.setting.ticket")
-@Data
+@Getter
+@Setter
 public class TicketManagementConfig {
     private String unAnalyzeDeviceBoardTerm = "false";
     private String filterSpareParts = "true";

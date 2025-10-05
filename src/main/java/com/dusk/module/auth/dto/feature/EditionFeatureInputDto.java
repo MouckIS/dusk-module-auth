@@ -1,7 +1,8 @@
 package com.dusk.module.auth.dto.feature;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -9,7 +10,8 @@ import java.util.List;
  * @author kefuming
  * @date 2020/5/13 11:47
  */
-@Data
+@Getter
+@Setter
 public class EditionFeatureInputDto {
     @ApiModelProperty("版本id")
     Long editionId;

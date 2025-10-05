@@ -1,17 +1,18 @@
 package com.dusk.module.auth.entity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 import com.dusk.common.core.annotation.LogicDelete;
 import com.dusk.common.core.constant.EntityConstant;
 import com.dusk.common.core.entity.CreationEntity;
 import com.dusk.module.auth.enums.PaymentPeriodType;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Version;
-import javax.validation.constraints.NotBlank;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
+import jakarta.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -21,7 +22,8 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "sys_edition")
-@Data
+@Getter
+@Setter
 @FieldNameConstants
 public class SubscribableEdition extends CreationEntity {
 

@@ -2,14 +2,16 @@ package com.dusk.module.auth.dto.setting.host;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author kefuming
  * @date 2020-05-21 16:28
  */
 @ApiModel("用户锁定")
-@Data
+@Getter
+@Setter
 public class UserLockOutSettingsEditDto {
     @ApiModelProperty("登录失败后启用用户的帐户锁定")
     public boolean enabled;

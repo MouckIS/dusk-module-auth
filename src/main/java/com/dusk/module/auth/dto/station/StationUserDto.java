@@ -1,7 +1,8 @@
 package com.dusk.module.auth.dto.station;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 
@@ -11,7 +12,8 @@ import lombok.experimental.FieldNameConstants;
  * @author kefuming
  * @date 2022/09/23 16:32
  */
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @FieldNameConstants
 public class StationUserDto {

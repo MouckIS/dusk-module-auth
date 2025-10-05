@@ -1,6 +1,7 @@
 package com.dusk.module.auth.common.config;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -10,13 +11,15 @@ import java.util.List;
  * @author kefuming
  * @date 2020-12-25 11:05
  */
-@Data
+@Getter
+@Setter
 @ConfigurationProperties(prefix = "wx.miniapp")
 public class WxMaProperties {
     private List<Config> configs;
 
 
-    @Data
+    @Getter
+@Setter
     public static class Config {
         /**
          * 设置微信小程序的appid

@@ -1,16 +1,18 @@
 package com.dusk.module.auth.dto.fingerprint;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * @author kefuming
  * @date 2021-05-12 10:05
  */
-@Data
+@Getter
+@Setter
 public class IdentifyInputDto {
     @ApiModelProperty(value = "指纹仪序列号", required = true)
     @NotNull(message = "用户id不允许为空")

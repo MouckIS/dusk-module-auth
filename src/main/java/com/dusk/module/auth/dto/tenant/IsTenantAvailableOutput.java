@@ -1,14 +1,16 @@
 package com.dusk.module.auth.dto.tenant;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 /**
  * @author kefuming
  * @date 2020-05-18 14:28
  */
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class IsTenantAvailableOutput {
     @ApiModelProperty("租户状态")

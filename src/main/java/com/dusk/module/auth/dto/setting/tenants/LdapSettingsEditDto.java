@@ -1,12 +1,14 @@
 package com.dusk.module.auth.dto.setting.tenants;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author kefuming
  * @date 2020-06-16 8:02
  */
-@Data
+@Getter
+@Setter
 public class LdapSettingsEditDto {
     private boolean moduleEnabled ;
 

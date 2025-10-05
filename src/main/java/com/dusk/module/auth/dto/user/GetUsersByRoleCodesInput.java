@@ -3,7 +3,8 @@ package com.dusk.module.auth.dto.user;
 import com.dusk.common.core.enums.EUnitType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
 import com.dusk.common.core.entity.BaseEntity;
@@ -15,7 +16,8 @@ import java.util.List;
  * @author kefuming
  * @date 2020/10/27
  */
-@Data
+@Getter
+@Setter
 @ApiModel(value = "GetUsersByRoleCodesInput", description = "通过角色code列表查询用户的实体类")
 public class GetUsersByRoleCodesInput extends PagedAndSortedInputDto {
     @ApiModelProperty("角色code列表")

@@ -1,7 +1,8 @@
 package com.dusk.module.auth.dto.weixin;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 /**
@@ -9,7 +10,8 @@ import lombok.NoArgsConstructor;
  * @date 2023/10/12
  */
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
 public class WxCpUserAuthorizationResult {
 
     private String wxUserId;

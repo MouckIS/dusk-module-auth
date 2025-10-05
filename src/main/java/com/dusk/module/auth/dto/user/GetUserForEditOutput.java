@@ -1,7 +1,8 @@
 package com.dusk.module.auth.dto.user;
 
 import com.dusk.common.rpc.auth.dto.UserEditDto;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import com.dusk.module.auth.dto.station.StationsOfLoginUserDto;
 import com.dusk.module.auth.enums.ELevel;
 
@@ -12,7 +13,8 @@ import java.util.List;
  * @author kefuming
  * @date 2020/5/15 17:22
  */
-@Data
+@Getter
+@Setter
 public class GetUserForEditOutput {
 
     private UserEditDto user;

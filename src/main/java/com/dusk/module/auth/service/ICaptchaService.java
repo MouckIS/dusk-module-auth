@@ -3,7 +3,7 @@ package com.dusk.module.auth.service;
 import com.dusk.module.auth.dto.captcha.CaptchaInputDto;
 import com.dusk.module.auth.dto.captcha.CaptchaOutDto;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * @author kefuming

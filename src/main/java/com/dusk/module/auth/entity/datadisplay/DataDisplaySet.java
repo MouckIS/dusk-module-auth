@@ -1,11 +1,12 @@
 package com.dusk.module.auth.entity.datadisplay;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 import com.dusk.common.core.entity.FullAuditedEntity;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 /**
  * 〈首页数据展示的设置项〉
@@ -14,7 +15,8 @@ import javax.persistence.Table;
  * @create 2022/2/8
  * @since 1.0.0
  */
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "sys_data_display_set")
 @FieldNameConstants

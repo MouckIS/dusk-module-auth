@@ -1,10 +1,11 @@
 package com.dusk.module.auth.entity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 import com.dusk.common.core.entity.TreeEntity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,8 @@ import java.util.List;
  */
 @Entity
 @Table(name = "sys_station")
-@Data
+@Getter
+@Setter
 @FieldNameConstants
 public class Station extends TreeEntity {
 

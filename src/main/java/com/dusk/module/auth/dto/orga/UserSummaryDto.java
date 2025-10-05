@@ -1,13 +1,15 @@
 package com.dusk.module.auth.dto.orga;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author kefuming
  * @date 2020-05-13 16:42
  */
-@Data
+@Getter
+@Setter
 public class UserSummaryDto {
     @ApiModelProperty("用户id")
     private String userId;

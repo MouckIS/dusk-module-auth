@@ -1,14 +1,16 @@
 package com.dusk.module.auth.dto.dashboard;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import com.dusk.common.core.dto.EntityDto;
 
 /**
  * @author jianjianhong
  * @date 2021-07-26 10:10
  */
-@Data
+@Getter
+@Setter
 public class ModuleListDto extends EntityDto {
     /**
      * 名称

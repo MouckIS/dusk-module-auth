@@ -1,11 +1,12 @@
 package com.dusk.module.auth.entity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 import com.dusk.common.core.entity.FullAuditedEntity;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 /**
  * 用户消息
@@ -13,7 +14,8 @@ import javax.persistence.Table;
  * @author kefuming
  * @date 2020/12/24 15:12
  */
-@Data
+@Getter
+@Setter
 @Entity
 @FieldNameConstants
 @Table(name = "sys_user_notification")

@@ -1,6 +1,7 @@
 package com.dusk.module.auth.dto.auditlog;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 import com.dusk.common.core.dto.EntityDto;
 import com.dusk.common.core.jpa.querydsl.QBeanMapper;
@@ -14,7 +15,8 @@ import java.time.LocalDateTime;
  * @author kefuming
  * @date 2020-05-15 11:38
  */
-@Data
+@Getter
+@Setter
 @FieldNameConstants
 public class AuditLogListDto extends EntityDto {
     @QBeanMapper(target = QAuditLog.class,field = AuditLog.Fields.createId)

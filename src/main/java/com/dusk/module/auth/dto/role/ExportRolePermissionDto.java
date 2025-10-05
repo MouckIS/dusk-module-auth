@@ -4,7 +4,8 @@ import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.dusk.common.rpc.auth.dto.role.RolePermissionDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.dozermapper.core.Mapping;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +14,8 @@ import java.util.List;
  * @author kefuming
  * @date 2021-08-06 9:02
  */
-@Data
+@Getter
+@Setter
 @ExcelIgnoreUnannotated
 public class ExportRolePermissionDto extends RolePermissionDto {
     @JsonIgnore

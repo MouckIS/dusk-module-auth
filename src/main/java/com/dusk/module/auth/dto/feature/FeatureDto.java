@@ -1,7 +1,8 @@
 package com.dusk.module.auth.dto.feature;
 
 import com.dusk.module.auth.dto.TenantFeature;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 import java.util.List;
@@ -11,7 +12,8 @@ import java.util.List;
  * @version 0.0.1
  * @date 2020/5/9 10:01
  */
-@Data
+@Getter
+@Setter
 @ToString
 public class FeatureDto extends TenantFeature
 {

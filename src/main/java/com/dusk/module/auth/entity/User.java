@@ -2,12 +2,13 @@ package com.dusk.module.auth.entity;
 
 import com.dusk.common.core.enums.EUnitType;
 import com.dusk.common.core.enums.UserStatus;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.FieldNameConstants;
 import com.dusk.common.core.entity.FullAuditedEntity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,7 +20,8 @@ import java.util.List;
  */
 @Entity
 @Table(name = "sys_user")
-@Data
+@Getter
+@Setter
 @FieldNameConstants
 @NamedEntityGraph(name = "user.role", attributeNodes = {
         @NamedAttributeNode(value = "userRoles"),

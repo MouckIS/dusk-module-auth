@@ -1,6 +1,7 @@
 package com.dusk.module.auth.dto.notification;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 用户消息输出的Dto
@@ -8,5 +9,6 @@ import lombok.Data;
  * @author kefuming
  * @date 2020/12/24 15:51
  */
-@Data
+@Getter
+@Setter
 public class NotificationOutput extends NotificationListOutput { }

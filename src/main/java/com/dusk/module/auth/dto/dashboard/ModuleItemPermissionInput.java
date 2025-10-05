@@ -2,7 +2,8 @@ package com.dusk.module.auth.dto.dashboard;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -10,7 +11,8 @@ import java.util.List;
  * @author jianjianhong
  * @date 2022/1/5
  */
-@Data
+@Getter
+@Setter
 @ApiModel(description = "导入模块统计项权限")
 public class ModuleItemPermissionInput {
     @ApiModelProperty("中心模块统计项权限")

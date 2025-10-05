@@ -1,7 +1,8 @@
 package com.dusk.module.auth.dto.dashboard;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import com.dusk.common.core.dto.EntityDto;
 import com.dusk.module.auth.entity.dashboard.DashboardModule;
 import com.dusk.module.auth.entity.dashboard.DashboardModuleItem;
@@ -10,7 +11,8 @@ import com.dusk.module.auth.entity.dashboard.DashboardModuleItem;
  * @author jianjianhong
  * @date 2021-07-26 10:10
  */
-@Data
+@Getter
+@Setter
 public class ZoneItemDetailDto extends EntityDto {
 
     private Long moduleId;

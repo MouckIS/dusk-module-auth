@@ -1,6 +1,7 @@
 package com.dusk.module.auth.dto.configuration;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 
@@ -8,7 +9,8 @@ import java.io.Serializable;
  * @author kefuming
  * @date 2020-05-07 15:23
  */
-@Data
+@Getter
+@Setter
 public class AuthConfigDto implements Serializable {
     private static final long serialVersionUID = -185939673621967905L;
 
