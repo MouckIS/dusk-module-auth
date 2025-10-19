@@ -1,8 +1,8 @@
 package com.dusk.module.auth.dto.orga;
 
+import com.dusk.module.auth.entity.User;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.module.auth.entity.User;
 
 import java.util.List;
 

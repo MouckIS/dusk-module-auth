@@ -4,7 +4,7 @@ import com.dusk.common.core.auth.permission.RoleInfo;
 import com.dusk.common.core.auth.permission.UrlPermission;
 import com.dusk.common.core.constant.AuthConstant;
 import com.dusk.module.auth.common.permission.IAuthPermissionManager;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
 import org.springframework.stereotype.Component;
@@ -22,8 +22,8 @@ import java.util.Map;
 @Component
 public class DefaultInvocationSecurityMetadataSource {
 
-    @Autowired
-    IAuthPermissionManager authPermissionManager;
+    @Resource
+    private IAuthPermissionManager authPermissionManager;
 
     public Collection<ConfigAttribute> getAttributes(String applicationName, String url) {
         Collection<ConfigAttribute> configAttributes = new ArrayList<>();

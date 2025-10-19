@@ -1,15 +1,14 @@
 package com.dusk.module.auth.service.impl;
 
 import com.dusk.common.rpc.auth.dto.GenerateTokenForNonUserInput;
-import com.dusk.common.rpc.auth.service.ISmRpcUtil;
 import com.dusk.common.rpc.auth.service.ITokenAuthRpcService;
-import com.github.dozermapper.core.Mapper;
-import lombok.extern.slf4j.Slf4j;
 import com.dusk.module.auth.dto.token.TokenSign;
 import com.dusk.module.auth.service.ITokenService;
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.Resource;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -22,14 +21,11 @@ public class TokenServiceImpl implements ITokenService {
 
     @Resource
     private ITokenAuthRpcService tokenAuthRpcService;
-    @Resource
-    private ISmRpcUtil smRpcUtil;
-    @Resource
-    private Mapper dozerMapper;
 
     @Override
     public String foreverTokenSign(TokenSign tokenSign) {
-        GenerateTokenForNonUserInput input = dozerMapper.map(tokenSign, GenerateTokenForNonUserInput.class);
+        GenerateTokenForNonUserInput input = new GenerateTokenForNonUserInput();
+        BeanUtils.copyProperties(tokenSign, input);
         input.setUnit(TimeUnit.DAYS);
         return tokenAuthRpcService.generateTokenForNonUser(input);
     }

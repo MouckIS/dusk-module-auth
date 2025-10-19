@@ -3,7 +3,7 @@ package com.dusk.module.auth.cache.impl;
 import cn.hutool.core.util.StrUtil;
 import com.dusk.common.core.redis.RedisUtil;
 import com.dusk.module.auth.cache.IUserFingerprintCacheService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 /**
@@ -12,8 +12,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class UserFingerprintCacheServiceImpl implements IUserFingerprintCacheService {
-    @Autowired
-    RedisUtil<Integer> redisUtil;
+    @Resource
+    private RedisUtil<Integer> redisUtil;
 
     private final String USER_SEQ_REDIS_KEY = "CRUX:AUTH:FINGERPRINT:USERSEQ:{}";
 

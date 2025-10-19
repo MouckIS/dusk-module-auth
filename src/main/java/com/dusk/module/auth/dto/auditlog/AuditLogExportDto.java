@@ -2,12 +2,10 @@ package com.dusk.module.auth.dto.auditlog;
 
 import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelProperty;
-import lombok.Getter;
-import lombok.Setter;
-import com.dusk.common.core.jpa.querydsl.QBeanMapper;
-import com.dusk.module.auth.entity.AuditLog;
 import com.dusk.module.auth.entity.QAuditLog;
 import com.dusk.module.auth.entity.QUser;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author kefuming
@@ -20,9 +18,9 @@ public class AuditLogExportDto {
     public String time;
 
     @ExcelIgnore
-    @QBeanMapper(target = QAuditLog.class,field = AuditLog.Fields.createId)
+    //@QBeanMapper(target = QAuditLog.class,field = AuditLog.Fields.createId)
     public Long userId;
-    @QBeanMapper(target = QUser.class)
+    //@QBeanMapper(target = QUser.class)
     @ExcelProperty("用户")
     public String userName;
 

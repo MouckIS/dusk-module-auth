@@ -1,16 +1,16 @@
 package com.dusk.module.auth.service.impl;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.redis.RedisUtil;
 import com.dusk.module.auth.dto.administrativeregions.RegionsDto;
 import com.dusk.module.auth.service.IAdministrativeRegionsService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
-import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,10 +23,10 @@ import java.util.Map;
  **/
 @Service
 public class AdministrativeRegionsServiceImpl implements IAdministrativeRegionsService {
-    @Autowired
-    RedisUtil<Object> redisUtil;
-    @Autowired
-    ObjectMapper objectMapper;
+    @Resource
+    private RedisUtil<Object> redisUtil;
+    @Resource
+    private ObjectMapper objectMapper;
 
     private static final String PROVINCE_PATH = "/regions/province.json";
     private static final String CITY_PATH = "/regions/city.json";

@@ -1,26 +1,26 @@
 package com.dusk.module.auth.controller;
 
-import com.dusk.common.rpc.auth.enums.EnumResetType;
-import com.github.dozermapper.core.Mapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import com.dusk.common.core.annotation.Authorize;
 import com.dusk.common.core.controller.CruxBaseController;
 import com.dusk.common.core.dto.PagedResultDto;
 import com.dusk.common.core.dto.SelectListOutputDto;
-import com.dusk.common.core.utils.DozerUtils;
 import com.dusk.common.core.utils.EnumUtils;
+import com.dusk.common.core.utils.MapperUtil;
+import com.dusk.common.rpc.auth.enums.EnumResetType;
 import com.dusk.module.auth.authorization.SerialNoAuthProvider;
 import com.dusk.module.auth.dto.sysno.GetSerialNoInput;
 import com.dusk.module.auth.dto.sysno.SerialNoDto;
 import com.dusk.module.auth.dto.sysno.SerialNoEditInput;
 import com.dusk.module.auth.entity.SerialNo;
+import com.dusk.module.auth.mapper.SerialNoMapper;
 import com.dusk.module.auth.service.ISerialNoService;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -32,17 +32,17 @@ import java.util.List;
 @RequestMapping("/serialNo")
 @Api(description = "序列号", tags = "SerialNo")
 public class SerialNoController extends CruxBaseController {
-    @Autowired
-    ISerialNoService serialNoService;
-    @Autowired
-    Mapper dozerMapper;
+    @Resource
+    private ISerialNoService serialNoService;
+
+    private final SerialNoMapper mapper = SerialNoMapper.INSTANCE;
 
     @GetMapping("/getPageData")
     @ApiOperation(value = "分页查询序列号（需要权限）")
     @Authorize(SerialNoAuthProvider.PAGES_SERIAL_NO)
     public PagedResultDto<SerialNoDto> getPageData(GetSerialNoInput input) {
         Page<SerialNo> pages = serialNoService.getSerialNos(input);
-        return DozerUtils.mapToPagedResultDto(dozerMapper, pages, SerialNoDto.class);
+        return MapperUtil.mapToPagedResultDto(pages, mapper::toDto);
     }
 
     @PostMapping("/update")

@@ -1,10 +1,10 @@
 package com.dusk.module.auth.dto.orga;
 
+import com.dusk.common.core.dto.EntityDto;
+import com.dusk.module.auth.enums.OrgLabel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.common.core.dto.EntityDto;
-import com.dusk.module.auth.enums.OrgLabel;
 
 /**
  * @author kefuming

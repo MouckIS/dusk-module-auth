@@ -1,20 +1,16 @@
 package com.dusk.module.auth.manage;
 
-import com.dusk.module.auth.entity.GrantPermission;
-import com.dusk.module.auth.entity.Role;
-import com.dusk.module.auth.entity.User;
-import com.dusk.module.auth.repository.IGrantPermissionRepository;
-import com.dusk.module.auth.repository.IRoleRepository;
-import com.dusk.module.auth.repository.IUserRepository;
-import com.dusk.module.auth.service.ITenantPermissionService;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.dusk.common.core.entity.BaseEntity;
 import com.dusk.common.core.model.UserContext;
 import com.dusk.common.core.tenant.TenantContextHolder;
 import com.dusk.common.core.utils.SecurityUtils;
 import com.dusk.module.auth.common.permission.IAuthPermissionManager;
 import com.dusk.module.auth.entity.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.dusk.module.auth.repository.IGrantPermissionRepository;
+import com.dusk.module.auth.repository.IUserRepository;
+import com.dusk.module.auth.service.ITenantPermissionService;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -31,20 +27,18 @@ import java.util.stream.Collectors;
 @Component
 @Transactional
 public class UserManage implements IUserManage {
-    @Autowired
-    IUserRepository userRepository;
-    @Autowired
-    IRoleRepository roleRepository;
-    @Autowired
-    SecurityUtils securityUtils;
-    @Autowired
-    IAuthPermissionManager permissionManager;
-    @Autowired
-    IGrantPermissionRepository grantPermissionRepository;
-    @Autowired
-    ITenantPermissionService tenantPermissionService;
-    @Autowired
-    JPAQueryFactory jpaQueryFactory;
+    @Resource
+    private IUserRepository userRepository;
+    @Resource
+    private SecurityUtils securityUtils;
+    @Resource
+    private IAuthPermissionManager permissionManager;
+    @Resource
+    private IGrantPermissionRepository grantPermissionRepository;
+    @Resource
+    private ITenantPermissionService tenantPermissionService;
+    @Resource
+    private JPAQueryFactory jpaQueryFactory;
 
     @Override
     public List<Role> getUserRole(Long userId) {

@@ -1,14 +1,14 @@
 package com.dusk.module.auth.entity;
 
 import cn.hutool.core.util.StrUtil;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.FieldNameConstants;
 import com.dusk.common.core.entity.BaseEntity;
 import com.dusk.common.core.entity.CreationEntity;
 import com.dusk.common.core.entity.FullAuditedEntity;
-
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;

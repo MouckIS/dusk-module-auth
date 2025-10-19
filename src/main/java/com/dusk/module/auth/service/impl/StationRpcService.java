@@ -1,17 +1,17 @@
 package com.dusk.module.auth.service.impl;
 
-import com.dusk.common.rpc.auth.dto.station.StationDto;
-import com.dusk.common.rpc.auth.service.IStationRpcService;
-import com.github.dozermapper.core.Mapper;
-import org.apache.dubbo.config.annotation.Service;
 import com.dusk.common.core.datafilter.DataFilterContextHolder;
 import com.dusk.common.core.entity.BaseEntity;
 import com.dusk.common.core.jpa.Specifications;
-import com.dusk.common.core.utils.DozerUtils;
+import com.dusk.common.core.utils.MapperUtil;
+import com.dusk.common.rpc.auth.dto.station.StationDto;
+import com.dusk.common.rpc.auth.service.IStationRpcService;
 import com.dusk.module.auth.entity.Station;
+import com.dusk.module.auth.mapper.StationMapper;
 import com.dusk.module.auth.repository.IStationRepository;
 import com.dusk.module.auth.service.IStationService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
+import org.apache.dubbo.config.annotation.Service;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
@@ -23,12 +23,12 @@ import java.util.List;
  */
 @Service
 public class StationRpcService implements IStationRpcService {
-    @Autowired
+    @Resource
     private IStationService stationService;
-    @Autowired
+    @Resource
     private IStationRepository stationRepository;
-    @Autowired
-    private Mapper mapper;
+
+    private final StationMapper mapper = StationMapper.INSTANCE;
 
     @Override
     public List<StationDto> getAllStations() {
@@ -43,7 +43,7 @@ public class StationRpcService implements IStationRpcService {
     @Override
     public StationDto findOneById(Long id) {
         Station station = stationService.findById(id).orElse(null);
-        return station == null ? null : mapper.map(station, StationDto.class);
+        return station == null ? null : mapper.toDto(station);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class StationRpcService implements IStationRpcService {
                 e.in(BaseEntity.Fields.id, ids);
             });
             List<Station> list = stationService.findAll(spec);
-            return DozerUtils.mapList(mapper, list, StationDto.class);
+            return MapperUtil.mapList(list, mapper::toDto);
         }
         return new ArrayList<>();
     }
@@ -61,7 +61,7 @@ public class StationRpcService implements IStationRpcService {
     @Override
     public List<StationDto> getStationsByUserId(Long userId) {
         List<Station> list = stationRepository.getStationsByUser(userId);
-        return DozerUtils.mapList(mapper, list, StationDto.class);
+        return MapperUtil.mapList(list, mapper::toDto);
     }
 
     @Override
@@ -74,12 +74,12 @@ public class StationRpcService implements IStationRpcService {
 
         Station station = stationService.findById(defaultOrgId).orElse(null);
 
-        return station != null ? mapper.map(station, StationDto.class) : null;
+        return station != null ? mapper.toDto(station) : null;
     }
 
     @Override
     public List<StationDto> getStationsByParentId(Long parentId) {
         List<Station> list = stationService.findDescendants(parentId);
-        return DozerUtils.mapList(mapper, list, StationDto.class);
+        return MapperUtil.mapList(list, mapper::toDto);
     }
 }

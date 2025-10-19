@@ -2,8 +2,8 @@ package com.dusk.module.auth.dto.station;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
 /**

@@ -1,12 +1,12 @@
 package com.dusk.module.auth.service.impl;
 
-import com.dusk.common.rpc.auth.service.IAuditLogRpcService;
 import com.dusk.common.core.dto.AuditLogDto;
-import com.github.dozermapper.core.Mapper;
-import org.apache.dubbo.config.annotation.Service;
+import com.dusk.common.rpc.auth.service.IAuditLogRpcService;
 import com.dusk.module.auth.entity.AuditLog;
 import com.dusk.module.auth.repository.IAuditLogRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
+import org.apache.dubbo.config.annotation.Service;
+import org.springframework.beans.BeanUtils;
 
 /**
  * @author kefuming
@@ -14,14 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Service(retries = 0, timeout = 2000)
 public class AuditLogRpcServiceImpl implements IAuditLogRpcService {
-    @Autowired
-    Mapper dozerMapper;
-    @Autowired
-    IAuditLogRepository repository;
+    @Resource
+    private IAuditLogRepository repository;
 
     @Override
     public void saveLog(AuditLogDto log) {
-        AuditLog auditLog = dozerMapper.map(log, AuditLog.class);
+        AuditLog auditLog = new AuditLog();
+        BeanUtils.copyProperties(log, auditLog);
         repository.save(auditLog);
     }
 }

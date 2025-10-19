@@ -1,21 +1,21 @@
 package com.dusk.module.auth.common.handler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.dusk.common.core.model.UserContext;
 import com.dusk.common.core.response.BaseApiResult;
 import com.dusk.module.auth.common.manage.TokenAuthManager;
 import com.dusk.module.auth.service.ICaptchaService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.Resource;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
@@ -25,11 +25,11 @@ import java.nio.charset.StandardCharsets;
  */
 @Component
 public class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
-    @Autowired
+    @Resource
     private ObjectMapper mapper;
-    @Autowired
+    @Resource
     private TokenAuthManager tokenAuthManager;
-    @Autowired
+    @Resource
     private ICaptchaService captchaService;
 
 

@@ -5,10 +5,10 @@ import com.dusk.common.core.utils.SpringContextUtils;
 import com.dusk.module.auth.common.datafilter.IDataFilterDefinitionContext;
 import com.dusk.module.auth.entity.Station;
 import com.dusk.module.auth.repository.IStationRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,9 +21,9 @@ import java.util.stream.Collectors;
  */
 @Component
 public class DataFilterDefinitionContext implements IDataFilterDefinitionContext {
-    @Autowired
+    @Resource
     IStationRepository stationRepository;
-    @Autowired
+    @Resource
     SpringContextUtils springUtil;
 
     private final Map<String, List<Long>> dataFilterDefinition = new HashMap<>();

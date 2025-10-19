@@ -1,7 +1,6 @@
 package com.dusk.module.auth.common.manage;
 
 import cn.hutool.core.util.StrUtil;
-import lombok.extern.slf4j.Slf4j;
 import com.dusk.common.core.jpa.Sequence;
 import com.dusk.common.core.jwt.JwtSettings;
 import com.dusk.common.core.jwt.JwtTokenFactory;
@@ -9,10 +8,11 @@ import com.dusk.common.core.jwt.extractor.JwtHeaderTokenExtractor;
 import com.dusk.common.core.model.UserContext;
 import com.dusk.common.core.redis.RedisUtil;
 import com.dusk.common.core.utils.UserContextUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -22,18 +22,18 @@ import java.util.concurrent.TimeUnit;
 @Component
 @Slf4j
 public class TokenAuthManager {
-    @Autowired
-    RedisUtil<String> redisUtil;
-    @Autowired
-    JwtTokenFactory jwtTokenFactory;
-    @Autowired
+    @Resource
+    private RedisUtil<String> redisUtil;
+    @Resource
+    private JwtTokenFactory jwtTokenFactory;
+    @Resource
     private JwtSettings jwtSettings;
-    @Autowired
-    UserContextUtils userContextUtils;
-    @Autowired
-    Sequence sequence;
-    @Autowired
-    JwtHeaderTokenExtractor jwtHeaderTokenExtractor;
+    @Resource
+    private UserContextUtils userContextUtils;
+    @Resource
+    private Sequence sequence;
+    @Resource
+    private JwtHeaderTokenExtractor jwtHeaderTokenExtractor;
 
     private static final String JWT_TOKEN_PREFIX = "CRUX:AUTH:TOKEN:";
 

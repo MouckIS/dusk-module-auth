@@ -1,32 +1,36 @@
 package com.dusk.module.auth.service.impl;
 
-import com.dusk.common.core.service.impl.CruxBaseServiceImpl;
-import com.dusk.module.auth.dto.configuration.*;
-import com.dusk.module.auth.dto.feature.FeatureConfigDto;
-import com.dusk.module.auth.service.*;
-import com.dusk.module.ddm.dto.DynamicMenuDto;
-import com.dusk.module.ddm.service.IDynamicMenuRpcService;
-import com.github.dozermapper.core.Mapper;
-import lombok.extern.slf4j.Slf4j;
 import com.dusk.common.core.dto.EntityDto;
+import com.dusk.common.core.entity.BaseEntity;
 import com.dusk.common.core.model.UserContext;
+import com.dusk.common.core.service.impl.CruxBaseServiceImpl;
 import com.dusk.common.core.tenant.TenantContextHolder;
 import com.dusk.module.auth.common.config.AppAuthConfig;
 import com.dusk.module.auth.common.manage.TokenAuthManager;
 import com.dusk.module.auth.common.permission.IAuthPermissionManager;
+import com.dusk.module.auth.dto.configuration.AuthConfigDto;
+import com.dusk.module.auth.dto.configuration.ConfigurationDto;
+import com.dusk.module.auth.dto.configuration.LoginInfoDto;
+import com.dusk.module.auth.dto.configuration.TenantConfigDto;
+import com.dusk.module.auth.dto.feature.FeatureConfigDto;
 import com.dusk.module.auth.dto.user.GetUserForEditOutput;
 import com.dusk.module.auth.dto.user.UserRoleDto;
 import com.dusk.module.auth.entity.GrantPermission;
 import com.dusk.module.auth.entity.Tenant;
 import com.dusk.module.auth.entity.User;
+import com.dusk.module.auth.mapper.TenantMapper;
 import com.dusk.module.auth.repository.IGrantPermissionRepository;
 import com.dusk.module.auth.repository.ITenantRepository;
 import com.dusk.module.auth.repository.IUserRepository;
+import com.dusk.module.auth.service.*;
+import com.dusk.module.ddm.dto.DynamicMenuDto;
+import com.dusk.module.ddm.service.IDynamicMenuRpcService;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.Reference;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -39,27 +43,28 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class ConfigurationServiceImpl extends CruxBaseServiceImpl implements IConfigurationService {
-    @Autowired
-    IUserRepository userRepository;
-    @Autowired
-    IAuthPermissionManager permissionManager;
-    @Autowired
-    IFeatureService featureService;
-    @Autowired
-    ITenantRepository tenantRepository;
-    @Autowired
-    IGrantPermissionRepository grantPermissionRepository;
-    @Autowired
-    private Mapper dozerMapper;
-    @Autowired
+
+    private final TenantMapper mapper = TenantMapper.INSTANCE;
+
+    @Resource
+    private IUserRepository userRepository;
+    @Resource
+    private IAuthPermissionManager permissionManager;
+    @Resource
+    private IFeatureService featureService;
+    @Resource
+    private ITenantRepository tenantRepository;
+    @Resource
+    private IGrantPermissionRepository grantPermissionRepository;
+    @Resource
     private ITenantPermissionService tenantPermissionService;
-    @Autowired
+    @Resource
     private ICaptchaService captchaService;
-    @Autowired
+    @Resource
     AppAuthConfig appAuthConfig;
-    @Autowired
+    @Resource
     private IUserService userService;
-    @Autowired
+    @Resource
     private TokenAuthManager tokenAuthManager;
     @Reference
     private IDynamicMenuRpcService dynamicMenuRpcService;
@@ -118,17 +123,15 @@ public class ConfigurationServiceImpl extends CruxBaseServiceImpl implements ICo
             Optional<User> userOptional = userRepository.findById(userContext.getId());
             if (userOptional.isPresent()) {
                 loginUser = userOptional.get();
-                List<Long> roleIds = loginUser.getUserRoles().stream().map(p -> p.getId()).collect(Collectors.toList());
-                if (roleIds.size() > 0) {
+                List<Long> roleIds = loginUser.getUserRoles().stream().map(BaseEntity::getId).toList();
+                if (!roleIds.isEmpty()) {
                     List<GrantPermission> grantPermissionList = grantPermissionRepository.findDistinctByRoleIdIn(roleIds.toArray(new Long[0]));
-                    grantPermissionList.stream().map(p -> p.getName()).collect(Collectors.toList()).forEach(p -> {
+                    grantPermissionList.stream().map(GrantPermission::getName).toList().forEach(p -> {
                         if (!grantPermissions.contains(p)) {
                             grantPermissions.add(p);
                         }
                     });
                 }
-            } else {
-                userContext = null;
             }
         }
 
@@ -177,7 +180,7 @@ public class ConfigurationServiceImpl extends CruxBaseServiceImpl implements ICo
         if (tenantId != null) {
             Optional<Tenant> tenantOptional = tenantRepository.findById(tenantId);
             if (tenantOptional.isPresent()) {
-                return dozerMapper.map(tenantOptional.get(), TenantConfigDto.class);
+                return mapper.entityToConfigDto(tenantOptional.get());
             }
         }
         return null;

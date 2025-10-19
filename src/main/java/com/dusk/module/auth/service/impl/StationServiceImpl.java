@@ -1,24 +1,24 @@
 package com.dusk.module.auth.service.impl;
 
-import com.dusk.common.rpc.auth.dto.station.StationDto;
-import com.dusk.common.rpc.auth.enums.EnumResetType;
-import com.dusk.common.rpc.auth.service.TreeService;
-import com.dusk.module.auth.dto.station.*;
-import com.github.dozermapper.core.Mapper;
-import org.apache.commons.lang.StringUtils;
 import com.dusk.common.core.entity.BaseEntity;
 import com.dusk.common.core.entity.TreeEntity;
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.jpa.Specifications;
-import com.dusk.common.core.utils.DozerUtils;
+import com.dusk.common.core.utils.MapperUtil;
+import com.dusk.common.rpc.auth.dto.station.StationDto;
+import com.dusk.common.rpc.auth.enums.EnumResetType;
+import com.dusk.common.rpc.auth.service.TreeService;
 import com.dusk.module.auth.common.datafilter.IDataFilterDefinitionContext;
+import com.dusk.module.auth.dto.station.*;
 import com.dusk.module.auth.entity.Station;
 import com.dusk.module.auth.entity.User;
+import com.dusk.module.auth.mapper.StationMapper;
 import com.dusk.module.auth.repository.IStationRepository;
 import com.dusk.module.auth.service.ISerialNoService;
 import com.dusk.module.auth.service.IStationService;
 import com.dusk.module.auth.service.IUserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -33,14 +33,14 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class StationServiceImpl extends TreeService<Station,IStationRepository> implements IStationService  {
-    @Autowired
-    private Mapper mapper;
-    @Autowired
+    @Resource
     private IUserService userService;
-    @Autowired
+    @Resource
     private IDataFilterDefinitionContext dataFilterDefinitionContext;
-    @Autowired
+    @Resource
     private ISerialNoService serialNoService;
+
+    private final StationMapper mapper = StationMapper.INSTANCE;
 
     @Override
     public Station createOrUpdate(CreateOrUpdateStationInput input) {
@@ -106,7 +106,7 @@ public class StationServiceImpl extends TreeService<Station,IStationRepository> 
         List<Station> stations = this.getAllStationsByUserId(id);
         User u = userService.getUserById(id);
 
-        return DozerUtils.mapList(dozerMapper, stations, StationsOfLoginUserDto.class, (s, t) -> {
+        return MapperUtil.mapList(stations, mapper::toStationsOfLoginUserDto, (s, t) -> {
             t.setName(s.getDisplayName());
             t.setMainStation(stations.stream().anyMatch(station -> s.getId().equals(station.getParentId())));//存在一个厂站其parentId为当前站id则认为该站为集控站
             t.setDefaultBy(s.getId().equals(u.getDefaultStation()));
@@ -116,7 +116,7 @@ public class StationServiceImpl extends TreeService<Station,IStationRepository> 
 
     @Override
     public List<StationDto> getAllStations() {
-        return DozerUtils.mapList(mapper, findAll(Sort.by(TreeEntity.Fields.sortIndex, TreeEntity.Fields.displayName)), StationDto.class);
+        return MapperUtil.mapList(findAll(Sort.by(TreeEntity.Fields.sortIndex, TreeEntity.Fields.displayName)), mapper::toDto);
     }
 
     @Override
@@ -137,7 +137,7 @@ public class StationServiceImpl extends TreeService<Station,IStationRepository> 
         });
         List<Station> list = findAll(spec);
 
-        return list.isEmpty() ? null : mapper.map(list.get(0), StationDto.class);
+        return list.isEmpty() ? null : mapper.toDto(list.getFirst());
     }
 
     /**

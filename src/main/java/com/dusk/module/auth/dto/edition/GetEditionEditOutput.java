@@ -1,9 +1,9 @@
 package com.dusk.module.auth.dto.edition;
 
 import com.dusk.module.auth.dto.TenantFeature;
+import com.dusk.module.auth.dto.feature.FeatureValueInput;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.module.auth.dto.feature.FeatureValueInput;
 
 import java.util.List;
 

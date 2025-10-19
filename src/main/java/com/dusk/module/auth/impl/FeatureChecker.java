@@ -5,9 +5,9 @@ import com.dusk.common.core.tenant.TenantContextHolder;
 import com.dusk.common.mqs.config.AppConfig;
 import com.dusk.module.auth.service.IFeatureChecker;
 import com.dusk.module.auth.service.IFeatureRpcService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.Reference;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -18,9 +18,9 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class FeatureChecker implements IFeatureChecker {
     @Reference
-    IFeatureRpcService featureService;
-    @Autowired
-    AppConfig appConfig;
+    private IFeatureRpcService featureService;
+    @Resource
+    private AppConfig appConfig;
 
     @Override
     public String getValue(String name) {

@@ -1,10 +1,10 @@
 package com.dusk.module.auth.dto.user;
 
 import com.dusk.common.rpc.auth.dto.UserEditDto;
-import lombok.Getter;
-import lombok.Setter;
 import com.dusk.module.auth.dto.station.StationsOfLoginUserDto;
 import com.dusk.module.auth.enums.ELevel;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.List;

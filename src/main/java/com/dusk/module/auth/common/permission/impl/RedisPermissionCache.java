@@ -1,8 +1,5 @@
 package com.dusk.module.auth.common.permission.impl;
 
-import com.github.dozermapper.core.Mapper;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.extern.slf4j.Slf4j;
 import com.dusk.common.core.auth.permission.Permission;
 import com.dusk.common.core.auth.permission.RoleInfo;
 import com.dusk.common.core.auth.permission.UrlPermission;
@@ -13,6 +10,9 @@ import com.dusk.module.auth.common.permission.PermissionUtil;
 import com.dusk.module.auth.repository.IGrantPermissionRepository;
 import com.dusk.module.auth.service.IGrantPermissionService;
 import com.dusk.module.auth.service.ITenantPermissionService;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Primary;
@@ -37,15 +37,13 @@ public class RedisPermissionCache implements IPermissionCache {
     private final String AUTH_PERMISSION_ANONYMOUS_KEY = "CRUX:AUTH:PERMISSION:ANONYMOUS";
     @Autowired(required = false)
     RedisUtil<Object> redisUtil;
-    @Autowired
+    @Resource
     private IGrantPermissionRepository grantPermissionRepository;
-    @Autowired
-    private Mapper dozerMapper;
-    @Autowired
+    @Resource
     private ITenantPermissionService tenantPermissionService;
-    @Autowired
+    @Resource
     private IGrantPermissionService grantPermissionService;
-    @Autowired
+    @Resource
     private JPAQueryFactory queryFactory;
 
 
@@ -109,7 +107,7 @@ public class RedisPermissionCache implements IPermissionCache {
         Map<String, List<RoleInfo>> allGrantPermission = grantPermissionService.getAll();
         Map<String, List<Long>> allTenantPermission = tenantPermissionService.getAllTenantPermission();
         for (Map<String, List<UrlPermission>> applicationPermission : urlPermission.values()) {
-            PermissionUtil.setPermissionRoleInfo(allGrantPermission, applicationPermission, allTenantPermission, dozerMapper);
+            PermissionUtil.setPermissionRoleInfo(allGrantPermission, applicationPermission, allTenantPermission);
         }
         redisUtil.setCache(AUTH_PERMISSION_URL_KEY, urlPermission);
     }

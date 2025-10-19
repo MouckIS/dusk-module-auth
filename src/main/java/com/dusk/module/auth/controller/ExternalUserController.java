@@ -1,8 +1,5 @@
 package com.dusk.module.auth.controller;
 
-import com.dusk.module.auth.dto.user.*;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import com.dusk.common.core.annotation.Authorize;
 import com.dusk.common.core.controller.CruxBaseController;
 import com.dusk.common.core.dto.EntityDto;
@@ -12,10 +9,11 @@ import com.dusk.common.core.model.UserContext;
 import com.dusk.module.auth.authorization.ExternalManagerAuthProvider;
 import com.dusk.module.auth.dto.user.*;
 import com.dusk.module.auth.service.IUserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author kefuming
@@ -26,8 +24,8 @@ import jakarta.validation.Valid;
 @Api(description = "外单位用户", tags = "externalUser")
 @Authorize(ExternalManagerAuthProvider.PAGES_EXTERNAL_USERS)
 public class ExternalUserController extends CruxBaseController {
-    @Autowired
-    IUserService userService;
+    @Resource
+    private IUserService userService;
 
     @ApiOperation(value = "获取用户列表")
     @RequestMapping(value = "/getUsers", method = RequestMethod.GET)

@@ -1,17 +1,17 @@
 package com.dusk.module.auth.entity;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.FieldNameConstants;
-import org.apache.commons.lang3.StringUtils;
 import com.dusk.common.core.annotation.LogicDelete;
 import com.dusk.common.core.constant.EntityConstant;
 import com.dusk.common.core.entity.CreationEntity;
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.module.auth.enums.EditionPaymentType;
 import com.dusk.module.auth.enums.PaymentPeriodType;
-
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
+import org.apache.commons.lang3.StringUtils;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 

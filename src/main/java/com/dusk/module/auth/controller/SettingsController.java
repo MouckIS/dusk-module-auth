@@ -1,7 +1,5 @@
 package com.dusk.module.auth.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import com.dusk.common.core.annotation.AllowAnonymous;
 import com.dusk.common.core.annotation.Authorize;
 import com.dusk.common.core.controller.CruxBaseController;
@@ -10,10 +8,12 @@ import com.dusk.module.auth.authorization.TenantSettingsAuthProvider;
 import com.dusk.module.auth.dto.setting.SettingDto;
 import com.dusk.module.auth.dto.setting.UpdateSettingInput;
 import com.dusk.module.auth.service.ISettingService;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +25,7 @@ import java.util.Map;
 @RequestMapping("/Settings")
 @Api(description = "配置", tags = "settings")
 public class SettingsController extends CruxBaseController {
-    @Autowired
+    @Resource
     private ISettingService settingService;
 
     @GetMapping("getApplicationSettings")

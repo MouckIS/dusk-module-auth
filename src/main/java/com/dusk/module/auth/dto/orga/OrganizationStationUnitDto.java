@@ -1,10 +1,10 @@
 package com.dusk.module.auth.dto.orga;
 
+import com.dusk.common.core.enums.EUnitType;
 import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitDto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.common.core.enums.EUnitType;
 
 /**
  * @author kefuming

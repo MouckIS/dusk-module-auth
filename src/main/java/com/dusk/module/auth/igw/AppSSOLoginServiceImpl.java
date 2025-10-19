@@ -6,10 +6,10 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
-import lombok.extern.slf4j.Slf4j;
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.module.auth.service.IUserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -25,31 +25,27 @@ import java.util.Map;
 @ConditionalOnProperty(name = "igwsso.enable", havingValue = "true")
 @Slf4j
 public class AppSSOLoginServiceImpl implements IAppSSOLoginService {
+    @Resource
+    private IUserService userService;
 
     @Value("${igwsso.iscAppId}")
     private String iscAppId;
-
     @Value("${igwsso.iscSecret}")
     private String iscSecret;
-
     @Value("${igwsso.service}")
     private String service;
-
     @Value("${igwsso.address}")
     private String address;
 
 
     // http请求超时时长  3秒超时
     private final static int TIME_OUT_MILLISECONDS = 3000;
-
     // i国网获取token url
     private final static String ACCESSTOKEN_URL = "zuul/sgid-provider-console/res/iscMincroService/getAccessToken";
-
     // i国网转换ticket
     private final static String TICKET_URL = "zuul/sgid-frontmv/identity/getUserInfoByTicket";
 
-    @Autowired
-    IUserService userService;
+
 
 
     /**

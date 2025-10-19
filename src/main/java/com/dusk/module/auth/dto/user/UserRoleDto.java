@@ -1,6 +1,5 @@
 package com.dusk.module.auth.dto.user;
 
-import com.github.dozermapper.core.Mapping;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +13,6 @@ import lombok.Setter;
 public class UserRoleDto {
 
     @ApiModelProperty("角色id")
-    @Mapping("id")
     private Long roleId;
     @ApiModelProperty("角色名称")
     private String roleName;

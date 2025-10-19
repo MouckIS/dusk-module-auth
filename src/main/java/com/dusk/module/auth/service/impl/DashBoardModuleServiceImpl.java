@@ -2,31 +2,33 @@ package com.dusk.module.auth.service.impl;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.json.JSONUtil;
-import com.dusk.module.auth.dto.dashboard.*;
-import com.querydsl.core.types.QBean;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import com.dusk.common.core.dto.PagedResultDto;
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.jpa.querydsl.QBeanBuilder;
 import com.dusk.common.core.utils.DateUtils;
-import com.dusk.common.core.utils.DozerUtils;
+import com.dusk.common.core.utils.MapperUtil;
+import com.dusk.module.auth.dto.dashboard.*;
 import com.dusk.module.auth.entity.dashboard.DashboardModule;
 import com.dusk.module.auth.entity.dashboard.DashboardModuleItem;
 import com.dusk.module.auth.entity.dashboard.DashboardZoneItemRef;
 import com.dusk.module.auth.entity.dashboard.QDashboardModule;
+import com.dusk.module.auth.mapper.DashboardMapper;
 import com.dusk.module.auth.repository.dashboard.IDashBoardModuleItemRepository;
 import com.dusk.module.auth.repository.dashboard.IDashBoardModuleRepository;
 import com.dusk.module.auth.repository.dashboard.IDashBoardZoneItemRefRepository;
 import com.dusk.module.auth.service.IDashBoardModuleService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.querydsl.core.types.QBean;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -46,14 +48,16 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DashBoardModuleServiceImpl extends CreateOrUpdateService<DashboardModule, IDashBoardModuleRepository> implements IDashBoardModuleService {
 
-    @Autowired
+    @Resource
     private IDashBoardModuleRepository moduleRepository;
-    @Autowired
+    @Resource
     private IDashBoardModuleItemRepository moduleItemRepository;
-    @Autowired
+    @Resource
     private IDashBoardZoneItemRefRepository zoneItemRefRepository;
-    @Autowired
-    JPAQueryFactory queryFactory;
+    @Resource
+    private JPAQueryFactory queryFactory;
+
+    private final DashboardMapper mapper = DashboardMapper.INSTANCE;
 
     @Override
     public DashboardModule saveModule(CreateOrUpdateModule input) {
@@ -125,10 +129,10 @@ public class DashBoardModuleServiceImpl extends CreateOrUpdateService<DashboardM
     @Override
     public ModuleDetailDto moduleDetail(Long id) {
         DashboardModule module = findT(id);
-        ModuleDetailDto detailDto = mapper.map(module, ModuleDetailDto.class);
+        ModuleDetailDto detailDto = mapper.toModuleDetailDto(module);
 
         List<DashboardModuleItem> items = moduleItemRepository.findAllByModuleIdOrderByCreateTime(module.getId());
-        List<ModuleItemListDto> itemListDtos = DozerUtils.mapList(mapper, items, ModuleItemListDto.class);
+        List<ModuleItemListDto> itemListDtos = MapperUtil.mapList(items, mapper::toModuleListDto);
         detailDto.setModuleItems(itemListDtos);
         return detailDto;
     }
@@ -159,10 +163,11 @@ public class DashBoardModuleServiceImpl extends CreateOrUpdateService<DashboardM
 
         DashboardModuleItem moduleItem;
         if (input.getId() == null) {
-            moduleItem = mapper.map(input, DashboardModuleItem.class);
+            moduleItem = mapper.createModuleItemEntity(input);
         } else {
             moduleItem = moduleItemRepository.findById(input.getId()).orElseThrow(() -> new BusinessException("未找到id为[" + input.getId() + "]的记录！"));
-            mapper.map(input, moduleItem);
+            //mapper.map(input, moduleItem);
+            BeanUtils.copyProperties(input, moduleItem);
         }
         moduleItemRepository.save(moduleItem);
         return moduleItem;
@@ -180,10 +185,10 @@ public class DashBoardModuleServiceImpl extends CreateOrUpdateService<DashboardM
     }
 
     private List<ModuleDetailDto> getModuleDetailList() {
-        List<ModuleDetailDto> moduleDetailList = DozerUtils.mapList(dozerMapper, findAll(), ModuleDetailDto.class);
+        List<ModuleDetailDto> moduleDetailList = MapperUtil.mapList(findAll(), mapper::toModuleDetailDto);
         moduleDetailList.forEach(module -> {
             List<DashboardModuleItem> items = moduleItemRepository.findAllByModuleIdOrderByCreateTime(module.getId());
-            List<ModuleItemListDto> itemListDtos = DozerUtils.mapList(mapper, items, ModuleItemListDto.class);
+            List<ModuleItemListDto> itemListDtos = MapperUtil.mapList(items, mapper::toModuleListDto);
             module.setModuleItems(itemListDtos);
         });
         return moduleDetailList;
@@ -239,7 +244,7 @@ public class DashBoardModuleServiceImpl extends CreateOrUpdateService<DashboardM
                 //更新模块
                 DashboardModule newModule;
                 if(!hasModule){
-                    newModule = dozerMapper.map(module, DashboardModule.class);
+                    newModule = mapper.detailDtoToEntity(module);
                 }else {
                     newModule = moduleRepository.findByName(module.getName());
                     newModule.setCenterModule(module.getCenterModule());
@@ -254,14 +259,14 @@ public class DashBoardModuleServiceImpl extends CreateOrUpdateService<DashboardM
                     module.getModuleItems().forEach(item -> {
                         if(itemMap.containsKey(item.getCode())) {
                             //更新统计项
-                            CreateOrUpdateModuleItem updateItem = dozerMapper.map(item, CreateOrUpdateModuleItem.class);
+                            CreateOrUpdateModuleItem updateItem = mapper.listDtoToCreateDto(item);
                             updateItem.setId(itemMap.get(item.getCode()).getId());
                             updateItem.setModuleId(newModule.getId());
                             saveModuleItem(updateItem);
                         }else {
                             //判断新增统计项是否有权限
                             if(hasPermission(permissionInput, module, item)) {
-                                CreateOrUpdateModuleItem addItem = dozerMapper.map(item, CreateOrUpdateModuleItem.class);
+                                CreateOrUpdateModuleItem addItem = mapper.listDtoToCreateDto(item);
                                 addItem.setId(null);
                                 addItem.setModuleId(newModule.getId());
                                 saveModuleItem(addItem);
@@ -272,7 +277,7 @@ public class DashBoardModuleServiceImpl extends CreateOrUpdateService<DashboardM
                     List<DashboardModuleItem> addItemList = new ArrayList<>();
                     module.getModuleItems().forEach(item -> {
                         if(hasPermission(permissionInput, module, item)) {
-                            DashboardModuleItem addItem = mapper.map(item, DashboardModuleItem.class);
+                            DashboardModuleItem addItem = mapper.listDtoToEntity(item);
                             addItem.setId(null);
                             addItem.setModuleId(newModule.getId());
                             addItemList.add(addItem);

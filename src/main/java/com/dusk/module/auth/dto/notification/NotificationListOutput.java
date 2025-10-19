@@ -1,7 +1,7 @@
 package com.dusk.module.auth.dto.notification;
 
-import com.dusk.common.rpc.auth.enums.NotificationType;
 import com.dusk.common.core.dto.VersionDto;
+import com.dusk.common.rpc.auth.enums.NotificationType;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;

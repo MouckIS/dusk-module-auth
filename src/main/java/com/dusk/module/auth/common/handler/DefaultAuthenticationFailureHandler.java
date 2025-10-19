@@ -1,12 +1,15 @@
 package com.dusk.module.auth.common.handler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.dusk.common.core.exception.UserLoginException;
 import com.dusk.common.core.jwt.exception.JwtExpiredTokenException;
 import com.dusk.common.core.response.BaseApiResult;
 import com.dusk.module.auth.service.ICaptchaService;
 import com.dusk.module.auth.service.impl.UserServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.Resource;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -15,9 +18,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
@@ -27,9 +27,9 @@ import java.nio.charset.StandardCharsets;
  */
 @Component
 public class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandler {
-    @Autowired
+    @Resource
     private ObjectMapper mapper;
-    @Autowired
+    @Resource
     private ICaptchaService captchaService;
 
     @Override

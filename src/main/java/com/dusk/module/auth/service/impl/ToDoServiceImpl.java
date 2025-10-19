@@ -1,41 +1,38 @@
 package com.dusk.module.auth.service.impl;
 
 import cn.hutool.core.util.StrUtil;
-import com.dusk.common.rpc.auth.dto.ToDoDto;
-import com.dusk.common.rpc.auth.enums.ToDoTargetType;
-import com.dusk.module.auth.entity.Todo;
-import com.dusk.module.auth.entity.TodoRead;
-import com.dusk.module.auth.entity.User;
-import com.github.dozermapper.core.Mapper;
-import com.querydsl.core.types.QBean;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import com.dusk.common.core.auth.authentication.LoginUserIdContextHolder;
 import com.dusk.common.core.datafilter.DataFilterContextHolder;
 import com.dusk.common.core.entity.CreationEntity;
 import com.dusk.common.core.jpa.querydsl.QBeanBuilder;
 import com.dusk.common.core.service.impl.BaseService;
 import com.dusk.common.core.utils.SecurityUtils;
+import com.dusk.common.rpc.auth.dto.ToDoDto;
+import com.dusk.common.rpc.auth.enums.ToDoTargetType;
 import com.dusk.module.auth.dto.todo.GetTodosInput;
 import com.dusk.module.auth.dto.todo.TodoInfoDto;
 import com.dusk.module.auth.entity.*;
 import com.dusk.module.auth.enums.ToDoMQTTTypeEnum;
 import com.dusk.module.auth.manage.IUserManage;
+import com.dusk.module.auth.mapper.TodoMapper;
 import com.dusk.module.auth.repository.IToDoRepository;
 import com.dusk.module.auth.service.IToDoService;
 import com.dusk.module.auth.service.ITodoIgnoreService;
 import com.dusk.module.auth.service.ITodoReadService;
 import com.dusk.module.auth.service.ToDoPushService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.querydsl.core.types.QBean;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -49,27 +46,26 @@ import java.util.stream.Collectors;
 @Transactional
 @Slf4j
 public class ToDoServiceImpl extends BaseService<Todo, IToDoRepository> implements IToDoService {
-    private static final int TITLE_MAX_LENGTH = 200;
-    @Autowired
-    Mapper dozerMapper;
-    @Autowired
-    JPAQueryFactory queryFactory;
-    @Autowired
-    SecurityUtils securityUtils;
-    @Autowired
-    IUserManage userManage;
-    @Autowired
-    ToDoPushService toDoPushService;
-    @Autowired
+    @Resource
+    private JPAQueryFactory queryFactory;
+    @Resource
+    private SecurityUtils securityUtils;
+    @Resource
+    private IUserManage userManage;
+    @Resource
+    private ToDoPushService toDoPushService;
+    @Resource
     private ITodoIgnoreService todoIgnoreService;
-    @Autowired
+    @Resource
     private ITodoReadService todoReadService;
 
+    private static final int TITLE_MAX_LENGTH = 200;
+    private final TodoMapper mapper = TodoMapper.INSTANCE;
 
     @Override
     public void addTodo(@Valid ToDoDto input) {
         //校验数据有效性
-        Todo data = dozerMapper.map(input, Todo.class);
+        Todo data = mapper.toEntity(input);
         if(input.getTitle().length() > TITLE_MAX_LENGTH){
             data.setTitle(StrUtil.sub(input.getTitle(), 0, TITLE_MAX_LENGTH) + "...");
         }
@@ -135,7 +131,7 @@ public class ToDoServiceImpl extends BaseService<Todo, IToDoRepository> implemen
         String dataFilterId = DataFilterContextHolder.getDataFilterId();
         BooleanExpression orgFilter = QTodo.todo.orgId.isNull();
         if (StringUtils.isNotEmpty(dataFilterId)) {
-            List<Long> orgIds = Arrays.stream(DataFilterContextHolder.getDataFilterId().split(",")).map(Long::new).collect(Collectors.toList());
+            List<Long> orgIds = Arrays.stream(DataFilterContextHolder.getDataFilterId().split(",")).map(Long::parseLong).collect(Collectors.toList());
             orgFilter = orgFilter.or(QTodo.todo.orgId.in(orgIds));
         }
         expression = expression.and(orgFilter);

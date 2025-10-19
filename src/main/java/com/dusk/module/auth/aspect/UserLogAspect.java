@@ -7,13 +7,13 @@ import com.dusk.common.core.utils.UserContextUtils;
 import com.dusk.module.auth.enums.LoginLogType;
 import com.dusk.module.auth.listener.LogInOutEvent;
 import com.dusk.module.auth.repository.IUserRepository;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -29,11 +29,11 @@ import java.time.LocalDateTime;
 @Aspect
 @Component
 public class UserLogAspect {
-    @Autowired
+    @Resource
     private ApplicationEventPublisher eventPublisher;
-    @Autowired
+    @Resource
     private IUserRepository userRepository;
-    @Autowired
+    @Resource
     private UserContextUtils userContextUtils;
 
     @Around("execution(* com.dusk.module.auth.common.manage.TokenAuthManager.removeToken(..))")

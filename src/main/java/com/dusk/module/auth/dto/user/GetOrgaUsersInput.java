@@ -1,15 +1,14 @@
 package com.dusk.module.auth.dto.user;
 
+import com.dusk.common.core.dto.PagedAndSortedInputDto;
+import com.dusk.common.core.entity.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
-import com.dusk.common.core.dto.PagedAndSortedInputDto;
-import com.dusk.common.core.entity.BaseEntity;
 import org.springframework.data.domain.Sort;
-
-import jakarta.validation.constraints.NotNull;
 
 /**
  * @author kefuming

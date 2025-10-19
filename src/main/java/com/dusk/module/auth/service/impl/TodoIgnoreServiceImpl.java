@@ -1,12 +1,12 @@
 package com.dusk.module.auth.service.impl;
 
-import com.querydsl.core.types.Predicate;
 import com.dusk.common.core.auth.authentication.LoginUserIdContextHolder;
 import com.dusk.common.core.service.impl.BaseService;
 import com.dusk.module.auth.entity.QTodoIgnore;
 import com.dusk.module.auth.entity.TodoIgnore;
 import com.dusk.module.auth.repository.ITodoIgnoreRepository;
 import com.dusk.module.auth.service.ITodoIgnoreService;
+import com.querydsl.core.types.Predicate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -1,7 +1,5 @@
 package com.dusk.module.auth.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import com.dusk.common.core.annotation.Authorize;
 import com.dusk.common.core.controller.CruxBaseController;
 import com.dusk.common.core.dto.PagedResultDto;
@@ -10,7 +8,9 @@ import com.dusk.module.auth.dto.datadisplay.DataDisplayItemDto;
 import com.dusk.module.auth.dto.datadisplay.GetDisplaySetInputDto;
 import com.dusk.module.auth.dto.datadisplay.UpdateDataDisplaySetDto;
 import com.dusk.module.auth.service.IDataDisplaySetService;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,7 +30,7 @@ import java.util.List;
 @Authorize(DataDisplaySetAuthProvider.PAGES_DATA_DISPLAY_SET)
 public class DataDisplaySetController extends CruxBaseController {
 
-    @Autowired
+    @Resource
     IDataDisplaySetService dataDisplaySetService;
 
     @PostMapping("/updateDisplaySetItem")

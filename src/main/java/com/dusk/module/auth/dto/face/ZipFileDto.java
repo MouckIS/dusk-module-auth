@@ -3,8 +3,8 @@ package com.dusk.module.auth.dto.face;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * @author kefuming

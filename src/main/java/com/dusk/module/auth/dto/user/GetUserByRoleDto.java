@@ -1,12 +1,11 @@
 package com.dusk.module.auth.dto.user;
 
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
 import com.dusk.common.core.enums.EUnitType;
-
+import io.swagger.annotations.ApiModelProperty;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author kefuming

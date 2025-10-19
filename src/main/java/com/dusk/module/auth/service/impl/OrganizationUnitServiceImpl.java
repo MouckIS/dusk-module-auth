@@ -4,21 +4,6 @@ import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.excel.EasyExcel;
-import com.dusk.common.rpc.auth.dto.orga.GetOrganizationUnitUsersInput;
-import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitDto;
-import com.dusk.common.rpc.auth.enums.EnumResetType;
-import com.dusk.common.rpc.auth.service.IOrganizationUnitRpcService;
-import com.dusk.common.rpc.auth.service.TreeService;
-import com.dusk.module.auth.dto.orga.*;
-import com.dusk.module.auth.entity.OrganizationManager;
-import com.dusk.module.auth.entity.OrganizationUnit;
-import com.dusk.module.auth.entity.User;
-import com.github.dozermapper.core.Mapper;
-import com.querydsl.core.types.QBean;
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.apache.commons.lang.StringUtils;
-import org.apache.dubbo.config.annotation.Service;
 import com.dusk.common.core.auth.authentication.LoginUserIdContextHolder;
 import com.dusk.common.core.constant.TreeConstant;
 import com.dusk.common.core.datafilter.DataFilterContextHolder;
@@ -28,25 +13,36 @@ import com.dusk.common.core.dto.PagedAndSortedInputDto;
 import com.dusk.common.core.dto.PagedResultDto;
 import com.dusk.common.core.entity.BaseEntity;
 import com.dusk.common.core.entity.TreeEntity;
+import com.dusk.common.core.enums.EUnitType;
+import com.dusk.common.core.enums.UserStatus;
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.jpa.Specifications;
 import com.dusk.common.core.jpa.querydsl.QBeanBuilder;
-import com.dusk.common.core.utils.DozerUtils;
+import com.dusk.common.core.utils.MapperUtil;
+import com.dusk.common.rpc.auth.dto.orga.GetOrganizationUnitUsersInput;
+import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitDto;
 import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitUserListDto;
-import com.dusk.common.core.enums.EUnitType;
-import com.dusk.common.core.enums.UserStatus;
-import com.dusk.module.auth.common.datafilter.IDataFilterDefinitionContext;
+import com.dusk.common.rpc.auth.enums.EnumResetType;
+import com.dusk.common.rpc.auth.service.IOrganizationUnitRpcService;
+import com.dusk.common.rpc.auth.service.TreeService;
+import com.dusk.module.auth.dto.orga.*;
 import com.dusk.module.auth.dto.station.StationsOfLoginUserDto;
 import com.dusk.module.auth.entity.*;
 import com.dusk.module.auth.listener.ExcelDataListener;
+import com.dusk.module.auth.mapper.OrganizationMapper;
 import com.dusk.module.auth.repository.IOrganizationManagerRepository;
 import com.dusk.module.auth.repository.IOrganizationUnitRepository;
 import com.dusk.module.auth.repository.IUserRepository;
 import com.dusk.module.auth.service.IOrganizationUnitService;
 import com.dusk.module.auth.service.ISerialNoService;
 import com.dusk.module.auth.service.IUserService;
+import com.querydsl.core.types.QBean;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.annotation.Resource;
+import org.apache.commons.lang.StringUtils;
+import org.apache.dubbo.config.annotation.Service;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -65,20 +61,18 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, IOrganizationUnitRepository> implements IOrganizationUnitRpcService, IOrganizationUnitService {
-    @Autowired
-    private Mapper mapper;
-    @Autowired
+    @Resource
     private JPAQueryFactory queryFactory;
-    @Autowired
+    @Resource
     private IUserService userService;
-    @Autowired
-    private IDataFilterDefinitionContext dataFilterDefinitionContext;
-    @Autowired
+    @Resource
     private ISerialNoService serialNoService;
-    @Autowired
+    @Resource
     private IUserRepository userRepository;
-    @Autowired
+    @Resource
     private IOrganizationManagerRepository organizationManagerRepository;
+
+    private final OrganizationMapper mapper = OrganizationMapper.INSTANCE;
 
     @Override
     public ListResultDto<OrganizationStationUnitDto> getExternalOrganizationUnits() {
@@ -93,10 +87,10 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
         } else {
             // 外部单位人员获取所属的组织机构
             List<OrganizationUnit> unitList = getOrganizationUnitsByUser(new EntityDto(userId));
-            organizationUnitList = getParentOrganizations(new EntityDto(unitList.get(0).getId()));
+            organizationUnitList = getParentOrganizations(new EntityDto(unitList.getFirst().getId()));
 
         }
-        return DozerUtils.mapToListResultDto(dozerMapper, organizationUnitList, OrganizationStationUnitDto.class, (unit, dto) -> {
+        return MapperUtil.mapToListResultDto(organizationUnitList, mapper::toStationUnitDto, (unit, dto) -> {
             Long orgId = unit.getId();
             if (map.containsKey(orgId)) {
                 dto.setManagerId(map.get(orgId));
@@ -180,7 +174,7 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
 
     @Override
     public OrganizationUnit create(CreateOrganizationUnitInput input) {
-        OrganizationUnit organizationUnit = mapper.map(input, OrganizationUnit.class);
+        OrganizationUnit organizationUnit = mapper.CreateOInputToEntity(input);
         OrganizationUnit save = save(organizationUnit);
         updateOrgManager(save.getId(), input.getManagerId());
         validDisplayNameUnique(organizationUnit);
@@ -213,7 +207,7 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
     @Override
     public OrganizationUnit update(UpdateOrganizationUnitInput input) {
         OrganizationUnit organizationUnit = findById(input.getId()).orElseThrow(() -> new BusinessException("未找到相应的组织机构"));
-        mapper.map(input, organizationUnit);
+        mapper.updateEntityFromDto(input, organizationUnit);
         save(organizationUnit);
         updateOrgManager(organizationUnit.getId(), input.getManagerId());
         validDisplayNameUnique(organizationUnit);
@@ -357,7 +351,7 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
     public List<StationsOfLoginUserDto> getStationsForFrontByUserId(Long id) {
         List<OrganizationUnit> stations = this.getStationsByUserId(id);
         User u = userService.getUserById(id);
-        return DozerUtils.mapList(dozerMapper, stations, StationsOfLoginUserDto.class, (s, t) -> {
+        return MapperUtil.mapList(stations, mapper::toStationsOfLoginUserDto, (s, t) -> {
            t.setValue(s.getId());
            t.setName(s.getDisplayName());
            t.setDefaultBy(s.getId().equals(u.getDefaultStation()));
@@ -366,7 +360,7 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
 
     @Override
     public List<OrganizationUnitDto> getAllOrgas() {
-        return DozerUtils.mapList(mapper, findAll(), OrganizationUnitDto.class);
+        return MapperUtil.mapList(findAll(), mapper::toDto);
     }
 
     @Override
@@ -379,7 +373,7 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
         });
         List<OrganizationUnit> list = findAll(spec);
 
-        return list.isEmpty() ? null : mapper.map(list.get(0), OrganizationUnitDto.class);
+        return list.isEmpty() ? null : mapper.toDto(list.getFirst());
     }
 
     @Override
@@ -387,22 +381,22 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
         if (id == null) {
             return null;
         }
-        Optional result = findById(id);
-        return result.isEmpty() ? null : mapper.map(result.get(), OrganizationUnitDto.class);
+        Optional<OrganizationUnit> result = findById(id);
+        return result.map(mapper::toDto).orElse(null);
     }
 
     @Override
     public List<OrganizationUnitDto> findByIds(List<Long> ids) {
         if (ids != null) {
             List<OrganizationUnit> data = repository.findByIdIn(ids);
-            return DozerUtils.mapList(mapper, data, OrganizationUnitDto.class);
+            return MapperUtil.mapList(data, mapper::toDto);
         }
         return null;
     }
 
     @Override
     public List<OrganizationUnitDto> getOrganizationUnitsByUserId(Long userId) {
-        return DozerUtils.mapList(mapper, repository.getOrganizationUnitsByUser(userId), OrganizationUnitDto.class);
+        return MapperUtil.mapList(repository.getOrganizationUnitsByUser(userId), mapper::toDto);
     }
 
     @Override
@@ -411,7 +405,7 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
         Map<Long, OrganizationUnitDto> unitDtoMap = findByIds(orgIds).stream().collect(Collectors.toMap(OrganizationUnitDto::getId, s -> s));
         orgIds.forEach(orgId -> {
             List<OrganizationUnit> organizationUnits = findDescendants(orgId);
-            List<OrganizationUnitDto> dtoList = DozerUtils.mapList(dozerMapper, organizationUnits, OrganizationUnitDto.class);
+            List<OrganizationUnitDto> dtoList = MapperUtil.mapList(organizationUnits, mapper::toDto);
             OrganizationUnitDto mapOrDefault = unitDtoMap.getOrDefault(orgId, null);
             dtoList.add(mapOrDefault);
             map.put(orgId, dtoList);
@@ -429,12 +423,13 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
 
         OrganizationUnit organizationUnit = findById(defaultOrgId).orElse(null);
 
-        return organizationUnit != null ? mapper.map(organizationUnit, OrganizationUnitDto.class) : null;
+        return organizationUnit != null ? mapper.toDto(organizationUnit) : null;
     }
 
     @Override
     public PagedResultDto<OrganizationUnitUserListDto> getOrganizationUnitUsers(PagedAndSortedInputDto pageReq, String filter, boolean deepQuery, Long... orgIds) {
-        GetOrganizationUnitUsersInput req = mapper.map(pageReq, GetOrganizationUnitUsersInput.class);
+        GetOrganizationUnitUsersInput req = new GetOrganizationUnitUsersInput();
+        BeanUtils.copyProperties(pageReq, req);
         req.setDeepQuery(deepQuery);
         req.setFilter(filter);
         if (orgIds != null) {
@@ -508,8 +503,8 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
         // 递归查询所有子机构
         List<OrganizationUnitDto> result = new ArrayList<>();
         List<OrganizationUnit> organizationUnitList = repository.getStationsByParentId(orgId);
-        if (organizationUnitList.size() > 0) {
-            result.addAll(DozerUtils.mapList(mapper, organizationUnitList, OrganizationUnitDto.class));
+        if (!organizationUnitList.isEmpty()) {
+            result.addAll(MapperUtil.mapList(organizationUnitList, mapper::toDto));
             for (OrganizationUnit organizationUnit : organizationUnitList) {
                 result.addAll(getStationsByParentId(organizationUnit.getId()));
             }
@@ -600,7 +595,7 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
 
     @Override
     public List<OrganizationUnitDto> getStationsByCurrUserAndStation(Long userId) {
-        return DozerUtils.mapList(mapper, repository.getStationsByCurrUserAndStation(userId), OrganizationUnitDto.class);
+        return MapperUtil.mapList(repository.getStationsByCurrUserAndStation(userId), mapper::toDto);
     }
 
     @Override
@@ -623,14 +618,14 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
             listener.getMap().forEach((deep, list) -> {
                 List<OrganizationUnit> units;
                 if (deep == 1) {
-                    units = DozerUtils.mapList(dozerMapper, list, OrganizationUnit.class, (s, t) -> {
+                    units = MapperUtil.mapList(list, mapper::excelImportDtoToEntity, (s, t) -> {
                         EUnitType unitType = "Inner".equals(s.getTypeStr()) ? EUnitType.Inner : EUnitType.External;
                         Long parentId = "Inner".equals(s.getTypeStr()) ? innerRoot.getId() : externalOrganization.getId();
                         t.setType(unitType);
                         t.setParentId(parentId);
                     });
                 } else {
-                    units = DozerUtils.mapList(dozerMapper, list, OrganizationUnit.class, (s, t) -> {
+                    units = MapperUtil.mapList(list, mapper::excelImportDtoToEntity, (s, t) -> {
                         EUnitType unitType = "Inner".equals(s.getTypeStr()) ? EUnitType.Inner : EUnitType.External;
                         t.setType(unitType);
                         Long parentId = orgNameIdMap.get().get(s.getParentOrg());

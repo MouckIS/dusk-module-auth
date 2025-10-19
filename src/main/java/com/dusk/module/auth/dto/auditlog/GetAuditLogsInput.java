@@ -1,13 +1,13 @@
 package com.dusk.module.auth.dto.auditlog;
 
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
 import com.dusk.common.core.entity.BaseEntity;
 import com.dusk.module.auth.entity.AuditLog;
 import com.dusk.module.auth.entity.User;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
 
 import java.time.LocalDateTime;

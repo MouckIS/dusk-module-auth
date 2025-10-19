@@ -3,7 +3,6 @@ package com.dusk.module.auth.dto.role;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.dusk.common.rpc.auth.dto.role.RolePermissionDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.github.dozermapper.core.Mapping;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,13 +18,11 @@ import java.util.List;
 @ExcelIgnoreUnannotated
 public class ExportRolePermissionDto extends RolePermissionDto {
     @JsonIgnore
-    @Mapping("this")
+    //@Mapping("this")
     private String grantedStr;
     @JsonIgnore
-    @Mapping("this")
-    /**
-     * 角色Excel导入导出的时候用
-     */
+    // 角色Excel导入导出的时候用
+    //@Mapping("this")
     private List<ExportRolePermissionDto> children = new ArrayList<>();
 
 

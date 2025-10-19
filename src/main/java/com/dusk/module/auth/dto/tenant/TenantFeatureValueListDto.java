@@ -1,12 +1,12 @@
 package com.dusk.module.auth.dto.tenant;
 
+import com.dusk.module.auth.dto.feature.FeatureValueInput;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.module.auth.dto.feature.FeatureValueInput;
 
-import jakarta.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.List;
 

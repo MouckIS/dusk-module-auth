@@ -13,9 +13,9 @@ import com.dusk.module.auth.feature.LoginFeatureProvider;
 import com.dusk.module.auth.service.ICaptchaService;
 import com.dusk.module.auth.service.IFeatureChecker;
 import com.wf.captcha.SpecCaptcha;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.TimeUnit;
@@ -27,10 +27,10 @@ import java.util.concurrent.TimeUnit;
 @Service
 @Slf4j
 public class CaptchaServiceImpl implements ICaptchaService {
-    @Autowired
-    RedisUtil<Object> redisUtil;
-    @Autowired
-    IFeatureChecker featureChecker;
+    @Resource
+    private RedisUtil<Object> redisUtil;
+    @Resource
+    private IFeatureChecker featureChecker;
 
     //region  帐户名密码登陆相关参数
     private final static String REDIS_KEY_CAPTCHA_PREFIX = "CRUX:LOGIN:CAPTCHA:KEY:";

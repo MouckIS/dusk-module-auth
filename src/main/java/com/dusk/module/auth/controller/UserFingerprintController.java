@@ -1,20 +1,20 @@
 package com.dusk.module.auth.controller;
 
-import com.dusk.common.rpc.auth.dto.fingerprint.GetAllInputDto;
-import com.dusk.common.rpc.auth.dto.fingerprint.UserFingerprintDto;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import com.dusk.common.core.annotation.Authorize;
 import com.dusk.common.core.controller.CruxBaseController;
+import com.dusk.common.rpc.auth.dto.fingerprint.GetAllInputDto;
+import com.dusk.common.rpc.auth.dto.fingerprint.UserFingerprintDto;
 import com.dusk.module.auth.authorization.UserFingerprintAuthProvider;
 import com.dusk.module.auth.dto.fingerprint.IdentifyInputDto;
 import com.dusk.module.auth.dto.fingerprint.RegisterFingerprintInputDto;
 import com.dusk.module.auth.dto.fingerprint.SaveFingerprintInputDto;
 import com.dusk.module.auth.service.IUserFingerprintService;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
 import java.util.List;
 
 /**
@@ -26,8 +26,8 @@ import java.util.List;
 @Api(tags = "UserFingerprint", description = "用户指纹管理")
 @Authorize(UserFingerprintAuthProvider.PAGES_FINGERPRINT)
 public class UserFingerprintController extends CruxBaseController {
-    @Autowired
-    IUserFingerprintService userFingerprintService;
+    @Resource
+    private IUserFingerprintService userFingerprintService;
 
     @ApiOperation(value = "发送注册指纹指令给指纹采集器")
     @PostMapping(value = "/registerFingerprint")

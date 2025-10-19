@@ -3,16 +3,6 @@ package com.dusk.module.auth.service.impl;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
-import com.dusk.common.rpc.auth.dto.notification.CreateNotificationInput;
-import com.dusk.common.rpc.auth.service.INotificationRpcService;
-import com.dusk.common.mqs.utils.MqttUtils;
-import com.dusk.module.auth.dto.notification.*;
-import com.github.dozermapper.core.Mapper;
-import com.querydsl.core.QueryResults;
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.Service;
 import com.dusk.common.core.dto.EntityDto;
 import com.dusk.common.core.dto.PagedResultDto;
 import com.dusk.common.core.entity.BaseEntity;
@@ -21,16 +11,26 @@ import com.dusk.common.core.jpa.Specifications;
 import com.dusk.common.core.jpa.querydsl.QBeanBuilder;
 import com.dusk.common.core.model.UserContext;
 import com.dusk.common.core.service.impl.BaseService;
-import com.dusk.common.core.utils.DozerUtils;
+import com.dusk.common.core.utils.MapperUtil;
 import com.dusk.common.core.utils.SecurityUtils;
+import com.dusk.common.mqs.utils.MqttUtils;
+import com.dusk.common.rpc.auth.dto.notification.CreateNotificationInput;
+import com.dusk.common.rpc.auth.service.INotificationRpcService;
+import com.dusk.module.auth.dto.notification.*;
 import com.dusk.module.auth.entity.Notification;
 import com.dusk.module.auth.entity.QNotification;
 import com.dusk.module.auth.entity.QUserNotification;
 import com.dusk.module.auth.entity.UserNotification;
+import com.dusk.module.auth.mapper.NotificationMapper;
 import com.dusk.module.auth.repository.INotificationRepository;
 import com.dusk.module.auth.repository.IUserNotificationRepository;
 import com.dusk.module.auth.service.INotificationService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.querydsl.core.QueryResults;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,34 +49,21 @@ import java.util.List;
 @Service
 @Transactional
 public class NotificationServiceImpl extends BaseService<UserNotification, IUserNotificationRepository> implements INotificationRpcService, INotificationService {
+    @Resource
+    private  MqttUtils mqttUtils;
+    @Resource
+    private SecurityUtils securityUtils;
+    @Resource
+    private JPAQueryFactory queryFactory;
+    @Resource
+    private INotificationRepository notificationRepository;
 
-
-    private final Mapper mapper;
-    private final MqttUtils mqttUtils;
-    private final SecurityUtils securityUtils;
-    private final JPAQueryFactory queryFactory;
-    private final INotificationRepository notificationRepository;
+    private final NotificationMapper mapper = NotificationMapper.INSTANCE;
 
     private final QNotification qNotification = QNotification.notification;
     private final QUserNotification qUserNotification = QUserNotification.userNotification;
 
     private final static String MQTT_TOPIC_TEMPLATE = "T/{}/crux/{}/notification";
-
-    @Autowired
-    public NotificationServiceImpl(
-            Mapper mapper,
-            MqttUtils mqttUtils,
-            SecurityUtils securityUtils,
-            JPAQueryFactory queryFactory,
-            INotificationRepository notificationRepository
-    ) {
-
-        this.mapper = mapper;
-        this.mqttUtils = mqttUtils;
-        this.securityUtils = securityUtils;
-        this.queryFactory = queryFactory;
-        this.notificationRepository = notificationRepository;
-    }
 
     /**
      * 获取用户消息列表
@@ -108,12 +95,20 @@ public class NotificationServiceImpl extends BaseService<UserNotification, IUser
             query = query.where(qNotification.type.eq(input.getType()));
         }
         Page<NotificationListOutput> data = (Page<NotificationListOutput>) page(query, input.getPageable());
-        return DozerUtils.mapToPagedResultDto(mapper, data, NotificationListOutput.class, (s, t) -> {
-            if (s.getType() != null) {
-                t.setTypeValue(s.getType().getValue());
-                t.setTypeName(s.getType().getDisplayName());
+        List<NotificationListOutput> outputList = data.getContent();
+        outputList.forEach(e -> {
+            if (e.getType() != null) {
+                e.setTypeValue(e.getType().getValue());
+                e.setTypeName(e.getType().getDisplayName());
             }
         });
+        return new PagedResultDto<>(data.getTotalPages(), outputList);
+        //return MapperUtil.mapToPagedResultDto(data, mapper::createDtoToEntity, (s, t) -> {
+        //    if (s.getType() != null) {
+        //        t.setTypeValue(s.getType().getValue());
+        //        t.setTypeName(s.getType().getDisplayName());
+        //    }
+        //});
     }
 
     /**
@@ -192,11 +187,11 @@ public class NotificationServiceImpl extends BaseService<UserNotification, IUser
      */
     @Override
     public void createNotification(CreateNotificationInput input) {
-        Notification notification = mapper.map(input, Notification.class);
+        Notification notification = mapper.createDtoToEntity(input);
         notification.setPageNavigation(JSONUtil.toJsonStr(input.getPageNavigation()));
         notificationRepository.save(notification);
         Long notificationId = notification.getId();
-        NotificationOutput payload = mapper.map(notification, NotificationOutput.class);
+        NotificationOutput payload = mapper.toOutDto(notification);
         payload.setId(notificationId);
         if (payload.getType() != null) {
             payload.setTypeValue(notification.getType().getValue());

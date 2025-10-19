@@ -1,14 +1,13 @@
 package com.dusk.module.auth.dto.station;
 
+import com.dusk.common.core.dto.PagedAndSortedInputDto;
+import com.dusk.common.core.enums.EUnitType;
 import io.swagger.annotations.ApiModelProperty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
-import com.dusk.common.core.dto.PagedAndSortedInputDto;
-import com.dusk.common.core.enums.EUnitType;
 import org.springframework.data.domain.Sort;
-
-import jakarta.validation.constraints.NotNull;
 
 /**
  * 获取未分配的厂站用户

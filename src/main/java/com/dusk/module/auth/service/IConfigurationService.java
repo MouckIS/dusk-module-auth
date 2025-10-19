@@ -2,7 +2,6 @@ package com.dusk.module.auth.service;
 
 
 import com.dusk.module.auth.dto.configuration.ConfigurationDto;
-
 import jakarta.servlet.http.HttpServletRequest;
 
 /**

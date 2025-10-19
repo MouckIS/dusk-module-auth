@@ -1,13 +1,13 @@
 package com.dusk.module.auth.service.impl;
 
+import com.dusk.common.core.utils.MapperUtil;
 import com.dusk.common.rpc.auth.dto.TenantInfoDto;
 import com.dusk.common.rpc.auth.service.ITenantRpcService;
-import com.github.dozermapper.core.Mapper;
-import org.apache.dubbo.config.annotation.Service;
-import com.dusk.common.core.utils.DozerUtils;
 import com.dusk.module.auth.entity.Tenant;
+import com.dusk.module.auth.mapper.TenantMapper;
 import com.dusk.module.auth.repository.ITenantRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
+import org.apache.dubbo.config.annotation.Service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,25 +19,26 @@ import java.util.Optional;
  */
 @Service
 public class TenantRpcServiceImpl implements ITenantRpcService {
-    @Autowired
-    ITenantRepository  tenantRepository;
-    @Autowired
-    Mapper dozerMapper;
+    @Resource
+    private ITenantRepository tenantRepository;
+
+    private final TenantMapper mapper = TenantMapper.INSTANCE;
+
     @Override
     public TenantInfoDto findById(Long id) {
         Optional<Tenant> tenant = tenantRepository.findById(id);
-        return tenant.map(value ->{
-            TenantInfoDto dto=  dozerMapper.map(value, TenantInfoDto.class);
+        return tenant.map(value -> {
+            TenantInfoDto dto = mapper.toInfoDto(value);
             dto.setEnabled(value.enabled());
             return dto;
-        } ).orElse(null);
+        }).orElse(null);
     }
 
     @Override
     public TenantInfoDto findByTenantName(String name) {
         Optional<Tenant> tenant = tenantRepository.findByTenantName(name);
         return tenant.map(value -> {
-            TenantInfoDto dto = dozerMapper.map(value, TenantInfoDto.class);
+            TenantInfoDto dto = mapper.toInfoDto(value);
             dto.setEnabled(value.enabled());
             return dto;
         }).orElse(null);
@@ -49,6 +50,6 @@ public class TenantRpcServiceImpl implements ITenantRpcService {
         if (allTenant.isEmpty()) {
             return new ArrayList<>();
         }
-        return DozerUtils.mapList(dozerMapper, allTenant, TenantInfoDto.class, (s, t) -> t.setEnabled(s.enabled()));
+        return MapperUtil.mapList(allTenant, mapper::toInfoDto, (s, t) -> t.setEnabled(s.enabled()));
     }
 }

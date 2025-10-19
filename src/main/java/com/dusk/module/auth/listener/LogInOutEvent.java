@@ -1,9 +1,9 @@
 package com.dusk.module.auth.listener;
 
+import com.dusk.module.auth.enums.LoginLogType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import com.dusk.module.auth.enums.LoginLogType;
 
 import java.time.LocalDateTime;
 

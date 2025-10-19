@@ -1,9 +1,9 @@
 package com.dusk.module.auth.dto.setting.host;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.EqualsAndHashCode;
 
 /**
  * @author kefuming

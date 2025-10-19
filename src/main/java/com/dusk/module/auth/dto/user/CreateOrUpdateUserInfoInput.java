@@ -1,14 +1,14 @@
 package com.dusk.module.auth.dto.user;
 
 import com.dusk.common.rpc.auth.dto.CreateOrUpdateUserInput;
+import com.dusk.module.auth.enums.ELevel;
 import io.swagger.annotations.ApiModelProperty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import com.dusk.module.auth.enums.ELevel;
 
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 

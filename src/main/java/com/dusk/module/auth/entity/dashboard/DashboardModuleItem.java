@@ -1,14 +1,13 @@
 package com.dusk.module.auth.entity.dashboard;
 
-import lombok.Getter;
-import lombok.Setter;
 import com.dusk.common.core.entity.FullAuditedEntity;
 import com.dusk.module.auth.enums.dashboard.DashboardModuleType;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author jianjianhong

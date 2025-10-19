@@ -1,14 +1,13 @@
 package com.dusk.module.auth.entity;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.FieldNameConstants;
 import com.dusk.common.core.annotation.Tenant;
 import com.dusk.common.core.constant.EntityConstant;
 import com.dusk.common.core.entity.BaseEntity;
 import com.dusk.common.core.entity.CreationEntity;
-
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
 
 /**
  * @author kefuming

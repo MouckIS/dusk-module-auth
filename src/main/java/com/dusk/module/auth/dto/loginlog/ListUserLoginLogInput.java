@@ -1,12 +1,12 @@
 package com.dusk.module.auth.dto.loginlog;
 
 import cn.hutool.core.util.StrUtil;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
 import com.dusk.module.auth.entity.UserLoginLog;
 import com.dusk.module.auth.enums.LoginLogType;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.domain.Sort;
 
 import java.time.LocalDateTime;

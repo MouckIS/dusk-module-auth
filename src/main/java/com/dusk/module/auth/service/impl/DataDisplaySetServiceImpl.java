@@ -1,20 +1,20 @@
 package com.dusk.module.auth.service.impl;
 
-import com.github.dozermapper.core.Mapper;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.extern.slf4j.Slf4j;
 import com.dusk.common.core.auth.authentication.LoginUserIdContextHolder;
 import com.dusk.common.core.dto.PagedResultDto;
 import com.dusk.common.core.service.impl.BaseService;
-import com.dusk.common.core.utils.DozerUtils;
+import com.dusk.common.core.utils.MapperUtil;
 import com.dusk.module.auth.dto.datadisplay.DataDisplayItemDto;
 import com.dusk.module.auth.dto.datadisplay.GetDisplaySetInputDto;
 import com.dusk.module.auth.dto.datadisplay.UpdateDataDisplaySetDto;
 import com.dusk.module.auth.entity.datadisplay.DataDisplaySet;
 import com.dusk.module.auth.entity.datadisplay.QDataDisplaySet;
+import com.dusk.module.auth.mapper.DataDisplaySetMapper;
 import com.dusk.module.auth.repository.datadisplay.IDataDisplaySetRepository;
 import com.dusk.module.auth.service.IDataDisplaySetService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,11 +34,10 @@ import java.util.Objects;
 @Transactional
 public class DataDisplaySetServiceImpl extends BaseService<DataDisplaySet, IDataDisplaySetRepository> implements IDataDisplaySetService {
 
-    @Autowired
-    JPAQueryFactory queryFactory;
+    @Resource
+    private JPAQueryFactory queryFactory;
 
-    @Autowired
-    protected Mapper dozerMapper;
+    private final DataDisplaySetMapper mapper = DataDisplaySetMapper.INSTANCE;
 
     @Override
     public void updateDisplaySetItem(List<UpdateDataDisplaySetDto> input) {
@@ -49,7 +48,7 @@ public class DataDisplaySetServiceImpl extends BaseService<DataDisplaySet, IData
         //删除当前用户所有的数据设置项
         queryFactory.delete(qDataDisplaySet).where(qDataDisplaySet.createId.eq(userId)).execute();
         //删除之后，新增
-        List<DataDisplaySet> addDataDisplaySetList = DozerUtils.mapList(dozerMapper, input, DataDisplaySet.class);
+        List<DataDisplaySet> addDataDisplaySetList = MapperUtil.mapList(input, mapper::toEntity);
         saveAll(addDataDisplaySetList);
 
     }
@@ -68,9 +67,7 @@ public class DataDisplaySetServiceImpl extends BaseService<DataDisplaySet, IData
             }
         }
 
-        Page pageResult = page(query, input.getPageable());
-        List<DataDisplayItemDto> content = pageResult.getContent();
-        return new PagedResultDto<>(pageResult.getTotalElements(), DozerUtils.mapList(dozerMapper, content, DataDisplayItemDto.class));
-
+        Page<DataDisplaySet> pageResult = (Page<DataDisplaySet>) page(query, input.getPageable());
+        return MapperUtil.mapToPagedResultDto(pageResult, mapper::toItemDto);
     }
 }

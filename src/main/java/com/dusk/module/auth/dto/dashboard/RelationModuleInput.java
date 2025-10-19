@@ -5,8 +5,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
 /**
  * @author jianjianhong
  * @date 2021/7/27

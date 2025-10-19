@@ -1,26 +1,29 @@
 package com.dusk.module.auth.service.impl;
 
+import com.dusk.common.core.dto.PagedResultDto;
+import com.dusk.common.core.exception.BusinessException;
+import com.dusk.common.core.jpa.querydsl.QBeanBuilder;
+import com.dusk.common.core.utils.MapperUtil;
 import com.dusk.common.rpc.auth.dto.RoleSimpleDto;
 import com.dusk.common.rpc.auth.dto.UserFullListDto;
 import com.dusk.common.rpc.auth.dto.UserRoleDto;
 import com.dusk.common.rpc.auth.dto.role.RoleListDto;
 import com.dusk.common.rpc.auth.service.IRoleRpcService;
 import com.dusk.common.rpc.auth.service.IUserRpcService;
+import com.dusk.module.auth.dto.dashboard.*;
 import com.dusk.module.auth.entity.dashboard.*;
+import com.dusk.module.auth.mapper.DashboardMapper;
+import com.dusk.module.auth.mapper.RoleMapper;
 import com.dusk.module.auth.repository.dashboard.*;
+import com.dusk.module.auth.service.IDashBoardModuleService;
+import com.dusk.module.auth.service.IDashBoardService;
 import com.querydsl.core.types.QBean;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.Reference;
-import com.dusk.common.core.dto.PagedResultDto;
-import com.dusk.common.core.exception.BusinessException;
-import com.dusk.common.core.jpa.querydsl.QBeanBuilder;
-import com.dusk.common.core.utils.DozerUtils;
-import com.dusk.module.auth.dto.dashboard.*;
-import com.dusk.module.auth.service.IDashBoardModuleService;
-import com.dusk.module.auth.service.IDashBoardService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,29 +39,30 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, IDashBoardThemeRepository> implements IDashBoardService {
 
-    @Autowired
+    @Resource
     private IDashBoardClassifyRepository classifyRepository;
-    @Autowired
+    @Resource
     private IDashBoardModuleRepository moduleRepository;
-    @Autowired
+    @Resource
     private IDashBoardModuleItemRepository moduleItemRepository;
-    @Autowired
-    private IDashBoardModuleService moduleService;
-    @Autowired
+    @Resource
     private IDashBoardPermissionRepository permissionRepository;
-    @Autowired
+    @Resource
     private IDashBoardThemeRepository themeRepository;
-    @Autowired
+    @Resource
     private IDashBoardZoneRepository zoneRepository;
-    @Autowired
+    @Resource
     private IDashBoardZoneItemRefRepository zoneItemRefRepository;
-    @Autowired
+    @Resource
     JPAQueryFactory queryFactory;
 
     @Reference
     private IUserRpcService userRpcService;
     @Reference
     private IRoleRpcService roleRpcService;
+
+    private final DashboardMapper mapper = DashboardMapper.INSTANCE;
+    private final RoleMapper roleMapper = RoleMapper.INSTANCE;
 
     @Override
     public DashboardTheme saveTheme(CreateOrUpdateTheme input) {
@@ -105,7 +109,7 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
             datas.forEach((theme) -> {
                 List<DashboardClassify> themeClassify = classifyMap.get(theme.getId());
                 if(themeClassify != null) {
-                    theme.setClassifies(DozerUtils.mapList(mapper, themeClassify, ClassifyDetailDto.class));
+                    theme.setClassifies(MapperUtil.mapList(themeClassify, mapper::toDetailDto));
                 }
             });
         }
@@ -115,10 +119,10 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
     @Override
     public ThemeDetailDto themeDetail(Long id) {
         DashboardTheme theme = findT(id);
-        ThemeDetailDto themeDto = mapper.map(theme, ThemeDetailDto.class);
+        ThemeDetailDto themeDto = mapper.toThemeDetailDto(theme);
 
         List<DashboardClassify> classifies = classifyRepository.findAllByThemeId(id);
-        List<ClassifyDetailDto> classifyDetailDtos = DozerUtils.mapList(mapper, classifies, ClassifyDetailDto.class);
+        List<ClassifyDetailDto> classifyDetailDtos = MapperUtil.mapList(classifies, mapper::toDetailDto);
         List<ClassifyDetailDto> sortedClassifies = classifyDetailDtos.stream().sorted(Comparator.comparing(ClassifyDetailDto::getSeq)).collect(Collectors.toList());
         themeDto.setClassifyList(sortedClassifies);
 
@@ -134,10 +138,11 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
         DashboardClassify dashboardClassify;
         boolean isAdd = input.getId() == null;
         if(isAdd) {
-            dashboardClassify = mapper.map(input, DashboardClassify.class);
+            dashboardClassify = mapper.createDtoToEntity(input);
         }else {
             dashboardClassify = classifyRepository.findById(input.getId()).orElseThrow(() -> new BusinessException("未找到id为["+input.getId()+"]的栏目记录！"));
-            mapper.map(input, dashboardClassify);
+            //mapper.map(input, dashboardClassify);
+            BeanUtils.copyProperties(input, dashboardClassify);
         }
         classifyRepository.save(dashboardClassify);
 
@@ -151,7 +156,7 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
     }
 
     private DashboardZone saveZone(CreateOrUpdateZone input, DashboardClassify dashboardClassify) {
-        DashboardZone zone = mapper.map(input, DashboardZone.class);
+        DashboardZone zone = mapper.toZoneEntity(input);
         zone.setId(null);
         zone.setClassifyId(dashboardClassify.getId());
         zoneRepository.save(zone);
@@ -167,7 +172,7 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
     }
 
     private DashboardZoneItemRef saveZoneItemRef(CreateOrUpdateZoneItemRef input, DashboardZone zone) {
-        DashboardZoneItemRef zoneItemRef = mapper.map(input, DashboardZoneItemRef.class);
+        DashboardZoneItemRef zoneItemRef = mapper.toZoneItemRefEntity(input);
         zoneItemRef.setZoneId(zone.getId());
         zoneItemRefRepository.save(zoneItemRef);
         return zoneItemRef;
@@ -176,14 +181,14 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
     @Override
     public ClassifyDetailDto classifyDetail(Long id) {
         DashboardClassify classify = classifyRepository.findById(id).orElseThrow(()->new BusinessException("未找到id为["+id+"]的栏目记录！"));
-        ClassifyDetailDto classifyDto = mapper.map(classify, ClassifyDetailDto.class);
+        ClassifyDetailDto classifyDto = mapper.toDetailDto(classify);
         classifyDto.setZones(findClassifyZones(classifyDto));
         return classifyDto;
     }
 
     private List<ZoneDetailDto> findClassifyZones(ClassifyDetailDto classifyDto) {
         List<DashboardZone> zones = zoneRepository.findAllByClassifyIdOrderByZonePosition(classifyDto.getId());
-        List<ZoneDetailDto> zoneDtos = DozerUtils.mapList(mapper, zones, ZoneDetailDto.class);
+        List<ZoneDetailDto> zoneDtos = MapperUtil.mapList(zones, mapper::toZoneDetailDto);
 
         zoneDtos.forEach((zone) -> {
             zone.setZoneItems(findZoneItemDetail(zone));
@@ -193,7 +198,7 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
 
     private List<ZoneItemDetailDto> findZoneItemDetail(ZoneDetailDto zone) {
         List<DashboardZoneItemRef> itemRefs = zoneItemRefRepository.findAllByZoneId(zone.getId());
-        List<ZoneItemDetailDto> itemRefDtos = DozerUtils.mapList(mapper, itemRefs, ZoneItemDetailDto.class);
+        List<ZoneItemDetailDto> itemRefDtos = MapperUtil.mapList(itemRefs, mapper::toZoneItemDetailDto);
         itemRefDtos.forEach((ref)->{
             DashboardModule module = moduleRepository.findById(ref.getModuleId()).orElse(null);
             DashboardModuleItem item = moduleItemRepository.findById(ref.getModuleItemId()).orElse(null);
@@ -275,7 +280,7 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
         List<DashboardPermission> permissions = permissionRepository.findAllByRoleIdIn(roleIds);
         List<Long> themeIds = permissions.stream().map(DashboardPermission::getThemeId).distinct().collect(Collectors.toList());
         List<DashboardTheme> themes = themeRepository.findAllByIdIn(themeIds);
-        return DozerUtils.mapList(mapper, themes, ThemeListDto.class);
+        return MapperUtil.mapList(themes, mapper::toListDto);
     }
 
     @Override
@@ -290,7 +295,7 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
             return new ArrayList<>();
         }
         List<RoleListDto> roleListDtos = roleRpcService.getRolesByIds(roleIds);
-        return DozerUtils.mapList(mapper, roleListDtos, RoleSimpleDto.class);
+        return MapperUtil.mapList(roleListDtos, roleMapper::listDtoToSimpleDto);
     }
 
     @Override

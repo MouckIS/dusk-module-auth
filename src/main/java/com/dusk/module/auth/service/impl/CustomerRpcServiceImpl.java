@@ -1,16 +1,16 @@
 package com.dusk.module.auth.service.impl;
 
+import com.dusk.common.core.jpa.Specifications;
+import com.dusk.common.core.utils.MapperUtil;
 import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitDto;
 import com.dusk.common.rpc.auth.service.ICustomerRpcService;
-import com.github.dozermapper.core.Mapper;
-import org.apache.dubbo.config.annotation.Service;
-import com.dusk.common.core.jpa.Specifications;
-import com.dusk.common.core.utils.DozerUtils;
 import com.dusk.module.auth.dto.orga.CreateOrganizationUnitInput;
 import com.dusk.module.auth.dto.orga.UpdateOrganizationUnitInput;
 import com.dusk.module.auth.entity.OrganizationUnit;
+import com.dusk.module.auth.mapper.OrganizationMapper;
 import com.dusk.module.auth.service.IOrganizationUnitService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
+import org.apache.dubbo.config.annotation.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -22,20 +22,19 @@ import java.util.List;
 @Service
 @Transactional
 public class CustomerRpcServiceImpl implements ICustomerRpcService {
+    @Resource
+    private IOrganizationUnitService organizationUnitService;
 
-    @Autowired
-    IOrganizationUnitService organizationUnitService;
-    @Autowired
-    Mapper mapper;
+    private final OrganizationMapper mapper = OrganizationMapper.INSTANCE;
 
     @Override
     public void saveCustomer(OrganizationUnitDto input) {
         OrganizationUnit org;
         if(input.getId() != null){
-            UpdateOrganizationUnitInput updateOrganizationUnitInput = mapper.map(input, UpdateOrganizationUnitInput.class);
+            UpdateOrganizationUnitInput updateOrganizationUnitInput = mapper.toUpdateInput(input);
             org = organizationUnitService.update(updateOrganizationUnitInput);
         }else{
-            CreateOrganizationUnitInput createOrganizationUnitInput = mapper.map(input, CreateOrganizationUnitInput.class);
+            CreateOrganizationUnitInput createOrganizationUnitInput = mapper.toCreateInput(input);
             org = organizationUnitService.create(createOrganizationUnitInput);
         }
         org.setCode(input.getCode());
@@ -52,13 +51,13 @@ public class CustomerRpcServiceImpl implements ICustomerRpcService {
         List<OrganizationUnit> organizationUnitList = organizationUnitService.findAll(Specifications.where(e -> {
             e.startingWith(OrganizationUnit.Fields.code, code);
         }));
-        return DozerUtils.mapList(mapper, organizationUnitList, OrganizationUnitDto.class);
+        return MapperUtil.mapList(organizationUnitList, mapper::toDto);
     }
 
     @Override
     public List<OrganizationUnitDto> getCurrentCustomerList(Long orgId) {
         OrganizationUnit org = organizationUnitService.getOne(orgId);
-        OrganizationUnitDto organizationUnitDto = mapper.map(org, OrganizationUnitDto.class);
+        OrganizationUnitDto organizationUnitDto = mapper.toDto(org);
         List<OrganizationUnitDto> result = organizationUnitService.getStationsByParentId(orgId);
         result.add(organizationUnitDto);
         return result;
@@ -67,6 +66,6 @@ public class CustomerRpcServiceImpl implements ICustomerRpcService {
     @Override
     public OrganizationUnitDto getOne(Long id) {
         OrganizationUnit organizationUnit = organizationUnitService.getOne(id);
-        return mapper.map(organizationUnit, OrganizationUnitDto.class);
+        return mapper.toDto(organizationUnit);
     }
 }

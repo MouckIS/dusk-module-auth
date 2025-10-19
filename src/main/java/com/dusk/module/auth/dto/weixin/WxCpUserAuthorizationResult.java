@@ -3,7 +3,6 @@ package com.dusk.module.auth.dto.weixin;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.NoArgsConstructor;
 
 /**
  * @author jianjianhong

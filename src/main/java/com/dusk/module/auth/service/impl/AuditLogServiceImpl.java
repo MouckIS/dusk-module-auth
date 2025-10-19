@@ -2,29 +2,28 @@ package com.dusk.module.auth.service.impl;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
 import com.alibaba.excel.EasyExcel;
-import com.dusk.module.auth.dto.auditlog.*;
-import com.github.dozermapper.core.Mapper;
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.jpa.querydsl.QBeanBuilder;
 import com.dusk.common.core.service.impl.BaseService;
-import com.dusk.common.core.utils.DozerUtils;
+import com.dusk.common.core.utils.MapperUtil;
 import com.dusk.module.auth.dto.auditlog.*;
 import com.dusk.module.auth.entity.AuditLog;
 import com.dusk.module.auth.entity.QAuditLog;
 import com.dusk.module.auth.entity.QUser;
+import com.dusk.module.auth.mapper.AuditLogMapper;
 import com.dusk.module.auth.repository.IAuditLogRepository;
 import com.dusk.module.auth.service.IAuditLogService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.annotation.Resource;
+import jakarta.servlet.ServletOutputStream;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.servlet.ServletOutputStream;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,11 +33,10 @@ import java.util.Optional;
  */
 @Service
 public class AuditLogServiceImpl extends BaseService<AuditLog, IAuditLogRepository> implements IAuditLogService {
-    @Autowired
-    private Mapper dozerMapper;
+    @Resource
+    private JPAQueryFactory queryFactory;
 
-    @Autowired
-    JPAQueryFactory queryFactory;
+    private final AuditLogMapper mapper = AuditLogMapper.INSTANCE;
 
     @Override
     public Page<AuditLogListDto> findAuditLogs(GetAuditLogsInput input) {
@@ -120,7 +118,7 @@ public class AuditLogServiceImpl extends BaseService<AuditLog, IAuditLogReposito
 
         List<AuditLogDetailDto> detailList = query.fetch();
 
-        List<AuditLogExportDto> list = DozerUtils.mapList(dozerMapper, detailList, AuditLogExportDto.class,  (s, t) -> {
+        List<AuditLogExportDto> list = MapperUtil.mapList(detailList, mapper::detailDtoToExportDto,  (s, t) -> {
             t.setTime(LocalDateTimeUtil.format(s.getExecutionTime(), "yyyy-MM-dd HH:mm:ss"));
         });
 

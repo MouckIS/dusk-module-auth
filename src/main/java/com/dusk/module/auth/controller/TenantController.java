@@ -1,8 +1,5 @@
 package com.dusk.module.auth.controller;
 
-import com.dusk.module.auth.dto.tenant.*;
-import com.github.dozermapper.core.Mapper;
-import io.swagger.annotations.*;
 import com.dusk.common.core.annotation.AllowAnonymous;
 import com.dusk.common.core.annotation.Authorize;
 import com.dusk.common.core.auth.authentication.LoginUserIdContextHolder;
@@ -13,7 +10,7 @@ import com.dusk.common.core.dto.PagedResultDto;
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.model.UserContext;
 import com.dusk.common.core.tenant.TenantContextHolder;
-import com.dusk.common.core.utils.DozerUtils;
+import com.dusk.common.core.utils.MapperUtil;
 import com.dusk.module.auth.authorization.TenantAuthProvider;
 import com.dusk.module.auth.common.manage.TokenAuthManager;
 import com.dusk.module.auth.common.util.LoginUtils;
@@ -22,14 +19,18 @@ import com.dusk.module.auth.dto.user.GetUsersInput;
 import com.dusk.module.auth.dto.user.UserListDto;
 import com.dusk.module.auth.entity.Tenant;
 import com.dusk.module.auth.entity.User;
+import com.dusk.module.auth.mapper.TenantMapper;
+import com.dusk.module.auth.mapper.UserMapper;
 import com.dusk.module.auth.service.ITenantService;
 import com.dusk.module.auth.service.IUserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.annotations.*;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -42,14 +43,15 @@ import java.util.List;
 @Api(description = "租户", tags = "Tenant")
 @Authorize(TenantAuthProvider.PAGES_TENANTS)
 public class TenantController extends CruxBaseController {
-    @Autowired
+    @Resource
     private ITenantService tenantService;
-    @Autowired
-    private Mapper dozerMapper;
-    @Autowired
-    IUserService userService;
-    @Autowired
+    @Resource
+    private IUserService userService;
+    @Resource
     private TokenAuthManager tokenAuthManager;
+
+    private final TenantMapper mapper = TenantMapper.INSTANCE;
+    private final UserMapper userMapper = UserMapper.INSTANCE;
 
     /**
      * 查询租户列表
@@ -61,7 +63,7 @@ public class TenantController extends CruxBaseController {
     @GetMapping("getTenants")
     public PagedResultDto<TenantListDto> getTenants(GetTenantsInput input) {
         Page<Tenant> page = tenantService.getTenants(input);
-        return DozerUtils.mapToPagedResultDto(dozerMapper, page, TenantListDto.class);
+        return MapperUtil.mapToPagedResultDto(page, mapper::toListDto);
     }
 
     /**
@@ -88,7 +90,7 @@ public class TenantController extends CruxBaseController {
     @Authorize(TenantAuthProvider.PAGES_TENANTS_EDIT)
     public TenantEditDto getTenantForEdit(EntityDto entityDto) {
         Tenant tenant = tenantService.findById(entityDto.getId()).orElseThrow(() -> new BusinessException("未找到相应的租户信息！"));
-        return dozerMapper.map(tenant, TenantEditDto.class);
+        return mapper.toEditDto(tenant);
     }
 
     /**
@@ -128,13 +130,14 @@ public class TenantController extends CruxBaseController {
     @ApiOperation("获取指定租户用户列表")
     @ApiImplicitParams({@ApiImplicitParam(name = "filter", value = "模糊查找[姓名、账号、电子邮箱、手机号、角色名]")})
     public PagedResultDto<UserListDto> getTenantUserList(@PathVariable Long tenantId, String filter, PagedAndSortedInputDto pageReq) {
-        GetUsersInput input = dozerMapper.map(pageReq, GetUsersInput.class);
+        GetUsersInput input = new GetUsersInput();
+        BeanUtils.copyProperties(pageReq, input);
         input.setFilter(filter);
         TenantContextHolder.setTenantId(tenantId);
         try {
             Page<User> page = userService.getUsers(input);
-            List<UserListDto> list = DozerUtils.mapList(dozerMapper, page.getContent(), UserListDto.class, (s, t) -> {
-                if (s.getLockoutEndDateUtc() != null && s.getLockoutEndDateUtc().compareTo(LocalDateTime.now()) > 0) {
+            List<UserListDto> list = MapperUtil.mapList(page.getContent(), userMapper::toListDto, (s, t) -> {
+                if (s.getLockoutEndDateUtc() != null && s.getLockoutEndDateUtc().isAfter(LocalDateTime.now())) {
                     t.setLock(true);
                 }
             });

@@ -1,26 +1,26 @@
 package com.dusk.module.auth.service.impl;
 
 import cn.hutool.core.util.StrUtil;
-import com.dusk.common.rpc.auth.dto.fingerprint.GetAllInputDto;
-import com.dusk.common.rpc.auth.dto.fingerprint.UserFingerprintDto;
-import com.dusk.common.rpc.auth.enums.EnumResetType;
-import com.dusk.common.rpc.auth.service.ISerialNoRpcService;
-import com.dusk.common.mqs.utils.MqttUtils;
-import com.dusk.module.auth.dto.fingerprint.*;
-import com.github.dozermapper.core.Mapper;
-import org.apache.dubbo.config.annotation.Reference;
 import com.dusk.common.core.entity.BaseEntity;
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.jpa.Specifications;
 import com.dusk.common.core.service.impl.BaseService;
-import com.dusk.common.core.utils.DozerUtils;
+import com.dusk.common.core.utils.MapperUtil;
 import com.dusk.common.core.utils.SecurityUtils;
 import com.dusk.common.core.utils.UtBeanUtils;
+import com.dusk.common.mqs.utils.MqttUtils;
+import com.dusk.common.rpc.auth.dto.fingerprint.GetAllInputDto;
+import com.dusk.common.rpc.auth.dto.fingerprint.UserFingerprintDto;
+import com.dusk.common.rpc.auth.enums.EnumResetType;
+import com.dusk.common.rpc.auth.service.ISerialNoRpcService;
 import com.dusk.module.auth.cache.IUserFingerprintCacheService;
+import com.dusk.module.auth.dto.fingerprint.*;
 import com.dusk.module.auth.entity.UserFingerprint;
+import com.dusk.module.auth.mapper.UserFingerprintMapper;
 import com.dusk.module.auth.repository.IUserFingerprintRepository;
 import com.dusk.module.auth.service.IUserFingerprintService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
+import org.apache.dubbo.config.annotation.Reference;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,21 +35,20 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class UserFingerprintServiceImpl extends BaseService<UserFingerprint, IUserFingerprintRepository> implements IUserFingerprintService {
-    @Autowired
-    IUserFingerprintCacheService userFingerprintCacheService;
+    @Resource
+    private IUserFingerprintCacheService userFingerprintCacheService;
+    @Resource
+    private MqttUtils mqttUtils;
+    @Resource
+    private SecurityUtils securityUtils;
     @Reference
-    ISerialNoRpcService serialNoRpcService;
-    @Autowired
-    MqttUtils mqttUtils;
-    @Autowired
-    Mapper mapper;
-    @Autowired
-    SecurityUtils securityUtils;
+    private ISerialNoRpcService serialNoRpcService;
 
     //注册指纹开始{指纹仪序列号}
     private final String TOPIC_REGISTER_START = "Fingerprint/{}/Register/Start";
     //验证指纹开始{指纹仪序列号}
     private final String TOPIC_IDENTIFY_START = "Fingerprint/{}/Identify/Start";
+    private final UserFingerprintMapper mapper = UserFingerprintMapper.INSTANCE;
 
     @Override
     public void registerFingerprint(RegisterFingerprintInputDto inputDto) {
@@ -75,7 +74,7 @@ public class UserFingerprintServiceImpl extends BaseService<UserFingerprint, IUs
             if (count >= 10) {
                 throw new BusinessException("每个用户最多只能录入10个指纹");
             }
-            return save(mapper.map(inputDto, UserFingerprint.class)).getId();
+            return save(mapper.toEntity(inputDto)).getId();
         } else {
             UserFingerprint fingerprint = findById(inputDto.getId()).orElseThrow(() -> new BusinessException("指纹记录不存在"));
             UtBeanUtils.copyNotNullProperties(inputDto, fingerprint);
@@ -96,7 +95,7 @@ public class UserFingerprintServiceImpl extends BaseService<UserFingerprint, IUs
             e.eq(inputDto.getFingerprintId() != null, BaseEntity.Fields.id, inputDto.getFingerprintId());
         }), Sort.by(BaseEntity.Fields.id));
 
-        return DozerUtils.mapList(mapper, all, UserFingerprintDto.class);
+        return MapperUtil.mapList(all, mapper::toDto);
     }
 
     @Override

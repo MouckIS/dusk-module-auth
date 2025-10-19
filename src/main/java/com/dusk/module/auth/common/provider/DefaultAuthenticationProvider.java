@@ -4,7 +4,7 @@ import com.dusk.common.core.model.UserContext;
 import com.dusk.module.auth.common.util.LoginUtils;
 import com.dusk.module.auth.entity.User;
 import com.dusk.module.auth.service.IUserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,7 +18,7 @@ import org.springframework.util.Assert;
  */
 @Component
 public class DefaultAuthenticationProvider implements AuthenticationProvider {
-    @Autowired
+    @Resource
     IUserService userService;
 
     @Override

@@ -1,17 +1,17 @@
 package com.dusk.module.auth.controller;
 
-import com.dusk.common.rpc.auth.dto.RoleSimpleDto;
-import com.dusk.module.auth.dto.dashboard.*;
-import com.dusk.module.auth.entity.dashboard.DashboardClassify;
-import com.dusk.module.auth.entity.dashboard.DashboardTheme;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import com.dusk.common.core.annotation.Authorize;
 import com.dusk.common.core.controller.CruxBaseController;
 import com.dusk.common.core.dto.PagedResultDto;
+import com.dusk.common.rpc.auth.dto.RoleSimpleDto;
 import com.dusk.module.auth.authorization.DashBoardAuthProvider;
+import com.dusk.module.auth.dto.dashboard.*;
+import com.dusk.module.auth.entity.dashboard.DashboardClassify;
+import com.dusk.module.auth.entity.dashboard.DashboardTheme;
 import com.dusk.module.auth.service.IDashBoardService;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +26,7 @@ import java.util.List;
 @Api(tags = "DashBoard", description = "数据仪表盘")
 @Authorize(DashBoardAuthProvider.PAGES_DASHBOARD_THEME)
 public class DashBoardController extends CruxBaseController {
-    @Autowired
+    @Resource
     private IDashBoardService service;
 
     @PostMapping("/saveTheme")

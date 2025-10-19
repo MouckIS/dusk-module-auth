@@ -3,17 +3,17 @@ package com.dusk.module.auth.service.impl;
 import com.dusk.common.rpc.auth.dto.ToDoDto;
 import com.dusk.common.rpc.auth.enums.ToDoTargetType;
 import com.dusk.common.rpc.auth.service.ITodoRpcService;
-import com.dusk.module.auth.entity.TodoPermission;
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.dubbo.config.annotation.Service;
 import com.dusk.module.auth.entity.QTodo;
 import com.dusk.module.auth.entity.QTodoPermission;
 import com.dusk.module.auth.entity.Todo;
+import com.dusk.module.auth.entity.TodoPermission;
 import com.dusk.module.auth.service.IToDoService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.dubbo.config.annotation.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -28,11 +28,10 @@ import java.util.stream.Collectors;
 @Transactional
 @Slf4j
 public class TodoRpcServiceImpl implements ITodoRpcService {
-    @Autowired
-    IToDoService toDoService;
-
-    @Autowired
-    JPAQueryFactory jpaQueryFactory;
+    @Resource
+    private IToDoService toDoService;
+    @Resource
+    private JPAQueryFactory jpaQueryFactory;
 
     @Override
     public void addTodo(ToDoDto input) {

@@ -1,9 +1,9 @@
 package com.dusk.module.auth.dto.todo;
 
+import com.dusk.module.auth.enums.ToDoMQTTTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.module.auth.enums.ToDoMQTTTypeEnum;
 
 /**
  * @author kefuming

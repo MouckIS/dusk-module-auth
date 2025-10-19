@@ -1,32 +1,32 @@
 package com.dusk.module.auth.controller;
 
 import com.dusk.common.core.annotation.Authorize;
-import com.github.dozermapper.core.Mapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Workbook;
 import com.dusk.common.core.controller.CruxBaseController;
 import com.dusk.common.core.dto.EntityDto;
 import com.dusk.common.core.dto.PagedResultDto;
 import com.dusk.common.core.exception.BusinessException;
-import com.dusk.common.core.utils.DozerUtils;
+import com.dusk.common.core.utils.MapperUtil;
 import com.dusk.module.auth.authorization.EditionAuthProvider;
 import com.dusk.module.auth.dto.edition.EditionEditDto;
 import com.dusk.module.auth.dto.edition.EditionListDto;
 import com.dusk.module.auth.dto.edition.GetEditionInput;
 import com.dusk.module.auth.dto.edition.SubscribableEditionComboboxItemDto;
+import com.dusk.module.auth.entity.QAuditLog;
 import com.dusk.module.auth.entity.SubscribableEdition;
-import com.dusk.module.auth.service.IFeatureService;
+import com.dusk.module.auth.mapper.SubscribableEditionMapper;
 import com.dusk.module.auth.service.ISubscribableEditionService;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.List;
@@ -41,13 +41,10 @@ import java.util.stream.Collectors;
 @Api(description = "版本", tags = "Edition")
 @Authorize(EditionAuthProvider.PAGES_EDITIONS)
 public class SubscribableEditionController  extends CruxBaseController {
-    @Autowired
+    @Resource
     private ISubscribableEditionService editionService;
-    @Autowired
-    private Mapper dozerMapper;
-    @Autowired
-    IFeatureService featureService;
 
+    private final SubscribableEditionMapper mapper = SubscribableEditionMapper.INSTANCE;
     /**
      * 查询版本列表
      * @return
@@ -56,8 +53,7 @@ public class SubscribableEditionController  extends CruxBaseController {
     @ApiOperation(value = "查询版本列表")
     public PagedResultDto<EditionListDto> getEditions(GetEditionInput input){
         Page<SubscribableEdition> page = editionService.getEditions(input);
-        List<EditionListDto> list = DozerUtils.mapList(dozerMapper, page.getContent(), EditionListDto.class);
-        return new PagedResultDto<>(page.getTotalElements(), list);
+        return MapperUtil.mapToPagedResultDto(page, mapper::toEditionListDto);
     }
 
     @GetMapping("export/{id}")
@@ -101,8 +97,8 @@ public class SubscribableEditionController  extends CruxBaseController {
         EditionEditDto editionEditDto;
         if (input.getId()!=null)
         {
-            var edition = editionService.findById(input.getId()).orElseThrow(() -> new BusinessException("未找到相应的版本信息"));
-            editionEditDto = dozerMapper.map(edition, EditionEditDto.class);
+            SubscribableEdition edition = editionService.findById(input.getId()).orElseThrow(() -> new BusinessException("未找到相应的版本信息"));
+            editionEditDto = mapper.toEditionEditDto(edition);
         }
         else
         {

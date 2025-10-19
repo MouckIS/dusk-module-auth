@@ -1,8 +1,5 @@
 package com.dusk.module.auth.common.permission.impl;
 
-import com.github.dozermapper.core.Mapper;
-import lombok.Getter;
-import lombok.Setter;
 import com.dusk.common.core.auth.permission.Permission;
 import com.dusk.common.core.auth.permission.RoleInfo;
 import com.dusk.common.core.auth.permission.UrlPermission;
@@ -11,7 +8,9 @@ import com.dusk.module.auth.common.permission.PermissionUtil;
 import com.dusk.module.auth.repository.IGrantPermissionRepository;
 import com.dusk.module.auth.service.IGrantPermissionService;
 import com.dusk.module.auth.service.ITenantPermissionService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -31,13 +30,11 @@ public class DefaultPermissionCache implements IPermissionCache {
     private final Map<String, Map<String, List<UrlPermission>>> urlPermission = new HashMap<>();
     private final Map<String, Map<String, Permission>> definitionPermission = new HashMap<>();
 
-    @Autowired
+    @Resource
     private IGrantPermissionRepository grantPermissionRepository;
-    @Autowired
+    @Resource
     private IGrantPermissionService grantPermissionService;
-    @Autowired
-    private Mapper dozerMapper;
-    @Autowired
+    @Resource
     private ITenantPermissionService tenantPermissionService;
 
     @Override
@@ -63,7 +60,7 @@ public class DefaultPermissionCache implements IPermissionCache {
         Map<String, List<RoleInfo>> allGrantPermission = grantPermissionService.getAll();
         Map<String, List<Long>> allTenantPermission = tenantPermissionService.getAllTenantPermission();
         for (Map<String, List<UrlPermission>> applicationPermission : urlPermission.values()) {
-            PermissionUtil.setPermissionRoleInfo(allGrantPermission, applicationPermission, allTenantPermission, dozerMapper);
+            PermissionUtil.setPermissionRoleInfo(allGrantPermission, applicationPermission, allTenantPermission);
         }
     }
 }

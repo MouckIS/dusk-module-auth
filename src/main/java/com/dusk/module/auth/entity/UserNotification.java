@@ -1,12 +1,11 @@
 package com.dusk.module.auth.entity;
 
+import com.dusk.common.core.entity.FullAuditedEntity;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
-import com.dusk.common.core.entity.FullAuditedEntity;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 
 /**
  * 用户消息

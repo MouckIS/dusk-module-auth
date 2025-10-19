@@ -2,10 +2,6 @@ package com.dusk.module.auth.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.excel.EasyExcel;
-import com.github.dozermapper.core.Mapper;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Workbook;
 import com.dusk.common.core.auth.permission.Permission;
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.jpa.Specifications;
@@ -18,6 +14,7 @@ import com.dusk.module.auth.dto.permission.EditionPermissionInputDto;
 import com.dusk.module.auth.entity.QTenantPermission;
 import com.dusk.module.auth.entity.SubscribableEdition;
 import com.dusk.module.auth.excel.EditionExcelExportWriter;
+import com.dusk.module.auth.mapper.SubscribableEditionMapper;
 import com.dusk.module.auth.repository.IFeatureValueRepository;
 import com.dusk.module.auth.repository.ISubscribableEditionRepository;
 import com.dusk.module.auth.repository.ITenantPermissionRepository;
@@ -25,7 +22,11 @@ import com.dusk.module.auth.service.IFeatureService;
 import com.dusk.module.auth.service.ISubscribableEditionService;
 import com.dusk.module.auth.service.ITenantPermissionService;
 import com.dusk.module.auth.service.ITenantService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.annotation.Resource;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -42,30 +43,26 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class SubscribableEditionServiceImpl extends BaseService<SubscribableEdition, ISubscribableEditionRepository> implements ISubscribableEditionService {
-    @Autowired
-    private Mapper dozerMapper;
-    @Autowired
+    @Resource
     private ITenantService tenantService;
-    @Autowired
-    IFeatureValueRepository featureValueRepository;
-    @Autowired
-    ITenantPermissionRepository tenantPermissionRepository;
+    @Resource
+    private IFeatureValueRepository featureValueRepository;
+    @Resource
+    private ITenantPermissionRepository tenantPermissionRepository;
+    @Resource
+    private IAuthPermissionManager permissionManager;
+    @Resource
+    private IFeatureService featureService;
+    @Resource
+    private ITenantPermissionService tenantPermissionService;
+    @Resource
+    private JPAQueryFactory queryFactory;
 
-    @Autowired
-    IAuthPermissionManager permissionManager;
-
-    @Autowired
-    IFeatureService featureService;
-
-    @Autowired
-    ITenantPermissionService tenantPermissionService;
-
-    @Autowired
-    JPAQueryFactory queryFactory;
+    private final SubscribableEditionMapper mapper = SubscribableEditionMapper.INSTANCE;
 
     @Override
     public SubscribableEdition createEdition(EditionEditDto input) {
-        var edition = dozerMapper.map(input, SubscribableEdition.class);
+        var edition = mapper.editDtoToEntity(input);
 
         if (notUniqueDisplayName(null, edition.getDisplayName())) {
             throw new BusinessException("名称[" + input.getDisplayName() + "]已存在，请重新输入！");
@@ -89,7 +86,7 @@ public class SubscribableEditionServiceImpl extends BaseService<SubscribableEdit
                 throw new BusinessException("名称[" + input.getDisplayName() + "]已存在，请重新输入！");
             }
 
-            var updatingSubscribableEdition = dozerMapper.map(input, SubscribableEdition.class);
+            var updatingSubscribableEdition = mapper.editDtoToEntity(input);
             if (existingSubscribableEdition.isFree() &&
                     !updatingSubscribableEdition.isFree() &&
                     repository.findOne(Specifications.where(e -> {
@@ -98,7 +95,8 @@ public class SubscribableEditionServiceImpl extends BaseService<SubscribableEdit
                 throw new BusinessException(("此版本用作其他版本订阅到期后版本。如果你想让这个版本付费，你应该先从其他版本中删除它。"));
             }
 
-            dozerMapper.map(input, existingSubscribableEdition);
+            //mapper.map(input, existingSubscribableEdition);
+            BeanUtils.copyProperties(input, existingSubscribableEdition);
             repository.save(existingSubscribableEdition);
         }
     }
@@ -146,7 +144,7 @@ public class SubscribableEditionServiceImpl extends BaseService<SubscribableEdit
 
     @Override
     public Workbook export(Long id) {
-        SubscribableEdition edition = findById(id).orElseThrow(()->new BusinessException("版本不存在或已被删除"));
+        SubscribableEdition edition = findById(id).orElseThrow(() -> new BusinessException("版本不存在或已被删除"));
         EditionExcelExportWriter writer = new EditionExcelExportWriter(edition);
 
         List<String> editionPermissions = findEditionPermission(id);
@@ -160,14 +158,14 @@ public class SubscribableEditionServiceImpl extends BaseService<SubscribableEdit
 
     @Override
     public void importEdition(InputStream in) {
-        List<Map<Integer,String>> list =  null;
+        List<Map<Integer, String>> list = null;
         try {
             list = EasyExcel.read(in).sheet().headRowNumber(0).doReadSync();
-        }catch (Exception e){
-            throw new BusinessException("无法识别的Excel文件",e);
+        } catch (Exception e) {
+            throw new BusinessException("无法识别的Excel文件", e);
         }
-        if(list.size()<2){
-            throw  new BusinessException("读取到的数据行数少于两行,不满足导入条件");
+        if (list.size() < 2) {
+            throw new BusinessException("读取到的数据行数少于两行,不满足导入条件");
         }
 
         SubscribableEdition edition = null;
@@ -175,38 +173,38 @@ public class SubscribableEditionServiceImpl extends BaseService<SubscribableEdit
         List<Permission> definitionPermissions = permissionManager.getDefinitionPermissionTree(true);
         Set<String> finalGrantedPermission = new LinkedHashSet<>();
         for (int i = 0; i < list.size(); i++) {
-            Map<Integer,String> map = list.get(i);
-            if(i==0){
+            Map<Integer, String> map = list.get(i);
+            if (i == 0) {
                 String displayName = map.get(2);
-                if(StringUtils.isBlank(displayName)){
-                    throw new BusinessException(StrUtil.format("第{}行版本名称不能为空",i+1));
+                if (StringUtils.isBlank(displayName)) {
+                    throw new BusinessException(StrUtil.format("第{}行版本名称不能为空", i + 1));
                 }
                 Optional<SubscribableEdition> optional = findByDisplayName(displayName);
-                if(optional.isPresent()){
+                if (optional.isPresent()) {
                     edition = optional.get();
-                }else {
+                } else {
                     edition = new SubscribableEdition();
                     edition.setDisplayName(displayName);
                 }
                 continue;
             }
-            if(i==1){
+            if (i == 1) {
                 continue;
             }
             String permission = map.get(0);
-            if(StringUtils.isNotBlank(permission)){
+            if (StringUtils.isNotBlank(permission)) {
                 String granted = map.get(2);
-                if("是".equals(granted)){
-                    recursionAddGrantedPermission(permission,definitionPermissions,finalGrantedPermission);
+                if ("是".equals(granted)) {
+                    recursionAddGrantedPermission(permission, definitionPermissions, finalGrantedPermission);
                 }
             }
             String featureName = map.get(EditionExcelExportWriter.FEATURE_START_INDEX);
-            if(StringUtils.isBlank(featureName)){
+            if (StringUtils.isBlank(featureName)) {
                 continue;
             }
-            String value = map.get(EditionExcelExportWriter.FEATURE_START_INDEX+2);
-            value = StringUtils.substringBefore(value,EditionExcelExportWriter.SEPARATOR);
-            if(Objects.isNull(value)){
+            String value = map.get(EditionExcelExportWriter.FEATURE_START_INDEX + 2);
+            value = StringUtils.substringBefore(value, EditionExcelExportWriter.SEPARATOR);
+            if (Objects.isNull(value)) {
                 value = StringUtils.EMPTY;
             }
             FeatureValueInput feature = new FeatureValueInput();
@@ -214,7 +212,7 @@ public class SubscribableEditionServiceImpl extends BaseService<SubscribableEdit
             feature.setValue(value);
             features.add(feature);
         }
-        if(edition.getId()==null){
+        if (edition.getId() == null) {
             edition = save(edition);
         }
 
@@ -223,22 +221,22 @@ public class SubscribableEditionServiceImpl extends BaseService<SubscribableEdit
         input.setPermissions(finalGrantedPermission.stream().collect(Collectors.toList()));
         tenantPermissionService.setEditionPermissions(input);
 
-        featureService.setEditionFeatures(edition.getId(),features);
+        featureService.setEditionFeatures(edition.getId(), features);
     }
 
-    void recursionAddGrantedPermission(String granted,List<Permission> definitionPermissions,Set<String> finalGrantedPermission){
+    void recursionAddGrantedPermission(String granted, List<Permission> definitionPermissions, Set<String> finalGrantedPermission) {
         for (Permission definitionPermission : definitionPermissions) {
-            if(StringUtils.equals(definitionPermission.getName(),granted)){
+            if (StringUtils.equals(definitionPermission.getName(), granted)) {
                 finalGrantedPermission.add(granted);
-                if(definitionPermission.getParent()!=null && StringUtils.isNotBlank(definitionPermission.getParent().getName())){
-                    recursionAddGrantedPermission(definitionPermission.getParent().getName(),definitionPermissions,finalGrantedPermission);
+                if (definitionPermission.getParent() != null && StringUtils.isNotBlank(definitionPermission.getParent().getName())) {
+                    recursionAddGrantedPermission(definitionPermission.getParent().getName(), definitionPermissions, finalGrantedPermission);
                 }
                 break;
             }
         }
     }
 
-    List<String> findEditionPermission(Long editionId){
+    List<String> findEditionPermission(Long editionId) {
         QTenantPermission tenantPermission = QTenantPermission.tenantPermission;
         return queryFactory.select(tenantPermission.name).from(tenantPermission).where(tenantPermission.editionId.eq(editionId)).fetch();
     }

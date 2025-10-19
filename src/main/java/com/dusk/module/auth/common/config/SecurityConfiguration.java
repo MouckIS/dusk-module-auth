@@ -6,9 +6,8 @@ import com.dusk.module.auth.common.handler.DefaultAuthenticationSuccessHandler;
 import com.dusk.module.auth.common.provider.DefaultAuthenticationProvider;
 import com.dusk.module.auth.service.ICaptchaService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,27 +31,20 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
-
-    private static final String AUTHENTICATION_URL = "/login";
-
-    @Autowired
-    ObjectMapper objectMapper;
-
-    @Autowired
-    ICaptchaService captchaService;
-
-    @Autowired
+    @Resource
+    private ObjectMapper objectMapper;
+    @Resource
+    private ICaptchaService captchaService;
+    @Resource
     private ApplicationEventPublisher publisher;
-
-    @Autowired
+    @Resource
     private DefaultAuthenticationSuccessHandler authenticationSuccessHandler;
-
-    @Autowired
+    @Resource
     private DefaultAuthenticationProvider authenticationProvider;
-
-    @Autowired
+    @Resource
     private DefaultAuthenticationFailureHandler authenticationFailureHandler;
 
+    private static final String AUTHENTICATION_URL = "/login";
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
