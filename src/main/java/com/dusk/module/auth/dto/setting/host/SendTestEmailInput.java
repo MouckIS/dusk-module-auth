@@ -1,10 +1,9 @@
 package com.dusk.module.auth.dto.setting.host;
 
 import io.swagger.annotations.ApiModelProperty;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
-
-import jakarta.validation.constraints.NotBlank;
 
 /**
  * @author kefuming

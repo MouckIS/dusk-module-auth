@@ -1,13 +1,14 @@
 package com.dusk.module.auth.service.impl;
 
-import com.github.dozermapper.core.Mapper;
 import com.dusk.common.core.entity.BaseEntity;
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.repository.IBaseRepository;
 import com.dusk.common.core.service.impl.BaseService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.BeanUtils;
 
 import java.util.function.Consumer;
+
+import static com.dusk.common.core.utils.UtBeanUtils.getNullPropertyNames;
 
 /**
  * @author jianjianhong
@@ -15,8 +16,6 @@ import java.util.function.Consumer;
  */
 public class CreateOrUpdateService<T extends BaseEntity, K extends IBaseRepository<T>> extends BaseService<T, K> {
 
-    @Autowired
-    protected Mapper mapper;
 
     /**
      * 新增或者更新对象
@@ -47,10 +46,15 @@ public class CreateOrUpdateService<T extends BaseEntity, K extends IBaseReposito
     protected T getUpdatedT(Object object, Long id, Class<T> tClass) {
         T t;
         if(id == null) {
-            t = mapper.map(object, tClass);
+            try {
+                t = tClass.getDeclaredConstructor().newInstance();
+                BeanUtils.copyProperties(object, t);
+            } catch (ReflectiveOperationException e) {
+                throw new RuntimeException("创建目标对象失败", e);
+            }
         }else {
             t = findT(id);
-            mapper.map(object, t);
+            BeanUtils.copyProperties(object, t, getNullPropertyNames(object));
         }
         return t;
     }

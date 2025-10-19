@@ -1,13 +1,12 @@
 package com.dusk.module.auth.entity.quickentry;
 
+import com.dusk.common.core.entity.FullAuditedEntity;
 import io.swagger.annotations.ApiModelProperty;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
-import com.dusk.common.core.entity.FullAuditedEntity;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 
 /**
  * 〈页面的快捷入口〉

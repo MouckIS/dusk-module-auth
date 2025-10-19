@@ -1,13 +1,13 @@
 package com.dusk.module.auth.dto.orga;
 
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
 import com.dusk.common.core.entity.BaseEntity;
 import com.dusk.common.core.entity.TreeEntity;
 import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitUserListDto;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
 
 /**

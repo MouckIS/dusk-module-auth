@@ -3,12 +3,6 @@ package com.dusk.module.auth.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
-import com.dusk.common.rpc.auth.service.IAuthRpcService;
-import com.dusk.common.core.utils.UserContextUtils;
-import com.dusk.module.auth.service.IFeatureChecker;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.Service;
-import org.apache.dubbo.rpc.RpcContext;
 import com.dusk.common.core.auth.permission.Permission;
 import com.dusk.common.core.auth.permission.UrlPermission;
 import com.dusk.common.core.dto.NameValueDefaultByDto;
@@ -19,17 +13,22 @@ import com.dusk.common.core.jwt.extractor.JwtHeaderTokenExtractor;
 import com.dusk.common.core.model.UserContext;
 import com.dusk.common.core.tenant.TenantContextHolder;
 import com.dusk.common.core.utils.SecurityUtils;
+import com.dusk.common.core.utils.UserContextUtils;
+import com.dusk.common.rpc.auth.service.IAuthRpcService;
 import com.dusk.module.auth.common.datafilter.IDataFilterDefinitionContext;
 import com.dusk.module.auth.common.manage.DefaultAccessDecisionManager;
 import com.dusk.module.auth.common.manage.TokenAuthManager;
 import com.dusk.module.auth.common.metadata.DefaultInvocationSecurityMetadataSource;
-import com.dusk.module.auth.common.permission.IAuthPermissionManager;
 import com.dusk.module.auth.common.provider.CustomAuthProvider;
 import com.dusk.module.auth.common.skiprequest.SkipPathRequestMatcher;
 import com.dusk.module.auth.dto.station.StationsOfLoginUserDto;
 import com.dusk.module.auth.feature.CenterControlFeatureProvider;
+import com.dusk.module.auth.service.IFeatureChecker;
 import com.dusk.module.auth.service.IStationService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.Service;
+import org.apache.dubbo.rpc.RpcContext;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.util.StringUtils;
 
@@ -43,31 +42,29 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class AuthRpcServiceImpl implements IAuthRpcService {
-    @Autowired
+    @Resource
     JwtTokenFactory jwtTokenFactory;
-    @Autowired
+    @Resource
     JwtHeaderTokenExtractor jwtHeaderTokenExtractor;
-    @Autowired
-    IAuthPermissionManager permissionManager;
-    @Autowired
+    @Resource
     UserContextUtils userContextUtils;
-    @Autowired
+    @Resource
     DefaultAccessDecisionManager accessDecisionManager;
-    @Autowired
+    @Resource
     DefaultInvocationSecurityMetadataSource metadataSource;
-    @Autowired
+    @Resource
     CustomAuthProvider customAuthProvider;
-    @Autowired
+    @Resource
     SkipPathRequestMatcher skipPathRequestMatcher;
-    @Autowired
+    @Resource
     IDataFilterDefinitionContext dataFilterDefinitionContext;
-    @Autowired
+    @Resource
     TokenAuthManager tokenAuthManager;
-    @Autowired
+    @Resource
     SecurityUtils securityUtils;
-    @Autowired
+    @Resource
     IStationService stationService;
-    @Autowired
+    @Resource
     IFeatureChecker featureChecker;
 
     @Override

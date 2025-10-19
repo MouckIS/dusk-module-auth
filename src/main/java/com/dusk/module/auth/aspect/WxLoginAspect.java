@@ -1,14 +1,14 @@
 package com.dusk.module.auth.aspect;
 
-import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
 import com.dusk.module.auth.dto.mobilelogin.MobileUserDto;
 import com.dusk.module.auth.dto.weixin.WxMaSessionResult;
 import com.dusk.module.auth.entity.UserWxRelation;
 import com.dusk.module.auth.service.IUserWxRelationService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -22,8 +22,8 @@ import java.util.List;
 @Component
 @Slf4j
 public class WxLoginAspect {
-    @Autowired
-    IUserWxRelationService userWxRelationService;
+    @Resource
+    private IUserWxRelationService userWxRelationService;
 
     @Around("execution(* com.dusk.module.auth.service.IWxMaService.login(..))")
     public Object aroundWxMicroProgramLogin(ProceedingJoinPoint joinPoint) throws Throwable {

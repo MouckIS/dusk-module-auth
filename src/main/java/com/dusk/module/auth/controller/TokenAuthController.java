@@ -1,7 +1,5 @@
 package com.dusk.module.auth.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import com.dusk.common.core.annotation.AllowAnonymous;
 import com.dusk.common.core.annotation.Authorize;
 import com.dusk.common.core.annotation.IgnoreResponseAdvice;
@@ -20,15 +18,17 @@ import com.dusk.module.auth.service.ICaptchaService;
 import com.dusk.module.auth.service.IScanCodeLoginService;
 import com.dusk.module.auth.service.ISsoTokenService;
 import com.dusk.module.auth.service.ITokenService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 
 /**
  * @author kefuming
@@ -38,21 +38,21 @@ import jakarta.validation.Valid;
 @RequestMapping("token-auth")
 @Api(tags = "TokenAuth", description = "登陆相关", position = -999)
 public class TokenAuthController extends CruxBaseController {
-    @Autowired
+    @Resource
     private TokenAuthManager tokenAuthManager;
-    @Autowired
+    @Resource
     ICaptchaService captchaService;
-    @Autowired
+    @Resource
     private AuthenticationManager authenticationManager;
-    @Autowired
+    @Resource
     IScanCodeLoginService scanCodeLoginService;
-    @Autowired
+    @Resource
     SecurityUtils securityUtils;
     @Autowired(required = false)
     IAppSSOLoginService appSSOLoginService;
-    @Autowired
+    @Resource
     ISsoTokenService ssoTokenService;
-    @Autowired
+    @Resource
     ITokenService tokenService;
 
     @AllowAnonymous

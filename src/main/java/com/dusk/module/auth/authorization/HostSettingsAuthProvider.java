@@ -5,7 +5,7 @@ import com.dusk.common.core.auth.permission.IPermissionDefinitionContext;
 import com.dusk.common.core.auth.permission.MultiTenancySides;
 import com.dusk.common.core.auth.permission.Permission;
 import com.dusk.module.auth.setting.config.MultiTenancyConfig;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
 /**
@@ -18,7 +18,7 @@ public class HostSettingsAuthProvider extends AuthorizationProvider {
     public static final String PAGES_ADMINISTRATION_HOST_MAINTENANCE = "Pages.Administration.Host.Maintenance";
     public static final String PAGES_ADMINISTRATION_HOST_DASHBOARD = "Pages.Administration.Host.Dashboard";
 
-    @Autowired
+    @Resource
     private MultiTenancyConfig multiTenancyConfig;
 
     @Override

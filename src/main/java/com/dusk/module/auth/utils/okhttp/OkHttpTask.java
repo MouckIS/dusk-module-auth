@@ -1,9 +1,9 @@
 package com.dusk.module.auth.utils.okhttp;
 
+import com.dusk.common.core.exception.BusinessException;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
-import com.dusk.common.core.exception.BusinessException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 

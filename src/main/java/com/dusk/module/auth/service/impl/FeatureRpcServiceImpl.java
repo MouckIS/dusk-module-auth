@@ -4,8 +4,8 @@ import com.dusk.module.auth.cache.IFeatureCache;
 import com.dusk.module.auth.dto.TenantFeature;
 import com.dusk.module.auth.service.IFeatureRpcService;
 import com.dusk.module.auth.service.IFeatureService;
+import jakarta.annotation.Resource;
 import org.apache.dubbo.config.annotation.Service;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
@@ -15,9 +15,9 @@ import java.util.List;
  */
 @Service
 public class FeatureRpcServiceImpl implements IFeatureRpcService {
-    @Autowired
+    @Resource
     private IFeatureCache featureCache;
-    @Autowired
+    @Resource
     private IFeatureService featureService;
 
 

@@ -1,13 +1,13 @@
 package com.dusk.module.auth.dto.user;
 
+import com.dusk.module.auth.enums.UserPrintType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
-import com.dusk.module.auth.enums.UserPrintType;
-
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
 
 /**

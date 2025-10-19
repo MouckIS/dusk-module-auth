@@ -5,7 +5,7 @@ import com.dusk.common.core.service.ITreeService;
 import com.dusk.common.core.tree.TreeFix;
 import com.dusk.module.auth.entity.OrganizationUnit;
 import com.dusk.module.auth.service.IOrganizationUnitService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
 /**
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class OrganizationUnitFix extends TreeFix<OrganizationUnit> {
-    @Autowired
+    @Resource
     private IOrganizationUnitService organizationUnitService;
 
     @Override

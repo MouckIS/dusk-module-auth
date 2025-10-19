@@ -3,12 +3,12 @@ package com.dusk.module.auth.entity;
 import com.dusk.common.core.entity.TreeEntity;
 import com.dusk.common.core.enums.EUnitType;
 import com.dusk.module.auth.enums.OrgLabel;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.FieldNameConstants;
 
-import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 

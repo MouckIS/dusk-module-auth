@@ -1,13 +1,5 @@
 package com.dusk.module.auth.service.impl;
 
-import com.dusk.common.rpc.auth.service.ICommonFavoriteRpcService;
-import com.github.dozermapper.core.Mapper;
-import com.querydsl.core.types.QBean;
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.SneakyThrows;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.dubbo.config.annotation.Service;
 import com.dusk.common.core.auth.authentication.LoginUserIdContextHolder;
 import com.dusk.common.core.dto.CommonFavoriteDto;
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
@@ -16,14 +8,22 @@ import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.jpa.Sequence;
 import com.dusk.common.core.jpa.querydsl.QBeanBuilder;
 import com.dusk.common.core.service.impl.BaseService;
+import com.dusk.common.rpc.auth.service.ICommonFavoriteRpcService;
 import com.dusk.module.auth.entity.CommonFavorite;
 import com.dusk.module.auth.entity.QCommonFavorite;
 import com.dusk.module.auth.repository.ICommonFavoriteRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.querydsl.core.types.QBean;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
+import lombok.SneakyThrows;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.dubbo.config.annotation.Service;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.validation.Valid;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -34,12 +34,10 @@ import java.util.Optional;
 @Service
 @Transactional
 public class CommonFavoriteServiceImpl extends BaseService<CommonFavorite, ICommonFavoriteRepository> implements ICommonFavoriteRpcService {
-    @Autowired
+    @Resource
     JPAQueryFactory queryFactory;
-    @Autowired
+    @Resource
     Sequence sequence;
-    @Autowired
-    Mapper dozer;
 
     QCommonFavorite qCommonFavorite = QCommonFavorite.commonFavorite;
 
@@ -53,7 +51,9 @@ public class CommonFavoriteServiceImpl extends BaseService<CommonFavorite, IComm
                 throw new BusinessException("该名称数据已存在");
             }
             dto.setId(sequence.nextId());
-            commonFavorite = dozer.map(dto, CommonFavorite.class);
+            commonFavorite = new CommonFavorite();
+            BeanUtils.copyProperties(dto, commonFavorite);
+            //commonFavorite = dozer.map(dto, CommonFavorite.class);
         } else {
             commonFavorite = findById(dto.getId()).orElseThrow(() -> new BusinessException("数据不存在或已被删除"));
             //判断修改操作的名字有没有重名
@@ -63,7 +63,8 @@ public class CommonFavoriteServiceImpl extends BaseService<CommonFavorite, IComm
                     throw new BusinessException("该名称数据已存在");
                 }
             }
-            dozer.map(dto, commonFavorite);
+            //dozer.map(dto, commonFavorite);
+            BeanUtils.copyProperties(dto, commonFavorite);
         }
 
         save(commonFavorite);

@@ -1,11 +1,11 @@
 package com.dusk.module.auth.dto.configuration;
 
-import com.dusk.module.ddm.dto.DynamicMenuDto;
-import lombok.Getter;
-import lombok.Setter;
 import com.dusk.common.core.model.UserContext;
 import com.dusk.module.auth.dto.feature.FeatureConfigDto;
 import com.dusk.module.auth.dto.user.GetUserForEditOutput;
+import com.dusk.module.ddm.dto.DynamicMenuDto;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.List;

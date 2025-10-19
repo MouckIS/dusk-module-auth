@@ -1,13 +1,13 @@
 package com.dusk.module.auth.common.permission.impl;
 
-import lombok.Getter;
-import lombok.Setter;
 import com.dusk.common.core.auth.permission.MultiTenancySides;
 import com.dusk.common.core.auth.permission.Permission;
 import com.dusk.common.core.auth.permission.UrlPermission;
 import com.dusk.module.auth.common.permission.IAuthPermissionManager;
 import com.dusk.module.auth.common.permission.IPermissionCache;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -24,8 +24,8 @@ import java.util.stream.Collectors;
 @Setter
 public class AuthPermissionManager implements IAuthPermissionManager {
 
-    @Autowired
-    IPermissionCache permissionCache;
+    @Resource
+    private IPermissionCache permissionCache;
 
     @Override
     public List<UrlPermission> getPermission(String applicationName, String url) {

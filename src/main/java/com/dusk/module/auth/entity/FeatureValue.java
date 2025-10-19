@@ -2,13 +2,13 @@ package com.dusk.module.auth.entity;
 
 import com.dusk.common.core.constant.EntityConstant;
 import com.dusk.common.core.entity.CreationEntity;
-import lombok.Getter;
-import lombok.Setter;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serial;
 import java.time.LocalDateTime;
 

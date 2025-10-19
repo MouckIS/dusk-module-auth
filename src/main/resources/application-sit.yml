@@ -13,7 +13,7 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: org.postgresql.Driver
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/crux}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://192.168.23.23:5432/dusk}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:DuskTech@postgre}
     druid:
@@ -40,7 +40,7 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: ${spring.cloud.nacos.server-addr:localhost:8848}
+        server-addr: ${spring.cloud.nacos.server-addr:dusk.com:8848}
         username: ${spring.cloud.nacos.username:nacos}
         password: ${spring.cloud.nacos.password:dusk}
         namespace: sit
@@ -49,15 +49,15 @@ spring:
     is-enabled: ${SPRING_RABBITMQ_ISENABLED:true}
     username: admin
     password: DuskTech#mq
-    addresses: localhost:5672
-    host: localhost
+    addresses: dusk.com:5672
+    host: dusk.com
 
   flyway:
     enabled: false
     table: flyway_schema_history_auth
 
   redis:
-    host: localhost
+    host: dusk.com
     password: redis123
   mvc:
     async:

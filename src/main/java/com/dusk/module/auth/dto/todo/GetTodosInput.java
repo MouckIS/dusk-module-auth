@@ -1,9 +1,9 @@
 package com.dusk.module.auth.dto.todo;
 
+import com.dusk.common.core.dto.PagedAndSortedInputDto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.common.core.dto.PagedAndSortedInputDto;
 
 import java.util.List;
 

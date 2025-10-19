@@ -1,14 +1,14 @@
 package com.dusk.module.auth.entity;
 
+import com.dusk.common.core.annotation.Tenant;
+import com.dusk.common.core.constant.EntityConstant;
+import com.dusk.common.core.entity.BaseEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
-import com.dusk.common.core.constant.EntityConstant;
-import com.dusk.common.core.entity.BaseEntity;
 import org.springframework.util.StringUtils;
-import com.dusk.common.core.annotation.Tenant;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 /**

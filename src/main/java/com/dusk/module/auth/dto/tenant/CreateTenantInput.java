@@ -1,10 +1,10 @@
 package com.dusk.module.auth.dto.tenant;
 
 import io.swagger.annotations.ApiModelProperty;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
-import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 /**

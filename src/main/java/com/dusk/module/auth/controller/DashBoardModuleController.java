@@ -1,8 +1,5 @@
 package com.dusk.module.auth.controller;
 
-import com.dusk.module.auth.dto.dashboard.*;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import com.dusk.common.core.annotation.Authorize;
 import com.dusk.common.core.controller.CruxBaseController;
 import com.dusk.common.core.dto.PagedResultDto;
@@ -11,12 +8,13 @@ import com.dusk.module.auth.dto.dashboard.*;
 import com.dusk.module.auth.entity.dashboard.DashboardModule;
 import com.dusk.module.auth.entity.dashboard.DashboardModuleItem;
 import com.dusk.module.auth.service.IDashBoardModuleService;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author jianjianhong
@@ -27,7 +25,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @Api(tags = "DashBoard", description = "数据仪表盘")
 @Authorize(DashBoardAuthProvider.PAGES_DASHBOARD_THEME_MODULE)
 public class DashBoardModuleController extends CruxBaseController {
-    @Autowired
+    @Resource
     private IDashBoardModuleService moduleService;
 
     /********************模块接口*************************/

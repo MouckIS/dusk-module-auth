@@ -1,14 +1,14 @@
 package com.dusk.module.auth.entity;
 
+import com.dusk.common.core.entity.FullAuditedEntity;
 import com.dusk.common.core.enums.EUnitType;
 import com.dusk.common.core.enums.UserStatus;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.FieldNameConstants;
-import com.dusk.common.core.entity.FullAuditedEntity;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;

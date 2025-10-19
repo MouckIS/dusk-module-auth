@@ -1,11 +1,10 @@
 package com.dusk.module.auth.entity;
 
-import lombok.Getter;
-import lombok.Setter;
 import com.dusk.common.core.entity.CreationEntity;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 租户和版本权限公用的表

@@ -1,8 +1,8 @@
 package com.dusk.module.auth.dto.weixin;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 

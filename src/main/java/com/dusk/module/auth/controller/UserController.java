@@ -1,12 +1,5 @@
 package com.dusk.module.auth.controller;
 
-import com.dusk.common.rpc.auth.dto.ChangePwdInput;
-import com.dusk.module.auth.dto.user.*;
-import com.dusk.module.auth.service.IFeatureChecker;
-import com.github.dozermapper.core.Mapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import com.dusk.common.core.annotation.AllowAnonymous;
 import com.dusk.common.core.annotation.Authorize;
 import com.dusk.common.core.auth.authentication.LoginUserIdContextHolder;
@@ -15,18 +8,25 @@ import com.dusk.common.core.dto.EntityDto;
 import com.dusk.common.core.dto.PagedResultDto;
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.model.UserContext;
-import com.dusk.common.core.utils.DozerUtils;
+import com.dusk.common.core.utils.MapperUtil;
+import com.dusk.common.rpc.auth.dto.ChangePwdInput;
 import com.dusk.module.auth.authorization.AdminUserAuthProvider;
+import com.dusk.module.auth.dto.user.*;
 import com.dusk.module.auth.entity.User;
 import com.dusk.module.auth.feature.UserFeatureProvider;
+import com.dusk.module.auth.mapper.UserMapper;
+import com.dusk.module.auth.service.IFeatureChecker;
 import com.dusk.module.auth.service.IUserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.*;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 //TODO:添加登陆用户得更改个人信息接口 常见于更新名字，邮箱，手机号等
@@ -40,12 +40,12 @@ import java.util.List;
 @Api(description = "用户", tags = "User")
 @Authorize(AdminUserAuthProvider.PAGES_ADMINISTRATION_USERS)
 public class UserController extends CruxBaseController {
-    @Autowired
-    IUserService userService;
-    @Autowired
-    private Mapper dozerMapper;
-    @Autowired
-    IFeatureChecker featureChecker;
+    @Resource
+    private IUserService userService;
+    @Resource
+    private IFeatureChecker featureChecker;
+
+    private final UserMapper mapper = UserMapper.INSTANCE;
 
 
     @ApiOperation(value = "获取用户列表")
@@ -58,28 +58,28 @@ public class UserController extends CruxBaseController {
     @RequestMapping(value = "/getOrgaUsers", method = RequestMethod.GET)
     public PagedResultDto<UserListDto> getOrgaUsers(@Valid GetOrgaUsersInput getOrgaUsersInput) {
         Page<User> page = userService.getOrgaUsers(getOrgaUsersInput);
-        return DozerUtils.mapToPagedResultDto(dozerMapper, page, UserListDto.class);
+        return MapperUtil.mapToPagedResultDto(page, mapper::toListDto);
     }
 
     @ApiOperation(value = "通过角色Code列表获取所有用户")
     @RequestMapping(value = "/getUsersByRoleCodes", method = RequestMethod.GET)
     public PagedResultDto<UserListDto> getUsersByRoleCodes(GetUsersByRoleCodesInput getUsersInput) {
         Page<User> page = userService.getUsersByRoleCodes(getUsersInput);
-        return DozerUtils.mapToPagedResultDto(dozerMapper, page, UserListDto.class);
+        return MapperUtil.mapToPagedResultDto(page, mapper::toListDto);
     }
 
     @ApiOperation(value = "通过角色名称列表获取所有用户")
     @RequestMapping(value = "/getUsersByRoleNames", method = RequestMethod.GET)
     public PagedResultDto<UserForSelectDto> getUsersByRoleNames(@Valid GetUsersByRoleNameInput input) {
         Page<User> page = userService.getUsersByRoleName(input);
-        return DozerUtils.mapToPagedResultDto(dozerMapper, page, UserForSelectDto.class);
+        return MapperUtil.mapToPagedResultDto(page, mapper::toSelectDto);
     }
 
     @ApiOperation(value = "获取所有用户列表（不分页）")
     @RequestMapping(value = "/getAllUsers", method = RequestMethod.GET)
     public List<UserListDto> getAllUsers() {
         List<User> userList = userService.getAllUsers();
-        return DozerUtils.mapList(dozerMapper, userList, UserListDto.class);
+        return MapperUtil.mapList(userList, mapper::toListDto);
     }
 
     @ApiOperation(value = "导出用户到excel")

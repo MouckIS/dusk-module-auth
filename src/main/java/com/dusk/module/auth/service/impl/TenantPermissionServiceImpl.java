@@ -1,13 +1,9 @@
 package com.dusk.module.auth.service.impl;
 
-import com.dusk.common.rpc.auth.dto.role.RolePermissionDto;
-import com.github.dozermapper.core.Mapper;
-import com.querydsl.core.Tuple;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.extern.slf4j.Slf4j;
 import com.dusk.common.core.auth.permission.Permission;
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.service.impl.BaseService;
+import com.dusk.common.rpc.auth.dto.role.RolePermissionDto;
 import com.dusk.module.auth.common.config.AppAuthConfig;
 import com.dusk.module.auth.common.permission.IAuthPermissionManager;
 import com.dusk.module.auth.dto.permission.EditionPermissionInputDto;
@@ -15,10 +11,14 @@ import com.dusk.module.auth.entity.QTenant;
 import com.dusk.module.auth.entity.QTenantPermission;
 import com.dusk.module.auth.entity.Tenant;
 import com.dusk.module.auth.entity.TenantPermission;
+import com.dusk.module.auth.mapper.PermissionMapper;
 import com.dusk.module.auth.repository.ITenantPermissionRepository;
 import com.dusk.module.auth.repository.ITenantRepository;
 import com.dusk.module.auth.service.ITenantPermissionService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.querydsl.core.Tuple;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,16 +36,16 @@ import java.util.stream.Collectors;
 @Transactional
 @Slf4j
 public class TenantPermissionServiceImpl extends BaseService<TenantPermission, ITenantPermissionRepository> implements ITenantPermissionService {
-    @Autowired
-    IAuthPermissionManager permissionManager;
-    @Autowired
-    JPAQueryFactory jpaQueryFactory;
-    @Autowired
-    Mapper dozerMapper;
-    @Autowired
-    ITenantRepository tenantRepository;
-    @Autowired
-    AppAuthConfig appAuthConfig;
+    @Resource
+    private IAuthPermissionManager permissionManager;
+    @Resource
+    private JPAQueryFactory jpaQueryFactory;
+    @Resource
+    private ITenantRepository tenantRepository;
+    @Resource
+    private AppAuthConfig appAuthConfig;
+
+    private final PermissionMapper mapper = PermissionMapper.INSTANCE;
 
     @Override
     public List<RolePermissionDto> getEditionPermissions(Long editionId) {
@@ -157,7 +157,7 @@ public class TenantPermissionServiceImpl extends BaseService<TenantPermission, I
         List<Permission> permissions = permissionManager.getDefinitionPermissionTree(true);
         List<RolePermissionDto> result = new ArrayList<>();
         permissions.forEach(s -> {
-            RolePermissionDto rolePermissionDto = dozerMapper.map(s, RolePermissionDto.class);
+            RolePermissionDto rolePermissionDto = mapper.toRolePermissionDto(s);
             if (hasPermissions.contains(s.getName())) {
                 rolePermissionDto.setGranted(true);
             } else {

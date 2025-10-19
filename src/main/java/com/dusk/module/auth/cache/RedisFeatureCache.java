@@ -4,7 +4,7 @@ import com.dusk.common.core.lock.annotation.Lock4j;
 import com.dusk.common.core.redis.RedisCacheCondition;
 import com.dusk.common.core.redis.RedisUtil;
 import com.dusk.module.auth.dto.TenantFeature;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -22,10 +22,11 @@ import java.util.Map;
 @Component
 @Primary
 public class RedisFeatureCache implements IFeatureCache {
+    @Resource
+    private RedisUtil<Object> redisUtil;
+
     private final String AUTH_FEATURE_MAP_KEY = "CRUX:AUTH:FEATURE";
 
-    @Autowired
-    RedisUtil<Object> redisUtil;
 
     @Override
     @Lock4j

@@ -1,7 +1,7 @@
 package com.dusk.module.auth.enums;
 
-import lombok.Getter;
 import com.dusk.common.core.entity.BaseEnum;
+import lombok.Getter;
 
 /**
  *

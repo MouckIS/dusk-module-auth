@@ -1,10 +1,10 @@
 package com.dusk.module.auth.service;
 
-import com.querydsl.core.types.dsl.EntityPathBase;
 import com.dusk.common.core.entity.BaseEntity;
 import com.dusk.common.core.service.IBaseService;
 import com.dusk.module.auth.entity.ExtendField;
 import com.dusk.module.auth.repository.IExtendFieldRepository;
+import com.querydsl.core.types.dsl.EntityPathBase;
 
 import java.util.List;
 

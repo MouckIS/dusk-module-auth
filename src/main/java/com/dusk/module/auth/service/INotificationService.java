@@ -1,6 +1,5 @@
 package com.dusk.module.auth.service;
 
-import com.dusk.module.auth.dto.notification.*;
 import com.dusk.common.core.dto.EntityDto;
 import com.dusk.common.core.dto.PagedResultDto;
 import com.dusk.common.core.service.IBaseService;

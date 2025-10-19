@@ -1,22 +1,15 @@
 package com.dusk.module.auth.service.impl;
 
 import cn.hutool.core.util.StrUtil;
-import com.dusk.common.mqs.pusher.PushSMS;
-import com.dusk.common.mqs.pusher.SmsPushConfig;
-import com.dusk.common.mqs.pusher.SmsTemplateParam;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.dozermapper.core.Mapper;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
 import com.dusk.common.core.annotation.DisableTenantFilter;
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.exception.MobileAccountNotFoundException;
 import com.dusk.common.core.model.UserContext;
 import com.dusk.common.core.redis.RedisUtil;
 import com.dusk.common.core.tenant.TenantContextHolder;
+import com.dusk.common.mqs.pusher.PushSMS;
+import com.dusk.common.mqs.pusher.SmsPushConfig;
+import com.dusk.common.mqs.pusher.SmsTemplateParam;
 import com.dusk.module.auth.common.manage.TokenAuthManager;
 import com.dusk.module.auth.common.util.LoginUtils;
 import com.dusk.module.auth.dto.mobilelogin.MobileUserDto;
@@ -24,16 +17,23 @@ import com.dusk.module.auth.dto.mobilelogin.SendCaptchaInput;
 import com.dusk.module.auth.entity.QUser;
 import com.dusk.module.auth.entity.User;
 import com.dusk.module.auth.feature.UserFeatureProvider;
+import com.dusk.module.auth.mapper.UserMapper;
 import com.dusk.module.auth.push.INotificationPushManager;
 import com.dusk.module.auth.repository.IUserRepository;
 import com.dusk.module.auth.service.ICaptchaService;
 import com.dusk.module.auth.service.IFeatureService;
 import com.dusk.module.auth.service.IMobileLoginService;
 import com.dusk.module.auth.service.IUserService;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,28 +49,26 @@ public class MobileLoginServiceImpl implements IMobileLoginService {
     //缓存手机验证码时长 单位 秒 默认给5分钟 可以改
     private final static int MOBILE_CAPTCHA_TIME = 60 * 5;
 
+    private final UserMapper mapper = UserMapper.INSTANCE;
+
     @Autowired(required = false)
-    RedisUtil<String> redisUtil;
-    @Autowired
+    private RedisUtil<String> redisUtil;
+    @Resource
     private TokenAuthManager tokenAuthManager;
-    @Autowired
-    JPAQueryFactory queryFactory;
-    @Autowired
-    SmsPushConfig smsPushConfig;
-    @Autowired
-    ObjectMapper jsonMapper;
-    @Autowired
-    Mapper dozerMapper;
+    @Resource
+    private JPAQueryFactory queryFactory;
+    @Resource
+    private SmsPushConfig smsPushConfig;
     @Autowired(required = false)
-    INotificationPushManager pushManager;
-    @Autowired
+    private INotificationPushManager pushManager;
+    @Resource
     private IFeatureService featureService;
-    @Autowired
-    IUserRepository userRepository;
-    @Autowired
-    IUserService userService;
-    @Autowired
-    ICaptchaService captchaService;
+    @Resource
+    private IUserRepository userRepository;
+    @Resource
+    private IUserService userService;
+    @Resource
+    private ICaptchaService captchaService;
 
     @Override
     @DisableTenantFilter
@@ -144,7 +142,8 @@ public class MobileLoginServiceImpl implements IMobileLoginService {
                 userService.checkUserValid(temp);
                 UserContext context = LoginUtils.getUserContextByUser(temp);
                 String token = tokenAuthManager.generateToken(context);
-                MobileUserDto dto = dozerMapper.map(temp, MobileUserDto.class);
+                //MobileUserDto dto = mapper.toMobileUserDto(temp);
+                MobileUserDto dto = new MobileUserDto();
                 dto.setToken(token);
                 list.add(dto);
 

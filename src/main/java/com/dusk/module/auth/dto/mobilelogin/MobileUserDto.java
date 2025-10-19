@@ -1,12 +1,11 @@
 package com.dusk.module.auth.dto.mobilelogin;
 
 import cn.hutool.core.util.StrUtil;
-import com.github.dozermapper.core.Mapping;
+import com.dusk.common.core.dto.EntityDto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
-import com.dusk.common.core.dto.EntityDto;
 
 /**
  * @author pengmengjiang
@@ -22,10 +21,8 @@ public class MobileUserDto extends EntityDto {
     private String userName;
     @ApiModelProperty("租户id")
     private Long tenantId;
-    @Mapping("tenant.name")
     @ApiModelProperty("租户显示名称")
     private String tenant;
-    @Mapping("tenant.tenantName")
     @ApiModelProperty("租户代码")
     private String tenantName;
     @ApiModelProperty("登陆token")

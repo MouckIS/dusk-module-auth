@@ -1,15 +1,12 @@
 package com.dusk.module.auth.service.impl;
 
-import com.dusk.module.auth.dto.tenant.*;
-import com.github.dozermapper.core.Mapper;
-import org.apache.commons.lang3.StringUtils;
 import com.dusk.common.core.entity.BaseEntity;
 import com.dusk.common.core.entity.CreationEntity;
+import com.dusk.common.core.enums.EUnitType;
+import com.dusk.common.core.enums.UserStatus;
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.jpa.Specifications;
 import com.dusk.common.core.service.impl.BaseService;
-import com.dusk.common.core.enums.EUnitType;
-import com.dusk.common.core.enums.UserStatus;
 import com.dusk.module.auth.common.permission.IAuthPermissionManager;
 import com.dusk.module.auth.dto.tenant.*;
 import com.dusk.module.auth.entity.SubscribableEdition;
@@ -19,7 +16,9 @@ import com.dusk.module.auth.repository.ITenantRepository;
 import com.dusk.module.auth.repository.IUserRepository;
 import com.dusk.module.auth.service.ISubscribableEditionService;
 import com.dusk.module.auth.service.ITenantService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,16 +35,14 @@ import java.util.UUID;
 @Service
 @Transactional
 public class TenantServiceImpl extends BaseService<Tenant, ITenantRepository> implements ITenantService {
-    @Autowired
+    @Resource
     private IUserRepository iUserRepository;
-    @Autowired
+    @Resource
     private PasswordEncoder passwordEncoder;
-    @Autowired
-    private Mapper dozerMapper;
-    @Autowired
+    @Resource
     private ISubscribableEditionService editionService;
-    @Autowired
-    IAuthPermissionManager permissionManager;
+    @Resource
+    private IAuthPermissionManager permissionManager;
 
     @Override
     public Tenant createTenantWithDefaultSettings(CreateTenantInput input) {
@@ -75,7 +72,8 @@ public class TenantServiceImpl extends BaseService<Tenant, ITenantRepository> im
         }
         SubscribableEdition edition = checkEdition(tenantEditDto.getEditionId(), tenantEditDto.isInTrialPeriod());
 
-        dozerMapper.map(tenantEditDto, tenant);
+        //mapper.map(tenantEditDto, tenant);
+        BeanUtils.copyProperties(tenantEditDto, tenant);
         tenant.setEdition(edition);
         permissionManager.refreshAll();
         repository.save(tenant);
@@ -119,7 +117,8 @@ public class TenantServiceImpl extends BaseService<Tenant, ITenantRepository> im
 
     private Tenant addTenant(CreateTenantInput input) {
         Tenant tenant = new Tenant();
-        dozerMapper.map(input, tenant);
+        //mapper.map(input, tenant);
+        BeanUtils.copyProperties(input, tenant);
         SubscribableEdition edition = checkEdition(input.getEditionId());
         tenant.setEdition(edition);
         return repository.save(tenant);

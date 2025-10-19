@@ -22,7 +22,7 @@
         <!--        crux依赖-->
         <dusk-common.version>1.1.0-SNAPSHOT</dusk-common.version>
         <flyway.user>postgres</flyway.user>
-        <flyway.url>jdbc:postgresql://wsl.com:5432/crux</flyway.url>
+        <flyway.url>jdbc:postgresql://dusk.com:5432/dusk</flyway.url>
         <flyway.password>DuskTech@postgre</flyway.password>
     </properties>
 
@@ -124,6 +124,33 @@
             <groupId>fr.opensagres.xdocreport</groupId>
             <artifactId>fr.opensagres.xdocreport.template.freemarker</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>io.github.openfeign.querydsl</groupId>
+            <artifactId>querydsl-apt</artifactId>
+            <version>7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.openfeign.querydsl</groupId>
+            <artifactId>querydsl-jpa</artifactId>
+            <version>7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
+        </dependency>
+        <!-- <dependency> -->
+        <!--     <groupId>org.projectlombok</groupId> -->
+        <!--     <artifactId>lombok</artifactId> -->
+        <!--     <version>1.18.36</version> -->
+        <!-- </dependency> -->
+
+        <!-- 仅迁移期使用，启动后控制台会打印所有需要改的 key -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-properties-migrator</artifactId>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -131,34 +158,65 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version> <!-- 使用一个较新的插件版本 -->
                 <configuration>
                     <source>21</source>
                     <target>21</target>
                     <encoding>UTF-8</encoding>
                     <annotationProcessorPaths>
-                        <!-- 1. QueryDSL 注解处理器 -->
                         <path>
-                            <groupId>com.querydsl</groupId>
-                            <artifactId>querydsl-apt</artifactId>
-                            <version>5.1.0</version>
-                            <classifier>jakarta</classifier>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.32</version>
                         </path>
-                        <!-- 2. JPA 持久化 API 处理器 -->
                         <path>
                             <groupId>jakarta.persistence</groupId>
                             <artifactId>jakarta.persistence-api</artifactId>
                             <version>3.1.0</version>
                         </path>
-                        <!-- 3. Lombok -->
                         <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>1.18.30</version>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>1.6.3</version>
+                        </path>
+                        <path>
+                            <groupId>io.github.openfeign.querydsl</groupId>
+                            <artifactId>querydsl-apt</artifactId>
+                            <version>7.0</version>
+                        </path>
+                        <path>
+                            <groupId>io.github.openfeign.querydsl</groupId>
+                            <artifactId>querydsl-jpa</artifactId>
+                            <version>7.0</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
+            <!-- <plugin> -->
+            <!--     <groupId>io.github.openfeign.querydsl</groupId> -->
+            <!--     <artifactId>querydsl-maven-plugin</artifactId> -->
+            <!--     <version>7.0</version> -->
+            <!--     <executions> -->
+            <!--         <execution> -->
+            <!--             <goals> -->
+            <!--                 <goal>jpa-export</goal> -->
+            <!--             </goals> -->
+            <!--         </execution> -->
+            <!--     </executions> -->
+            <!--     <configuration> -->
+            <!--         <sourceFolder>${project.basedir}/src/main/java</sourceFolder> -->
+            <!--         <packageName>com.dusk</packageName> -->
+            <!--         <packages>com.dusk</packages> -->
+            <!--         <targetFolder>${project.basedir}/src/main/java</targetFolder> -->
+            <!--     </configuration> -->
+            <!--     <dependencies> -->
+            <!--         &lt;!&ndash; 让插件能解析 jakarta 注解 &ndash;&gt; -->
+            <!--         <dependency> -->
+            <!--             <groupId>jakarta.persistence</groupId> -->
+            <!--             <artifactId>jakarta.persistence-api</artifactId> -->
+            <!--             <version>3.1.0</version> -->
+            <!--         </dependency> -->
+            <!--     </dependencies> -->
+            <!-- </plugin> -->
         </plugins>
     </build>
 </project>

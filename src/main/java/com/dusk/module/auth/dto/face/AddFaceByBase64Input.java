@@ -1,11 +1,10 @@
 package com.dusk.module.auth.dto.face;
 
+import com.dusk.common.core.dto.ImgBase64Dto;
 import io.swagger.annotations.ApiModelProperty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.common.core.dto.ImgBase64Dto;
-
-import jakarta.validation.constraints.NotNull;
 
 /**
  * @author kefuming

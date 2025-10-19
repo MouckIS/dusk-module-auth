@@ -1,9 +1,8 @@
 package com.dusk.module.auth.common.permission;
 
-import com.github.dozermapper.core.Mapper;
-import lombok.experimental.UtilityClass;
 import com.dusk.common.core.auth.permission.RoleInfo;
 import com.dusk.common.core.auth.permission.UrlPermission;
+import lombok.experimental.UtilityClass;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +15,7 @@ import java.util.Map;
 @UtilityClass
 public class PermissionUtil {
 
-    public void setPermissionRoleInfo(Map<String, List<RoleInfo>> allGrantPermission, Map<String, List<UrlPermission>> applicationPermission, Map<String, List<Long>> allTenantPermission, Mapper dozerMapper) {
+    public void setPermissionRoleInfo(Map<String, List<RoleInfo>> allGrantPermission, Map<String, List<UrlPermission>> applicationPermission, Map<String, List<Long>> allTenantPermission) {
         applicationPermission.values().forEach(p -> {
             for (UrlPermission item : p) {
                 List<Long> tenants = allTenantPermission.get(item.getName());
@@ -37,7 +36,7 @@ public class PermissionUtil {
                         }
                     }
                 }
-                if (roles.size() > 0) {
+                if (!roles.isEmpty()) {
                     item.setRoles(roles);
                 }
             }

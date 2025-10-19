@@ -2,24 +2,24 @@ package com.dusk.module.auth.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
-import com.dusk.common.rpc.auth.enums.EnumResetType;
-import com.dusk.common.rpc.auth.service.ISerialNoRpcService;
-import com.github.dozermapper.core.Mapper;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.dubbo.config.annotation.Service;
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.jpa.Specifications;
 import com.dusk.common.core.lock.annotation.Lock4j;
 import com.dusk.common.core.service.impl.BaseService;
+import com.dusk.common.rpc.auth.enums.EnumResetType;
+import com.dusk.common.rpc.auth.service.ISerialNoRpcService;
 import com.dusk.module.auth.dto.sysno.GetSerialNoInput;
 import com.dusk.module.auth.dto.sysno.SerialNoEditInput;
 import com.dusk.module.auth.entity.QSerialNo;
 import com.dusk.module.auth.entity.SerialNo;
 import com.dusk.module.auth.repository.ISerialNoRepository;
 import com.dusk.module.auth.service.ISerialNoService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.dubbo.config.annotation.Service;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,10 +34,8 @@ import java.time.LocalDateTime;
 @Transactional
 @Slf4j
 public class SerialNoServiceImpl extends BaseService<SerialNo, ISerialNoRepository> implements ISerialNoRpcService, ISerialNoService {
-    @Autowired
+    @Resource
     JPAQueryFactory queryFactory;
-    @Autowired
-    Mapper dozerMapper;
 
     @Lock4j(keys = "#billType")
     @Override
@@ -140,7 +138,8 @@ public class SerialNoServiceImpl extends BaseService<SerialNo, ISerialNoReposito
     @Override
     public void update(SerialNoEditInput input) {
         SerialNo entity = repository.findById(input.getId()).orElseThrow(() -> new BusinessException("数据不存在"));
-        dozerMapper.map(input, entity);
+        //mapper.map(input, entity);
+        BeanUtils.copyProperties(input, entity);
         save(entity);
     }
 

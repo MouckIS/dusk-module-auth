@@ -1,19 +1,17 @@
 package com.dusk.module.auth.controller;
 
-import com.dusk.module.auth.dto.notification.*;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
 import com.dusk.common.core.controller.CruxBaseController;
 import com.dusk.common.core.dto.EntityDto;
 import com.dusk.common.core.dto.PagedResultDto;
 import com.dusk.module.auth.dto.notification.*;
 import com.dusk.module.auth.service.INotificationService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 用户消息的controller
@@ -25,13 +23,8 @@ import jakarta.validation.Valid;
 @RequestMapping("notification")
 @Api(tags = "Notification", description = "用户消息通知")
 public class NotificationController extends CruxBaseController {
-
-    private final INotificationService service;
-
-    @Autowired
-    public NotificationController(INotificationService service) {
-        this.service = service;
-    }
+    @Resource
+    private INotificationService service;
 
 
     /**

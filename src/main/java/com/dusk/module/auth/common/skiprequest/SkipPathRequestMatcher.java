@@ -1,7 +1,7 @@
 package com.dusk.module.auth.common.skiprequest;
 
 import com.dusk.module.auth.common.permission.IPermissionCache;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 
@@ -14,8 +14,8 @@ import java.util.List;
 @Component
 public class SkipPathRequestMatcher {
 
-    @Autowired
-    IPermissionCache permissionCache;
+    @Resource
+    private IPermissionCache permissionCache;
 
 
     public boolean matches(String applicationName, String url){

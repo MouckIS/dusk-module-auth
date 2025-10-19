@@ -1,12 +1,6 @@
 package com.dusk.module.auth.service.impl;
 
 import cn.hutool.core.util.StrUtil;
-import com.dusk.module.auth.entity.OrganizationUnit;
-import com.dusk.module.auth.entity.Station;
-import com.dusk.module.auth.entity.Tenant;
-import com.dusk.module.auth.entity.User;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.extern.slf4j.Slf4j;
 import com.dusk.common.core.annotation.DisableTenantFilter;
 import com.dusk.common.core.entity.CreationEntity;
 import com.dusk.common.core.entity.TreeEntity;
@@ -18,12 +12,14 @@ import com.dusk.module.auth.service.IOrganizationUnitService;
 import com.dusk.module.auth.service.IStationMigrationService;
 import com.dusk.module.auth.service.IStationService;
 import com.dusk.module.auth.service.ITenantService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.annotation.PostConstruct;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,17 +31,17 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class StationMigrationService implements IStationMigrationService {
-    @Autowired
+    @Resource
     private ITenantService tenantService;
-    @Autowired
+    @Resource
     private IOrganizationUnitService organizationUnitService;
-    @Autowired
+    @Resource
     private IStationService stationService;
-    @Autowired
+    @Resource
     private IDataFilterDefinitionContext dataFilterDefinitionContext;
-    @Autowired
+    @Resource
     private SpringContextUtils springContextUtils;
-    @Autowired
+    @Resource
     private JPAQueryFactory queryFactory;
 
 

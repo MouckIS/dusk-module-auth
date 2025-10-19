@@ -1,6 +1,5 @@
 package com.dusk.module.auth.dto.user;
 
-import com.github.dozermapper.core.Mapping;
 import lombok.Getter;
 import lombok.Setter;
 

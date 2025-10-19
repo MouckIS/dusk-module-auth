@@ -1,12 +1,10 @@
 package com.dusk.module.auth.dto.notification;
 
+import com.dusk.common.core.dto.EntityDto;
 import io.swagger.annotations.ApiModelProperty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.common.core.dto.EntityDto;
-import com.dusk.common.core.dto.VersionDto;
-
-import jakarta.validation.constraints.NotNull;
 
 /**
  * @author kefuming

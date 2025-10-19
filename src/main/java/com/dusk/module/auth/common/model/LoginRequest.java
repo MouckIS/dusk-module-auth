@@ -1,11 +1,11 @@
 package com.dusk.module.auth.common.model;
 
+import com.dusk.module.auth.dto.captcha.CaptchaInputDto;
 import io.swagger.annotations.ApiModelProperty;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.module.auth.dto.captcha.CaptchaInputDto;
 
-import jakarta.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 /**

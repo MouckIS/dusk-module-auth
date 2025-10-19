@@ -6,32 +6,6 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.write.metadata.WriteSheet;
-import com.dusk.common.rpc.auth.dto.BindRoleToUserInput;
-import com.dusk.common.rpc.auth.dto.RoleSimpleDto;
-import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitUserListDto;
-import com.dusk.common.rpc.auth.dto.role.RoleListDto;
-import com.dusk.common.rpc.auth.dto.role.RolePermissionDto;
-import com.dusk.common.rpc.auth.service.IRoleRpcService;
-import com.dusk.module.auth.dto.role.*;
-import com.dusk.module.auth.entity.GrantPermission;
-import com.dusk.module.auth.entity.Role;
-import com.dusk.module.auth.entity.User;
-import com.dusk.module.auth.dto.orga.BindRoleToOrgInput;
-import com.dusk.module.auth.dto.user.GetUserByRoleDto;
-import com.dusk.module.auth.dto.user.UnbindRoleForUserDto;
-import com.dusk.module.auth.repository.IGrantPermissionRepository;
-import com.dusk.module.auth.repository.IRoleRepository;
-import com.dusk.module.auth.repository.IUserRepository;
-import com.dusk.module.auth.service.IOrganizationUnitService;
-import com.dusk.module.auth.service.IRoleService;
-import com.dusk.module.auth.service.ITenantPermissionService;
-import com.github.dozermapper.core.Mapper;
-import com.querydsl.core.types.QBean;
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.dubbo.config.annotation.Service;
 import com.dusk.common.core.auth.permission.Permission;
 import com.dusk.common.core.dto.EntityDto;
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
@@ -42,12 +16,35 @@ import com.dusk.common.core.jpa.Specifications;
 import com.dusk.common.core.jpa.querydsl.QBeanBuilder;
 import com.dusk.common.core.service.impl.BaseService;
 import com.dusk.common.core.tenant.TenantContextHolder;
-import com.dusk.common.core.utils.DozerUtils;
+import com.dusk.common.core.utils.MapperUtil;
 import com.dusk.common.core.utils.UtBeanUtils;
+import com.dusk.common.rpc.auth.dto.BindRoleToUserInput;
+import com.dusk.common.rpc.auth.dto.RoleSimpleDto;
+import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitUserListDto;
+import com.dusk.common.rpc.auth.dto.role.RoleListDto;
+import com.dusk.common.rpc.auth.dto.role.RolePermissionDto;
+import com.dusk.common.rpc.auth.service.IRoleRpcService;
 import com.dusk.module.auth.common.permission.IAuthPermissionManager;
+import com.dusk.module.auth.dto.orga.BindRoleToOrgInput;
+import com.dusk.module.auth.dto.role.*;
+import com.dusk.module.auth.dto.user.GetUserByRoleDto;
+import com.dusk.module.auth.dto.user.UnbindRoleForUserDto;
 import com.dusk.module.auth.entity.*;
 import com.dusk.module.auth.excel.RolePermissionExportRowWriteHandler;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.dusk.module.auth.mapper.RoleMapper;
+import com.dusk.module.auth.repository.IGrantPermissionRepository;
+import com.dusk.module.auth.repository.IRoleRepository;
+import com.dusk.module.auth.repository.IUserRepository;
+import com.dusk.module.auth.service.IOrganizationUnitService;
+import com.dusk.module.auth.service.IRoleService;
+import com.dusk.module.auth.service.ITenantPermissionService;
+import com.querydsl.core.types.QBean;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.annotation.Resource;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.dubbo.config.annotation.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,31 +58,29 @@ import java.util.stream.Collectors;
 @Transactional
 public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implements IRoleRpcService, IRoleService {
 
-    @Autowired
+    @Resource
     private IRoleRepository repository;
 
-    @Autowired
+    @Resource
     private IUserRepository userRepository;
 
-    @Autowired
+    @Resource
     private IOrganizationUnitService organizationUnitService;
 
-    @Autowired
+    @Resource
     private IGrantPermissionRepository permissionRepository;
 
-    @Autowired
-    private Mapper dozerMapper;
+    @Resource
+    private IAuthPermissionManager permissionManager;
 
-    @Autowired
-    IAuthPermissionManager permissionManager;
+    @Resource
+    private ITenantPermissionService tenantPermissionService;
 
-    @Autowired
-    ITenantPermissionService tenantPermissionService;
+    @Resource
+    private JPAQueryFactory queryFactory;
 
-    @Autowired
-    JPAQueryFactory queryFactory;
-
-    QRole qRole = QRole.role;
+    private final RoleMapper mapper = RoleMapper.INSTANCE;
+    private final QRole qRole = QRole.role;
 
     @Override
     public List<Role> getRoles() {
@@ -108,9 +103,9 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
         Role entity = null;
         if (dto.getId() != null) {
             entity = repository.findById(dto.getId()).orElseThrow(() -> new BusinessException("此角色不存在"));
-            dozerMapper.map(dto, entity);
+            mapper.updateEntityFromDto(dto, entity);
         } else {
-            entity = dozerMapper.map(dto, Role.class);
+            entity = mapper.editDtoToEntity(dto);
         }
         validateRoleCodeAndNameUnique(entity);
         return repository.save(entity);
@@ -127,9 +122,9 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
         queryFactory.delete(QGrantPermission.grantPermission).where(QGrantPermission.grantPermission.businessKey.isNull().and(QGrantPermission.grantPermission.role.id.eq(dto.getId()))).execute();
 
         entity.clearPermission();
-        //dozerMapper.map(dto,entity);
+        //mapper.map(dto,entity);
         //modify by wangji 调整了方法
-        entity.addPermissions(DozerUtils.mapList(dozerMapper, dto.getPermissions(), GrantPermission.class));
+        entity.addPermissions(MapperUtil.mapList(dto.getPermissions(), mapper::dtoToPermissionEntity));
 
         entity.setPermissionRole();
         Role save = repository.save(entity);
@@ -144,7 +139,7 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
             throw new BusinessException("ID不可为空");
         }
         Role entity = repository.findById(dto.getId()).orElseThrow(() -> new BusinessException("此角色不存在"));
-        RoleDto result = dozerMapper.map(entity, RoleDto.class);
+        RoleDto result = mapper.toDto(entity);
         //筛选不包含标识得权限清单
         List<GrantPermission> orion = entity.getPermissions().stream().filter(p -> StrUtil.isEmpty(p.getBusinessKey())).collect(Collectors.toList());
         result.setPermissionList(getRoleRealPermission(orion));
@@ -278,19 +273,17 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
     @Override
     public PagedResultDto<RoleListDto> getRoles(PagedAndSortedInputDto input) {
         Page<Role> pageResult = repository.findAll(input.getPageable());
-        List<RoleListDto> list = DozerUtils.mapList(dozerMapper, pageResult.getContent(), RoleListDto.class);
-        return new PagedResultDto<>(pageResult.getTotalElements(), list);
+        return MapperUtil.mapToPagedResultDto(pageResult, mapper::enitytToListDto);
     }
 
     @Override
     public PagedResultDto<RoleListDto> getRolesForSync(PagedAndSortedInputDto input) {
         Page<Role> pageResult = repository.findAll(input.getPageable());
         List<RolePermissionDto> tenantGrantedPermissions = getTenantGrantedPermissions();
-        List<RoleListDto> list = DozerUtils.mapList(dozerMapper, pageResult.getContent(), RoleListDto.class, (s, t) -> {
+        return MapperUtil.mapToPagedResultDto(pageResult, mapper::enitytToListDto, (s, t) -> {
             List<RolePermissionDto> roleRealPermission = getRoleRealPermission(s.getPermissions(), tenantGrantedPermissions);
             t.setPermissionList(roleRealPermission);
         });
-        return new PagedResultDto<>(pageResult.getTotalElements(), list);
     }
 
     @Override
@@ -306,7 +299,7 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
         }
         List<Role> roles = queryFactory.selectFrom(QRole.role).where(QRole.role.id.in(ids)).fetch();
         List<RolePermissionDto> tenantGrantedPermissions = getTenantGrantedPermissions();
-        return DozerUtils.mapList(dozerMapper, roles, RoleListDto.class, (s, t) -> {
+        return MapperUtil.mapList(roles, mapper::enitytToListDto, (s, t) -> {
             List<RolePermissionDto> roleRealPermission = getRoleRealPermission(s.getPermissions(), tenantGrantedPermissions);
             t.setPermissionList(roleRealPermission);
         });
@@ -327,7 +320,7 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
     @Override
     public List<RoleListDto> listDefaultRoles() {
         List<Role> roles = queryFactory.selectFrom(QRole.role).where(QRole.role.isDefault.eq(true)).fetch();
-        return DozerUtils.mapList(dozerMapper, roles, RoleListDto.class);
+        return MapperUtil.mapList(roles, mapper::enitytToListDto);
     }
 
     @Override
@@ -447,7 +440,7 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
         if (TenantContextHolder.getTenantId() == null) {
             List<Permission> permissions = permissionManager.getDefinitionPermissionTree(false);
             permissions.forEach(s -> {
-                RolePermissionDto rolePermissionDto = dozerMapper.map(s, RolePermissionDto.class);
+                RolePermissionDto rolePermissionDto = mapper.entityToPermissionDto(s);
                 rolePermissionDto.setGranted(true);
                 result.add(rolePermissionDto);
             });

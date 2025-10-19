@@ -1,18 +1,18 @@
 package com.dusk.module.auth.entity;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.FieldNameConstants;
 import com.dusk.common.core.annotation.LogicDelete;
 import com.dusk.common.core.constant.EntityConstant;
 import com.dusk.common.core.entity.CreationEntity;
 import com.dusk.module.auth.enums.PaymentPeriodType;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 

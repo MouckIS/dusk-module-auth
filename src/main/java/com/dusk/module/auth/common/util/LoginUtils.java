@@ -1,9 +1,9 @@
 package com.dusk.module.auth.common.util;
 
-import lombok.experimental.UtilityClass;
 import com.dusk.common.core.constant.AuthConstant;
 import com.dusk.common.core.model.UserContext;
 import com.dusk.module.auth.entity.User;
+import lombok.experimental.UtilityClass;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.util.StringUtils;

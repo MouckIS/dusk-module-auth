@@ -1,10 +1,10 @@
 package com.dusk.module.auth.dto.notification;
 
 import io.swagger.annotations.ApiModelProperty;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 
-import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
 
 /**

@@ -1,11 +1,10 @@
 package com.dusk.module.auth.dto.mobilelogin;
 
+import com.dusk.module.auth.dto.captcha.CaptchaInputDto;
 import io.swagger.annotations.ApiModelProperty;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.module.auth.dto.captcha.CaptchaInputDto;
-
-import jakarta.validation.constraints.NotEmpty;
 
 /**
  * @author kefuming

@@ -1,19 +1,18 @@
 package com.dusk.module.auth.setting;
 
-import com.dusk.module.auth.entity.Setting;
-import com.dusk.module.auth.repository.ISettingRepository;
-import com.dusk.module.auth.service.ITenantService;
-import com.dusk.module.auth.setting.config.MultiTenancyConfig;
-import com.dusk.module.ddm.enums.SettingScopes;
-import com.github.dozermapper.core.Mapper;
-import io.seata.common.util.StringUtils;
 import com.dusk.common.core.auth.authentication.LoginUserIdContextHolder;
 import com.dusk.common.core.datafilter.DataFilterContextHolder;
 import com.dusk.common.core.jpa.Specifications;
 import com.dusk.common.core.tenant.TenantContextHolder;
-import com.dusk.common.core.utils.DozerUtils;
-import com.dusk.common.core.utils.SecurityUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.dusk.common.core.utils.MapperUtil;
+import com.dusk.module.auth.entity.Setting;
+import com.dusk.module.auth.mapper.SettingMapper;
+import com.dusk.module.auth.repository.ISettingRepository;
+import com.dusk.module.auth.service.ITenantService;
+import com.dusk.module.auth.setting.config.MultiTenancyConfig;
+import com.dusk.module.ddm.enums.SettingScopes;
+import io.seata.common.util.StringUtils;
+import jakarta.annotation.Resource;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
@@ -28,19 +27,16 @@ import java.util.Optional;
  */
 @Component
 public class SettingManagerDefault implements ISettingManager {
-    @Autowired
+    @Resource
     protected ISettingsCache settingsCache;
-    @Autowired
+    @Resource
     protected ITenantService tenantService;
-    @Autowired
-    protected SecurityUtils securityUtils;
-    @Autowired
-    private Mapper mapper;
-    @Autowired
+    @Resource
     private ISettingRepository settingRepository;
-
-    @Autowired
+    @Resource
     protected MultiTenancyConfig multiTenancyConfig;
+
+    private final SettingMapper mapper = SettingMapper.INSTANCE;
 
     @Override
     public String getSettingValue(String name) {
@@ -318,7 +314,7 @@ public class SettingManagerDefault implements ISettingManager {
 
     private List<SettingInfo> getAllSettings(Long tenantId, Long stationId, Long userId) {
         Specification<Setting> query = createQuery(tenantId, stationId, userId, null);
-        return DozerUtils.mapList(mapper, settingRepository.findAll(query), SettingInfo.class);
+        return MapperUtil.mapList(settingRepository.findAll(query), mapper::toInfo);
     }
 
     private Specification<Setting> createQuery(Long tenantId, Long stationId, Long userId, String name) {
@@ -331,7 +327,7 @@ public class SettingManagerDefault implements ISettingManager {
 
     private SettingInfo getSettingOrNull(Long tenantId, Long stationId, Long userId, String name) {
         Optional<Setting> optional = settingRepository.findOne(createQuery(tenantId, stationId, userId, name));
-        return optional.isEmpty() ? null : mapper.map(optional.get(), SettingInfo.class);
+        return optional.map(mapper::toInfo).orElse(null);
     }
 
     public void delete(SettingInfo settingInfo) {
@@ -340,7 +336,7 @@ public class SettingManagerDefault implements ISettingManager {
     }
 
     public void create(SettingInfo settingInfo) {
-        settingRepository.save(mapper.map(settingInfo, Setting.class));
+        settingRepository.save(mapper.infoDtoToEntity(settingInfo));
     }
 
     public void update(SettingInfo settingInfo) {

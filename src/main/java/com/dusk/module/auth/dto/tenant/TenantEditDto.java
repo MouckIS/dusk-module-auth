@@ -1,11 +1,11 @@
 package com.dusk.module.auth.dto.tenant;
 
+import com.dusk.common.core.dto.VersionDto;
 import io.swagger.annotations.ApiModelProperty;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.common.core.dto.VersionDto;
 
-import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 /**

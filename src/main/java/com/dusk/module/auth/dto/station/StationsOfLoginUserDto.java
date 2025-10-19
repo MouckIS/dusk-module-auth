@@ -1,9 +1,9 @@
 package com.dusk.module.auth.dto.station;
 
+import com.dusk.common.core.dto.NameValueDefaultByDto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.common.core.dto.NameValueDefaultByDto;
 
 /**
  * @author kefuming

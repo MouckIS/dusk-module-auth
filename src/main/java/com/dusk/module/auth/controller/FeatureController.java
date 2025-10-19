@@ -1,6 +1,8 @@
 package com.dusk.module.auth.controller;
 
 import com.dusk.common.core.annotation.Authorize;
+import com.dusk.common.core.controller.CruxBaseController;
+import com.dusk.common.core.dto.EntityDto;
 import com.dusk.module.auth.authorization.EditionAuthProvider;
 import com.dusk.module.auth.authorization.TenantAuthProvider;
 import com.dusk.module.auth.dto.TenantFeature;
@@ -10,15 +12,13 @@ import com.dusk.module.auth.service.IFeatureService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import com.dusk.common.core.controller.CruxBaseController;
-import com.dusk.common.core.dto.EntityDto;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
@@ -31,8 +31,8 @@ import java.util.Map;
 @RestController
 public class FeatureController extends CruxBaseController {
 
-    @Autowired
-    IFeatureService featureService;
+    @Resource
+    private IFeatureService featureService;
 
     /**
      * 获取租户特性值，用于getAll接口

@@ -1,11 +1,5 @@
 package com.dusk.module.auth.controller;
 
-import com.dusk.common.rpc.auth.dto.orga.GetOrganizationUnitUsersInput;
-import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitDto;
-import com.dusk.common.rpc.auth.dto.station.StationDto;
-import com.dusk.module.auth.dto.orga.*;
-import com.github.dozermapper.core.Mapper;
-import io.swagger.annotations.*;
 import com.dusk.common.core.annotation.Authorize;
 import com.dusk.common.core.controller.CruxBaseController;
 import com.dusk.common.core.dto.EntityDto;
@@ -13,24 +7,33 @@ import com.dusk.common.core.dto.ListResultDto;
 import com.dusk.common.core.dto.NameValueDto;
 import com.dusk.common.core.dto.PagedResultDto;
 import com.dusk.common.core.entity.TreeEntity;
-import com.dusk.common.core.jpa.Specifications;
-import com.dusk.common.core.utils.DozerUtils;
-import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitUserListDto;
 import com.dusk.common.core.enums.EUnitType;
+import com.dusk.common.core.jpa.Specifications;
+import com.dusk.common.core.utils.MapperUtil;
+import com.dusk.common.rpc.auth.dto.orga.GetOrganizationUnitUsersInput;
+import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitDto;
+import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitUserListDto;
+import com.dusk.common.rpc.auth.dto.station.StationDto;
 import com.dusk.module.auth.authorization.OrganizationUnitAuthProvider;
+import com.dusk.module.auth.dto.orga.*;
 import com.dusk.module.auth.dto.station.StationsOfLoginUserDto;
 import com.dusk.module.auth.entity.OrganizationManager;
 import com.dusk.module.auth.entity.OrganizationUnit;
 import com.dusk.module.auth.entity.User;
+import com.dusk.module.auth.mapper.OrganizationMapper;
 import com.dusk.module.auth.repository.IOrganizationManagerRepository;
 import com.dusk.module.auth.service.IOrganizationUnitService;
 import com.dusk.module.auth.service.IStationService;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,14 +47,14 @@ import java.util.stream.Collectors;
 @RequestMapping("organizationUnit")
 @Api(tags = "OrganizationUnit", description = "组织机构")
 public class OrganizationUnitController extends CruxBaseController {
-    @Autowired
+    @Resource
     private IOrganizationUnitService organizationUnitService;
-    @Autowired
+    @Resource
     private IOrganizationManagerRepository organizationManagerRepository;
-    @Autowired
-    private Mapper dozerMapper;
-    @Autowired
+    @Resource
     private IStationService stationService;
+
+    private final OrganizationMapper mapper = OrganizationMapper.INSTANCE;
 
     @GetMapping("getOrganizationUnits")
     @ApiOperation("获取本单位所有组织机构")
@@ -62,7 +65,7 @@ public class OrganizationUnitController extends CruxBaseController {
         Map<Long, Long> map = organizationManagerRepository.findAll().stream()
                 .collect(Collectors.toMap(OrganizationManager::getOrgId, OrganizationManager::getUserId));
 
-        return DozerUtils.mapToListResultDto(dozerMapper, organizationUnitList, OrganizationStationUnitDto.class, (unit, dto) -> {
+        return MapperUtil.mapToListResultDto(organizationUnitList, mapper::toStationUnitDto, (unit, dto) -> {
             // 设置管理的组织id
             Long orgId = unit.getId();
             if (map.containsKey(orgId)) {
@@ -76,21 +79,21 @@ public class OrganizationUnitController extends CruxBaseController {
     @ApiOperation("获取组织机构下的用户")
     public PagedResultDto<OrganizationUnitUserListDto> getOrganizationUnitUsers(@Valid @RequestBody GetOrganizationUnitUsersInput input) {
         Page<OrganizationUnitUserListDto> page = organizationUnitService.getOrganizationUnitUsers(input);
-        return DozerUtils.mapToPagedResultDto(dozerMapper, page, OrganizationUnitUserListDto.class);
+        return new PagedResultDto<>(page.getTotalElements(), page.getContent());
     }
 
     @PutMapping("getOrganizationUnitUsersInfo")
     @ApiOperation("获取组织机构下的用户(部分信息)")
     public PagedResultDto<OrganizationUnitUserInfoListDto> getOrganizationUnitUsersInfo(@Valid @RequestBody GetOrganizationUnitUsersExtInput input) {
         Page<OrganizationUnitUserInfoListDto> page = organizationUnitService.getOrganizationUnitUsersInfo(input);
-        return DozerUtils.mapToPagedResultDto(dozerMapper, page, OrganizationUnitUserInfoListDto.class);
+        return new PagedResultDto<>(page.getTotalElements(), page.getContent());
     }
 
     @PutMapping("getOrganizationUnitUsersForSelect")
     @ApiOperation("组织机构的用户选择下拉列表")
     public PagedResultDto<OrganizationUnitUserForSelectDto> getOrganizationUnitUsersForSelect(@Valid @RequestBody GetOrganizationUnitUsersForSelectInput input) {
         Page<OrganizationUnitUserForSelectDto> page = organizationUnitService.getOrganizationUnitUsersForSelect(input);
-        return DozerUtils.mapToPagedResultDto(dozerMapper, page, OrganizationUnitUserForSelectDto.class);
+        return new PagedResultDto<>(page.getTotalElements(), page.getContent());
     }
 
     @PostMapping("createOrganizationUnit")
@@ -98,7 +101,7 @@ public class OrganizationUnitController extends CruxBaseController {
     @Authorize(OrganizationUnitAuthProvider.PAGES_ADMINISTRATION_ORGANIZATIONUNITS_MANAGEORGANIZATIONTREE)
     public OrganizationUnitDto createOrganizationUnit(@Valid @RequestBody CreateOrganizationUnitInput input) {
         OrganizationUnit organizationUnit = organizationUnitService.create(input);
-        return dozerMapper.map(organizationUnit, OrganizationUnitDto.class);
+        return mapper.toDto(organizationUnit);
     }
 
 
@@ -107,7 +110,7 @@ public class OrganizationUnitController extends CruxBaseController {
     @Authorize(OrganizationUnitAuthProvider.PAGES_ADMINISTRATION_ORGANIZATIONUNITS_MANAGEORGANIZATIONTREE)
     public OrganizationUnitDto updateOrganizationUnit(@Valid @RequestBody UpdateOrganizationUnitInput input) {
         OrganizationUnit organizationUnit = organizationUnitService.update(input);
-        return dozerMapper.map(organizationUnit, OrganizationUnitDto.class);
+        return mapper.toDto(organizationUnit);
     }
 
     @PutMapping("moveOrganizationUnit")
@@ -115,7 +118,7 @@ public class OrganizationUnitController extends CruxBaseController {
     @Authorize(OrganizationUnitAuthProvider.PAGES_ADMINISTRATION_ORGANIZATIONUNITS_MANAGEORGANIZATIONTREE)
     public OrganizationUnitDto moveOrganizationUnit(@Valid @RequestBody MoveOrganizationUnitInput input) {
         OrganizationUnit organizationUnit = organizationUnitService.move(input);
-        return dozerMapper.map(organizationUnit, OrganizationUnitDto.class);
+        return mapper.toDto(organizationUnit);
     }
 
     @DeleteMapping("deleteOrganizationUnit")
@@ -165,7 +168,7 @@ public class OrganizationUnitController extends CruxBaseController {
     @ApiOperation("获取组织机构节点的父级[包括自身]")
     @GetMapping("getParentOrganizations")
     public List<ParentOrganizationOutput> getParentOrganizations(EntityDto input) {
-        return DozerUtils.mapList(dozerMapper, organizationUnitService.getParentOrganizations(input), ParentOrganizationOutput.class);
+        return MapperUtil.mapList(organizationUnitService.getParentOrganizations(input), mapper::toParentOrganizationOutput);
     }
 
     @ApiOperation("设置厂站可用/不可用")
@@ -204,6 +207,6 @@ public class OrganizationUnitController extends CruxBaseController {
     @GetMapping("getStationTreeOfLoginUser")
     public List<OrganizationUnitDto> getStationTreeOfLoginUser() {
         List<OrganizationUnit> organizationUnits = organizationUnitService.getStationTreeByUserId(getCurrentUser().getId());
-        return DozerUtils.mapList(dozerMapper, organizationUnits, OrganizationUnitDto.class);
+        return MapperUtil.mapList(organizationUnits, mapper::toDto);
     }
 }

@@ -1,8 +1,8 @@
 package com.dusk.module.auth.dto.edition;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * @author kefuming

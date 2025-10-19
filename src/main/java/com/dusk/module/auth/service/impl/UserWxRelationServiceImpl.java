@@ -8,7 +8,7 @@ import com.dusk.module.auth.cache.IUserWxRelationCacheService;
 import com.dusk.module.auth.entity.UserWxRelation;
 import com.dusk.module.auth.repository.IUserWxRelationRepository;
 import com.dusk.module.auth.service.IUserWxRelationService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class UserWxRelationServiceImpl extends BaseService<UserWxRelation, IUserWxRelationRepository> implements IUserWxRelationService {
-    @Autowired
-    IUserWxRelationCacheService userWxRelationCacheService;
+    @Resource
+    private IUserWxRelationCacheService userWxRelationCacheService;
 
     @Override
     public String getOpenId(Long userId, String appId) {

@@ -1,13 +1,12 @@
 package com.dusk.module.auth.dto.role;
 
+import com.dusk.common.core.dto.EntityDto;
 import com.dusk.common.rpc.auth.dto.role.RolePermissionDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.github.dozermapper.core.Mapping;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.common.core.dto.EntityDto;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ public class RoleDto extends EntityDto {
     @ApiModelProperty("创建时间")
     private LocalDateTime createTime;
     @ApiModelProperty("创建人名称")
-    @Mapping("createUser.name")
+    //@Mapping("createUser.name")
     private String createUserName;
     @ApiModelProperty("是否是默认权限")
     private boolean isDefault;

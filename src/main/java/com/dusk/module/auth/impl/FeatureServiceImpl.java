@@ -12,14 +12,12 @@ import com.dusk.module.auth.entity.Tenant;
 import com.dusk.module.auth.repository.IFeatureValueRepository;
 import com.dusk.module.auth.service.IFeatureService;
 import com.dusk.module.auth.service.ITenantService;
-import com.github.dozermapper.core.Mapper;
+import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import jakarta.annotation.Resource;
 import java.util.*;
 
 /**
@@ -35,13 +33,11 @@ import java.util.*;
 @Transactional
 public class FeatureServiceImpl extends CruxBaseServiceImpl implements IFeatureService {
 
-    @Autowired
+    @Resource
     private IFeatureValueRepository featureValueRepository;
-    @Autowired
-    private Mapper dozerMapper;
     @Resource
     private ITenantService tenantService;
-    @Autowired
+    @Resource
     private IFeatureCache featureCache;
 
 
@@ -106,7 +102,8 @@ public class FeatureServiceImpl extends CruxBaseServiceImpl implements IFeatureS
                 });
                 if (null == fv[0]) {
                     fv[0] = new FeatureValue();
-                    dozerMapper.map(f, fv[0]);
+                    //mapper.map(f, fv[0]);
+                    BeanUtils.copyProperties(f, fv[0]);
                     fv[0].setEditionId(editionId);
                 } else {
                     fv[0].setValue(f.getValue());
@@ -143,7 +140,8 @@ public class FeatureServiceImpl extends CruxBaseServiceImpl implements IFeatureS
                 });
                 if (null == fv[0]) {
                     fv[0] = new FeatureValue();
-                    dozerMapper.map(f, fv[0]);
+                    //mapper.map(f, fv[0]);
+                    BeanUtils.copyProperties(f, fv[0]);
                     fv[0].setTenantId(tenantId);
                 } else {
                     fv[0].setValue(f.getValue());

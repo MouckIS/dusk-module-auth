@@ -2,8 +2,8 @@ package com.dusk.module.auth.utils.okhttp;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import okhttp3.MediaType;
 
 import java.util.HashMap;

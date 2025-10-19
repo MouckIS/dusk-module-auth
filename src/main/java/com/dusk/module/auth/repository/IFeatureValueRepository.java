@@ -1,11 +1,11 @@
 package com.dusk.module.auth.repository;
 
 import com.dusk.module.auth.entity.FeatureValue;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
-import jakarta.transaction.Transactional;
 import java.util.List;
 
 /**

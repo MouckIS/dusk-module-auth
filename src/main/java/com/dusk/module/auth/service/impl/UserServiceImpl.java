@@ -6,36 +6,14 @@ import cn.hutool.core.collection.IterUtil;
 import cn.hutool.core.util.HexUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SmUtil;
-import com.dusk.common.rpc.auth.dto.ChangePwdInput;
-import com.dusk.common.rpc.auth.dto.CreateOrUpdateUserInput;
-import com.dusk.common.rpc.auth.dto.UserEditDto;
-import com.dusk.common.rpc.auth.dto.UserFullListDto;
-import com.dusk.common.rpc.auth.dto.orga.GetOrganizationUnitUsersInput;
-import com.dusk.common.core.utils.SecurityUtils;
-import com.dusk.common.mqs.pusher.PushSMS;
-import com.dusk.common.mqs.pusher.SmsPushConfig;
-import com.dusk.common.mqs.pusher.SmsTemplateParam;
-import com.dusk.common.mqs.utils.RabbitMQUtils;
-import com.dusk.module.auth.dto.user.*;
-import com.dusk.module.auth.entity.*;
-import com.dusk.module.auth.repository.*;
-import com.dusk.module.auth.service.*;
-import com.dusk.module.ddm.service.ISettingChecker;
-import com.dusk.module.ddm.service.ISettingRpcService;
-import com.github.dozermapper.core.Mapper;
-import com.hankcs.hanlp.HanLP;
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
 import com.dusk.common.core.annotation.DisableTenantFilter;
 import com.dusk.common.core.auth.authentication.LoginUserIdContextHolder;
 import com.dusk.common.core.dto.EntityDto;
 import com.dusk.common.core.dto.PagedResultDto;
 import com.dusk.common.core.entity.BaseEntity;
 import com.dusk.common.core.entity.FullAuditedEntity;
+import com.dusk.common.core.enums.EUnitType;
+import com.dusk.common.core.enums.UserStatus;
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.exception.UserLoginException;
 import com.dusk.common.core.jpa.Specifications;
@@ -43,11 +21,18 @@ import com.dusk.common.core.model.UserContext;
 import com.dusk.common.core.redis.RedisUtil;
 import com.dusk.common.core.service.impl.BaseService;
 import com.dusk.common.core.tenant.TenantContextHolder;
-import com.dusk.common.core.utils.DozerUtils;
+import com.dusk.common.core.utils.MapperUtil;
+import com.dusk.common.core.utils.SecurityUtils;
+import com.dusk.common.mqs.pusher.PushSMS;
+import com.dusk.common.mqs.pusher.SmsPushConfig;
+import com.dusk.common.mqs.pusher.SmsTemplateParam;
+import com.dusk.common.mqs.utils.RabbitMQUtils;
+import com.dusk.common.rpc.auth.dto.ChangePwdInput;
+import com.dusk.common.rpc.auth.dto.CreateOrUpdateUserInput;
+import com.dusk.common.rpc.auth.dto.UserEditDto;
+import com.dusk.common.rpc.auth.dto.UserFullListDto;
+import com.dusk.common.rpc.auth.dto.orga.GetOrganizationUnitUsersInput;
 import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitUserListDto;
-import com.dusk.common.core.enums.EUnitType;
-import com.dusk.common.core.enums.UserStatus;
-//import com.dusk.common.module.face.service.IUserFaceRpcService;
 import com.dusk.module.auth.common.config.AppAuthConfig;
 import com.dusk.module.auth.common.manage.TokenAuthManager;
 import com.dusk.module.auth.common.rabbitmq.RabbitConstant;
@@ -55,12 +40,29 @@ import com.dusk.module.auth.common.util.LoginUtils;
 import com.dusk.module.auth.dto.station.AddUsersToStationInput;
 import com.dusk.module.auth.dto.station.RemoveUserFromStationInput;
 import com.dusk.module.auth.dto.station.StationsOfLoginUserDto;
+import com.dusk.module.auth.dto.user.*;
+import com.dusk.module.auth.entity.*;
 import com.dusk.module.auth.enums.ELevel;
 import com.dusk.module.auth.feature.LoginFeatureProvider;
 import com.dusk.module.auth.feature.UserFeatureProvider;
-import com.dusk.module.auth.manage.IUserManage;
+import com.dusk.module.auth.mapper.OrganizationMapper;
+import com.dusk.module.auth.mapper.RoleMapper;
+import com.dusk.module.auth.mapper.UserMapper;
 import com.dusk.module.auth.push.INotificationPushManager;
+import com.dusk.module.auth.repository.*;
+import com.dusk.module.auth.service.*;
+import com.dusk.module.ddm.service.ISettingRpcService;
+import com.hankcs.hanlp.HanLP;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.Reference;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -73,8 +75,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -93,55 +93,54 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     private final static String REDIS_KEY_RESET_PWD_CAPTCHA_KEY_PREFIX = "CRUX:PWD:RESET:";
     private final static String REDIS_KEY_RESET_PWD_CAPTCHA_SEND_KEY_PREFIX = "CRUX:PWD:RESET:SEND";
     private final static int RESET_PWD_CAPTCHA_TIME = 60 * 5;
-    @Autowired
-    private Mapper dozerMapper;
-    @Autowired
+
+    @Resource
     private IUserRepository userRepository;
-    @Autowired
+    @Resource
     private PasswordEncoder passwordEncoder;
-    @Autowired
+    @Resource
     private IRoleService roleService;
-    @Autowired
+    @Resource
     private IOrganizationUnitService organizationUnitService;
-    @Autowired
+    @Resource
     IGrantPermissionRepository grantPermissionRepository;
-    @Autowired
+    @Resource
     private IFeatureChecker featureChecker;
     @Autowired(required = false)
     private RedisUtil<Object> redisUtil;
-    @Autowired
-    IUserManage userManage;
-    @Autowired
-    JPAQueryFactory queryFactory;
-    @Autowired
-    ITenantRepository tenantRepository;
-    @Autowired
-    AppAuthConfig appAuthConfig;
-    @Autowired
-    SmsPushConfig smsPushConfig;
+    @Resource
+    private JPAQueryFactory queryFactory;
+    @Resource
+    private ITenantRepository tenantRepository;
+    @Resource
+    private AppAuthConfig appAuthConfig;
+    @Resource
+    private SmsPushConfig smsPushConfig;
     @Autowired(required = false)
-    INotificationPushManager pushManager;
-    @Autowired
+    private INotificationPushManager pushManager;
+    @Resource
     private IEmailService emailService;
-    @Autowired
+    @Resource
     private TokenAuthManager tokenAuthManager;
-    @Autowired
-    SecurityUtils securityUtils;
-    @Autowired
+    @Resource
+    private SecurityUtils securityUtils;
+    @Resource
     private IOrganizationManagerRepository organizationManagerRepository;
-    //@Reference(timeout = 15000)
-    //private IUserFaceRpcService userFaceRpcService;
-    @Autowired
+    @Resource
     private IStationService stationService;
     
     @Reference
     private ISettingRpcService settingRpcService;
 
-    @Autowired
+    @Resource
     private IUserWxRelationRepository userWxRelationRepository;
 
     @Resource
     private RabbitMQUtils rabbitMQUtils;
+
+    private final UserMapper mapper = UserMapper.INSTANCE;
+    private final RoleMapper roleMapper = RoleMapper.INSTANCE;
+    private final OrganizationMapper orgMapper = OrganizationMapper.INSTANCE;
 
     //随机密码长度，可配置读取
     @Value("${app.setting.passwdLen}")
@@ -291,13 +290,12 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     @Override
     public PagedResultDto<UserListDto> getUsersList(GetUsersInput getUserInput) {
         Page<User> page = getUsers(getUserInput);
-        List<UserListDto> list = DozerUtils.mapList(dozerMapper, page.getContent(), UserListDto.class, (s, t) -> {
+        return MapperUtil.mapToPagedResultDto(page, mapper::toListDto, (s, t) -> {
             if (s.getLockoutEndDateUtc() != null && s.getLockoutEndDateUtc().compareTo(LocalDateTime.now()) > 0) {
                 t.setLock(true);
             }
             t.setActive(checkUserIsActive(s));
         });
-        return new PagedResultDto<>(page.getTotalElements(), list);
     }
 
     @Override
@@ -379,11 +377,11 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
         Map<Long, List<String>> orgNamePathMap = getAllUserOrgMap();
 
         //先去掉Role里面关联字段，以免序列化时出错
-//        List<UserListDto> userDtoList = DozerUtils.mapList(dozerMapper, userList, UserListDto.class);
-        List<UserExcellDto> outUserList = DozerUtils.mapList(dozerMapper, userList, UserExcellDto.class, (s, t) -> {
+        //List<UserListDto> userDtoList = MapperUtil.mapList(userList, UserListDto.class);
+        List<UserExcellDto> outUserList = MapperUtil.mapList(userList, mapper::toExcellDto, (s, t) -> {
             t.setRoleNames(s.getUserRoles().stream().map(Role::getRoleName).collect(Collectors.joining(",")));
             List<String> orgs = orgNamePathMap.get(s.getId());
-            if (orgs != null && orgs.size() > 0) {
+            if (orgs != null && !orgs.isEmpty()) {
                 t.setOrgNamePath(String.join(";", orgs));
             }
             t.setUserType(s.getUserType().getDisplayName());
@@ -395,7 +393,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     public GetUserForEditOutput getUserForEdit(EntityDto entityDto) {
         //获取所有角色
         List<Role> allRoles = roleService.findAll();
-        List<UserRoleDto> roles = DozerUtils.mapList(dozerMapper, allRoles, UserRoleDto.class);
+        List<UserRoleDto> roles = MapperUtil.mapList(allRoles, roleMapper::toRoleDto);
         GetUserForEditOutput output = new GetUserForEditOutput();
         output.setRoles(roles);
         output.setMemberedOrganizationUnits(new ArrayList<>());
@@ -409,8 +407,9 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
         } else {
             var user =
                     userRepository.findById(entityDto.getId()).orElseThrow(() -> new BusinessException(ERROR_USER_NOT_FIND));
-            output.setUser(dozerMapper.map(user, UserEditDto.class));
-            dozerMapper.map(user, output);
+            output.setUser(mapper.toEditDto(user));
+            //mapper.map(user, output);
+            BeanUtil.copyProperties(user, output);
             // 厂站信息
             output.setStations(stationService.getStationsForFrontByUserId(user.getId()));
             for (UserRoleDto userRoleDto : roles) {
@@ -422,7 +421,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
             }
             List<OrganizationUnit> organizationUnits =
                     organizationUnitService.getOrganizationUnitsByUser(new EntityDto(user.getId()));
-            output.setUserOrgaDtoList(DozerUtils.mapList(dozerMapper, organizationUnits, UserOrgaDto.class));
+            output.setUserOrgaDtoList(MapperUtil.mapList(organizationUnits, orgMapper::toUserOrgaDto));
             output.setMemberedOrganizationUnits(organizationUnits.stream().map(BaseEntity::getId).collect(Collectors.toList()));
             // 获取岗位管理信息
             List<OrganizationUnit> managerUnit = queryFactory.selectFrom(qOrganizationUnit)
@@ -432,7 +431,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
                 output.setLevel(ELevel.General);
             } else {
                 output.setLevel(ELevel.Manager);
-                List<UserOrgaDto> managerDto = DozerUtils.mapList(dozerMapper, managerUnit, UserOrgaDto.class);
+                List<UserOrgaDto> managerDto = MapperUtil.mapList(managerUnit, orgMapper::toUserOrgaDto);
                 output.setManagerOrgDtos(managerDto);
             }
 
@@ -443,11 +442,11 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     @Override
     public GetExternalUserEditOutput getExternalUserEditInfo(Long userId) {
         User user = findById(userId).orElseThrow(() -> new BusinessException(ERROR_USER_NOT_FIND));
-        GetExternalUserEditOutput output = dozerMapper.map(user, GetExternalUserEditOutput.class);
+        GetExternalUserEditOutput output = mapper.toGetExternalUserEditOutput(user);
 
         //获取所有角色
         List<Role> allRoles = roleService.findAll();
-        List<UserRoleDto> roles = DozerUtils.mapList(dozerMapper, allRoles, UserRoleDto.class);
+        List<UserRoleDto> roles = MapperUtil.mapList(allRoles, roleMapper::toRoleDto);
         for (UserRoleDto userRoleDto : roles) {
             for (Role r : user.getUserRoles()) {
                 if (userRoleDto.getRoleId().equals(r.getId())) {
@@ -459,13 +458,13 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
 
         // 获取所属的组织
         List<OrganizationUnit> organizationUnits = organizationUnitService.getOrganizationUnitsByUser(new EntityDto(user.getId()));
-        output.setUserOrgaDtoList(DozerUtils.mapList(dozerMapper, organizationUnits, UserOrgaDto.class));
+        output.setUserOrgaDtoList(MapperUtil.mapList(organizationUnits, orgMapper::toUserOrgaDto));
 
         // 获取岗位管理信息
         List<OrganizationUnit> managerUnit = queryFactory.selectFrom(qOrganizationUnit)
                 .leftJoin(qOrganizationManager).on(qOrganizationUnit.id.eq(qOrganizationManager.orgId))
                 .where(qOrganizationManager.userId.eq(user.getId())).fetch();
-        List<UserOrgaDto> managerDto = DozerUtils.mapList(dozerMapper, managerUnit, UserOrgaDto.class);
+        List<UserOrgaDto> managerDto = MapperUtil.mapList(managerUnit, orgMapper::toUserOrgaDto);
         output.setManagerOrgDtos(managerDto);
 
         return output;
@@ -474,8 +473,8 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     @Override
     public GetUserInfoOutput getUserInfo(Long id) {
         var user = userRepository.findById(id).orElseThrow(() -> new BusinessException(ERROR_USER_NOT_FIND));
-        BaseUserInfoDto baseUserInfoDto = dozerMapper.map(user, BaseUserInfoDto.class);
-        AccountInfoDto accountInfoDto = dozerMapper.map(user, AccountInfoDto.class);
+        BaseUserInfoDto baseUserInfoDto = mapper.toBaseUserInfoDto(user);
+        AccountInfoDto accountInfoDto = mapper.toAccountInfoDto(user);
         GetUserInfoOutput output = new GetUserInfoOutput();
         output.setAccountInfoDto(accountInfoDto);
         baseUserInfoDto.setLevel(ELevel.General);
@@ -483,7 +482,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
 
         //获取所有角色
         List<Role> allRoles = roleService.findAll();
-        List<UserRoleDto> roles = DozerUtils.mapList(dozerMapper, allRoles, UserRoleDto.class);
+        List<UserRoleDto> roles = MapperUtil.mapList(allRoles, roleMapper::toRoleDto);
         accountInfoDto.setRoles(roles);
         for (UserRoleDto userRoleDto : roles) {
             for (Role r : user.getUserRoles()) {
@@ -493,13 +492,13 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
             }
         }
         List<OrganizationUnit> organizationUnits = organizationUnitService.getOrganizationUnitsByUser(new EntityDto(id));
-        List<UserOrgaDto> userOrgaDtos = DozerUtils.mapList(dozerMapper, organizationUnits, UserOrgaDto.class);
+        List<UserOrgaDto> userOrgaDtos = MapperUtil.mapList(organizationUnits, orgMapper::toUserOrgaDto);
         baseUserInfoDto.setOrgaDtos(userOrgaDtos);
         List<OrganizationUnit> organizationUnit = queryFactory.select(qOrganizationUnit).from(qOrganizationManager)
                 .leftJoin(qOrganizationUnit).on(qOrganizationUnit.id.eq(qOrganizationManager.orgId))
                 .where(qOrganizationManager.userId.eq(user.getId())).fetch();
         if (!organizationUnit.isEmpty()) {
-            List<UserOrgaDto> managerDtos = DozerUtils.mapList(dozerMapper, organizationUnit, UserOrgaDto.class);
+            List<UserOrgaDto> managerDtos = MapperUtil.mapList(organizationUnit, orgMapper::toUserOrgaDto);
             baseUserInfoDto.setManagerDtos(managerDtos);
             baseUserInfoDto.setLevel(ELevel.Manager);
         }
@@ -514,7 +513,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     public UserFullListDto getSuperiorUserFullById(Long userId) {
         Long superiorId = getSuperiorId(userId);
         if (superiorId != null) {
-            return dozerMapper.map(getUserById(superiorId), UserFullListDto.class);
+            return mapper.toFullListDto(getUserById(superiorId));
         } else {
             return null;
         }
@@ -526,7 +525,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
         if (CollectionUtil.isEmpty(units)) {
             return null;
         } else {
-            return findSuperiorId(units.get(0));
+            return findSuperiorId(units.getFirst());
         }
     }
     /**
@@ -547,7 +546,8 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     @Override
     public void updatePersonalInfo(PersonalInfoInput input) {
         User user = getUserById(input.getId());
-        dozerMapper.map(input, user);
+        //mapper.map(input, user);
+        BeanUtil.copyProperties(input, user);
 
         // 外单位用户的手机号码为必填
         checkMobilePhoneIfNeed(user.getId(), user.getPhoneNo(), user.getUserType());
@@ -619,7 +619,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     @Transactional
     public Long createExternalUser(CreateExternalUserInput input) {
         Long userId;
-        User user = dozerMapper.map(input, User.class);
+        User user = mapper.CreateExternalUserInputToEntity(input);
         user.setUserType(EUnitType.External);
         user.setUserStatus(UserStatus.OnJob);
 
@@ -700,7 +700,8 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
      */
     private Long saveUserAccount(ExternalUserSettingDto input, User user) {
         String hasAccount = user.getUserName(); // 判断是否已经有账号，有账号就不设置密码
-        dozerMapper.map(input, user);
+        //mapper.map(input, user);
+        BeanUtils.copyProperties(input, user);
         //设置密码
         if (user.getId() == null || StrUtil.isBlank(hasAccount)) {
             String decryptSm4 = decryptSm4(input.getPassword(), "密码解密失败,未经加密或错误的加密算法");
@@ -771,7 +772,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
             // 如果组织机构是厂站且唯一，则设置为默认厂站
             List<OrganizationUnit> stations = units.stream().filter(p -> Boolean.TRUE.equals(p.getStation())).collect(Collectors.toList());
             if (stations.size() == 1) {
-                user.setDefaultStation(units.get(0).getId());
+                user.setDefaultStation(units.getFirst().getId());
             } else {
                 user.setDefaultStation(null);
             }
@@ -794,7 +795,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
         if (StrUtil.isBlank(createOrUpdateUserInput.getUser().getPassword())) {
             throw new BusinessException("密码不能为空.");
         }
-        User user = dozerMapper.map(createOrUpdateUserInput.getUser(), User.class);
+        User user = mapper.editDtoToEntity(createOrUpdateUserInput.getUser());
         user.setUserType(type);
         user.setUserStatus(UserStatus.OnJob);
         //仅在创建用户设置密码
@@ -926,7 +927,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
         });
         List<User> userList = userRepository.findAll(spec, Sort.by(User.Fields.name, User.Fields.surName));
 
-        return DozerUtils.mapList(dozerMapper, userList, UserListForLoginDto.class);
+        return MapperUtil.mapList(userList, mapper::toListForLoginDto);
     }
 
     @Override
@@ -1129,7 +1130,8 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     @Override
     public void updateInfoBySelf(UserInfoDto dto) {
         User user = getUserById(LoginUserIdContextHolder.getUserId());
-        dozerMapper.map(dto, user);
+        //mapper.map(dto, user);
+        BeanUtil.copyProperties(dto, user);
         save(user);
     }
 
@@ -1453,7 +1455,8 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
      */
     private void updateUserInfo(Long userId, CreateOrUpdateUserInfoInput input) {
         User user = findById(userId).orElseThrow(() -> new BusinessException(ERROR_USER_NOT_FIND));
-        dozerMapper.map(input, user);
+        //mapper.map(input, user);
+        BeanUtils.copyProperties(input, user);
         save(user);
     }
 

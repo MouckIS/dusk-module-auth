@@ -1,11 +1,11 @@
 package com.dusk.module.auth.dto.dashboard;
 
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
 import com.dusk.common.core.dto.EntityDto;
 import com.dusk.module.auth.entity.dashboard.DashboardModule;
 import com.dusk.module.auth.entity.dashboard.DashboardModuleItem;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author jianjianhong

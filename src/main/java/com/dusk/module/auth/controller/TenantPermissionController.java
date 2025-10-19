@@ -1,18 +1,18 @@
 package com.dusk.module.auth.controller;
 
-import com.dusk.common.rpc.auth.dto.role.RolePermissionDto;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import com.dusk.common.core.annotation.Authorize;
 import com.dusk.common.core.controller.CruxBaseController;
 import com.dusk.common.core.dto.EntityDto;
+import com.dusk.common.rpc.auth.dto.role.RolePermissionDto;
 import com.dusk.module.auth.authorization.EditionAuthProvider;
 import com.dusk.module.auth.dto.permission.EditionPermissionInputDto;
 import com.dusk.module.auth.service.ITenantPermissionService;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
 import java.util.List;
 
 /**
@@ -23,8 +23,8 @@ import java.util.List;
 @RequestMapping("/permission")
 @Api(description = "租户权限", tags = "TenantPermission")
 public class TenantPermissionController extends CruxBaseController {
-    @Autowired
-    ITenantPermissionService tenantPermissionService;
+    @Resource
+    private ITenantPermissionService tenantPermissionService;
 
     @ApiOperation("获取指定版本下的权限清单")
     @GetMapping("getEditionPermissionsById")

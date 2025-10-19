@@ -1,8 +1,5 @@
 package com.dusk.module.auth.service.impl;
 
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.apache.commons.lang3.StringUtils;
 import com.dusk.common.core.dto.PagedResultDto;
 import com.dusk.common.core.jpa.querydsl.QBeanBuilder;
 import com.dusk.common.core.service.impl.BaseService;
@@ -14,7 +11,11 @@ import com.dusk.module.auth.entity.UserLoginLog;
 import com.dusk.module.auth.listener.LogInOutEvent;
 import com.dusk.module.auth.repository.IUserLoginLogRepository;
 import com.dusk.module.auth.service.IUserLoginLogService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.annotation.Resource;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -25,13 +26,15 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class UserLoginLogServiceImpl extends BaseService<UserLoginLog, IUserLoginLogRepository> implements IUserLoginLogService {
-    @Autowired
+    @Resource
     private JPAQueryFactory queryFactory;
 
 
     @Override
     public void saveLog(LogInOutEvent event) {
-        repository.save(dozerMapper.map(event, UserLoginLog.class));
+        UserLoginLog dto = new UserLoginLog();
+        BeanUtils.copyProperties(event, dto);
+        repository.save(dto);
     }
 
     @Override

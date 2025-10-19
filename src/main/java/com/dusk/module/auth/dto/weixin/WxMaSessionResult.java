@@ -1,9 +1,9 @@
 package com.dusk.module.auth.dto.weixin;
 
+import com.dusk.module.auth.dto.mobilelogin.MobileUserDto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.module.auth.dto.mobilelogin.MobileUserDto;
 
 import java.util.List;
 

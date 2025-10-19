@@ -1,9 +1,9 @@
 package com.dusk.module.auth.repository;
 
-import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitUserListDto;
 import com.dusk.common.core.annotation.DisableGlobalFilter;
 import com.dusk.common.core.enums.EUnitType;
 import com.dusk.common.core.repository.IBaseRepository;
+import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitUserListDto;
 import com.dusk.module.auth.dto.orga.OrganizationUnitUserForSelectDto;
 import com.dusk.module.auth.dto.orga.OrganizationUnitUserInfoListDto;
 import com.dusk.module.auth.entity.OrganizationUnit;

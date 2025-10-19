@@ -1,16 +1,16 @@
 package com.dusk.module.auth.service.impl;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.querydsl.core.types.dsl.EntityPathBase;
-import com.querydsl.core.types.dsl.NumberPath;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.dusk.common.core.entity.BaseEntity;
 import com.dusk.common.core.service.impl.BaseService;
 import com.dusk.module.auth.entity.ExtendField;
 import com.dusk.module.auth.entity.QExtendField;
 import com.dusk.module.auth.repository.IExtendFieldRepository;
 import com.dusk.module.auth.service.IExtendFieldService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.querydsl.core.types.dsl.EntityPathBase;
+import com.querydsl.core.types.dsl.NumberPath;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +19,7 @@ import java.util.List;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class ExtendFieldServiceImpl extends BaseService<ExtendField,IExtendFieldRepository> implements IExtendFieldService  {
-    @Autowired
+    @Resource
     private JPAQueryFactory queryFactory;
 
     QExtendField qExtendField = QExtendField.extendField;

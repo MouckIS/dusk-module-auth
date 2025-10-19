@@ -2,10 +2,9 @@ package com.dusk.module.auth.dto.orga;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
-import com.dusk.common.core.dto.EntityDto;
 
 /**
  * 组织机构下拉选择用户的Dto

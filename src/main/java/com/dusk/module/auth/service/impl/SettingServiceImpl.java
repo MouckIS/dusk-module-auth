@@ -1,5 +1,15 @@
 package com.dusk.module.auth.service.impl;
 
+import com.dusk.common.core.auth.authentication.LoginUserIdContextHolder;
+import com.dusk.common.core.datafilter.DataFilterContextHolder;
+import com.dusk.common.core.dto.NameValueDto;
+import com.dusk.common.core.exception.BusinessException;
+import com.dusk.module.auth.dto.setting.SettingDto;
+import com.dusk.module.auth.dto.setting.UpdateSettingInput;
+import com.dusk.module.auth.entity.Setting;
+import com.dusk.module.auth.mapper.SettingMapper;
+import com.dusk.module.auth.repository.ISettingRepository;
+import com.dusk.module.auth.service.ISettingService;
 import com.dusk.module.auth.setting.ISettingManager;
 import com.dusk.module.auth.setting.ISettingsCache;
 import com.dusk.module.ddm.dto.SettingDefinition;
@@ -7,21 +17,10 @@ import com.dusk.module.ddm.dto.ui.FileInput;
 import com.dusk.module.ddm.dto.ui.InputType;
 import com.dusk.module.ddm.enums.SettingAccessLevel;
 import com.dusk.module.ddm.service.ISettingRpcService;
-import com.github.dozermapper.core.Mapper;
 import io.seata.common.util.StringUtils;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.Service;
-import com.dusk.common.core.auth.authentication.LoginUserIdContextHolder;
-import com.dusk.common.core.datafilter.DataFilterContextHolder;
-import com.dusk.common.core.dto.NameValueDto;
-import com.dusk.common.core.exception.BusinessException;
-import com.dusk.common.core.utils.SecurityUtils;
-import com.dusk.module.auth.dto.setting.SettingDto;
-import com.dusk.module.auth.dto.setting.UpdateSettingInput;
-import com.dusk.module.auth.entity.Setting;
-import com.dusk.module.auth.repository.ISettingRepository;
-import com.dusk.module.auth.service.ISettingService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -38,21 +37,21 @@ import java.util.stream.Collectors;
 @Transactional
 @Slf4j
 public class SettingServiceImpl implements ISettingRpcService, ISettingService {
-    @Autowired
+    @Resource
     private ISettingRepository repository;
-    @Autowired
-    private Mapper dozerMapper;
-    @Autowired
+    @Resource
     private ISettingsCache settingsCache;
-    @Autowired
+    @Resource
     private ISettingManager settingManager;
+
+    private final SettingMapper mapper = SettingMapper.INSTANCE;
 
     @Override
     public List<SettingDto> getApplicationSettings() {
         List<SettingDto> result = new ArrayList<>();
         Map<String, SettingDefinition> settingDefinitionMap = settingsCache.getAllApplicationSettingDefinitions();
         settingDefinitionMap.forEach((name, definition) -> {
-            SettingDto setting = dozerMapper.map(definition, SettingDto.class);
+            SettingDto setting = mapper.definitionToDto(definition);
             setting.setValue(settingManager.getSettingValueForApplication(name));
             result.add(setting);
         });
@@ -66,7 +65,7 @@ public class SettingServiceImpl implements ISettingRpcService, ISettingService {
         List<SettingDto> result = new ArrayList<>();
         Map<String, SettingDefinition> settingDefinitionMap = settingsCache.getAllTenantSettingDefinitions();
         settingDefinitionMap.forEach((name, definition) -> {
-            SettingDto setting = dozerMapper.map(definition, SettingDto.class);
+            SettingDto setting = mapper.definitionToDto(definition);
             setting.setValue(settingManager.getSettingValueForTenant(name));
             result.add(setting);
         });
@@ -80,7 +79,7 @@ public class SettingServiceImpl implements ISettingRpcService, ISettingService {
         List<SettingDto> result = new ArrayList<>();
         Map<String, SettingDefinition> settingDefinitionMap = settingsCache.getAllStationSettingDefinitions();
         settingDefinitionMap.forEach((name, definition) -> {
-            SettingDto setting = dozerMapper.map(definition, SettingDto.class);
+            SettingDto setting = mapper.definitionToDto(definition);
             setting.setValue(settingManager.getSettingValueForStation(name));
             result.add(setting);
         });
@@ -94,7 +93,7 @@ public class SettingServiceImpl implements ISettingRpcService, ISettingService {
         List<SettingDto> result = new ArrayList<>();
         Map<String, SettingDefinition> settingDefinitionMap = settingsCache.getAllUserSettingDefinitions();
         settingDefinitionMap.forEach((name, definition) -> {
-            SettingDto setting = dozerMapper.map(definition, SettingDto.class);
+            SettingDto setting = mapper.definitionToDto(definition);
             setting.setValue(settingManager.getSettingValueForUser(name));
             result.add(setting);
         });

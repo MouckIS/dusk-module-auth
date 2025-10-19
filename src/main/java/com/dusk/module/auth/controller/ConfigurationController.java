@@ -1,17 +1,16 @@
 package com.dusk.module.auth.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import com.dusk.common.core.annotation.AllowAnonymous;
 import com.dusk.common.core.controller.CruxBaseController;
 import com.dusk.module.auth.dto.configuration.ConfigurationDto;
 import com.dusk.module.auth.service.IConfigurationService;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * @author kefuming
@@ -21,8 +20,8 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping("configuration")
 @Api(description = "系统配置管理",tags = "Configuration")
 public class ConfigurationController extends CruxBaseController {
-    @Autowired
-    IConfigurationService configurationService;
+    @Resource
+    private IConfigurationService configurationService;
 
     @AllowAnonymous
     @GetMapping("getAll")

@@ -5,9 +5,9 @@ import com.dusk.common.mqs.config.AppConfig;
 import com.dusk.module.auth.service.IFeatureDefinitionContext;
 import com.dusk.module.auth.service.IFeaturePusher;
 import com.dusk.module.auth.service.IFeatureRpcService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.Reference;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -18,8 +18,8 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class FeaturePusher implements IFeaturePusher {
-    @Autowired
-    AppConfig appConfig;
+    @Resource
+    private AppConfig appConfig;
 
     @Reference
     IFeatureRpcService featureService;

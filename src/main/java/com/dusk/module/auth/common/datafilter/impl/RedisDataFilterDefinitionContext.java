@@ -3,16 +3,16 @@ package com.dusk.module.auth.common.datafilter.impl;
 import com.dusk.common.core.constant.EntityConstant;
 import com.dusk.common.core.redis.RedisCacheCondition;
 import com.dusk.common.core.redis.RedisUtil;
-import com.dusk.common.core.utils.SpringContextUtils;
 import com.dusk.module.auth.common.datafilter.IDataFilterDefinitionContext;
 import com.dusk.module.auth.entity.Station;
 import com.dusk.module.auth.repository.IStationRepository;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,12 +28,10 @@ import java.util.stream.Collectors;
 @Primary
 public class RedisDataFilterDefinitionContext implements IDataFilterDefinitionContext {
     private final String REDIS_KEY = "CRUX:AUTH:DATA:FILTER:DEFINITION";
-    @Autowired
-    IStationRepository stationRepository;
+    @Resource
+    private IStationRepository stationRepository;
     @Autowired(required = false)
-    RedisUtil<Object> redisUtil;
-    @Autowired
-    SpringContextUtils springUtil;
+    private RedisUtil<Object> redisUtil;
 
     /**
      * 组织机构变动都需要重新初始化

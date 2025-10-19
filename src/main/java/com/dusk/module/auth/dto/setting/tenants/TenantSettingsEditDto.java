@@ -1,13 +1,13 @@
 package com.dusk.module.auth.dto.setting.tenants;
 
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.timing.Clock;
 import com.dusk.module.auth.dto.setting.host.EmailSettingsEditDto;
 import com.dusk.module.auth.dto.setting.host.GeneralSettingsEditDto;
 import com.dusk.module.auth.dto.setting.host.SecuritySettingsEditDto;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;

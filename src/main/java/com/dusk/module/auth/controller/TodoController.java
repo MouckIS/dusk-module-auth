@@ -1,15 +1,14 @@
 package com.dusk.module.auth.controller;
 
-import com.github.dozermapper.core.Mapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import com.dusk.common.core.controller.CruxBaseController;
 import com.dusk.common.core.dto.PagedResultDto;
 import com.dusk.module.auth.dto.todo.EnumOutputDto;
 import com.dusk.module.auth.dto.todo.GetTodosInput;
 import com.dusk.module.auth.dto.todo.TodoInfoDto;
 import com.dusk.module.auth.service.IToDoService;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import jakarta.annotation.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,10 +20,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/todo")
 @Api(tags = "ToDo", description = "待办")
 public class TodoController extends CruxBaseController {
-    @Autowired
-    IToDoService toDoService;
-    @Autowired
-    Mapper dozerMapper;
+    @Resource
+    private IToDoService toDoService;
 
     @PostMapping("/getTodos")
     @ApiOperation(value = "查询待办清单")

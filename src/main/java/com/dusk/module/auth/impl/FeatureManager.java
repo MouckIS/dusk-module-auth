@@ -7,7 +7,7 @@ import com.dusk.module.auth.service.IFeatureDefinitionContext;
 import com.dusk.module.auth.service.IFeatureManager;
 import com.dusk.module.auth.service.IFeaturePusher;
 import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -28,11 +28,9 @@ public class FeatureManager implements IFeatureManager {
     private final List<TenantFeature> tenantFeatureList;
     private final Map<String, TenantFeature> tenantFeatureMap;
 
-    @Autowired
+    @Resource
     private IFeatureDefinitionContext featureDefinitionContext;
-    @Autowired
-    private SpringContextUtils springContextUtils;
-    @Autowired
+    @Resource
     private IFeaturePusher featurePusher;
 
 

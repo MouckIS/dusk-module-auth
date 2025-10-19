@@ -1,7 +1,5 @@
 package com.dusk.module.auth.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import com.dusk.common.core.annotation.Authorize;
 import com.dusk.common.core.controller.CruxBaseController;
 import com.dusk.common.core.dto.PagedResultDto;
@@ -10,7 +8,9 @@ import com.dusk.module.auth.dto.quickentry.GetQuickSetListDto;
 import com.dusk.module.auth.dto.quickentry.QuickEntryListDto;
 import com.dusk.module.auth.dto.quickentry.UpdatePageQuickSetDto;
 import com.dusk.module.auth.service.IPageQuickEntryService;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,8 +30,8 @@ import java.util.List;
 @Authorize(PageQuickEntryAuthProvider.PAGES_QUICK_ENTRY)
 public class PageQuickEntryController extends CruxBaseController {
 
-    @Autowired
-    IPageQuickEntryService quickEntryService;
+    @Resource
+    private IPageQuickEntryService quickEntryService;
 
     @PostMapping("/updateQuickSet")
     @ApiOperation("更新设置项")

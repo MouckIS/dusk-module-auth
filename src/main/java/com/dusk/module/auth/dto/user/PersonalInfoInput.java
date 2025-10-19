@@ -1,14 +1,14 @@
 package com.dusk.module.auth.dto.user;
 
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
 import com.dusk.common.core.dto.EntityDto;
 import com.dusk.module.auth.enums.ELevel;
-import org.hibernate.validator.constraints.Length;
-
+import io.swagger.annotations.ApiModelProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.validator.constraints.Length;
+
 import java.time.LocalDate;
 import java.util.List;
 

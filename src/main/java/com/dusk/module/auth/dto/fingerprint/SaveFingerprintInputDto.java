@@ -1,13 +1,12 @@
 package com.dusk.module.auth.dto.fingerprint;
 
+import com.dusk.common.core.dto.VersionDto;
 import com.dusk.common.rpc.auth.enums.FingerprintFromEnum;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
-import com.dusk.common.core.dto.VersionDto;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author kefuming

@@ -1,11 +1,6 @@
 package com.dusk.module.auth.service.impl;
 
 import cn.hutool.core.util.StrUtil;
-import com.dusk.common.rpc.auth.dto.GenerateTokenForNonUserInput;
-import com.dusk.common.rpc.auth.dto.RoleSimpleDto;
-import com.dusk.common.rpc.auth.service.ITokenAuthRpcService;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.Service;
 import com.dusk.common.core.constant.AuthConstant;
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.jwt.JwtTokenFactory;
@@ -13,9 +8,14 @@ import com.dusk.common.core.jwt.extractor.JwtHeaderTokenExtractor;
 import com.dusk.common.core.model.UserContext;
 import com.dusk.common.core.redis.RedisUtil;
 import com.dusk.common.core.tenant.TenantContextHolder;
+import com.dusk.common.rpc.auth.dto.GenerateTokenForNonUserInput;
+import com.dusk.common.rpc.auth.dto.RoleSimpleDto;
+import com.dusk.common.rpc.auth.service.ITokenAuthRpcService;
 import com.dusk.module.auth.common.manage.TokenAuthManager;
 import com.dusk.module.auth.service.IRoleService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.Service;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -29,16 +29,16 @@ import java.util.stream.Collectors;
 @Service(retries = 0, timeout = 2000)
 @Slf4j
 public class TokenAuthRpcService implements ITokenAuthRpcService {
-    @Autowired
+    @Resource
     private TokenAuthManager tokenAuthManager;
 
-    @Autowired
+    @Resource
     RedisUtil<String> redisUtil;
 
-    @Autowired
+    @Resource
     JwtTokenFactory jwtTokenFactory;
 
-    @Autowired
+    @Resource
     IRoleService roleService;
 
     private static final String JWT_NONUSER_TOKEN_PREFIX = "CRUX:AUTH:NONUSER:TOKEN:";

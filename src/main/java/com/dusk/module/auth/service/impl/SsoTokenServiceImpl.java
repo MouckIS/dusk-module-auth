@@ -9,6 +9,7 @@ import com.dusk.common.core.redis.RedisUtil;
 import com.dusk.module.auth.common.config.AppAuthConfig;
 import com.dusk.module.auth.service.ISsoTokenService;
 import com.dusk.module.auth.service.IUserService;
+import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,15 +22,13 @@ import java.util.concurrent.TimeUnit;
  */
 @Service
 public class SsoTokenServiceImpl implements ISsoTokenService {
-
-
-    @Autowired
-    IUserService userService;
-    @Autowired
-    AppAuthConfig appAuthConfig;
+    @Resource
+    private IUserService userService;
+    @Resource
+    private AppAuthConfig appAuthConfig;
 
     @Autowired(required = false)
-    RedisUtil<String> redisUtil;
+    private RedisUtil<String> redisUtil;
 
     @Value("${sso.time-diff}")
     int timeDiff;

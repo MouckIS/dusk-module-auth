@@ -1,12 +1,12 @@
 package com.dusk.module.auth.dto.orga;
 
+import com.dusk.common.core.enums.UserStatus;
 import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitUserListDto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import com.dusk.common.core.enums.UserStatus;
 
 /**
  * @author kefuming

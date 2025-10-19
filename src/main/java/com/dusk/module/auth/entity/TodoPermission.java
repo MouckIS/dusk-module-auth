@@ -1,12 +1,11 @@
 package com.dusk.module.auth.entity;
 
+import com.dusk.common.core.entity.BaseEntity;
+import com.dusk.common.core.entity.CreationEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
-import com.dusk.common.core.entity.BaseEntity;
-import com.dusk.common.core.entity.CreationEntity;
-
-import jakarta.persistence.*;
 
 /**
  * @author kefuming

@@ -1,12 +1,9 @@
 package com.dusk.module.auth.dto.orga;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.Getter;
-import org.w3c.dom.stylesheets.LinkStyle;
-
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.List;
 

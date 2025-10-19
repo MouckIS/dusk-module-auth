@@ -1,46 +1,44 @@
 package com.dusk.module.auth.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.dusk.common.rpc.auth.dto.*;
-import com.dusk.common.rpc.auth.dto.orga.GetOrganizationUnitUsersInput;
-import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitDto;
-import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitUserDto;
-import com.dusk.common.rpc.auth.service.IUserRpcService;
-import com.dusk.module.auth.entity.OrganizationUnit;
-import com.dusk.module.auth.entity.Role;
-import com.dusk.module.auth.entity.User;
-import com.github.dozermapper.core.Mapper;
-import com.querydsl.core.types.QBean;
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.dubbo.config.annotation.Service;
 import com.dusk.common.core.datafilter.DataFilterContextHolder;
 import com.dusk.common.core.dto.EntityDto;
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
 import com.dusk.common.core.dto.PagedResultDto;
 import com.dusk.common.core.entity.BaseEntity;
+import com.dusk.common.core.enums.EUnitType;
+import com.dusk.common.core.enums.UserStatus;
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.jpa.Specifications;
 import com.dusk.common.core.jpa.querydsl.QBeanBuilder;
 import com.dusk.common.core.service.impl.BaseService;
-import com.dusk.common.core.utils.DozerUtils;
+import com.dusk.common.core.utils.MapperUtil;
 import com.dusk.common.core.utils.UtBeanUtils;
-import com.dusk.common.core.enums.EUnitType;
-import com.dusk.common.core.enums.UserStatus;
+import com.dusk.common.rpc.auth.dto.*;
+import com.dusk.common.rpc.auth.dto.orga.GetOrganizationUnitUsersInput;
+import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitDto;
+import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitUserDto;
+import com.dusk.common.rpc.auth.service.IUserRpcService;
 import com.dusk.module.auth.common.manage.TokenAuthManager;
 import com.dusk.module.auth.dto.user.GetUsersInput;
 import com.dusk.module.auth.dto.user.UserIdAndPermissionDto;
 import com.dusk.module.auth.entity.*;
 import com.dusk.module.auth.manage.IUserManage;
-import com.dusk.module.auth.repository.IOrganizationManagerRepository;
+import com.dusk.module.auth.mapper.OrganizationMapper;
+import com.dusk.module.auth.mapper.UserMapper;
 import com.dusk.module.auth.repository.IUserRepository;
 import com.dusk.module.auth.service.IOrganizationUnitService;
 import com.dusk.module.auth.service.IRoleService;
 import com.dusk.module.auth.service.IUserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.querydsl.core.types.QBean;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.dubbo.config.annotation.Service;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,68 +55,55 @@ import java.util.stream.Collectors;
 @Transactional
 @Slf4j
 public class UserRpcServiceImpl extends BaseService<User, IUserRepository> implements IUserRpcService {
-    @Autowired
-    IUserService userService;
-
-    @Autowired
-    Mapper dozerMapper;
-
-    @Autowired
-    IOrganizationUnitService organizationUnitService;
-
-    @Autowired
+    @Resource
+    private IUserService userService;
+    @Resource
+    private IOrganizationUnitService organizationUnitService;
+    @Resource
     private PasswordEncoder passwordEncoder;
+    @Resource
+    private JPAQueryFactory queryFactory;
+    @Resource
+    private IRoleService roleService;
+    @Resource
+    private IUserManage userManage;
+    @Resource
+    private TokenAuthManager tokenAuthManager;
 
-    @Autowired
-    JPAQueryFactory queryFactory;
-
-    @Autowired
-    IRoleService roleService;
-
-    @Autowired
-    IUserManage userManage;
-
-    @Autowired
-    TokenAuthManager tokenAuthManager;
-
-    @Autowired
-    IOrganizationManagerRepository orgManagerRepository;
-
-    QUser qUser = QUser.user;
+    private final QUser qUser = QUser.user;
+    private final UserMapper mapper = UserMapper.INSTANCE;
+    private final OrganizationMapper organizationMapper = OrganizationMapper.INSTANCE;
 
     @Override
     public PagedResultDto<UserFullListDto> getUsers(PagedAndSortedInputDto input) {
         Page<User> pageResult = repository.findAll(input.getPageable());
-        List<UserFullListDto> list = DozerUtils.mapList(dozerMapper, pageResult.getContent(), UserFullListDto.class);
-        return new PagedResultDto<>(pageResult.getTotalElements(), list);
+        return MapperUtil.mapToPagedResultDto(pageResult, mapper::toFullListDto);
     }
 
     @Override
     public PagedResultDto<UserFullListDto> getUsers(UserInputDto input) {
-        GetUsersInput userInput = dozerMapper.map(input, GetUsersInput.class);
+        GetUsersInput userInput = mapper.inputToGetUsersInput(input);
         Page<User> pageResult = userService.getUsers(userInput);
-        List<UserFullListDto> list = DozerUtils.mapList(dozerMapper, pageResult.getContent(), UserFullListDto.class);
-        return new PagedResultDto<>(pageResult.getTotalElements(), list);
+        return MapperUtil.mapToPagedResultDto(pageResult, mapper::toFullListDto);
     }
 
     @Override
     public PagedResultDto<UserFullListSyncDto> getUsersForSync(PagedAndSortedInputDto input) {
         Page<User> pageResult = repository.findAll(input.getPageable());
-        List<UserFullListSyncDto> list = DozerUtils.mapList(dozerMapper, pageResult.getContent(), UserFullListSyncDto.class, (s, t) -> {
+        return MapperUtil.mapToPagedResultDto(pageResult, mapper::toFullListSyncDto, (s, t) -> {
             t.setOrgIds(s.getOrganizationUnit().stream().map(BaseEntity::getId).collect(Collectors.toList()));
         });
-        return new PagedResultDto<>(pageResult.getTotalElements(), list);
     }
 
     @Override
     public UserFullListDto getUserFullById(Long userId) {
-        return repository.findById(userId).map(value -> dozerMapper.map(value, UserFullListDto.class)).orElse(null);
+        return repository.findById(userId).map(mapper::toFullListDto).orElse(null);
     }
 
     @Override
     public List<UserFullListDto> getUserFullByIds(List<Long> userIds) {
         List<User> users = repository.findByIdIn(userIds);
-        return DozerUtils.mapList(dozerMapper, users, UserFullListDto.class);
+        return MapperUtil.mapList(users, mapper::toFullListDto);
     }
 
     @Override
@@ -150,7 +135,7 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
     public List<UserFullListDto> getUsersByUserNameStartWith(String head, List<EUnitType> userTypes) {
         JPAQuery<User> query = queryFactory.selectFrom(qUser).where(qUser.userName.startsWith(head).and(qUser.userType.in(userTypes)).and(qUser.userStatus.eq(UserStatus.OnJob)));
         List<User> users = query.fetch();
-        return DozerUtils.mapList(dozerMapper, users, UserFullListDto.class);
+        return MapperUtil.mapList(users, mapper::toFullListDto);
     }
 
     @Override
@@ -238,7 +223,7 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
 
     @Override
     public UserFullListDto getUserByUserName(String userName) {
-        return repository.findByUserName(userName).map(value -> dozerMapper.map(value, UserFullListDto.class)).orElse(null);
+        return repository.findByUserName(userName).map(mapper::toFullListDto).orElse(null);
     }
 
     @Override
@@ -248,7 +233,7 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
             throw new BusinessException("出现重名的用户【" + name + "】");
         }
         if (users.size() == 1) {
-            return dozerMapper.map(users.get(0), UserFullListDto.class);
+            return mapper.toFullListDto(users.getFirst());
         }
         return null;
     }
@@ -275,12 +260,12 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
             e.in(User.Fields.userType, userTypes);
             e.eq(User.Fields.userStatus, UserStatus.OnJob);
         }));
-        return DozerUtils.mapList(dozerMapper, users, UserFullListDto.class);
+        return MapperUtil.mapList(users, mapper::toFullListDto);
     }
 
     @Override
     public UserFullListDto getUserByWorkNumber(String workNumber) {
-        return repository.findByWorkNumber(workNumber).map(value -> dozerMapper.map(value, UserFullListDto.class)).orElse(null);
+        return repository.findByWorkNumber(workNumber).map(mapper::toFullListDto).orElse(null);
     }
 
     @Override
@@ -412,9 +397,9 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
     @Override
     public List<UserOrgDto> getUserOrgByIds(List<Long> userIds) {
         List<User> userList = repository.findAllById(userIds);
-        return DozerUtils.mapList(dozerMapper, userList, UserOrgDto.class, ((user, userOrgDto) -> {
+        return MapperUtil.mapList(userList, mapper::toUserOrgDto, ((user, userOrgDto) -> {
             List<OrganizationUnit> units = user.getOrganizationUnit();
-            List<OrganizationUnitDto> unitDtos = DozerUtils.mapList(dozerMapper, units, OrganizationUnitDto.class);
+            List<OrganizationUnitDto> unitDtos = MapperUtil.mapList(units, organizationMapper::toDto);
             userOrgDto.setDtos(unitDtos);
         }));
     }
@@ -429,7 +414,7 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
         queryInput.setOrganizationUnitIds(input.getOrgIds());
         queryInput.setDeepQuery(input.isDeepQuery());
         List<User> users = organizationUnitService.findUsers(queryInput).getContent();
-        return DozerUtils.mapList(dozerMapper, users, UserFullListDto.class);
+        return MapperUtil.mapList(users, mapper::toFullListDto);
     }
 
     @Override
@@ -453,7 +438,8 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
                     user = findById(userSimpleDto.getId()).orElse(new User());
                 }
                 if (Objects.isNull(user.getId())) {
-                    dozerMapper.map(userSimpleDto, user);
+                    //mapper.map(userSimpleDto, user);
+                    BeanUtils.copyProperties(userSimpleDto, user);
                     // 新增的用户
                     user.setAccessFailedCount(0);
                     user.setActive(true);
@@ -587,7 +573,7 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
             user = optional.get();
             UtBeanUtils.copyNotNullProperties(userDto, user);
         } else {
-            user = dozerMapper.map(userDto, User.class);
+            user = mapper.userSimpleDtoToEntity(userDto);
             List<Role> roleList = queryFactory.selectFrom(QRole.role).where(QRole.role.isDefault.eq(true)).fetch();
             user.getUserRoles().addAll(roleList);
         }
@@ -596,11 +582,7 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
         for (OrganizationUnitDto unitDto : employeeOrgList) {
             Optional<OrganizationUnit> op = organizationUnitService.findById(unitDto.getId());
             OrganizationUnit org = null;
-            if (op.isPresent()) {
-                org = op.get();
-            } else {
-                org = dozerMapper.map(unitDto, OrganizationUnit.class);
-            }
+            org = op.orElseGet(() -> organizationMapper.toEntity(unitDto));
             if (unitDto.getParentId() == null) {
                 org.setParentId(null);
             } else {
@@ -688,7 +670,7 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
         if (role == null) {
             return new ArrayList<>();
         }
-        List<UserFullListDto> users = DozerUtils.mapList(dozerMapper, role.getUserRoles(), UserFullListDto.class);
+        List<UserFullListDto> users = MapperUtil.mapList(role.getUserRoles(), mapper::toFullListDto);
 
         return users.stream().filter(dto -> userTypes.contains(dto.getUserType()) && UserStatus.OnJob.equals(dto.getUserStatus())).collect(Collectors.toList());
     }
@@ -706,7 +688,7 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
             List<Long> ids = Arrays.stream(idStrings).map(Long::parseLong).collect(Collectors.toList());
             query.where(qUser.organizationUnit.any().id.in(ids));
         }
-        return DozerUtils.mapList(dozerMapper, query.fetch(), UserFullListDto.class);
+        return MapperUtil.mapList(query.fetch(), mapper::toFullListDto);
     }
 
     @Override
@@ -717,7 +699,7 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
     @Override
     public UserFullListDto getByEmailAddressOrPhoneNo(String input) {
         var user = queryFactory.selectFrom(qUser).where(qUser.emailAddress.eq(input).or(qUser.phoneNo.eq(input))).fetchFirst();
-        return Objects.isNull(user) ? null : dozerMapper.map(user, UserFullListDto.class);
+        return Objects.isNull(user) ? null : mapper.toFullListDto(user);
     }
 
     @Override
@@ -742,7 +724,7 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
             users.addAll(role.getUserRoles());
         }
         users = users.stream().collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(User::getId))), ArrayList::new));
-        return DozerUtils.mapList(dozerMapper, users, UserFullListDto.class);
+        return MapperUtil.mapList(users, mapper::toFullListDto);
     }
 
     @Override

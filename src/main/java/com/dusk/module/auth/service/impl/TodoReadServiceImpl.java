@@ -5,7 +5,7 @@ import com.dusk.common.core.service.impl.BaseService;
 import com.dusk.module.auth.entity.TodoRead;
 import com.dusk.module.auth.repository.ITodoReadRepository;
 import com.dusk.module.auth.service.ITodoReadService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +16,7 @@ import java.util.Optional;
 @Transactional(rollbackFor = Exception.class)
 public class TodoReadServiceImpl extends BaseService<TodoRead,ITodoReadRepository> implements ITodoReadService  {
 
-    @Autowired
+    @Resource
     private ITodoReadRepository todoReadRepository;
 
     @Override

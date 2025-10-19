@@ -2,17 +2,13 @@ package com.dusk.module.auth.controller;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.enums.CellExtraTypeEnum;
-import com.dusk.common.rpc.auth.dto.BindRoleToUserInput;
-import com.github.dozermapper.core.Mapper;
-import io.swagger.annotations.*;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import com.dusk.common.core.annotation.Authorize;
 import com.dusk.common.core.controller.CruxBaseController;
 import com.dusk.common.core.dto.EntityDto;
 import com.dusk.common.core.dto.PagedResultDto;
 import com.dusk.common.core.exception.BusinessException;
-import com.dusk.common.core.utils.DozerUtils;
+import com.dusk.common.core.utils.MapperUtil;
+import com.dusk.common.rpc.auth.dto.BindRoleToUserInput;
 import com.dusk.module.auth.authorization.RoleAuthProvider;
 import com.dusk.module.auth.dto.orga.BindRoleToOrgInput;
 import com.dusk.module.auth.dto.role.GetRolesInput;
@@ -24,14 +20,19 @@ import com.dusk.module.auth.dto.user.UnbindRoleForUserDto;
 import com.dusk.module.auth.dto.user.UserListDto;
 import com.dusk.module.auth.entity.Role;
 import com.dusk.module.auth.excel.RolePermissionImportListener;
+import com.dusk.module.auth.mapper.RoleMapper;
+import com.dusk.module.auth.mapper.UserMapper;
 import com.dusk.module.auth.service.IRoleService;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.annotations.*;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
@@ -45,17 +46,17 @@ import java.util.List;
 @Authorize(RoleAuthProvider.PAGES_ROLES)
 public class RoleController extends CruxBaseController {
 
-    @Autowired
+    @Resource
     private IRoleService roleService;
 
-    @Autowired
-    private Mapper dozerMapper;
+    private final RoleMapper mapper = RoleMapper.INSTANCE;
+    private final UserMapper userMapper = UserMapper.INSTANCE;
 
     @GetMapping("/getAllRoles")
     @ApiOperation(value = "获取所有角色")
     public List<RoleDto> getAllRoles() {
         List<Role> list = roleService.getRoles();
-        return DozerUtils.mapList(dozerMapper,list,RoleDto.class);
+        return MapperUtil.mapList(list, mapper::toDto);
     }
 
     @GetMapping("/getRoles")
@@ -63,7 +64,7 @@ public class RoleController extends CruxBaseController {
     @Authorize(RoleAuthProvider.PAGES_ROLES)
     public PagedResultDto<RoleDto> getRoles(GetRolesInput input) {
         Page<Role> pages = roleService.getRoles(input);
-        return DozerUtils.mapToPagedResultDto(dozerMapper,pages,RoleDto.class);
+        return MapperUtil.mapToPagedResultDto(pages, mapper::toDto);
     }
 
     @ApiOperation(value = "查看某个角色详情")
@@ -191,7 +192,7 @@ public class RoleController extends CruxBaseController {
     @ApiOperation(value = "查找有某角色的用户列表")
     @GetMapping(value = "/getUserByRoleId")
     public PagedResultDto<UserListDto> getUsersByRoleId(@Valid GetUserByRoleDto getUserByRoleDto) {
-        return DozerUtils.mapToPagedResultDto(dozerMapper, roleService.getUserByRoleId(getUserByRoleDto), UserListDto.class);
+        return MapperUtil.mapToPagedResultDto(roleService.getUserByRoleId(getUserByRoleDto), userMapper::toListDto);
     }
 
     @ApiOperation(value = "取消用户的角色")

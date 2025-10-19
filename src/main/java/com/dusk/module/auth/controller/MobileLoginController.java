@@ -1,18 +1,18 @@
 package com.dusk.module.auth.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import com.dusk.common.core.annotation.AllowAnonymous;
 import com.dusk.common.core.controller.CruxBaseController;
 import com.dusk.module.auth.dto.mobilelogin.MobileUserDto;
 import com.dusk.module.auth.dto.mobilelogin.SendCaptchaInput;
 import com.dusk.module.auth.service.IMobileLoginService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 /**
@@ -24,7 +24,7 @@ import java.util.List;
 @Api(description = "手机登录", tags = "AuthMobile")
 public class MobileLoginController extends CruxBaseController {
 
-    @Autowired
+    @Resource
     IMobileLoginService mobileLoginService;
 
     @PostMapping("/captcha")

@@ -1,15 +1,14 @@
 package com.dusk.module.auth.entity;
 
-import com.dusk.common.rpc.auth.enums.FingerprintFromEnum;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.FieldNameConstants;
 import com.dusk.common.core.entity.FullAuditedEntity;
-
+import com.dusk.common.rpc.auth.enums.FingerprintFromEnum;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
 
 /**
  * @author kefuming

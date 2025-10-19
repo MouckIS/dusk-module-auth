@@ -1,13 +1,11 @@
 package com.dusk.module.auth.dto.auditlog;
 
+import com.dusk.common.core.dto.EntityDto;
+import com.dusk.module.auth.entity.QAuditLog;
+import com.dusk.module.auth.entity.QUser;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
-import com.dusk.common.core.dto.EntityDto;
-import com.dusk.common.core.jpa.querydsl.QBeanMapper;
-import com.dusk.module.auth.entity.AuditLog;
-import com.dusk.module.auth.entity.QAuditLog;
-import com.dusk.module.auth.entity.QUser;
 
 import java.time.LocalDateTime;
 
@@ -19,9 +17,9 @@ import java.time.LocalDateTime;
 @Setter
 @FieldNameConstants
 public class AuditLogListDto extends EntityDto {
-    @QBeanMapper(target = QAuditLog.class,field = AuditLog.Fields.createId)
+    //@QBeanMapper(target = QAuditLog.class,field = AuditLog.Fields.createId)
     public Long userId;
-    @QBeanMapper(target = QUser.class)
+    //@QBeanMapper(target = QUser.class)
     public String userName;
 
     public String serviceName;

@@ -1,21 +1,20 @@
 package com.dusk.module.auth.controller;
 
-import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitDto;
-import com.dusk.module.auth.dto.orga.*;
-import com.github.dozermapper.core.Mapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import com.dusk.common.core.annotation.Authorize;
 import com.dusk.common.core.controller.CruxBaseController;
 import com.dusk.common.core.dto.EntityDto;
 import com.dusk.common.core.dto.ListResultDto;
+import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitDto;
 import com.dusk.module.auth.authorization.ExternalManagerAuthProvider;
+import com.dusk.module.auth.dto.orga.*;
 import com.dusk.module.auth.entity.OrganizationUnit;
+import com.dusk.module.auth.mapper.OrganizationMapper;
 import com.dusk.module.auth.service.IOrganizationUnitService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author kefuming
@@ -26,10 +25,10 @@ import jakarta.validation.Valid;
 @RequestMapping("externalOrganization")
 @Authorize(ExternalManagerAuthProvider.PAGES_EXTERNAL_ORGANIZATION)
 public class ExternalOrganizationController extends CruxBaseController {
-    @Autowired
+    @Resource
     private IOrganizationUnitService organizationUnitService;
-    @Autowired
-    private Mapper dozerMapper;
+
+    private final OrganizationMapper mapper = OrganizationMapper.INSTANCE;
 
     @GetMapping("getExternalOrganizationUnits")
     @ApiOperation("获取外单位所有组织机构")
@@ -42,7 +41,7 @@ public class ExternalOrganizationController extends CruxBaseController {
     @Authorize(ExternalManagerAuthProvider.PAGES_EXTERNAL_ORGANIZATION_MANAGE_ORGANIZATION_TREE)
     public OrganizationUnitDto createExternalOrganizationUnit(@Valid @RequestBody CreateOrganizationUnitInput input) {
         OrganizationUnit organizationUnit = organizationUnitService.createExternalOrganization(input);
-        return dozerMapper.map(organizationUnit, OrganizationUnitDto.class);
+        return mapper.toDto(organizationUnit);
     }
 
     @PutMapping("updateOrganizationUnit")
@@ -50,7 +49,7 @@ public class ExternalOrganizationController extends CruxBaseController {
     @Authorize(ExternalManagerAuthProvider.PAGES_EXTERNAL_ORGANIZATION_MANAGE_ORGANIZATION_TREE)
     public OrganizationUnitDto updateOrganizationUnit(@Valid @RequestBody UpdateOrganizationUnitInput input) {
         OrganizationUnit organizationUnit = organizationUnitService.update(input);
-        return dozerMapper.map(organizationUnit, OrganizationUnitDto.class);
+        return mapper.toDto(organizationUnit);
     }
 
     @PutMapping("moveOrganizationUnit")
@@ -58,7 +57,7 @@ public class ExternalOrganizationController extends CruxBaseController {
     @Authorize(ExternalManagerAuthProvider.PAGES_EXTERNAL_ORGANIZATION_MANAGE_ORGANIZATION_TREE)
     public OrganizationUnitDto moveOrganizationUnit(@Valid @RequestBody MoveOrganizationUnitInput input) {
         OrganizationUnit organizationUnit = organizationUnitService.move(input);
-        return dozerMapper.map(organizationUnit, OrganizationUnitDto.class);
+        return mapper.toDto(organizationUnit);
     }
 
     @DeleteMapping("deleteOrganizationUnit")

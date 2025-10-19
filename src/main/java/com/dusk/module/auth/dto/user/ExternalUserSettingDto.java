@@ -1,11 +1,11 @@
 package com.dusk.module.auth.dto.user;
 
+import com.dusk.common.core.dto.EntityDto;
 import io.swagger.annotations.ApiModelProperty;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
-import com.dusk.common.core.dto.EntityDto;
 
-import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDate;
 import java.util.List;
 
