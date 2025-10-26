@@ -9,6 +9,7 @@ import com.dusk.common.mqs.pusher.PushSMS;
 import com.dusk.common.mqs.rabbitmq.RabbitMQEnableCondition;
 import com.dusk.common.mqs.utils.RabbitMQUtils;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.Queue;
@@ -26,9 +27,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Conditional(RabbitMQEnableCondition.class)
 public class NotificationPushManager implements INotificationPushManager {
-    @Autowired(required = false)
+    @Resource
     private RabbitMQUtils rabbitMQUtils;
-    @Autowired(required = false)
+    @Resource
     private AmqpAdmin amqpAdmin;
 
 

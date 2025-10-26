@@ -40,14 +40,12 @@ public class StationMigrationService implements IStationMigrationService {
     @Resource
     private IDataFilterDefinitionContext dataFilterDefinitionContext;
     @Resource
-    private SpringContextUtils springContextUtils;
-    @Resource
     private JPAQueryFactory queryFactory;
 
 
     @PostConstruct
     public void autoMigration(){
-        boolean needMigration = springContextUtils.getBean(StationMigrationService.class).needMigration();//忽略租户过滤
+        boolean needMigration = SpringContextUtils.getBean(StationMigrationService.class).needMigration();//忽略租户过滤
         if(needMigration){ //新的厂站表没有数据的时候执行一次迁移
             migration();
         }
@@ -78,7 +76,7 @@ public class StationMigrationService implements IStationMigrationService {
 
     private void syncStations(){
         List<OrganizationUnit> list = organizationUnitService.findAll(Sort.by(Sort.Order.asc(TreeEntity.Fields.sortIndex), Sort.Order.desc(CreationEntity.Fields.createTime)));
-        List<OrganizationUnit> rootList = list.stream().filter(e -> e.getParentId() == null).collect(Collectors.toList());
+        List<OrganizationUnit> rootList = list.stream().filter(e -> e.getParentId() == null).toList();
         for (OrganizationUnit unit : rootList) {
             if(unit.getStation()){
                 Station station = syncStation(unit, null);
@@ -111,8 +109,7 @@ public class StationMigrationService implements IStationMigrationService {
     /**
      * 同步厂站信息
      * @param organizationUnit 当前组织机构
-     * @param parentStation 前一个厂站，
-     * @return
+     * @param parentStation 前一个厂站
      */
     private Station syncStation(OrganizationUnit organizationUnit, Station parentStation){
         Station station = stationService.findById(organizationUnit.getId()).orElse(null);

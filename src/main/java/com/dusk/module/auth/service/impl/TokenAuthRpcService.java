@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
  */
 @Service(retries = 0, timeout = 2000)
 @Slf4j
+@org.springframework.stereotype.Service
 public class TokenAuthRpcService implements ITokenAuthRpcService {
     @Resource
     private TokenAuthManager tokenAuthManager;

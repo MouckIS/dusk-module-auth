@@ -48,6 +48,7 @@ import java.util.List;
 @Slf4j
 @Service
 @Transactional
+@org.springframework.stereotype.Service
 public class NotificationServiceImpl extends BaseService<UserNotification, IUserNotificationRepository> implements INotificationRpcService, INotificationService {
     @Resource
     private  MqttUtils mqttUtils;

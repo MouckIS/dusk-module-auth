@@ -19,7 +19,7 @@ import org.springframework.util.Assert;
 @Component
 public class DefaultAuthenticationProvider implements AuthenticationProvider {
     @Resource
-    IUserService userService;
+    private IUserService userService;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {

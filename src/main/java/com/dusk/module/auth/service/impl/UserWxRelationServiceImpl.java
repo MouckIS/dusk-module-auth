@@ -19,7 +19,8 @@ import java.util.stream.Collectors;
  * @author kefuming
  * @date 2021-07-23 15:37
  */
-@Service
+//@Service
+@Deprecated
 public class UserWxRelationServiceImpl extends BaseService<UserWxRelation, IUserWxRelationRepository> implements IUserWxRelationService {
     @Resource
     private IUserWxRelationCacheService userWxRelationCacheService;

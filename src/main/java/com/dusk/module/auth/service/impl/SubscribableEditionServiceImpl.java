@@ -3,6 +3,7 @@ package com.dusk.module.auth.service.impl;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.excel.EasyExcel;
 import com.dusk.common.core.auth.permission.Permission;
+import com.dusk.common.core.entity.BaseEntity;
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.jpa.Specifications;
 import com.dusk.common.core.service.impl.BaseService;
@@ -13,11 +14,13 @@ import com.dusk.module.auth.dto.feature.FeatureValueInput;
 import com.dusk.module.auth.dto.permission.EditionPermissionInputDto;
 import com.dusk.module.auth.entity.QTenantPermission;
 import com.dusk.module.auth.entity.SubscribableEdition;
+import com.dusk.module.auth.entity.Tenant;
 import com.dusk.module.auth.excel.EditionExcelExportWriter;
 import com.dusk.module.auth.mapper.SubscribableEditionMapper;
 import com.dusk.module.auth.repository.IFeatureValueRepository;
 import com.dusk.module.auth.repository.ISubscribableEditionRepository;
 import com.dusk.module.auth.repository.ITenantPermissionRepository;
+import com.dusk.module.auth.repository.ITenantRepository;
 import com.dusk.module.auth.service.IFeatureService;
 import com.dusk.module.auth.service.ISubscribableEditionService;
 import com.dusk.module.auth.service.ITenantPermissionService;
@@ -44,13 +47,13 @@ import java.util.stream.Collectors;
 @Transactional
 public class SubscribableEditionServiceImpl extends BaseService<SubscribableEdition, ISubscribableEditionRepository> implements ISubscribableEditionService {
     @Resource
-    private ITenantService tenantService;
+    private ITenantRepository tenantRepository;
     @Resource
     private IFeatureValueRepository featureValueRepository;
     @Resource
     private ITenantPermissionRepository tenantPermissionRepository;
     @Resource
-    private IAuthPermissionManager permissionManager;
+    private IAuthPermissionManager authPermissionManager;
     @Resource
     private IFeatureService featureService;
     @Resource
@@ -133,7 +136,11 @@ public class SubscribableEditionServiceImpl extends BaseService<SubscribableEdit
     @Override
     public void deleteEdition(Long editionId) {
         repository.findById(editionId).orElseThrow(() -> new BusinessException("数据不存在"));
-        long count = tenantService.countTenantsByEdition(editionId);
+        Specification<Tenant> spec = Specifications.where(e -> {
+            e.eq(Tenant.Fields.edition + "." + BaseEntity.Fields.id, editionId);
+        });
+
+        long count = tenantRepository.count(spec);
         if (count > 0) {
             throw new BusinessException("当前有" + count + "个租户关联到该版本，不能删除！");
         }
@@ -148,7 +155,7 @@ public class SubscribableEditionServiceImpl extends BaseService<SubscribableEdit
         EditionExcelExportWriter writer = new EditionExcelExportWriter(edition);
 
         List<String> editionPermissions = findEditionPermission(id);
-        List<Permission> permissions = permissionManager.getDefinitionPermissionTree(true);
+        List<Permission> permissions = authPermissionManager.getDefinitionPermissionTree(true);
         writer.setEditionPermissions(editionPermissions);
         writer.setDefinitionPermissions(permissions);
         writer.setEditionFeatures(featureService.getTenantFeaturesByEdition(id));
@@ -170,7 +177,7 @@ public class SubscribableEditionServiceImpl extends BaseService<SubscribableEdit
 
         SubscribableEdition edition = null;
         List<FeatureValueInput> features = new ArrayList<>();
-        List<Permission> definitionPermissions = permissionManager.getDefinitionPermissionTree(true);
+        List<Permission> definitionPermissions = authPermissionManager.getDefinitionPermissionTree(true);
         Set<String> finalGrantedPermission = new LinkedHashSet<>();
         for (int i = 0; i < list.size(); i++) {
             Map<Integer, String> map = list.get(i);

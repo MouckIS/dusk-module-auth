@@ -13,8 +13,10 @@ import com.dusk.module.auth.service.ITenantPermissionService;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
@@ -35,16 +37,13 @@ public class RedisPermissionCache implements IPermissionCache {
     private final String AUTH_PERMISSION_URL_KEY_OLD = "CRUX:AUTH:PERMISSION:URL";
     private final String AUTH_PERMISSION_URL_KEY = "CRUX:AUTH:PERMISSION:URLS";
     private final String AUTH_PERMISSION_ANONYMOUS_KEY = "CRUX:AUTH:PERMISSION:ANONYMOUS";
+
     @Autowired(required = false)
     RedisUtil<Object> redisUtil;
     @Resource
-    private IGrantPermissionRepository grantPermissionRepository;
+    private ObjectProvider<ITenantPermissionService> tenantPermissionServiceProvider;
     @Resource
-    private ITenantPermissionService tenantPermissionService;
-    @Resource
-    private IGrantPermissionService grantPermissionService;
-    @Resource
-    private JPAQueryFactory queryFactory;
+    private ObjectProvider<IGrantPermissionService> grantPermissionServiceProvider;
 
 
     @Override
@@ -104,8 +103,21 @@ public class RedisPermissionCache implements IPermissionCache {
     @Override
     public void refreshAll() {
         Map<String, Map<String, List<UrlPermission>>> urlPermission = getUrlPermission();
-        Map<String, List<RoleInfo>> allGrantPermission = grantPermissionService.getAll();
-        Map<String, List<Long>> allTenantPermission = tenantPermissionService.getAllTenantPermission();
+
+        IGrantPermissionService grantService = grantPermissionServiceProvider.getIfAvailable();
+        ITenantPermissionService tenantService = tenantPermissionServiceProvider.getIfAvailable();
+        if (grantService == null) {
+            log.warn("IGrantPermissionService not available, skip refreshAll()");
+            return;
+        }
+        if (tenantService == null) {
+            log.warn("ITenantPermissionService not available, skip tenant-specific permission refresh");
+        }
+        Map<String, List<RoleInfo>> allGrantPermission = grantService.getAll();
+        Map<String, List<Long>> allTenantPermission = null;
+        if (tenantService != null) {
+            allTenantPermission = tenantService.getAllTenantPermission();
+        }
         for (Map<String, List<UrlPermission>> applicationPermission : urlPermission.values()) {
             PermissionUtil.setPermissionRoleInfo(allGrantPermission, applicationPermission, allTenantPermission);
         }

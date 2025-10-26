@@ -18,8 +18,8 @@ import java.util.List;
  * @author kefuming
  * @date 2021-07-23 15:44
  */
-@Aspect
-@Component
+//@Aspect
+//@Component
 @Slf4j
 public class WxLoginAspect {
     @Resource

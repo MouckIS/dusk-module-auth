@@ -32,7 +32,7 @@ public class UserManage implements IUserManage {
     @Resource
     private SecurityUtils securityUtils;
     @Resource
-    private IAuthPermissionManager permissionManager;
+    private IAuthPermissionManager authPermissionManager;
     @Resource
     private IGrantPermissionRepository grantPermissionRepository;
     @Resource
@@ -68,7 +68,7 @@ public class UserManage implements IUserManage {
         User userInfo = getUserInfo(userId);
         List<String> permissions;
         if (userInfo.getTenantId() == null) {
-            permissions = permissionManager.getDefinitionPermission(!StringUtils.isEmpty(TenantContextHolder.getTenantId()));
+            permissions = authPermissionManager.getDefinitionPermission(!StringUtils.isEmpty(TenantContextHolder.getTenantId()));
         } else {
             permissions = tenantPermissionService.getGrantedPermissionByTenantId(userInfo.getTenantId());
         }

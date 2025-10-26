@@ -49,7 +49,7 @@ public class ConfigurationServiceImpl extends CruxBaseServiceImpl implements ICo
     @Resource
     private IUserRepository userRepository;
     @Resource
-    private IAuthPermissionManager permissionManager;
+    private IAuthPermissionManager authPermissionManager;
     @Resource
     private IFeatureService featureService;
     @Resource
@@ -138,11 +138,11 @@ public class ConfigurationServiceImpl extends CruxBaseServiceImpl implements ICo
         List<String> permissions;
         //当配置不过滤租户权限
         if (appAuthConfig.isDisableTenantAuthFilter()) {
-            permissions = permissionManager.getDefinitionPermission(TenantContextHolder.getTenantId() != null);
+            permissions = authPermissionManager.getDefinitionPermission(TenantContextHolder.getTenantId() != null);
         } else {
             //当宿主进入访问获取所有的权限清单
             if (TenantContextHolder.getTenantId() == null) {
-                permissions = permissionManager.getDefinitionPermission(false);
+                permissions = authPermissionManager.getDefinitionPermission(false);
             } else {
                 //租户进来获取有权限的清单
                 permissions = tenantPermissionService.getGrantedPermissionByTenantId(TenantContextHolder.getTenantId());

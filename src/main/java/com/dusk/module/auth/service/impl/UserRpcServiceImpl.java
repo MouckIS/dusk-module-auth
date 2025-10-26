@@ -54,6 +54,7 @@ import java.util.stream.Collectors;
 @Service(retries = 0, timeout = 2000)
 @Transactional
 @Slf4j
+@org.springframework.stereotype.Service
 public class UserRpcServiceImpl extends BaseService<User, IUserRepository> implements IUserRpcService {
     @Resource
     private IUserService userService;
