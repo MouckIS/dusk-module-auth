@@ -2,7 +2,7 @@ package com.dusk.module.auth.dto.dashboard;
 
 import com.dusk.common.core.dto.EntityDto;
 import com.dusk.module.auth.enums.dashboard.DashboardModuleType;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.Getter;
@@ -18,41 +18,41 @@ public class ModuleItemListDto extends EntityDto {
     /**
      * code
      */
-    @ApiModelProperty("code")
+    @Schema(description = "code")
     private String code;
     /**
      * 名称
      */
-    @ApiModelProperty("名称")
+    @Schema(description = "名称")
     private String name;
     /**
      * 详情路径
      */
-    @ApiModelProperty("详情路径")
+    @Schema(description = "详情路径")
     private String detailPath;
     /**
      * 数据来源
      */
-    @ApiModelProperty("数据来源")
+    @Schema(description = "数据来源")
     private String dataSource;
 
     /**
      * 类型
      */
-    @ApiModelProperty("类型")
+    @Schema(description = "类型")
     @Enumerated(EnumType.STRING)
     private DashboardModuleType moduleType;
 
     /**
      * 模块Id
      */
-    @ApiModelProperty("模块Id")
+    @Schema(description = "模块Id")
     private Long moduleId;
 
 
     /**
      * 图表类型
      */
-    @ApiModelProperty("图表类型")
+    @Schema(description = "图表类型")
     private String chartType;
 }

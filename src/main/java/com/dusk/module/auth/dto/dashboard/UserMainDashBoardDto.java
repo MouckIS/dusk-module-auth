@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.dashboard;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,10 +11,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserMainDashBoardDto {
-    @ApiModelProperty("首页大屏ID")
+    @Schema(description = "首页大屏ID")
     private Long mainDashBoardId;
 
-    @ApiModelProperty("是否有权限")
+    @Schema(description = "是否有权限")
     private Boolean permission;
 
     public UserMainDashBoardDto() {

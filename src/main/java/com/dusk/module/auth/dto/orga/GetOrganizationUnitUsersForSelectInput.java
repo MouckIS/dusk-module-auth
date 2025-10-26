@@ -4,7 +4,7 @@ import com.dusk.common.core.dto.PagedAndSortedInputDto;
 import com.dusk.common.core.entity.BaseEntity;
 import com.dusk.common.core.entity.TreeEntity;
 import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitUserListDto;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -20,10 +20,10 @@ import org.springframework.data.domain.Sort;
 @Setter
 public class GetOrganizationUnitUsersForSelectInput extends PagedAndSortedInputDto {
 
-    @ApiModelProperty("组织机构id")
+    @Schema(description = "组织机构id")
     private Long orgId;
 
-    @ApiModelProperty("搜索关键字(姓名/账号)")
+    @Schema(description = "搜索关键字(姓名/账号)")
     private String filter;
 
     @Override

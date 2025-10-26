@@ -1,7 +1,7 @@
 package com.dusk.module.auth.dto.notification;
 
 import com.dusk.common.rpc.auth.enums.NotificationType;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,13 +18,13 @@ public class GetNotificationListCountInput {
     /**
      * 是否已读
      */
-    @ApiModelProperty("是否已读")
+    @Schema(description = "是否已读")
     private Boolean read;
 
     /**
      * 消息类型
      */
-    @ApiModelProperty("消息类型")
+    @Schema(description = "消息类型")
     private NotificationType type;
 
 }

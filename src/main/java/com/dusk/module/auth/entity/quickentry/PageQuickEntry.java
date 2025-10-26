@@ -1,7 +1,7 @@
 package com.dusk.module.auth.entity.quickentry;
 
 import com.dusk.common.core.entity.FullAuditedEntity;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -22,6 +22,6 @@ import lombok.experimental.FieldNameConstants;
 @FieldNameConstants
 public class PageQuickEntry extends FullAuditedEntity {
 
-    @ApiModelProperty("前端路由的name")
+    @Schema(description = "前端路由的name")
     private String routeName;
 }

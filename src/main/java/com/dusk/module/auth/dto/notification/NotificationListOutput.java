@@ -2,7 +2,7 @@ package com.dusk.module.auth.dto.notification;
 
 import com.dusk.common.core.dto.VersionDto;
 import com.dusk.common.rpc.auth.enums.NotificationType;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,25 +18,25 @@ import java.time.LocalDateTime;
 @Setter
 public class NotificationListOutput extends VersionDto {
 
-    @ApiModelProperty("消息标题")
+    @Schema(description = "消息标题")
     private String title;
 
-    @ApiModelProperty("消息是否已读")
+    @Schema(description = "消息是否已读")
     private boolean read;
 
-    @ApiModelProperty("消息创建时间")
+    @Schema(description = "消息创建时间")
     private LocalDateTime createTime;
 
-    @ApiModelProperty("消息类型")
+    @Schema(description = "消息类型")
     private NotificationType type;
 
-    @ApiModelProperty("消息类型值")
+    @Schema(description = "消息类型值")
     private int typeValue;
 
-    @ApiModelProperty("消息类型名称")
+    @Schema(description = "消息类型名称")
     private String typeName;
 
-    @ApiModelProperty("消息内容")
+    @Schema(description = "消息内容")
     private String content;
 
 

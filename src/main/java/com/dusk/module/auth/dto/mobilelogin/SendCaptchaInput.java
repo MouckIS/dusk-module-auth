@@ -1,7 +1,7 @@
 package com.dusk.module.auth.dto.mobilelogin;
 
 import com.dusk.module.auth.dto.captcha.CaptchaInputDto;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +13,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class SendCaptchaInput extends CaptchaInputDto {
-    @ApiModelProperty("手机号")
+    @Schema(description = "手机号")
     @NotEmpty(message = "手机号不能为空")
     private String mobile;
 }

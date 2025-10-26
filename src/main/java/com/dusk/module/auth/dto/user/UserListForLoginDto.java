@@ -1,7 +1,7 @@
 package com.dusk.module.auth.dto.user;
 
 import com.dusk.common.core.dto.EntityDto;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,10 +13,10 @@ import lombok.Setter;
 @Setter
 public class UserListForLoginDto extends EntityDto {
 
-    @ApiModelProperty("姓名")
+    @Schema(description = "姓名")
     private String name;
-    @ApiModelProperty("姓名拼音")
+    @Schema(description = "姓名拼音")
     private String surName;
-    @ApiModelProperty("账户名")
+    @Schema(description = "账户名")
     private String userName;
 }

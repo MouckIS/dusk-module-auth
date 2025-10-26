@@ -18,8 +18,8 @@ import com.dusk.module.auth.service.ICaptchaService;
 import com.dusk.module.auth.service.IScanCodeLoginService;
 import com.dusk.module.auth.service.ISsoTokenService;
 import com.dusk.module.auth.service.ITokenService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("token-auth")
-@Api(tags = "TokenAuth", description = "登陆相关", position = -999)
+@Tag(name = "TokenAuth", description = "登陆相关")
 public class TokenAuthController extends CruxBaseController {
     @Resource
     private TokenAuthManager tokenAuthManager;
@@ -57,7 +57,7 @@ public class TokenAuthController extends CruxBaseController {
 
     @AllowAnonymous
     @RequestMapping(value = "authenticate", method = RequestMethod.POST)
-    @ApiOperation("测试用的登陆接口，前端不要用来做登陆")
+    @Operation(summary = "测试用的登陆接口，前端不要用来做登陆")
     public String authenticate(@Valid @RequestBody LoginRequest input, HttpServletRequest request) {
         boolean verifyCaptcha = captchaService.verifyCaptcha(input, request);
         if (!verifyCaptcha) {
@@ -76,7 +76,7 @@ public class TokenAuthController extends CruxBaseController {
 
     @AllowAnonymous
     @GetMapping(value = "scan-code/key")
-    @ApiOperation("获取扫码登陆的唯一的key")
+    @Operation(summary = "获取扫码登陆的唯一的key")
     public String getScanCodeKey() {
         return scanCodeLoginService.getLoginKey();
     }
@@ -84,26 +84,26 @@ public class TokenAuthController extends CruxBaseController {
     @AllowAnonymous
     @GetMapping(value = "scan-code/token/{key}")
     @IgnoreResponseAdvice
-    @ApiOperation("获取扫码登陆的key对应的token，可能不存在key的情况 code为1001")
+    @Operation(summary = "获取扫码登陆的key对应的token，可能不存在key的情况 code为1001")
     public BaseApiResult<String> getScanCodeToken(@PathVariable String key) {
         return scanCodeLoginService.getToken(key);
     }
 
     @GetMapping(value = "scan-code/login/{key}")
     @IgnoreResponseAdvice
-    @ApiOperation("对指定的key执行扫码登陆，目前是1年的token")
+    @Operation(summary = "对指定的key执行扫码登陆，目前是1年的token")
     public void scanCodeLogin(@PathVariable String key) {
         scanCodeLoginService.login(key);
     }
 
-    @ApiOperation("登出接口")
+    @Operation(summary = "登出接口")
     @RequestMapping(value = "logout", method = RequestMethod.POST)
     public void logout() {
         tokenAuthManager.removeToken(AuthorizationContextHolder.getAuthorization());
     }
 
 
-    @ApiOperation("刷新token")
+    @Operation(summary = "刷新token")
     @RequestMapping(value = "refresh", method = RequestMethod.GET)
     public String refresh() {
         //TODO:是否需要注销掉之前的token？
@@ -113,7 +113,7 @@ public class TokenAuthController extends CruxBaseController {
 
     @AllowAnonymous
     @GetMapping("igw-login")
-    @ApiOperation("获取i国网 token")
+    @Operation(summary = "获取i国网 token")
     public String igwLogin(String ticket) {
         if (appSSOLoginService != null) {
             return appSSOLoginService.login(ticket);
@@ -124,14 +124,14 @@ public class TokenAuthController extends CruxBaseController {
 
     @AllowAnonymous
     @GetMapping("ssoSm4Token")
-    @ApiOperation("基于国密4加密机制给第三方快速签发token")
+    @Operation(summary = "基于国密4加密机制给第三方快速签发token")
     public String ssoSm4Token(String encryptStr) {
         return ssoTokenService.ssoSm4Token(encryptStr);
     }
 
     @Authorize(TokenConfigProvider.PAGES_FOREVER_TOKEN_SIGN)
     @PostMapping("foreverTokenSign")
-    @ApiOperation("长久token签发")
+    @Operation(summary = "长久token签发")
     public String foreverTokenSign(@Valid @RequestBody TokenSign tokenSign) {
         return tokenService.foreverTokenSign(tokenSign);
     }

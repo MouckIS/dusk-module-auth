@@ -2,7 +2,7 @@ package com.dusk.module.auth.dto.user;
 
 import com.dusk.common.core.enums.EUnitType;
 import com.dusk.common.rpc.auth.dto.CreateOrUpdateUserInput;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,7 +15,7 @@ import lombok.Setter;
 @Setter
 public class CreateUserInput extends CreateOrUpdateUserInput {
 
-    @ApiModelProperty("账号类型")
+    @Schema(description = "账号类型")
     @NotNull
     private EUnitType userType;
 }

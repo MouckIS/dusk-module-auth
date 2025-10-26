@@ -2,7 +2,7 @@ package com.dusk.module.auth.dto.orga;
 
 import com.dusk.common.core.enums.UserStatus;
 import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitUserListDto;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,31 +17,31 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrganizationUnitUserInfoListDto extends OrganizationUnitUserListDto {
-    @ApiModelProperty("用户id")
+    @Schema(description = "用户id")
     private Long id;
 
-    @ApiModelProperty("姓名")
+    @Schema(description = "姓名")
     private String name;
 
-    @ApiModelProperty("账号")
+    @Schema(description = "账号")
     private String userName;
 
-    @ApiModelProperty("邮箱地址")
+    @Schema(description = "邮箱地址")
     private String emailAddress;
 
-    @ApiModelProperty("所属组织机构id")
+    @Schema(description = "所属组织机构id")
     private Long organizationUnitId;
 
-    @ApiModelProperty("所属组织机构名称")
+    @Schema(description = "所属组织机构名称")
     private String organizationUnitName;
 
-    @ApiModelProperty("工作岗位")
+    @Schema(description = "工作岗位")
     private String job;
 
-    @ApiModelProperty("手机号")
+    @Schema(description = "手机号")
     private String phoneNo;
 
-    @ApiModelProperty("用户状态")
+    @Schema(description = "用户状态")
     private UserStatus userStatus;
 
     public String getStatusName() {

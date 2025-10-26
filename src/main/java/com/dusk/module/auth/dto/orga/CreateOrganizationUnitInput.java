@@ -2,7 +2,7 @@ package com.dusk.module.auth.dto.orga;
 
 import com.dusk.common.core.enums.EUnitType;
 import com.dusk.module.auth.enums.OrgLabel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
@@ -15,28 +15,28 @@ import org.hibernate.validator.constraints.Length;
 @Getter
 @Setter
 public class CreateOrganizationUnitInput {
-    @ApiModelProperty("父组织机构id")
+    @Schema(description = "父组织机构id")
     private Long parentId;
 
-    @ApiModelProperty("名称")
+    @Schema(description = "名称")
     private String displayName;
 
-    @ApiModelProperty("是否为厂站")
+    @Schema(description = "是否为厂站")
     private boolean station = false;
 
-    @ApiModelProperty("序号")
+    @Schema(description = "序号")
     private int sortIndex;
 
-    @ApiModelProperty("组织的类型")
+    @Schema(description = "组织的类型")
     private EUnitType type = EUnitType.Inner;
 
-    @ApiModelProperty("组织标签")
+    @Schema(description = "组织标签")
     private OrgLabel label;
 
-    @ApiModelProperty("管理层人员id")
+    @Schema(description = "管理层人员id")
     private Long ManagerId;
 
-    @ApiModelProperty("组织机构描述")
+    @Schema(description = "组织机构描述")
     @Length(max = 1000, message = "描述内容最多为1000字符")
     private String description;
 }

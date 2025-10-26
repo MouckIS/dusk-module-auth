@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.user;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,29 +18,29 @@ import java.time.LocalDate;
 public class UserInfoDto {
 
     @NotBlank(message = "姓名不能为空")
-    @ApiModelProperty("用户名")
+    @Schema(description = "用户名")
     @Length(max = 20, message = "姓名过长")
     private String name;
 
-    @ApiModelProperty("工号")
+    @Schema(description = "工号")
     private String workNumber;
 
-    @ApiModelProperty("岗位")
+    @Schema(description = "岗位")
     private String job;
 
-    @ApiModelProperty("邮箱地址")
+    @Schema(description = "邮箱地址")
     private String emailAddress;
 
-    @ApiModelProperty("手机号")
+    @Schema(description = "手机号")
     @NotBlank(message = "手机号不能为空")
     private String phoneNo;
 
-    @ApiModelProperty("身份证号")
+    @Schema(description = "身份证号")
     private String idCard;
 
-    @ApiModelProperty("入厂时间")
+    @Schema(description = "入厂时间")
     private LocalDate enterDate;
 
-    @ApiModelProperty("门禁卡号")
+    @Schema(description = "门禁卡号")
     private String accessCard;
 }

@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.station;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -15,11 +15,11 @@ import java.util.List;
 @Getter
 @Setter
 public class AddUsersToStationInput {
-    @ApiModelProperty("用户id列表")
+    @Schema(description = "用户id列表")
     @NotEmpty(message = "用户id列表不能为空")
     private List<Long> userIds;
 
-    @ApiModelProperty("厂站id")
+    @Schema(description = "厂站id")
     @NotNull(message = "厂站id不能为空")
     private Long stationId;
 }

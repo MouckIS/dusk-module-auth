@@ -3,7 +3,7 @@ package com.dusk.module.auth.dto.dashboard;
 import com.dusk.common.core.dto.EntityDto;
 import com.dusk.module.auth.entity.dashboard.DashboardModule;
 import com.dusk.module.auth.entity.dashboard.DashboardModuleItem;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,7 +19,7 @@ public class ZoneItemDetailDto extends EntityDto {
     /**
      * 模块Id
      */
-    @ApiModelProperty("模块")
+    @Schema(description = "模块")
     private DashboardModule module;
 
     private Long moduleItemId;
@@ -27,30 +27,30 @@ public class ZoneItemDetailDto extends EntityDto {
     /**
      * 统计项ID
      */
-    @ApiModelProperty("统计项")
+    @Schema(description = "统计项")
     private DashboardModuleItem moduleItem;
 
     /**
      * 区域ID
      */
-    @ApiModelProperty("区域ID")
+    @Schema(description = "区域ID")
     private Long zoneId;
 
     /**
      * 顺序
      */
-    @ApiModelProperty("顺序")
+    @Schema(description = "顺序")
     private Integer seq;
 
     /**
      * 图表颜色
      */
-    @ApiModelProperty("图表颜色")
+    @Schema(description = "图表颜色")
     private String chartColor;
 
     /**
      * 接线图id
      */
-    @ApiModelProperty("接线图id")
+    @Schema(description = "接线图id")
     private Long graphId;
 }

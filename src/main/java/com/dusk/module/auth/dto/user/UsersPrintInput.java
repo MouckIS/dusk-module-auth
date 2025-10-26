@@ -1,8 +1,7 @@
 package com.dusk.module.auth.dto.user;
 
 import com.dusk.module.auth.enums.UserPrintType;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.Getter;
@@ -17,19 +16,19 @@ import java.util.List;
  */
 @Getter
 @Setter
-@ApiModel(value = "UsersPrintInput", description = "用户信息打印实体类")
+@Schema(description = "用户信息打印实体类")
 public class UsersPrintInput {
-    @ApiModelProperty("人员id")
+    @Schema(description = "人员id")
     public List<Long> userIds;
 
     @Enumerated(EnumType.STRING)
-    @ApiModelProperty("人员打印类型")
+    @Schema(description = "人员打印类型")
     public UserPrintType printType = UserPrintType.INNER;
 
-    @ApiModelProperty("项目名称")
+    @Schema(description = "项目名称")
     public String projectName;
 
-    @ApiModelProperty("工种")
+    @Schema(description = "工种")
     public String workType;
 
 }

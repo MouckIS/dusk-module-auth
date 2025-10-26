@@ -2,7 +2,7 @@ package com.dusk.module.auth.dto.sysno;
 
 import com.dusk.common.core.dto.EntityDto;
 import com.dusk.common.rpc.auth.enums.EnumResetType;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,18 +15,18 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class SerialNoDto extends EntityDto {
-    @ApiModelProperty("单据类型")
+    @Schema(description = "单据类型")
     private String billType;
-    @ApiModelProperty("重置类型")
+    @Schema(description = "重置类型")
     private EnumResetType resetType;
-    @ApiModelProperty("当前序号")
+    @Schema(description = "当前序号")
     private long currentNo;
-    @ApiModelProperty("最后一次的序列号")
+    @Schema(description = "最后一次的序列号")
     private String lastNo;
-    @ApiModelProperty("日期格式化")
+    @Schema(description = "日期格式化")
     private String dateFormat;
-    @ApiModelProperty("自增长序号长度")
+    @Schema(description = "自增长序号长度")
     private int noLength;
-    @ApiModelProperty("上一次获取序列号时间")
+    @Schema(description = "上一次获取序列号时间")
     private LocalDateTime lastUpdateTime;
 }

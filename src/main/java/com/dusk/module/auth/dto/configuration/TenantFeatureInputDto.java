@@ -1,7 +1,7 @@
 package com.dusk.module.auth.dto.configuration;
 
 import com.dusk.module.auth.dto.feature.FeatureValueInput;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,8 +14,8 @@ import java.util.List;
 @Getter
 @Setter
 public class TenantFeatureInputDto {
-    @ApiModelProperty("租户id")
+    @Schema(description = "租户id")
     Long tenantId;
-    @ApiModelProperty("特性")
+    @Schema(description = "特性")
     List<FeatureValueInput> featureList;
 }

@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.tenant;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,6 +11,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class IsTenantAvailableInput {
-    @ApiModelProperty("租户代码")
+    @Schema(description = "租户代码")
     private String tenantName;
 }

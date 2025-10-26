@@ -1,7 +1,7 @@
 package com.dusk.module.auth.dto.tenant;
 
 import com.dusk.common.core.dto.EntityDto;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,33 +15,33 @@ import java.time.LocalDateTime;
 @Setter
 public class TenantListDto extends EntityDto {
 
-    @ApiModelProperty("租户代码")
+    @Schema(description = "租户代码")
     private String tenantName;
-    @ApiModelProperty("租户名称")
+    @Schema(description = "租户名称")
     private String name;
-    @ApiModelProperty("版本名称")
+    @Schema(description = "版本名称")
     private String editionDisplayName;
-    @ApiModelProperty("连接url")
+    @Schema(description = "连接url")
     private String connUrl;
-    @ApiModelProperty("数据库帐户名")
+    @Schema(description = "数据库帐户名")
     private String connUserName;
-    @ApiModelProperty("数据库密码")
+    @Schema(description = "数据库密码")
     private String connPassword;
-    @ApiModelProperty("租户是否激活")
+    @Schema(description = "租户是否激活")
     private boolean active;
-    @ApiModelProperty("创建时间")
+    @Schema(description = "创建时间")
     private LocalDateTime createTime;
-    @ApiModelProperty("订阅到期时间")
+    @Schema(description = "订阅到期时间")
     private LocalDateTime subscriptionEndDateUtc;
-    @ApiModelProperty("租户关联的版本的唯一标识id")
+    @Schema(description = "租户关联的版本的唯一标识id")
     private String editionId;
-    @ApiModelProperty("描述")
+    @Schema(description = "描述")
     private String description;
 
     /**
      * app下载地址
      */
-    @ApiModelProperty("app下载地址")
+    @Schema(description = "app下载地址")
     private String appDownloadUrl;
 
 }

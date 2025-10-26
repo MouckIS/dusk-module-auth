@@ -2,7 +2,7 @@ package com.dusk.module.auth.dto.dashboard;
 
 import com.dusk.common.core.dto.EntityDto;
 import com.dusk.module.auth.enums.dashboard.DashboardModuleType;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -19,44 +19,44 @@ public class CreateOrUpdateModuleItem extends EntityDto {
      * 名称
      */
     @NotBlank(message = "名称不能为空")
-    @ApiModelProperty("名称")
+    @Schema(description = "名称")
     private String name;
 
     /**
      * code
      */
     @NotBlank(message = "编号不能为空")
-    @ApiModelProperty("编号")
+    @Schema(description = "编号")
     private String code;
 
     /**
      * 详情路径
      */
-    @ApiModelProperty("详情路径")
+    @Schema(description = "详情路径")
     private String detailPath;
     /**
      * 数据来源
      */
-    @ApiModelProperty("数据源")
+    @Schema(description = "数据源")
     private String dataSource;
 
     /**
      * 类型
      */
     @NotNull(message = "类型不能为空")
-    @ApiModelProperty("类型")
+    @Schema(description = "类型")
     private DashboardModuleType moduleType;
 
     /**
      * 模块Id
      */
     @NotNull(message = "模块Id不能为空")
-    @ApiModelProperty("模块Id")
+    @Schema(description = "模块Id")
     private Long moduleId;
 
     /**
      * 图表类型
      */
-    @ApiModelProperty("图表类型")
+    @Schema(description = "图表类型")
     private String chartType;
 }

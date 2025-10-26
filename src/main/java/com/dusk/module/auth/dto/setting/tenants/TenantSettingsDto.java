@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.setting.tenants;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,6 +26,6 @@ public class TenantSettingsDto {
 
     private TenantTicketSettingsDto ticket;
 
-    @ApiModelProperty("外观配置")
+    @Schema(description = "外观配置")
     private FacadeSettingDto facadeSetting;
 }

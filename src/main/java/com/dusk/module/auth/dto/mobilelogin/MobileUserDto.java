@@ -2,7 +2,7 @@ package com.dusk.module.auth.dto.mobilelogin;
 
 import cn.hutool.core.util.StrUtil;
 import com.dusk.common.core.dto.EntityDto;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
@@ -15,17 +15,19 @@ import lombok.experimental.FieldNameConstants;
 @Setter
 @FieldNameConstants
 public class MobileUserDto extends EntityDto {
-    @ApiModelProperty("姓名")
+    @Schema(description = "姓名")
     private String name;
-    @ApiModelProperty("用户名")
+    @Schema(description = "用户名")
     private String userName;
-    @ApiModelProperty("租户id")
+    @Schema(description = "租户id")
     private Long tenantId;
-    @ApiModelProperty("租户显示名称")
+    //@Mapping("tenant.name")
+    @Schema(description = "租户显示名称")
     private String tenant;
-    @ApiModelProperty("租户代码")
+    //@Mapping("tenant.tenantName")
+    @Schema(description = "租户代码")
     private String tenantName;
-    @ApiModelProperty("登陆token")
+    @Schema(description = "登陆token")
     private String token;
 
     public String getTenant() {

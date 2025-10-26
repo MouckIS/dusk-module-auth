@@ -1,7 +1,7 @@
 package com.dusk.module.auth.dto.dashboard;
 
 import com.dusk.common.core.dto.EntityDto;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,32 +17,32 @@ public class ClassifyDetailDto extends EntityDto {
     /**
      * 名称
      */
-    @ApiModelProperty("名称")
+    @Schema(description = "名称")
     private String name;
     /**
      * 布局id
      */
-    @ApiModelProperty("布局id")
+    @Schema(description = "布局id")
     private String layoutId;
 
     /**
      * 区域总数
      */
-    @ApiModelProperty("区域总数")
+    @Schema(description = "区域总数")
     private int zoneNum;
 
     /**
      * 主题Id
      */
-    @ApiModelProperty("主题Id")
+    @Schema(description = "主题Id")
     private Long themeId;
 
     /**
      * 顺序
      */
-    @ApiModelProperty("顺序")
+    @Schema(description = "顺序")
     private Integer seq;
 
-    @ApiModelProperty("区域列表")
+    @Schema(description = "区域列表")
     private List<ZoneDetailDto> zones;
 }

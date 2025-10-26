@@ -2,8 +2,7 @@ package com.dusk.module.auth.dto.user;
 
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
 import com.dusk.common.core.enums.EUnitType;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,11 +15,11 @@ import java.util.List;
  */
 @Getter
 @Setter
-@ApiModel
+@Schema
 public class GetUsersByRoleNameInput extends PagedAndSortedInputDto {
-    @ApiModelProperty("角色名称列表")
+    @Schema(description = "角色名称列表")
     @NotEmpty(message = "角色名称不能为空")
     public List<String> roleNames;
-    @ApiModelProperty("账号类型")
+    @Schema(description = "账号类型")
     private EUnitType userType;
 }

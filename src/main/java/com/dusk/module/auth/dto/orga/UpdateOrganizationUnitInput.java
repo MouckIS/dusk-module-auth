@@ -2,7 +2,7 @@ package com.dusk.module.auth.dto.orga;
 
 import com.dusk.common.core.dto.EntityDto;
 import com.dusk.module.auth.enums.OrgLabel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,25 +13,25 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UpdateOrganizationUnitInput extends EntityDto {
-    @ApiModelProperty("父组织机构id")
+    @Schema(description = "父组织机构id")
     private Long parentId;
 
-    @ApiModelProperty("名字")
+    @Schema(description = "名字")
     private String displayName;
 
-    @ApiModelProperty("是否为厂站")
+    @Schema(description = "是否为厂站")
     private boolean station = false;
 
-    @ApiModelProperty("序号")
+    @Schema(description = "序号")
     private int sortIndex;
 
-    @ApiModelProperty("组织机构描述")
+    @Schema(description = "组织机构描述")
     private String description;
 
-    @ApiModelProperty("组织标签")
+    @Schema(description = "组织标签")
     private OrgLabel label;
 
     // todo: 只有覆盖管理层员工id时， 这个字段才有用
-    @ApiModelProperty("管理层人员id")
+    @Schema(description = "管理层人员id")
     private Long ManagerId;
 }

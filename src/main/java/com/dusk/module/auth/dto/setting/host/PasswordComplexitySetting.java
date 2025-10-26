@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.setting.host;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,18 +13,18 @@ import lombok.Setter;
 @Setter
 @EqualsAndHashCode
 public class PasswordComplexitySetting {
-    @ApiModelProperty("包含数字")
+    @Schema(description = "包含数字")
     public boolean requireDigit;
 
-    @ApiModelProperty("包含小写字母")
+    @Schema(description = "包含小写字母")
     public boolean requireLowercase;
 
-    @ApiModelProperty("包含特殊字符")
+    @Schema(description = "包含特殊字符")
     public boolean requireNonAlphanumeric;
 
-    @ApiModelProperty("包含大写字母")
+    @Schema(description = "包含大写字母")
     public boolean requireUppercase;
 
-    @ApiModelProperty("最小字符长度")
+    @Schema(description = "最小字符长度")
     public int requiredLength;
 }

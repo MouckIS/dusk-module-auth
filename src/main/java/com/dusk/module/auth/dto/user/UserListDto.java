@@ -1,7 +1,7 @@
 package com.dusk.module.auth.dto.user;
 
 import com.dusk.common.core.dto.EntityDto;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,32 +15,32 @@ import java.util.List;
 @Getter
 @Setter
 public class UserListDto extends EntityDto {
-    @ApiModelProperty("姓名")
+    @Schema(description = "姓名")
     private String name;
-    @ApiModelProperty("姓名拼音")
+    @Schema(description = "姓名拼音")
     private String surName;
-    @ApiModelProperty("账号")
+    @Schema(description = "账号")
     private String userName;
-    @ApiModelProperty("电子邮箱地址")
+    @Schema(description = "电子邮箱地址")
     private String emailAddress;
-    @ApiModelProperty("电话号码")
+    @Schema(description = "电话号码")
     private String phoneNo;
-    @ApiModelProperty("是否管理员")
+    @Schema(description = "是否管理员")
     private boolean admin;
-    @ApiModelProperty("头像图片")
+    @Schema(description = "头像图片")
     private String profilePictureId;
-    @ApiModelProperty("是否确认邮箱")
+    @Schema(description = "是否确认邮箱")
     private boolean emailConfirmed;
-    @ApiModelProperty("角色列表")
+    @Schema(description = "角色列表")
     private List<UserListRoleDto> userRoles;
-    @ApiModelProperty("是否激活")
+    @Schema(description = "是否激活")
     private boolean active;
-    @ApiModelProperty("是否被锁定")
+    @Schema(description = "是否被锁定")
     private boolean lock;
-    @ApiModelProperty("创建时间")
+    @Schema(description = "创建时间")
     private LocalDateTime createTime;
-    @ApiModelProperty("工号")
+    @Schema(description = "工号")
     public String workNumber;
-    @ApiModelProperty("签字图片")
+    @Schema(description = "签字图片")
     public Long signaturePictureId;
 }
