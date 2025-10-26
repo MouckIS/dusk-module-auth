@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.configuration;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,6 +11,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class LoginInfoDto {
-    @ApiModelProperty("是否需要验证码")
+    @Schema(description = "是否需要验证码")
     private boolean needCaptcha;
 }

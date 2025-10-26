@@ -1,7 +1,7 @@
 package com.dusk.module.auth.dto.user;
 
 import com.dusk.common.core.enums.UserStatus;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -16,11 +16,11 @@ import java.util.List;
 @Getter
 @Setter
 public class ChangeStatusInput {
-    @ApiModelProperty("用户列表")
+    @Schema(description = "用户列表")
     @NotEmpty(message = "用户列表不能为空")
     private List<Long> userIds;
 
-    @ApiModelProperty("用户状态")
+    @Schema(description = "用户状态")
     @NotNull(message = "用户状态不能为空")
     private UserStatus status;
 }

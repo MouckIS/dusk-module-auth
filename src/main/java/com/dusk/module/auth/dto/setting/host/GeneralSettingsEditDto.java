@@ -1,7 +1,6 @@
 package com.dusk.module.auth.dto.setting.host;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,10 +10,10 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@ApiModel("基本信息")
+@Schema(description = "基本信息")
 public class GeneralSettingsEditDto {
-    @ApiModelProperty("时区")
+    @Schema(description = "时区")
     private String timezone;
-    @ApiModelProperty("used for comparing user's timezone to default timezone")
+    @Schema(description = "used for comparing user's timezone to default timezone")
     private String timezoneForComparison;
 }

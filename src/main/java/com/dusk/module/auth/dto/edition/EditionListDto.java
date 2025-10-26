@@ -1,7 +1,7 @@
 package com.dusk.module.auth.dto.edition;
 
 import com.dusk.common.core.dto.EntityDto;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,10 +14,10 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class EditionListDto extends EntityDto {
-    @ApiModelProperty("名称")
+    @Schema(description = "名称")
     private String name;
-    @ApiModelProperty("显示的名称")
+    @Schema(description = "显示的名称")
     private String displayName;
-    @ApiModelProperty("创建时间")
+    @Schema(description = "创建时间")
     private LocalDateTime createTime;
 }

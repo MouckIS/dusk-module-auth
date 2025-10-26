@@ -1,16 +1,15 @@
 package com.dusk.module.auth.dto.role;
 
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
 
 @Getter
 @Setter
-@ApiModel
+@Schema
 public class GetRolesInput extends PagedAndSortedInputDto {
-    @ApiModelProperty("根据角色名模糊查找")
+    @Schema(description = "根据角色名模糊查找")
     private String filter;
 }

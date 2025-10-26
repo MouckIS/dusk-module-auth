@@ -10,10 +10,10 @@ import com.dusk.module.auth.dto.auditlog.AuditLogListDto;
 import com.dusk.module.auth.dto.auditlog.ExportAuditLogsInput;
 import com.dusk.module.auth.dto.auditlog.GetAuditLogsInput;
 import com.dusk.module.auth.service.IAuditLogService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -32,17 +32,17 @@ import java.net.URLEncoder;
  */
 @RestController
 @RequestMapping("auditLog")
-@Api(tags = "AuditLog", description = "审计日志")
+@Tag(name = "AuditLog", description = "审计日志")
 @DisableAuditLog
 public class AuditLogController extends CruxBaseController {
     @Resource
     private IAuditLogService auditLogService;
 
     @GetMapping("getAuditLogs")
-    @ApiOperation("查询审计日志")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "minExecutionDuration", value = "最小持续时间", defaultValue = ""),
-            @ApiImplicitParam(name = "maxExecutionDuration", value = "最大持续时间", defaultValue = "")
+    @Operation(summary = "查询审计日志")
+    @Parameters({
+            @Parameter(name = "minExecutionDuration", description = "最小持续时间"),
+            @Parameter(name = "maxExecutionDuration", description = "最大持续时间")
     })
     @Authorize(AuditLogAuthProvider.PAGES_ADMINISTRATION_AUDITLOGS)
     public PagedResultDto<AuditLogListDto> getAuditLogs(GetAuditLogsInput input) {
@@ -51,14 +51,14 @@ public class AuditLogController extends CruxBaseController {
     }
 
     @GetMapping("/{id}")
-    @ApiOperation("审计日志详情")
+    @Operation(summary = "审计日志详情")
     @Authorize(AuditLogAuthProvider.PAGES_ADMINISTRATION_AUDITLOGS)
     public AuditLogDetailDto detail(@PathVariable Long id) {
         return auditLogService.getAuditLogDetail(id);
     }
 
 
-    @ApiOperation(value = "导出审计日志")
+    @Operation(summary = "导出审计日志")
     @GetMapping("exportLog")
     @Authorize(AuditLogAuthProvider.PAGES_ADMINISTRATION_AUDITLOGS_EXPORT)
     public void exportLog(@Valid ExportAuditLogsInput input, HttpServletResponse response) throws IOException {

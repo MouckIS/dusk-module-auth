@@ -4,7 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
 import com.dusk.module.auth.entity.UserLoginLog;
 import com.dusk.module.auth.enums.LoginLogType;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.domain.Sort;
@@ -20,13 +20,13 @@ import java.time.LocalTime;
 @Getter
 @Setter
 public class ListUserLoginLogInput extends PagedAndSortedInputDto {
-    @ApiModelProperty("用户名")
+    @Schema(description = "用户名")
     private String userName;
-    @ApiModelProperty("日志类型")
+    @Schema(description = "日志类型")
     private LoginLogType logType;
-    @ApiModelProperty("开始时间")
+    @Schema(description = "开始时间")
     private LocalDateTime beginTime;
-    @ApiModelProperty("结束时间")
+    @Schema(description = "结束时间")
     private LocalDateTime endTime;
 
     public LocalDateTime getBeginTime() {

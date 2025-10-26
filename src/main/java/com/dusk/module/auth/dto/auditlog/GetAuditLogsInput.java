@@ -4,7 +4,7 @@ import com.dusk.common.core.dto.PagedAndSortedInputDto;
 import com.dusk.common.core.entity.BaseEntity;
 import com.dusk.module.auth.entity.AuditLog;
 import com.dusk.module.auth.entity.User;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -19,23 +19,23 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class GetAuditLogsInput extends PagedAndSortedInputDto {
-    @ApiModelProperty("开始时间")
+    @Schema(description = "开始时间")
     public LocalDateTime startDate;
-    @ApiModelProperty("结束时间")
+    @Schema(description = "结束时间")
     public LocalDateTime endDate;
-    @ApiModelProperty("用户名")
+    @Schema(description = "用户名")
     public String userName;
-    @ApiModelProperty("服务")
+    @Schema(description = "服务")
     public String serviceName;
-    @ApiModelProperty("操作")
+    @Schema(description = "操作")
     public String methodName;
-    @ApiModelProperty("浏览器")
+    @Schema(description = "浏览器")
     public String browserInfo;
-    @ApiModelProperty("错误状态")
+    @Schema(description = "错误状态")
     public Boolean hasException;
-    @ApiModelProperty(value = "最小持续时间")
+    @Schema(description = "最小持续时间")
     public Integer minExecutionDuration;
-    @ApiModelProperty(value = "最大持续时间")
+    @Schema(description = "最大持续时间")
     public Integer maxExecutionDuration;
 
     @Override

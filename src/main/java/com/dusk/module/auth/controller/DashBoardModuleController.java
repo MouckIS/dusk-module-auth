@@ -8,8 +8,8 @@ import com.dusk.module.auth.dto.dashboard.*;
 import com.dusk.module.auth.entity.dashboard.DashboardModule;
 import com.dusk.module.auth.entity.dashboard.DashboardModuleItem;
 import com.dusk.module.auth.service.IDashBoardModuleService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.validation.annotation.Validated;
@@ -22,7 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @RestController
 @RequestMapping("dashBoard")
-@Api(tags = "DashBoard", description = "数据仪表盘")
+@Tag(name = "DashBoard", description = "数据仪表盘")
 @Authorize(DashBoardAuthProvider.PAGES_DASHBOARD_THEME_MODULE)
 public class DashBoardModuleController extends CruxBaseController {
     @Resource
@@ -31,39 +31,39 @@ public class DashBoardModuleController extends CruxBaseController {
     /********************模块接口*************************/
 
     @PostMapping("/saveModule")
-    @ApiOperation("新增或更新模块")
+    @Operation(summary = "新增或更新模块")
     @Authorize(DashBoardAuthProvider.PAGES_DASHBOARD_THEME_MODULE_EDIT)
     public DashboardModule saveModule(@Validated @RequestBody CreateOrUpdateModule input) {
         return moduleService.saveModule(input);
     }
 
     @PostMapping("/copyItem")
-    @ApiOperation("拷贝模块")
+    @Operation(summary = "拷贝模块")
     public void copyItem(@Validated @RequestBody CopyModuleItemInput input) {
         moduleService.copyItem(input);
     }
 
     @PostMapping("/copyModuleItems")
-    @ApiOperation(value = "拷贝模块所有统计项")
+    @Operation(summary = "拷贝模块所有统计项")
     public void copyModuleItems(@Validated @RequestBody CopyModuleItemsInput input) {
         moduleService.copyModuleItems(input);
     }
 
     @GetMapping("moduleDetail/{id}")
-    @ApiOperation(value = "获取模块详细信息")
+    @Operation(summary = "获取模块详细信息")
     public ModuleDetailDto moduleDetail(@PathVariable Long id) {
         return moduleService.moduleDetail(id);
     }
 
     @DeleteMapping("removeModule/{id}")
-    @ApiOperation(value = "删除模块")
+    @Operation(summary = "删除模块")
     @Authorize(DashBoardAuthProvider.PAGES_DASHBOARD_THEME_MODULE_DELETE)
     public void removeModule(@PathVariable Long id) {
         moduleService.deleteModule(id);
     }
 
     @GetMapping("/getModuleList")
-    @ApiOperation("获取统计模块列表")
+    @Operation(summary = "获取统计模块列表")
     public PagedResultDto<ModuleListDto> getModuleList(@Validated GetModuleInput input) {
         return moduleService.getModuleList(input);
     }
@@ -71,27 +71,27 @@ public class DashBoardModuleController extends CruxBaseController {
     /********************模块统计项接口*************************/
 
     @PostMapping("/saveModuleItem")
-    @ApiOperation("新增或更新统计项")
+    @Operation(summary = "新增或更新统计项")
     @Authorize(DashBoardAuthProvider.PAGES_DASHBOARD_THEME_MODULE_EDIT)
     public DashboardModuleItem saveModuleItem(@Validated @RequestBody CreateOrUpdateModuleItem input) {
         return moduleService.saveModuleItem(input);
     }
 
     @DeleteMapping("removeModuleItem/{id}")
-    @ApiOperation(value = "删除统计项")
+    @Operation(summary = "删除统计项")
     @Authorize(DashBoardAuthProvider.PAGES_DASHBOARD_THEME_MODULE_EDIT)
     public void removeModuleItem(@PathVariable Long id) {
         moduleService.removeModuleItem(id);
     }
 
-    @ApiOperation("导出模块配置【文本格式】")
+    @Operation(summary = "导出模块配置【文本格式】")
     @PostMapping(value = "/exportModule")
     @Authorize(DashBoardAuthProvider.PAGES_DASHBOARD_THEME_MODULE_EXPORT)
     public void exportModule(HttpServletResponse response) {
         moduleService.exportModule(response);
     }
 
-    @ApiOperation("导入模块配置【文本格式】")
+    @Operation(summary = "导入模块配置【文本格式】")
     @PostMapping(value = "/importModule")
     @Authorize(DashBoardAuthProvider.PAGES_DASHBOARD_THEME_MODULE_IMPORT)
     public void importModule(ModuleItemPermissionInput permissionInput, @RequestParam("uploadFile") MultipartFile uploadFile) {

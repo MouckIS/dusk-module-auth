@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.orga;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,9 +11,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserToOrganizationUnitInput {
-    @ApiModelProperty("用户id")
+    @Schema(description = "用户id")
     private Long userId;
 
-    @ApiModelProperty("组织机构id")
+    @Schema(description = "组织机构id")
     private Long organizationUnitId;
 }

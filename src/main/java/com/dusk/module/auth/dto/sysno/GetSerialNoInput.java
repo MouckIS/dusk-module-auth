@@ -1,7 +1,7 @@
 package com.dusk.module.auth.dto.sysno;
 
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,6 +12,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class GetSerialNoInput extends PagedAndSortedInputDto {
-    @ApiModelProperty("单据类型")
+    @Schema(description = "单据类型")
     private String billType;
 }

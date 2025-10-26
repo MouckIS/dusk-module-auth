@@ -5,7 +5,7 @@ import com.dusk.common.core.timing.Clock;
 import com.dusk.module.auth.dto.setting.host.EmailSettingsEditDto;
 import com.dusk.module.auth.dto.setting.host.GeneralSettingsEditDto;
 import com.dusk.module.auth.dto.setting.host.SecuritySettingsEditDto;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,7 +34,7 @@ public class TenantSettingsEditDto {
 
     private TenantTicketSettingsEditDto ticket;
 
-    @ApiModelProperty("外观配置")
+    @Schema(description = "外观配置")
     private FacadeSettingEditDto facadeSetting;
 
     /**

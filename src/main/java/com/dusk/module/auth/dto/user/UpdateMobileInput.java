@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.user;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,9 +11,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UpdateMobileInput {
-    @ApiModelProperty("新手机号")
+    @Schema(description = "新手机号")
     public String newMobile;
 
-    @ApiModelProperty("验证码")
+    @Schema(description = "验证码")
     public String verificationCode;
 }

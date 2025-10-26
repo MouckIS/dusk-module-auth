@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.permission;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,8 +11,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PermissionInputDto {
-    @ApiModelProperty("权限名称")
+    @Schema(description = "权限名称")
     private String name;
-    @ApiModelProperty("是否已授权")
+    @Schema(description = "是否已授权")
     private boolean granted;
 }

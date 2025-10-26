@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.setting.host;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,8 +11,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class HostUserManagementSettingsEditDto {
-    @ApiModelProperty("必须验证邮箱地址后才能登录")
+    @Schema(description = "必须验证邮箱地址后才能登录")
     public boolean emailConfirmationRequiredForLogin;
-    @ApiModelProperty("启用电话号码验证（通过短信）")
+    @Schema(description = "启用电话号码验证（通过短信）")
     public boolean smsVerificationEnabled;
 }

@@ -2,8 +2,7 @@ package com.dusk.module.auth.dto.user;
 
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
 import com.dusk.common.core.entity.BaseEntity;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,16 +15,16 @@ import org.springframework.data.domain.Sort;
  */
 @Getter
 @Setter
-@ApiModel(value = "GetUsersInput", description = "查询用户列表的实体类")
+@Schema(description = "查询用户列表的实体类")
 public class GetOrgaUsersInput extends PagedAndSortedInputDto {
-    @ApiModelProperty("组织机构Id")
+    @Schema(description = "组织机构Id")
     @NotNull(message = "组织机构id不能为空")
     private Long orgaId;
-    @ApiModelProperty("模糊查找[姓名、账号、电子邮箱、手机号、角色名、工号]")
+    @Schema(description = "模糊查找[姓名、账号、电子邮箱、手机号、角色名、工号]")
     public String filter;
-    @ApiModelProperty("角色id")
+    @Schema(description = "角色id")
     public Long roleId;
-    @ApiModelProperty("角色 name")
+    @Schema(description = "角色 name")
     public String roleName;
 
     @Override

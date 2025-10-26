@@ -2,7 +2,7 @@ package com.dusk.module.auth.dto.user;
 
 import com.dusk.common.core.dto.PagedAndSortedInputDto;
 import com.dusk.common.core.enums.EUnitType;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,13 +15,13 @@ import lombok.Setter;
 @Getter
 @Setter
 public class GetUserByRoleDto extends PagedAndSortedInputDto {
-    @ApiModelProperty("角色id")
+    @Schema(description = "角色id")
     @NotNull(message = "角色id不能为空")
     private Long roleId;
 
-    @ApiModelProperty("过滤用户名")
+    @Schema(description = "过滤用户名")
     private String userName;
 
-    @ApiModelProperty("用户类型")
+    @Schema(description = "用户类型")
     private EUnitType userType;
 }

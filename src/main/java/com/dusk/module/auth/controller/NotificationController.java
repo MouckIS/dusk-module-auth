@@ -5,10 +5,10 @@ import com.dusk.common.core.dto.EntityDto;
 import com.dusk.common.core.dto.PagedResultDto;
 import com.dusk.module.auth.dto.notification.*;
 import com.dusk.module.auth.service.INotificationService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("notification")
-@Api(tags = "Notification", description = "用户消息通知")
+@Tag(name = "Notification", description = "用户消息通知")
 public class NotificationController extends CruxBaseController {
     @Resource
     private INotificationService service;
@@ -33,7 +33,7 @@ public class NotificationController extends CruxBaseController {
      * @param input
      * @return
      */
-    @ApiOperation("获取用户消息列表")
+    @Operation(summary = "获取用户消息列表")
     @GetMapping("getNotificationList")
     public PagedResultDto<NotificationListOutput> getNotificationList(GetNotificationListInput input) {
         return service.getNotificationList(input);
@@ -45,7 +45,7 @@ public class NotificationController extends CruxBaseController {
      * @param input
      * @return
      */
-    @ApiOperation("获取用户消息详情")
+    @Operation(summary = "获取用户消息详情")
     @GetMapping("getNotification")
     public NotificationOutput getNotification(EntityDto input) {
         return service.getNotification(input);
@@ -57,7 +57,7 @@ public class NotificationController extends CruxBaseController {
      * @param input
      * @return
      */
-    @ApiOperation("获取用户消息数量")
+    @Operation(summary = "获取用户消息数量")
     @GetMapping("getCount")
     public Long getCount(GetNotificationListCountInput input) {
         return service.getCount(input);
@@ -68,7 +68,7 @@ public class NotificationController extends CruxBaseController {
      *
      * @param input
      */
-    @ApiOperation("设置用户消息的状态为已读")
+    @Operation(summary = "设置用户消息的状态为已读")
     @PutMapping("setNotificationAsRead")
     public void setNotificationAsRead(@RequestBody SetNotificationAsReadInput input) {
         service.setNotificationAsRead(input);
@@ -79,10 +79,10 @@ public class NotificationController extends CruxBaseController {
      *
      * @param id
      */
-    @ApiOperation("删除消息通知")
+    @Operation(summary = "删除消息通知")
     @DeleteMapping("deleteNotification")
-    @ApiImplicitParams(
-            @ApiImplicitParam(name = "id", value = "消息Id", required = true)
+    @Parameters(
+            @Parameter(name = "id", description = "消息Id", required = true)
     )
     public void deleteNotification(@RequestParam Long id) {
         service.deleteNotification(id);
@@ -93,7 +93,7 @@ public class NotificationController extends CruxBaseController {
      *
      * @param input
      */
-    @ApiOperation("批量删除消息通知")
+    @Operation(summary = "批量删除消息通知")
     @DeleteMapping("batchDeleteNotification")
     public void batchDeleteNotification(@Valid @RequestBody BatchDeleteNotificationInput input) {
         service.batchDeleteNotification(input);

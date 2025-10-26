@@ -2,7 +2,7 @@ package com.dusk.module.auth.dto.fingerprint;
 
 import com.dusk.common.core.dto.VersionDto;
 import com.dusk.common.rpc.auth.enums.FingerprintFromEnum;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -15,24 +15,24 @@ import lombok.Setter;
 @Getter
 @Setter
 public class SaveFingerprintInputDto extends VersionDto {
-    @ApiModelProperty(value = "用户id")
+    @Schema(description = "用户id")
     @NotNull(message = "用户Id不能为空")
     private Long userId;
 
-    @ApiModelProperty(value = "用户序列")
+    @Schema(description = "用户序列")
     private Integer userSeq;
 
-    @ApiModelProperty("指纹名称")
+    @Schema(description = "指纹名称")
     @NotBlank(message = "指纹名称不能为空")
     private String name;
 
-    @ApiModelProperty("指纹数据")
+    @Schema(description = "指纹数据")
     @NotBlank(message = "指纹数据不能为空")
     private String data;
 
-    @ApiModelProperty("指纹数据大小")
+    @Schema(description = "指纹数据大小")
     private Integer size;
 
-    @ApiModelProperty("指纹来源，默认为指纹采集器Live20R")
+    @Schema(description = "指纹来源，默认为指纹采集器Live20R")
     private FingerprintFromEnum fromEnum = FingerprintFromEnum.LIVE20R;
 }

@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.dashboard;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,12 +18,12 @@ public class CreateOrUpdateDashBoardPermission {
      * 主题ID
      */
     @NotNull(message = "主题Id不能为空")
-    @ApiModelProperty("主题Id")
+    @Schema(description = "主题Id")
     private Long themeId;
 
     /**
      * 角色ID列表
      */
-    @ApiModelProperty("角色ID列表")
+    @Schema(description = "角色ID列表")
     private List<Long> roleIds;
 }

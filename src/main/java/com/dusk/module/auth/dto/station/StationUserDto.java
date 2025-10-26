@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.station;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,13 +18,13 @@ import lombok.experimental.FieldNameConstants;
 @FieldNameConstants
 public class StationUserDto {
 
-    @ApiModelProperty("用户id")
+    @Schema(description = "用户id")
     private Long id;
 
-    @ApiModelProperty("姓名")
+    @Schema(description = "姓名")
     private String name;
 
-    @ApiModelProperty("账号")
+    @Schema(description = "账号")
     private String userName;
 
     public StationUserDto(Long id, String name, String userName) {

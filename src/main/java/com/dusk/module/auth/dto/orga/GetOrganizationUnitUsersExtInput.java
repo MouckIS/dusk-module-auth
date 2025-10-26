@@ -1,7 +1,7 @@
 package com.dusk.module.auth.dto.orga;
 
 import com.dusk.common.rpc.auth.dto.orga.GetOrganizationUnitUsersInput;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.domain.Sort;
@@ -15,7 +15,7 @@ import org.springframework.data.domain.Sort;
 @Getter
 @Setter
 public class GetOrganizationUnitUsersExtInput extends GetOrganizationUnitUsersInput {
-    @ApiModelProperty("显示离职账号")
+    @Schema(description = "显示离职账号")
     private boolean displayDimissionUsers = false;
 
     @Override

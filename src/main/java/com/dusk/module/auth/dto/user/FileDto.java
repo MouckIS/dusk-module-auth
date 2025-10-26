@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.user;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,9 +12,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FileDto {
-    @ApiModelProperty("文件名")
+    @Schema(description = "文件名")
     private String fileName;
-    @ApiModelProperty("文件类型")
+    @Schema(description = "文件类型")
     private String fileType;
     private String fileToken;
 

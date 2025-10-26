@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto.setting.host;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,15 +11,15 @@ import lombok.Setter;
 @Getter
 @Setter
 public class TenantManagementSettingsEditDto {
-    @ApiModelProperty("Setting_AllowSelfRegistration")
+    @Schema(description = "Setting_AllowSelfRegistration")
     public boolean allowSelfRegistration;
 
-    @ApiModelProperty("新注册的默认项目")
+    @Schema(description = "新注册的默认项目")
     public boolean newRegisteredTenantActiveByDefault;
 
-    @ApiModelProperty("用户注册时使用图片验证码(captcha).")
+    @Schema(description = "用户注册时使用图片验证码(captcha).")
     public boolean useCaptchaOnRegistration;
 
-    @ApiModelProperty("版本")
+    @Schema(description = "版本")
     public String defaultEditionId;
 }
