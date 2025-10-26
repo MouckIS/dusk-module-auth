@@ -14,6 +14,7 @@ import com.dusk.module.auth.entity.Station;
 import com.dusk.module.auth.entity.User;
 import com.dusk.module.auth.mapper.StationMapper;
 import com.dusk.module.auth.repository.IStationRepository;
+import com.dusk.module.auth.repository.IUserRepository;
 import com.dusk.module.auth.service.ISerialNoService;
 import com.dusk.module.auth.service.IStationService;
 import com.dusk.module.auth.service.IUserService;
@@ -34,7 +35,7 @@ import java.util.stream.Collectors;
 @Transactional(rollbackFor = Exception.class)
 public class StationServiceImpl extends TreeService<Station,IStationRepository> implements IStationService  {
     @Resource
-    private IUserService userService;
+    private IUserRepository userRepository;
     @Resource
     private IDataFilterDefinitionContext dataFilterDefinitionContext;
     @Resource
@@ -104,7 +105,7 @@ public class StationServiceImpl extends TreeService<Station,IStationRepository> 
     @Override
     public List<StationsOfLoginUserDto> getStationsForFrontByUserId(Long id) {
         List<Station> stations = this.getAllStationsByUserId(id);
-        User u = userService.getUserById(id);
+        User u = userRepository.findById(id).orElseThrow(() -> new BusinessException("未找到相应的用户"));
 
         return MapperUtil.mapList(stations, mapper::toStationsOfLoginUserDto, (s, t) -> {
             t.setName(s.getDisplayName());

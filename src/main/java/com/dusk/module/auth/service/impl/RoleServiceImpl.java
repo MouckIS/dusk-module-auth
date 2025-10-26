@@ -56,6 +56,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@org.springframework.stereotype.Service
 public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implements IRoleRpcService, IRoleService {
 
     @Resource
@@ -71,7 +72,7 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
     private IGrantPermissionRepository permissionRepository;
 
     @Resource
-    private IAuthPermissionManager permissionManager;
+    private IAuthPermissionManager authPermissionManager;
 
     @Resource
     private ITenantPermissionService tenantPermissionService;
@@ -129,7 +130,7 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
         entity.setPermissionRole();
         Role save = repository.save(entity);
         //刷新权限缓存
-        permissionManager.refreshAll();
+        authPermissionManager.refreshAll();
         return save;
     }
 
@@ -153,7 +154,7 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
         repository.delete(entity);
 
         //刷新权限缓存
-        permissionManager.refreshAll();
+        authPermissionManager.refreshAll();
     }
 
     @Override
@@ -245,7 +246,7 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
         permissionRepository.deleteInBatch(deletePermissions);
         save(role);
         //刷新权限缓存
-        permissionManager.refreshAll();
+        authPermissionManager.refreshAll();
     }
 
     @Override
@@ -408,7 +409,7 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
         long i = queryFactory.delete(QRole.role).where(QRole.role.roleCode.eq(code)).execute();
         if (i > 0) {
             //刷新权限缓存
-            permissionManager.refreshAll();
+            authPermissionManager.refreshAll();
         }
     }
 
@@ -438,7 +439,7 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
         List<RolePermissionDto> result = new ArrayList<>();
         //租户角色权限清单
         if (TenantContextHolder.getTenantId() == null) {
-            List<Permission> permissions = permissionManager.getDefinitionPermissionTree(false);
+            List<Permission> permissions = authPermissionManager.getDefinitionPermissionTree(false);
             permissions.forEach(s -> {
                 RolePermissionDto rolePermissionDto = mapper.entityToPermissionDto(s);
                 rolePermissionDto.setGranted(true);

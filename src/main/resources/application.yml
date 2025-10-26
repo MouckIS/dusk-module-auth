@@ -1,3 +1,9 @@
 spring:
   profiles:
+    active: ${SPRING_PROFILES_ACTIVE:sit}
     include: common-${spring.profiles.active}
+  application:
+    name: ${SPRING_APPLICATION_NAME:dusk-module-auth}
+  config:
+    import:
+      - optional:nacos:${spring.application.name}.yaml

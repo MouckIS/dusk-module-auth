@@ -33,6 +33,7 @@ import java.time.LocalDateTime;
 @Service(retries = 0, timeout = 2000)
 @Transactional
 @Slf4j
+@org.springframework.stereotype.Service
 public class SerialNoServiceImpl extends BaseService<SerialNo, ISerialNoRepository> implements ISerialNoRpcService, ISerialNoService {
     @Resource
     JPAQueryFactory queryFactory;

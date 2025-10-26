@@ -55,6 +55,7 @@ import com.dusk.module.ddm.service.ISettingRpcService;
 import com.hankcs.hanlp.HanLP;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.SneakyThrows;
@@ -128,13 +129,8 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     private IOrganizationManagerRepository organizationManagerRepository;
     @Resource
     private IStationService stationService;
-    
     @Reference
     private ISettingRpcService settingRpcService;
-
-    @Resource
-    private IUserWxRelationRepository userWxRelationRepository;
-
     @Resource
     private RabbitMQUtils rabbitMQUtils;
 
@@ -837,7 +833,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
         organizationManagerRepository.deleteByUserId(id);
 
         //删除企业微信绑定
-        userWxRelationRepository.deleteAllByUserId(id);
+        //userWxRelationRepository.deleteAllByUserId(id);
         //删除人脸
         //userFaceRpcService.removeFace(id);
         //删除门禁权限

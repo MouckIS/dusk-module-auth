@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -32,23 +33,33 @@ public class GrantPermissionServiceImpl extends BaseService<GrantPermission, IGr
 
     @Resource
     private JPAQueryFactory queryFactory;
-    @Resource
-    private IAuthPermissionManager permissionManager;
+
+    /**
+     * todo：产生了循环依赖问题 先注释掉
+     * ┌─────┐
+     * |  authPermissionManager
+     * ↑     ↓
+     * |  redisPermissionCache
+     * ↑     ↓
+     * |  grantPermissionServiceImpl
+     * └─────┘
+     */
+    //@Resource
+    //private IAuthPermissionManager authPermissionManager;
 
 
     @Override
     @DisableTenantFilter
     public Map<String, List<RoleInfo>> getAll() {
         QGrantPermission grantPermission = QGrantPermission.grantPermission;
-        Map<String, List<RoleInfo>> result = queryFactory.selectDistinct(grantPermission.tenantId, grantPermission.name, grantPermission.role.id, grantPermission.role.roleCode, grantPermission.role.roleName).from(grantPermission).leftJoin(grantPermission.role).fetch()
+        return queryFactory.selectDistinct(grantPermission.tenantId, grantPermission.name, grantPermission.role.id, grantPermission.role.roleCode, grantPermission.role.roleName).from(grantPermission).leftJoin(grantPermission.role).fetch()
                 .stream().collect(Collectors.groupingBy(p -> (p.get(grantPermission.tenantId) == null ? "" : p.get(grantPermission.tenantId)) + p.get(grantPermission.name), Collectors.mapping(p -> {
                     RoleInfo roleInfo = new RoleInfo();
-                    roleInfo.setId(p.get(grantPermission.role.id).toString());
+                    roleInfo.setId(Objects.requireNonNull(p.get(grantPermission.role.id)).toString());
                     roleInfo.setRoleName(p.get(grantPermission.role.roleName));
                     roleInfo.setRoleCode(p.get(grantPermission.role.roleCode));
                     return roleInfo;
                 }, Collectors.toList())));
-        return result;
     }
 
     @Override
@@ -64,9 +75,9 @@ public class GrantPermissionServiceImpl extends BaseService<GrantPermission, IGr
                 addPermissions.add(permission);
             });
         });
-        if (addPermissions.size() > 0) {
+        if (!addPermissions.isEmpty()) {
             repository.saveAll(addPermissions);
-            permissionManager.refreshAll();
+            //authPermissionManager.refreshAll();
         }
     }
 
@@ -74,7 +85,7 @@ public class GrantPermissionServiceImpl extends BaseService<GrantPermission, IGr
     public void deleteDynamicPermission(String businessKey) {
         long execute = queryFactory.delete(QGrantPermission.grantPermission).where(QGrantPermission.grantPermission.businessKey.eq(businessKey)).execute();
         if (execute > 0) {
-            permissionManager.refreshAll();
+            //authPermissionManager.refreshAll();
         }
     }
 }

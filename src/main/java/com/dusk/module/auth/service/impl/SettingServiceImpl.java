@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @Slf4j
+@org.springframework.stereotype.Service
 public class SettingServiceImpl implements ISettingRpcService, ISettingService {
     @Resource
     private ISettingRepository repository;

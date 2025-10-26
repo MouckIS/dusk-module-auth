@@ -24,6 +24,7 @@ import org.springframework.scheduling.annotation.Async;
  */
 @Slf4j
 @Service
+@org.springframework.stereotype.Service
 public class EmailServiceImpl implements IEmailRpcService, IEmailService {
 
     @Reference

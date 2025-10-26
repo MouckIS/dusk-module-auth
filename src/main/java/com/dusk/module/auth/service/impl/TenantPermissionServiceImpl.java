@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class TenantPermissionServiceImpl extends BaseService<TenantPermission, ITenantPermissionRepository> implements ITenantPermissionService {
     @Resource
-    private IAuthPermissionManager permissionManager;
+    private IAuthPermissionManager authPermissionManager;
     @Resource
     private JPAQueryFactory jpaQueryFactory;
     @Resource
@@ -77,14 +77,14 @@ public class TenantPermissionServiceImpl extends BaseService<TenantPermission, I
         }
 
         //要刷新权限缓存
-        permissionManager.refreshAll();
+        authPermissionManager.refreshAll();
     }
 
     @Override
     public List<RolePermissionDto> getTenantPermissions(Long tenantId) {
         List<String> permissions;
         if (appAuthConfig.isDisableTenantAuthFilter()) {
-            permissions = permissionManager.getDefinitionPermission(true);
+            permissions = authPermissionManager.getDefinitionPermission(true);
         } else {
             permissions = getGrantedPermissionByTenantId(tenantId);
         }
@@ -108,7 +108,7 @@ public class TenantPermissionServiceImpl extends BaseService<TenantPermission, I
         QTenant qTenant = QTenant.tenant;
         QTenantPermission qTenantPermission = QTenantPermission.tenantPermission;
 
-        List<String> allPermission = permissionManager.getDefinitionPermission(true);
+        List<String> allPermission = authPermissionManager.getDefinitionPermission(true);
         Map<String, List<Long>> resultMap = new HashMap<>();
         if (appAuthConfig.isDisableTenantAuthFilter()) {
             List<Long> fetch = jpaQueryFactory.select(qTenant.id).from(qTenant).fetch();
@@ -122,7 +122,7 @@ public class TenantPermissionServiceImpl extends BaseService<TenantPermission, I
                 List<Long> hasPermissionTenantIds = new ArrayList<>();
                 List<Tuple> edition = editionMap.get(p);
                 if (edition != null) {
-                    hasPermissionTenantIds.addAll(edition.stream().map(o -> o.get(qTenant.id)).collect(Collectors.toList()));
+                    hasPermissionTenantIds.addAll(edition.stream().map(o -> o.get(qTenant.id)).toList());
                 }
                 resultMap.put(p, hasPermissionTenantIds);
             });
@@ -130,8 +130,6 @@ public class TenantPermissionServiceImpl extends BaseService<TenantPermission, I
 
         return resultMap;
     }
-
-    //region private
 
 
     private List<TenantPermission> getPermissionByEditionId(Long editionId) {
@@ -154,7 +152,7 @@ public class TenantPermissionServiceImpl extends BaseService<TenantPermission, I
 
 
     private List<RolePermissionDto> getPermissionDto(List<String> hasPermissions) {
-        List<Permission> permissions = permissionManager.getDefinitionPermissionTree(true);
+        List<Permission> permissions = authPermissionManager.getDefinitionPermissionTree(true);
         List<RolePermissionDto> result = new ArrayList<>();
         permissions.forEach(s -> {
             RolePermissionDto rolePermissionDto = mapper.toRolePermissionDto(s);

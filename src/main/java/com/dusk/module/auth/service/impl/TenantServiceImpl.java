@@ -42,7 +42,7 @@ public class TenantServiceImpl extends BaseService<Tenant, ITenantRepository> im
     @Resource
     private ISubscribableEditionService editionService;
     @Resource
-    private IAuthPermissionManager permissionManager;
+    private IAuthPermissionManager authPermissionManager;
 
     @Override
     public Tenant createTenantWithDefaultSettings(CreateTenantInput input) {
@@ -55,7 +55,7 @@ public class TenantServiceImpl extends BaseService<Tenant, ITenantRepository> im
         if (input.isSendActivationEmail()) {
             sendActivationEmail(user);
         }
-        permissionManager.refreshAll();
+        authPermissionManager.refreshAll();
         return tenant;
     }
 
@@ -75,7 +75,7 @@ public class TenantServiceImpl extends BaseService<Tenant, ITenantRepository> im
         //mapper.map(tenantEditDto, tenant);
         BeanUtils.copyProperties(tenantEditDto, tenant);
         tenant.setEdition(edition);
-        permissionManager.refreshAll();
+        authPermissionManager.refreshAll();
         repository.save(tenant);
     }
 
@@ -168,7 +168,7 @@ public class TenantServiceImpl extends BaseService<Tenant, ITenantRepository> im
     @Override
     public void deleteTenant(Long id) {
         repository.deleteById(id);
-        permissionManager.refreshAll();
+        authPermissionManager.refreshAll();
     }
 
     private String randomPassword() {

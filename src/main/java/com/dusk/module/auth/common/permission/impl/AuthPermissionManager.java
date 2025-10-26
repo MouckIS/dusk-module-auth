@@ -46,10 +46,10 @@ public class AuthPermissionManager implements IAuthPermissionManager {
     public List<String> getDefinitionPermission(boolean tenantFilter) {
         if (tenantFilter) {
             return allFlatPermission().values().stream().filter(p -> p.getMultiTenancySides().equals(MultiTenancySides.All) || p.getMultiTenancySides().equals(MultiTenancySides.Tenant))
-                    .map(p -> p.getName()).collect(Collectors.toList());
+                    .map(Permission::getName).collect(Collectors.toList());
         }
         return allFlatPermission().values().stream().filter(p -> p.getMultiTenancySides().equals(MultiTenancySides.Host) || p.getMultiTenancySides().equals(MultiTenancySides.All))
-                .map(p -> p.getName()).collect(Collectors.toList());
+                .map(Permission::getName).collect(Collectors.toList());
     }
 
     @Override

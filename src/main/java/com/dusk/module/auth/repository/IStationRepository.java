@@ -36,8 +36,8 @@ public interface IStationRepository extends IBaseRepository<Station> {
 
 
     /**
-     * 查询厂站下的用户，queryOrgaIds为-1时查询所有用户
-     * @param queryOrgaIds
+     * 查询厂站下的用户，queryStationIds为-1时查询所有用户
+     * @param queryStationIds
      * @param filter
      * @param pageable
      * @return
@@ -48,9 +48,9 @@ public interface IStationRepository extends IBaseRepository<Station> {
             "where (-1L in (:queryStationIds) or station.id in (:queryStationIds)) " +
             "and (:filter is null or :filter = '' or u.name like %:filter% or u.userName like %:filter%)" +
             "and (:userType is null or u.userType = :userType)")
-    Page<StationUserListDto> getStationUsers(@Param("queryStationIds") Set<Long> queryOrgaIds, @Param("filter") String filter, EUnitType userType, Pageable pageable);
+    Page<StationUserListDto> getStationUsers(Set<Long> queryStationIds, String filter, EUnitType userType, Pageable pageable);
 
 
     @Query("select distinct new com.dusk.module.auth.dto.station.StationUserDto(u.id,u.name,u.userName) from User u where u.id not in (select u2.id from Station station inner join station.users u2 where station.id = :stationId) and (:filter is null or :filter = '' or u.name like %:filter% or u.userName like %:filter%) and (:userType is null or u.userType = :userType) and u.userName is not null")
-    Page<StationUserDto> getNotAssignedStationUsers(@Param("stationId") Long stationId, @Param("filter") String filter, EUnitType userType, Pageable pageable);
+    Page<StationUserDto> getNotAssignedStationUsers(Long stationId, String filter, EUnitType userType, Pageable pageable);
 }

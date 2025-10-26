@@ -35,7 +35,6 @@ import com.dusk.module.auth.repository.IOrganizationUnitRepository;
 import com.dusk.module.auth.repository.IUserRepository;
 import com.dusk.module.auth.service.IOrganizationUnitService;
 import com.dusk.module.auth.service.ISerialNoService;
-import com.dusk.module.auth.service.IUserService;
 import com.querydsl.core.types.QBean;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -60,11 +59,10 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional
+@org.springframework.stereotype.Service
 public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, IOrganizationUnitRepository> implements IOrganizationUnitRpcService, IOrganizationUnitService {
     @Resource
     private JPAQueryFactory queryFactory;
-    @Resource
-    private IUserService userService;
     @Resource
     private ISerialNoService serialNoService;
     @Resource
@@ -229,7 +227,7 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
         input.setUnPage(true);
         input.setOrganizationUnitIds(Collections.singletonList(orgId));
         List<Long> userIdList = getOrganizationUnitUsers(input).stream().map(OrganizationUnitUserListDto::getId).collect(Collectors.toList());
-        userService.deleteUserByIds(userIdList);
+        queryFactory.delete(QUser.user).where(QUser.user.id.in(userIdList)).execute();
         // 删除管理层信息
         organizationManagerRepository.deleteByOrgId(orgId);
         // 删除组织机构
@@ -308,7 +306,7 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
         if (queryOrgaIds.isEmpty()) {
             queryOrgaIds.add(-1L); //查询所有用户
         }
-        return repository.findUsers(queryOrgaIds, input.getFilter(), input.getPageable(), input.getType());
+        return repository.findUsers(queryOrgaIds, input.getFilter(), input.getType(), input.getPageable());
     }
 
     @Override
@@ -350,7 +348,7 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
     @Override
     public List<StationsOfLoginUserDto> getStationsForFrontByUserId(Long id) {
         List<OrganizationUnit> stations = this.getStationsByUserId(id);
-        User u = userService.getUserById(id);
+        User u = userRepository.findById(id).orElseThrow(() -> new BusinessException("未找到用户!"));
         return MapperUtil.mapList(stations, mapper::toStationsOfLoginUserDto, (s, t) -> {
            t.setValue(s.getId());
            t.setName(s.getDisplayName());

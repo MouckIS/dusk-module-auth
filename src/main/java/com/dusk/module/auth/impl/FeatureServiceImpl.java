@@ -10,6 +10,7 @@ import com.dusk.module.auth.dto.feature.FeatureValueInput;
 import com.dusk.module.auth.entity.FeatureValue;
 import com.dusk.module.auth.entity.Tenant;
 import com.dusk.module.auth.repository.IFeatureValueRepository;
+import com.dusk.module.auth.repository.ITenantRepository;
 import com.dusk.module.auth.service.IFeatureService;
 import com.dusk.module.auth.service.ITenantService;
 import jakarta.annotation.Resource;
@@ -36,7 +37,7 @@ public class FeatureServiceImpl extends CruxBaseServiceImpl implements IFeatureS
     @Resource
     private IFeatureValueRepository featureValueRepository;
     @Resource
-    private ITenantService tenantService;
+    private ITenantRepository tenantRepository;
     @Resource
     private IFeatureCache featureCache;
 
@@ -64,7 +65,7 @@ public class FeatureServiceImpl extends CruxBaseServiceImpl implements IFeatureS
         if (StringUtils.isEmpty(tenantId)) {
             return result;
         }
-        Tenant t = tenantService.findById(tenantId).orElseThrow(() -> new BusinessException("未找到租户"));
+        Tenant t = tenantRepository.findById(tenantId).orElseThrow(() -> new BusinessException("未找到租户"));
         List<FeatureValue> tflist = new ArrayList<>(featureValueRepository.findAllByTenantId(tenantId));
         List<TenantFeature> dflist = featureCache.getDefaultFeatureList();
         if (!StringUtils.isEmpty(t.getEditionId())) {
@@ -116,7 +117,7 @@ public class FeatureServiceImpl extends CruxBaseServiceImpl implements IFeatureS
     @Override
     public void updateTenantFeaturesList(Long tenantId, List<FeatureValueInput> featureValues) {
         List<FeatureValue> flist = featureValueRepository.findAllByTenantId(tenantId);
-        Tenant t = tenantService.findById(tenantId).orElseThrow(() -> new BusinessException("未找到租户"));
+        Tenant t = tenantRepository.findById(tenantId).orElseThrow(() -> new BusinessException("未找到租户"));
         if (StringUtils.isEmpty(t.getEdition())) {
             throw new BusinessException("该租户未定义版本!");
         }
@@ -181,7 +182,7 @@ public class FeatureServiceImpl extends CruxBaseServiceImpl implements IFeatureS
         String result = null;
         FeatureValue fv = featureValueRepository.getFeatureValueByTenant(tenantId, name);
         if (fv == null) {
-            Optional<Tenant> option = tenantService.findById(tenantId);
+            Optional<Tenant> option = tenantRepository.findById(tenantId);
             if (option.isPresent()) {
                 Tenant tenant = option.get();
                 fv = featureValueRepository.getFeatureValueByEdition(tenant.getEditionId(), name);
