@@ -5,7 +5,7 @@
 
     <groupId>dusk-module</groupId>
     <artifactId>dusk-module-auth</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
     <name>dusk-module-auth</name>
 
@@ -126,16 +126,6 @@
         </dependency>
 
         <dependency>
-            <groupId>io.github.openfeign.querydsl</groupId>
-            <artifactId>querydsl-apt</artifactId>
-            <version>7.0</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.openfeign.querydsl</groupId>
-            <artifactId>querydsl-jpa</artifactId>
-            <version>7.0</version>
-        </dependency>
-        <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
         </dependency>
@@ -158,65 +148,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>21</source>
-                    <target>21</target>
-                    <encoding>UTF-8</encoding>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>1.18.32</version>
-                        </path>
-                        <path>
-                            <groupId>jakarta.persistence</groupId>
-                            <artifactId>jakarta.persistence-api</artifactId>
-                            <version>3.1.0</version>
-                        </path>
-                        <path>
-                            <groupId>org.mapstruct</groupId>
-                            <artifactId>mapstruct-processor</artifactId>
-                            <version>1.6.3</version>
-                        </path>
-                        <path>
-                            <groupId>io.github.openfeign.querydsl</groupId>
-                            <artifactId>querydsl-apt</artifactId>
-                            <version>7.0</version>
-                        </path>
-                        <path>
-                            <groupId>io.github.openfeign.querydsl</groupId>
-                            <artifactId>querydsl-jpa</artifactId>
-                            <version>7.0</version>
-                        </path>
-                    </annotationProcessorPaths>
-                </configuration>
             </plugin>
-            <!-- <plugin> -->
-            <!--     <groupId>io.github.openfeign.querydsl</groupId> -->
-            <!--     <artifactId>querydsl-maven-plugin</artifactId> -->
-            <!--     <version>7.0</version> -->
-            <!--     <executions> -->
-            <!--         <execution> -->
-            <!--             <goals> -->
-            <!--                 <goal>jpa-export</goal> -->
-            <!--             </goals> -->
-            <!--         </execution> -->
-            <!--     </executions> -->
-            <!--     <configuration> -->
-            <!--         <sourceFolder>${project.basedir}/src/main/java</sourceFolder> -->
-            <!--         <packageName>com.dusk</packageName> -->
-            <!--         <packages>com.dusk</packages> -->
-            <!--         <targetFolder>${project.basedir}/src/main/java</targetFolder> -->
-            <!--     </configuration> -->
-            <!--     <dependencies> -->
-            <!--         &lt;!&ndash; 让插件能解析 jakarta 注解 &ndash;&gt; -->
-            <!--         <dependency> -->
-            <!--             <groupId>jakarta.persistence</groupId> -->
-            <!--             <artifactId>jakarta.persistence-api</artifactId> -->
-            <!--             <version>3.1.0</version> -->
-            <!--         </dependency> -->
-            <!--     </dependencies> -->
-            <!-- </plugin> -->
         </plugins>
     </build>
 </project>
