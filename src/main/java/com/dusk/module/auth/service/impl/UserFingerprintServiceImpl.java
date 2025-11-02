@@ -20,7 +20,7 @@ import com.dusk.module.auth.mapper.UserFingerprintMapper;
 import com.dusk.module.auth.repository.IUserFingerprintRepository;
 import com.dusk.module.auth.service.IUserFingerprintService;
 import jakarta.annotation.Resource;
-import org.apache.dubbo.config.annotation.Reference;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +41,7 @@ public class UserFingerprintServiceImpl extends BaseService<UserFingerprint, IUs
     private MqttUtils mqttUtils;
     @Resource
     private SecurityUtils securityUtils;
-    @Reference
+    @DubboReference
     private ISerialNoRpcService serialNoRpcService;
 
     //注册指纹开始{指纹仪序列号}

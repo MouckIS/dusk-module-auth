@@ -5,13 +5,13 @@ import cn.hutool.crypto.SmUtil;
 import com.dusk.common.rpc.auth.service.ISmRpcUtil;
 import com.dusk.module.auth.common.config.AppAuthConfig;
 import jakarta.annotation.Resource;
-import org.apache.dubbo.config.annotation.Service;
+import org.apache.dubbo.config.annotation.DubboService;
 
 /**
  * @author kefuming
  * @date 2023/2/10 14:29
  */
-@Service
+@DubboService
 public class SmRpcUtil implements ISmRpcUtil {
     @Resource
     private AppAuthConfig appAuthConfig;

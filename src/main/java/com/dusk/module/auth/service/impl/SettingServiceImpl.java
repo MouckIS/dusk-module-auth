@@ -20,7 +20,7 @@ import com.dusk.module.ddm.service.ISettingRpcService;
 import io.seata.common.util.StringUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.Service;
+import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -33,10 +33,9 @@ import java.util.stream.Collectors;
  * @author kefuming
  * @date 2020-05-21 15:12
  */
-@Service
-@Transactional
 @Slf4j
-@org.springframework.stereotype.Service
+@DubboService
+@Transactional
 public class SettingServiceImpl implements ISettingRpcService, ISettingService {
     @Resource
     private ISettingRepository repository;

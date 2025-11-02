@@ -22,7 +22,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.dubbo.config.annotation.Reference;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,9 +56,9 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
     @Resource
     JPAQueryFactory queryFactory;
 
-    @Reference
+    @DubboReference
     private IUserRpcService userRpcService;
-    @Reference
+    @DubboReference
     private IRoleRpcService roleRpcService;
 
     private final DashboardMapper mapper = DashboardMapper.INSTANCE;

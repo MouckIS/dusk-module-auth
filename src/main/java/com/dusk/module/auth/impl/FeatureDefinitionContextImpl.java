@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,7 @@ import java.util.List;
 @Component
 @Slf4j
 public class FeatureDefinitionContextImpl implements IFeatureDefinitionContext {
+    @Serial
     private static final long serialVersionUID = 7413664785667499567L;
     private final List<TenantFeature> TENANT_FEATURE_LIST;
     private String currParentName = "";

@@ -9,15 +9,15 @@ import com.dusk.common.mqs.pusher.PushSMS;
 import com.dusk.common.rpc.auth.service.IAuthPushRpcService;
 import com.dusk.module.auth.push.INotificationPushManager;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.Service;
+import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author kefuming
  * @date 2021-04-26 10:02
  */
-@Service
 @Slf4j
+@DubboService
 public class PushRpcServiceImpl implements IAuthPushRpcService {
     @Autowired(required = false)
     INotificationPushManager notificationPushManager;

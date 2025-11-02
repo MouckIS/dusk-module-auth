@@ -30,7 +30,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.Service;
+import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,9 +46,8 @@ import java.util.List;
  * @date 2020-12-24 15:17:08
  */
 @Slf4j
-@Service
+@DubboService
 @Transactional
-@org.springframework.stereotype.Service
 public class NotificationServiceImpl extends BaseService<UserNotification, IUserNotificationRepository> implements INotificationRpcService, INotificationService {
     @Resource
     private  MqttUtils mqttUtils;

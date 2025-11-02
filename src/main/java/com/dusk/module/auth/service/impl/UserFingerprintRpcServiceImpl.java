@@ -5,7 +5,7 @@ import com.dusk.common.rpc.auth.dto.fingerprint.UserFingerprintDto;
 import com.dusk.common.rpc.auth.service.IUserFingerprintRpcService;
 import com.dusk.module.auth.service.IUserFingerprintService;
 import jakarta.annotation.Resource;
-import org.apache.dubbo.config.annotation.Service;
+import org.apache.dubbo.config.annotation.DubboService;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ import java.util.List;
  * @author kefuming
  * @date 2021-05-13 8:23
  */
-@Service
+@DubboService
 public class UserFingerprintRpcServiceImpl implements IUserFingerprintRpcService {
     @Resource
     private IUserFingerprintService userFingerprintService;

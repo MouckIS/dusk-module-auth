@@ -18,7 +18,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.dubbo.config.annotation.Service;
+import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
@@ -30,10 +30,9 @@ import java.time.LocalDateTime;
  * @author kefuming
  * @date 2020-09-22 15:50
  */
-@Service(retries = 0, timeout = 2000)
-@Transactional
 @Slf4j
-@org.springframework.stereotype.Service
+@Transactional
+@DubboService(retries = 0, timeout = 2000)
 public class SerialNoServiceImpl extends BaseService<SerialNo, ISerialNoRepository> implements ISerialNoRpcService, ISerialNoService {
     @Resource
     JPAQueryFactory queryFactory;
