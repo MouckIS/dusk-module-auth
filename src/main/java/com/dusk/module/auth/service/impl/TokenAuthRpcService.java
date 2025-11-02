@@ -15,7 +15,7 @@ import com.dusk.module.auth.common.manage.TokenAuthManager;
 import com.dusk.module.auth.service.IRoleService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.Service;
+import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -26,9 +26,8 @@ import java.util.stream.Collectors;
  * @author kefuming
  * @date 2023/2/9 19:23
  */
-@Service(retries = 0, timeout = 2000)
 @Slf4j
-@org.springframework.stereotype.Service
+@DubboService(retries = 0, timeout = 2000)
 public class TokenAuthRpcService implements ITokenAuthRpcService {
     @Resource
     private TokenAuthManager tokenAuthManager;

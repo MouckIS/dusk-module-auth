@@ -5,7 +5,7 @@ import com.dusk.module.auth.dto.TenantFeature;
 import com.dusk.module.auth.service.IFeatureRpcService;
 import com.dusk.module.auth.service.IFeatureService;
 import jakarta.annotation.Resource;
-import org.apache.dubbo.config.annotation.Service;
+import org.apache.dubbo.config.annotation.DubboService;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ import java.util.List;
  * @author kefuming
  * @date 2020-07-24 15:18
  */
-@Service
+@DubboService
 public class FeatureRpcServiceImpl implements IFeatureRpcService {
     @Resource
     private IFeatureCache featureCache;

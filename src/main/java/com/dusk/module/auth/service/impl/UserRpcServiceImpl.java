@@ -37,7 +37,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.dubbo.config.annotation.Service;
+import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -51,10 +51,9 @@ import java.util.stream.Collectors;
  * @author kefuming
  * @date 2021-08-19 17:14
  */
-@Service(retries = 0, timeout = 2000)
-@Transactional
 @Slf4j
-@org.springframework.stereotype.Service
+@Transactional
+@DubboService(retries = 0, timeout = 2000)
 public class UserRpcServiceImpl extends BaseService<User, IUserRepository> implements IUserRpcService {
     @Resource
     private IUserService userService;

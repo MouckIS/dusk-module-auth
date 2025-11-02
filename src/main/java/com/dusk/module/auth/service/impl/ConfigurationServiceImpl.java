@@ -28,7 +28,7 @@ import com.dusk.module.ddm.service.IDynamicMenuRpcService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.Reference;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -40,8 +40,8 @@ import java.util.stream.Collectors;
  * @author kefuming
  * @date 2020-05-07 15:29
  */
-@Service
 @Slf4j
+@Service
 public class ConfigurationServiceImpl extends CruxBaseServiceImpl implements IConfigurationService {
 
     private final TenantMapper mapper = TenantMapper.INSTANCE;
@@ -50,7 +50,7 @@ public class ConfigurationServiceImpl extends CruxBaseServiceImpl implements ICo
     private IUserRepository userRepository;
     @Resource
     private IAuthPermissionManager authPermissionManager;
-    @Resource
+    @Resource(name = "featureServiceImpl")
     private IFeatureService featureService;
     @Resource
     private ITenantRepository tenantRepository;
@@ -61,12 +61,12 @@ public class ConfigurationServiceImpl extends CruxBaseServiceImpl implements ICo
     @Resource
     private ICaptchaService captchaService;
     @Resource
-    AppAuthConfig appAuthConfig;
+    private AppAuthConfig appAuthConfig;
     @Resource
     private IUserService userService;
     @Resource
     private TokenAuthManager tokenAuthManager;
-    @Reference
+    @DubboReference
     private IDynamicMenuRpcService dynamicMenuRpcService;
 
     /**

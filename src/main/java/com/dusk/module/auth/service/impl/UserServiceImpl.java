@@ -62,7 +62,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.dubbo.config.annotation.Reference;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -129,7 +129,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     private IOrganizationManagerRepository organizationManagerRepository;
     @Resource
     private IStationService stationService;
-    @Reference
+    @DubboReference
     private ISettingRpcService settingRpcService;
     @Resource
     private RabbitMQUtils rabbitMQUtils;

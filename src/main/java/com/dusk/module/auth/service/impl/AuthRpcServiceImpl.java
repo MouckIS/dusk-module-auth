@@ -27,7 +27,7 @@ import com.dusk.module.auth.service.IFeatureChecker;
 import com.dusk.module.auth.service.IStationService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.Service;
+import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.dubbo.rpc.RpcContext;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.util.StringUtils;
@@ -39,8 +39,8 @@ import java.util.stream.Collectors;
  * @author kefuming
  * @date 2020-05-22 14:01
  */
-@Service
 @Slf4j
+@DubboService
 public class AuthRpcServiceImpl implements IAuthRpcService {
     @Resource
     JwtTokenFactory jwtTokenFactory;

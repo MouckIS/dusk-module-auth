@@ -7,3 +7,7 @@ spring:
   config:
     import:
       - optional:nacos:${spring.application.name}.yaml
+dubbo:
+  application:
+    # todo: 暂时禁用序列化安全检查，后续补充自定义序列化白名单
+    serialize-check-status: DISABLE

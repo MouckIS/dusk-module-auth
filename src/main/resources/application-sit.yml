@@ -8,6 +8,7 @@ spring:
   main:
     # 自动解析循环引用
     allow-circular-references: true
+    allow-bean-definition-overriding: true
   servlet:
     multipart:
       max-file-size: 2000MB

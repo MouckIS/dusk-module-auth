@@ -12,8 +12,8 @@ import com.dusk.module.auth.setting.provider.HostSettingProvider;
 import com.dusk.module.ddm.service.ISettingRpcService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.dubbo.config.annotation.Reference;
-import org.apache.dubbo.config.annotation.Service;
+import org.apache.dubbo.config.annotation.DubboReference;
+import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.scheduling.annotation.Async;
 
@@ -23,11 +23,10 @@ import org.springframework.scheduling.annotation.Async;
  * @date: 2021/2/4 11:25
  */
 @Slf4j
-@Service
-@org.springframework.stereotype.Service
+@DubboService
 public class EmailServiceImpl implements IEmailRpcService, IEmailService {
 
-    @Reference
+    @DubboReference
     private ISettingRpcService settingRpcService;
 
 

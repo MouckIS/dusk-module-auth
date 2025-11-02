@@ -19,7 +19,7 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.dubbo.config.annotation.Service;
+import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +31,7 @@ import java.util.Optional;
  * @author chenzhi1
  * @date 2021/5/25 11:30
  */
-@Service
+@DubboService
 @Transactional
 public class CommonFavoriteServiceImpl extends BaseService<CommonFavorite, ICommonFavoriteRepository> implements ICommonFavoriteRpcService {
     @Resource

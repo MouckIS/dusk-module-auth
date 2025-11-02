@@ -40,7 +40,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang.StringUtils;
-import org.apache.dubbo.config.annotation.Service;
+import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -57,9 +57,8 @@ import java.util.stream.Collectors;
  * @author kefuming
  * @date 2020-05-13 13:42
  */
-@Service
+@DubboService
 @Transactional
-@org.springframework.stereotype.Service
 public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, IOrganizationUnitRepository> implements IOrganizationUnitRpcService, IOrganizationUnitService {
     @Resource
     private JPAQueryFactory queryFactory;

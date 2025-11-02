@@ -7,7 +7,7 @@ import com.dusk.module.auth.service.IFeatureChecker;
 import com.dusk.module.auth.service.IFeatureRpcService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.Reference;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.stereotype.Service;
 
 /**
@@ -17,8 +17,8 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class FeatureChecker implements IFeatureChecker {
-    @Reference
-    private IFeatureRpcService featureService;
+    @DubboReference
+    private IFeatureRpcService featureRpcService;
     @Resource
     private AppConfig appConfig;
 
@@ -49,6 +49,6 @@ public class FeatureChecker implements IFeatureChecker {
 
 
     private String getFeatureValue(Long tenantId, String name) {
-        return featureService.getValue(appConfig.getApplicationName(), tenantId, name);
+        return featureRpcService.getValue(appConfig.getApplicationName(), tenantId, name);
     }
 }
