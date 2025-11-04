@@ -144,3 +144,8 @@ igwsso:
 aliyun-push:
   iosAppKey: ${ALIYUN_PUSH_IOSAPPKEY:""}
   androidAppKey: ${ALIYUN_PUSH_ANDROIDAPPKEY:31911606}
+springdoc:
+  api-docs:
+    enabled: ${swagger.enable}
+  swagger-ui:
+    enabled: ${swagger.enable}
