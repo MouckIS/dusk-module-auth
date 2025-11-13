@@ -15,6 +15,7 @@ import java.util.Optional;
 public interface ITenantService extends IBaseService<Tenant, ITenantRepository> {
     /**
      * 创建租户并初始化默认设置
+     *
      * @param input
      * @return
      */
@@ -22,12 +23,14 @@ public interface ITenantService extends IBaseService<Tenant, ITenantRepository> 
 
     /**
      * 更新租户
+     *
      * @param tenantEditDto
      */
     void updateTenant(TenantEditDto tenantEditDto);
 
     /**
      * 查询租户（分页）
+     *
      * @param input
      * @return
      */
@@ -35,6 +38,7 @@ public interface ITenantService extends IBaseService<Tenant, ITenantRepository> 
 
     /**
      * 根据租户代码查找租户
+     *
      * @param name
      * @return
      */
@@ -42,6 +46,7 @@ public interface ITenantService extends IBaseService<Tenant, ITenantRepository> 
 
     /**
      * 租户是否可用
+     *
      * @param input
      * @return
      */
@@ -49,6 +54,7 @@ public interface ITenantService extends IBaseService<Tenant, ITenantRepository> 
 
     /**
      * 计数有多少租户关联到版本
+     *
      * @param editionId
      * @return
      */
@@ -56,6 +62,7 @@ public interface ITenantService extends IBaseService<Tenant, ITenantRepository> 
 
     /**
      * 删除租户
+     *
      * @param id
      * @return
      */

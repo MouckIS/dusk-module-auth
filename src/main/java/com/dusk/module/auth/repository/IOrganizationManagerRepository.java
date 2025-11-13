@@ -10,6 +10,7 @@ import java.util.List;
 public interface IOrganizationManagerRepository extends IBaseRepository<OrganizationManager> {
     /**
      * 判断组织id列表是否存在
+     *
      * @param orgIds 组织列表
      */
     List<OrganizationManager> findByOrgIdIn(Collection<Long> orgIds);

@@ -10,6 +10,7 @@ public interface IWxCpService {
 
     /**
      * 企业微信服务商应用验证URL
+     *
      * @param msg_signature
      * @param timestamp
      * @param nonce
@@ -22,15 +23,17 @@ public interface IWxCpService {
 
     /**
      * 企业微信用户身份验证
+     *
      * @param code
      * @param state
-     * @param n 租户名称
+     * @param n     租户名称
      * @return
      */
     WxCpUserAuthorizationResult authorization(String code, String state, String n);
 
     /**
      * 绑定企业微信用户
+     *
      * @param wxUserId
      * @param userName
      * @param password

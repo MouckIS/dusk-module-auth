@@ -17,15 +17,15 @@ import org.springframework.data.domain.Sort;
 @Setter
 @Schema(description = "查询用户列表的实体类")
 public class GetOrgaUsersInput extends PagedAndSortedInputDto {
-    @Schema(description = "组织机构Id")
-    @NotNull(message = "组织机构id不能为空")
-    private Long orgaId;
     @Schema(description = "模糊查找[姓名、账号、电子邮箱、手机号、角色名、工号]")
     public String filter;
     @Schema(description = "角色id")
     public Long roleId;
     @Schema(description = "角色 name")
     public String roleName;
+    @Schema(description = "组织机构Id")
+    @NotNull(message = "组织机构id不能为空")
+    private Long orgaId;
 
     @Override
     protected Sort getSort() {

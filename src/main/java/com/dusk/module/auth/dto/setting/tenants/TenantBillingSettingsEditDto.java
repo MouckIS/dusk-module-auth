@@ -11,7 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Schema(description = "发票")
-public class TenantBillingSettingsEditDto{
+public class TenantBillingSettingsEditDto {
     @Schema(description = "法定名称")
     public String legalName;
 

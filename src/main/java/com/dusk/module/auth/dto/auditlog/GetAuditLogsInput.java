@@ -40,15 +40,15 @@ public class GetAuditLogsInput extends PagedAndSortedInputDto {
 
     @Override
     protected Sort getSort() {
-        if(StringUtils.isBlank(sorting)){//默认按执行时间倒序排序
+        if (StringUtils.isBlank(sorting)) {//默认按执行时间倒序排序
             return Sort.by(Sort.Direction.DESC, AuditLog.Fields.executionTime);
         }
 
         String sortingStr = sorting;
-        if(AuditLogListDto.Fields.userId.equals(sorting)){
+        if (AuditLogListDto.Fields.userId.equals(sorting)) {
             sortingStr = AuditLog.Fields.createUser + "." + BaseEntity.Fields.id;
-        }else if(AuditLogListDto.Fields.userName.equals(sorting)){
-            sortingStr =AuditLog.Fields.createUser + "." + User.Fields.userName;
+        } else if (AuditLogListDto.Fields.userName.equals(sorting)) {
+            sortingStr = AuditLog.Fields.createUser + "." + User.Fields.userName;
         }
         return Sort.by(sortingDirection, sortingStr);
     }

@@ -3,7 +3,6 @@ package com.dusk.module.auth.service.impl;
 import com.dusk.common.core.annotation.DisableTenantFilter;
 import com.dusk.common.core.auth.permission.RoleInfo;
 import com.dusk.common.core.service.impl.BaseService;
-import com.dusk.module.auth.common.permission.IAuthPermissionManager;
 import com.dusk.module.auth.entity.GrantPermission;
 import com.dusk.module.auth.entity.QGrantPermission;
 import com.dusk.module.auth.entity.QRole;
@@ -46,8 +45,6 @@ public class GrantPermissionServiceImpl extends BaseService<GrantPermission, IGr
      */
     //@Resource
     //private IAuthPermissionManager authPermissionManager;
-
-
     @Override
     @DisableTenantFilter
     public Map<String, List<RoleInfo>> getAll() {

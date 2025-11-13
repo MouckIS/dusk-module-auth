@@ -19,6 +19,7 @@ public class CreateOrUpdateService<T extends BaseEntity, K extends IBaseReposito
 
     /**
      * 新增或者更新对象
+     *
      * @param object
      * @param id
      * @param tClass
@@ -30,7 +31,7 @@ public class CreateOrUpdateService<T extends BaseEntity, K extends IBaseReposito
 
     protected T createOrUpdate(Object object, Long id, Class<T> tClass, Consumer<? super T> action) {
         T t = getUpdatedT(object, id, tClass);
-        if(action != null) {
+        if (action != null) {
             action.accept(t);
         }
         return save(t);
@@ -38,6 +39,7 @@ public class CreateOrUpdateService<T extends BaseEntity, K extends IBaseReposito
 
     /**
      * 获取更新后的对象
+     *
      * @param object
      * @param id
      * @param tClass
@@ -45,14 +47,14 @@ public class CreateOrUpdateService<T extends BaseEntity, K extends IBaseReposito
      */
     protected T getUpdatedT(Object object, Long id, Class<T> tClass) {
         T t;
-        if(id == null) {
+        if (id == null) {
             try {
                 t = tClass.getDeclaredConstructor().newInstance();
                 BeanUtils.copyProperties(object, t);
             } catch (ReflectiveOperationException e) {
                 throw new RuntimeException("创建目标对象失败", e);
             }
-        }else {
+        } else {
             t = findT(id);
             BeanUtils.copyProperties(object, t, getNullPropertyNames(object));
         }
@@ -61,10 +63,11 @@ public class CreateOrUpdateService<T extends BaseEntity, K extends IBaseReposito
 
     /**
      * 根据ID获取对象
+     *
      * @param id
      * @return
      */
-    protected T findT(Long id){
+    protected T findT(Long id) {
         return findById(id).orElseThrow(() -> new BusinessException("未找到相应的记录！"));
     }
 }

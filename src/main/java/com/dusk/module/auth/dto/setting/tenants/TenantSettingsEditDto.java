@@ -41,21 +41,17 @@ public class TenantSettingsEditDto {
      * This validation is done for single-tenant applications.
      * Because, these settings can only be set by tenant in a single-tenant application.
      */
-    public void validateHostSettings()
-    {
+    public void validateHostSettings() {
         List<String> validationErrors = new ArrayList<String>();
-        if (Clock.isSupportsMultipleTimezone() && general == null)
-        {
+        if (Clock.isSupportsMultipleTimezone() && general == null) {
             validationErrors.add("General settings can not be null.");
         }
 
-        if (email == null)
-        {
+        if (email == null) {
             validationErrors.add("Email settings can not be null.");
         }
 
-        if (validationErrors.size() > 0)
-        {
+        if (validationErrors.size() > 0) {
             throw new BusinessException("Method arguments are not valid! See ValidationErrors for details:" + validationErrors);
         }
     }

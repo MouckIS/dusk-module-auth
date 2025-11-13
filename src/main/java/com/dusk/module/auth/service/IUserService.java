@@ -78,6 +78,7 @@ public interface IUserService {
 
     /**
      * 获取所有本单位用户列表
+     *
      * @return
      */
     List<User> getAllInnerUsers();
@@ -139,6 +140,7 @@ public interface IUserService {
 
     /**
      * 创建/修改用户 （包括员工级别信息）
+     *
      * @param input
      */
     void createOrUpdateUserExistByUserName(CreateOrUpdateUserInfoInput input);
@@ -298,11 +300,14 @@ public interface IUserService {
 
     /**
      * 删除用户
+     *
      * @param ids
      */
     void deleteUserByIds(List<Long> ids);
+
     /**
      * 根据用户名查找用户
+     *
      * @param userNames
      */
     List<User> findByUserNames(List<String> userNames);
@@ -313,6 +318,7 @@ public interface IUserService {
 
     /**
      * 更新当前用户的信息
+     *
      * @param dto
      */
     void updateInfoBySelf(UserInfoDto dto);

@@ -27,9 +27,9 @@ public class SettingManagerCache extends SettingManagerDefault {
 
     @Override
     public void changeSettingForApplication(String name, String value) {
-        if (multiTenancyConfig.isEnable()){
+        if (multiTenancyConfig.isEnable()) {
             insertOrUpdateOrDeleteSettingValue(name, value, null, null, null);
-        }else{
+        } else {
             // If MultiTenancy is disabled, then we should change default tenant's setting
             changeSettingForTenant(name, value);
         }
@@ -55,9 +55,9 @@ public class SettingManagerCache extends SettingManagerDefault {
     }
 
     @Override
-    protected Map<String, SettingInfo> getUserSettings(){
+    protected Map<String, SettingInfo> getUserSettings() {
         Map<String, SettingInfo> result = convertCache(getCache(USER_SETTINGS_CACHE_KEY_PREFIX + getCurrentUserId()));
-        if(result == null){
+        if (result == null) {
             result = super.getUserSettings();
             redisUtil.setCache(USER_SETTINGS_CACHE_KEY_PREFIX + getCurrentUserId(), result);
         }
@@ -65,9 +65,9 @@ public class SettingManagerCache extends SettingManagerDefault {
     }
 
     @Override
-    protected Map<String, SettingInfo> getStationSettings(){
+    protected Map<String, SettingInfo> getStationSettings() {
         Map<String, SettingInfo> result = convertCache(getCache(STATION_SETTINGS_CACHE_KEY_PREFIX + getStationId()));
-        if(result == null){
+        if (result == null) {
             result = super.getStationSettings();
             redisUtil.setCache(STATION_SETTINGS_CACHE_KEY_PREFIX + getStationId(), result);
         }
@@ -75,37 +75,37 @@ public class SettingManagerCache extends SettingManagerDefault {
     }
 
     @Override
-    protected Map<String, SettingInfo> getTenantSettings(){
+    protected Map<String, SettingInfo> getTenantSettings() {
         Map<String, SettingInfo> result = convertCache(getCache(TENANT_SETTINGS_CACHE_KEY_PREFIX + getTenantId()));
-        if(result == null){
+        if (result == null) {
             result = super.getTenantSettings();
             redisUtil.setCache(TENANT_SETTINGS_CACHE_KEY_PREFIX + getTenantId(), result);
         }
         return result;
     }
 
-    protected Map<String, SettingInfo> getApplicationSettings(){
+    protected Map<String, SettingInfo> getApplicationSettings() {
         Map<String, SettingInfo> result = convertCache(getCache(APPLICATION_SETTINGS_CACHE_KEY));
-        if(result == null){
+        if (result == null) {
             result = super.getApplicationSettings();
             redisUtil.setCache(APPLICATION_SETTINGS_CACHE_KEY, result);
         }
         return result;
     }
 
-    private Object getCache(String key){
-        try{
+    private Object getCache(String key) {
+        try {
             return redisUtil.getCache(key);
-        }catch (Exception e){
+        } catch (Exception e) {
             return null;
         }
     }
 
-    private Map<String, SettingInfo> convertCache(Object cache){
-        if(cache != null){
+    private Map<String, SettingInfo> convertCache(Object cache) {
+        if (cache != null) {
             try {
-                return (Map<String, SettingInfo>)cache;
-            }catch (Exception ignored){
+                return (Map<String, SettingInfo>) cache;
+            } catch (Exception ignored) {
             }
         }
         return null;

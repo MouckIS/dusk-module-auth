@@ -39,25 +39,26 @@ import java.util.stream.Collectors;
 @RequestMapping("edition")
 @Tag(name = "版本", description = "Edition")
 @Authorize(EditionAuthProvider.PAGES_EDITIONS)
-public class SubscribableEditionController  extends CruxBaseController {
+public class SubscribableEditionController extends CruxBaseController {
+    private final SubscribableEditionMapper mapper = SubscribableEditionMapper.INSTANCE;
     @Resource
     private ISubscribableEditionService editionService;
 
-    private final SubscribableEditionMapper mapper = SubscribableEditionMapper.INSTANCE;
     /**
      * 查询版本列表
+     *
      * @return
      */
     @GetMapping("getEditions")
     @Operation(summary = "查询版本列表")
-    public PagedResultDto<EditionListDto> getEditions(GetEditionInput input){
+    public PagedResultDto<EditionListDto> getEditions(GetEditionInput input) {
         Page<SubscribableEdition> page = editionService.getEditions(input);
         return MapperUtil.mapToPagedResultDto(page, mapper::toEditionListDto);
     }
 
     @GetMapping("export/{id}")
     @Operation(summary = "导出版本")
-    public void exportEdition(@PathVariable Long id, HttpServletResponse response) throws Exception{
+    public void exportEdition(@PathVariable Long id, HttpServletResponse response) throws Exception {
         response.setContentType("application/vnd.ms-excel;charset=utf-8");
         response.setCharacterEncoding("utf-8");
         String fileName = URLEncoder.encode("版本信息导出", "UTF-8").replaceAll("\\+", "%20");
@@ -68,39 +69,37 @@ public class SubscribableEditionController  extends CruxBaseController {
 
     @PostMapping("import")
     @Operation(summary = "导入版本")
-    public void importEdition(@RequestParam MultipartFile file){
+    public void importEdition(@RequestParam MultipartFile file) {
         InputStream in = null;
-        try{
+        try {
             in = file.getInputStream();
             editionService.importEdition(in);
-        }catch (Exception e){
-            if(e instanceof BusinessException){
-                throw (BusinessException)e;
-            }else {
-                throw new BusinessException("导入失败,请检查Excel是否符合导入要求",e);
+        } catch (Exception e) {
+            if (e instanceof BusinessException) {
+                throw (BusinessException) e;
+            } else {
+                throw new BusinessException("导入失败,请检查Excel是否符合导入要求", e);
             }
-        }finally {
+        } finally {
             IOUtils.closeQuietly(in);
         }
     }
 
     /**
      * 获取版本信息进行编辑
+     *
      * @param input
      * @return
      */
     @GetMapping("getEditionForEdit")
     @Operation(summary = "获取版本信息进行编辑")
     @Authorize(EditionAuthProvider.PAGES_EDITIONS_EDIT)
-    public EditionEditDto getEditionForEdit(EntityDto input){
+    public EditionEditDto getEditionForEdit(EntityDto input) {
         EditionEditDto editionEditDto;
-        if (input.getId()!=null)
-        {
+        if (input.getId() != null) {
             SubscribableEdition edition = editionService.findById(input.getId()).orElseThrow(() -> new BusinessException("未找到相应的版本信息"));
             editionEditDto = mapper.toEditionEditDto(edition);
-        }
-        else
-        {
+        } else {
             editionEditDto = new EditionEditDto();
         }
         return editionEditDto;
@@ -109,10 +108,10 @@ public class SubscribableEditionController  extends CruxBaseController {
     @PostMapping("createOrUpdateEdition")
     @Operation(summary = "新增或编辑版本信息")
     @Authorize(EditionAuthProvider.PAGES_EDITIONS_EDIT)
-    public void createOrUpdateEdition(@Valid @RequestBody EditionEditDto input){
-        if (input.getId()==null){
+    public void createOrUpdateEdition(@Valid @RequestBody EditionEditDto input) {
+        if (input.getId() == null) {
             editionService.createEdition(input);
-        }else{
+        } else {
             editionService.updateEdition(input);
         }
     }
@@ -120,7 +119,7 @@ public class SubscribableEditionController  extends CruxBaseController {
     @DeleteMapping("deleteEdition")
     @Operation(summary = "删除版本")
     @Authorize(EditionAuthProvider.PAGES_EDITIONS_DELETE)
-    public void deleteEdition(@Valid @RequestBody EntityDto input){
+    public void deleteEdition(@Valid @RequestBody EntityDto input) {
         editionService.deleteEdition(input.getId());
     }
 
@@ -128,8 +127,8 @@ public class SubscribableEditionController  extends CruxBaseController {
     @Operation(summary = "获取版本选择列表")
     public List<SubscribableEditionComboboxItemDto> getEditionComboboxItems(
             @RequestParam(required = false) String selectedEditionId,
-            @RequestParam(defaultValue = "false")Boolean addAllItem,
-            @RequestParam(defaultValue = "false") Boolean onlyFreeItems){
+            @RequestParam(defaultValue = "false") Boolean addAllItem,
+            @RequestParam(defaultValue = "false") Boolean onlyFreeItems) {
         var editions = editionService.findAll();
         var subscribableEditions = editions.stream()
                 .filter(e -> {
@@ -138,20 +137,20 @@ public class SubscribableEditionController  extends CruxBaseController {
                 .collect(Collectors.toList());
 
         var editionItems = subscribableEditions.stream()
-                .map(e -> new SubscribableEditionComboboxItemDto(String.valueOf( e.getId()), e.getDisplayName(), e.isFree()))
+                .map(e -> new SubscribableEditionComboboxItemDto(String.valueOf(e.getId()), e.getDisplayName(), e.isFree()))
                 .collect(Collectors.toList());
 
         var defaultItem = new SubscribableEditionComboboxItemDto("", "没有分配", null);
-        editionItems.add(0,defaultItem);
+        editionItems.add(0, defaultItem);
 
-        if (addAllItem){
+        if (addAllItem) {
             editionItems.add(0, new SubscribableEditionComboboxItemDto("-1", "- " + "全部" + " -", null));
         }
 
-        if (StringUtils.isNoneBlank(selectedEditionId)){
+        if (StringUtils.isNoneBlank(selectedEditionId)) {
             var selectedEdition = editionItems.stream().filter(e -> selectedEditionId.equals(e.getValue())).findFirst();
             selectedEdition.ifPresent(subscribableEditionComboboxItemDto -> subscribableEditionComboboxItemDto.setSelected(true));
-        }else{
+        } else {
             editionItems.get(0).setSelected(true);
         }
         return editionItems;

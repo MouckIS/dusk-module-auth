@@ -55,6 +55,9 @@ import java.util.stream.Collectors;
 @Transactional
 @DubboService(retries = 0, timeout = 2000)
 public class UserRpcServiceImpl extends BaseService<User, IUserRepository> implements IUserRpcService {
+    private final QUser qUser = QUser.user;
+    private final UserMapper mapper = UserMapper.INSTANCE;
+    private final OrganizationMapper organizationMapper = OrganizationMapper.INSTANCE;
     @Resource
     private IUserService userService;
     @Resource
@@ -69,10 +72,6 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
     private IUserManage userManage;
     @Resource
     private TokenAuthManager tokenAuthManager;
-
-    private final QUser qUser = QUser.user;
-    private final UserMapper mapper = UserMapper.INSTANCE;
-    private final OrganizationMapper organizationMapper = OrganizationMapper.INSTANCE;
 
     @Override
     public PagedResultDto<UserFullListDto> getUsers(PagedAndSortedInputDto input) {
@@ -326,7 +325,7 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
             }
         }
 
-//        organizationUnitService.deleteInBatch(orgList);
+        //        organizationUnitService.deleteInBatch(orgList);
 
         for (UserSimpleDto userDto : saveUserList) {
             User user = null;
@@ -374,7 +373,7 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
             }
         }
         batchSave(persistUserList);
-//        deleteInBatch(userList);    // TODO: 2021/2/24 发布事件通知其他模块删除的用户
+        //        deleteInBatch(userList);    // TODO: 2021/2/24 发布事件通知其他模块删除的用户
 
 
     }
@@ -406,7 +405,7 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
 
     @Override
     public List<UserFullListDto> getUsersByOrg(GetUsersByOrgInput input) {
-        if(input.getOrgIds() == null || input.getOrgIds().isEmpty()){
+        if (input.getOrgIds() == null || input.getOrgIds().isEmpty()) {
             return new ArrayList<>();
         }
         GetOrganizationUnitUsersInput queryInput = new GetOrganizationUnitUsersInput();
@@ -621,17 +620,17 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
 
     @Override
     public List<UserSimpleDto> getUserSimpleDto(Long... userId) {
-        if(Objects.isNull(userId)||userId.length==0){
+        if (Objects.isNull(userId) || userId.length == 0) {
             return new ArrayList<>();
         }
         List<UserSimpleDto> list;
-        if(userId.length==1){
+        if (userId.length == 1) {
             list = new ArrayList<>();
             UserSimpleDto user = getUserSimpleDto(userId[0]);
-            if(!Objects.isNull(user)){
+            if (!Objects.isNull(user)) {
                 list.add(user);
             }
-        }else{
+        } else {
             list = queryFactory.select(createUserSimpleQBean()).from(qUser).where(qUser.id.in(userId)).fetch();
         }
         return list;
@@ -639,23 +638,23 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
 
     @Override
     public List<UserSimpleDto> getUserSimpleDto(Collection<Long> userId) {
-        if(Objects.isNull(userId)||userId.size()==0){
+        if (Objects.isNull(userId) || userId.size() == 0) {
             return new ArrayList<>();
         }
         List<UserSimpleDto> list;
-        if(userId.size()==1){
+        if (userId.size() == 1) {
             list = new ArrayList<>();
             UserSimpleDto user = getUserSimpleDto(userId.iterator().next());
-            if(!Objects.isNull(user)){
+            if (!Objects.isNull(user)) {
                 list.add(user);
             }
-        }else{
+        } else {
             list = queryFactory.select(createUserSimpleQBean()).from(qUser).where(qUser.id.in(userId)).fetch();
         }
         return list;
     }
 
-    QBean<UserSimpleDto> createUserSimpleQBean(){
+    QBean<UserSimpleDto> createUserSimpleQBean() {
         return QBeanBuilder.create(UserSimpleDto.class).appendQEntity(qUser).build();
     }
 
@@ -709,7 +708,7 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
 
     @Override
     public String generateExpireTokenByUserName(String userName, long expireTime, TimeUnit unit) {
-        return userService.generateExpireTokenByUserName(userName,expireTime,unit);
+        return userService.generateExpireTokenByUserName(userName, expireTime, unit);
     }
 
     @Override

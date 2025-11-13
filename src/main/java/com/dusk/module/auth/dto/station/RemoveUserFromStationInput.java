@@ -15,7 +15,7 @@ public class RemoveUserFromStationInput {
     @Schema(description = "用户id")
     @NotNull(message = "用户id不能为空")
     private Long userId;
-    
+
     @Schema(description = "厂站id")
     @NotNull(message = "厂站id不能为空")
     private Long stationId;

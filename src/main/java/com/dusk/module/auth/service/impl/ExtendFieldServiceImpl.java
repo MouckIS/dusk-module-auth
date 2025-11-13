@@ -18,23 +18,22 @@ import java.util.List;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class ExtendFieldServiceImpl extends BaseService<ExtendField,IExtendFieldRepository> implements IExtendFieldService  {
+public class ExtendFieldServiceImpl extends BaseService<ExtendField, IExtendFieldRepository> implements IExtendFieldService {
+    QExtendField qExtendField = QExtendField.extendField;
     @Resource
     private JPAQueryFactory queryFactory;
-
-    QExtendField qExtendField = QExtendField.extendField;
     private EntityPathBase<? extends BaseEntity> entityPathBase;
 
     @Override
     public void addOrUpdateField(Long entityId, String entityClass, String key, String value) {
         ExtendField record = queryFactory.selectFrom(qExtendField).where(qExtendField.entityId.eq(entityId), qExtendField.entityClass.eq(entityClass), qExtendField.key.eq(key)).fetchFirst();
-        if(record == null){
+        if (record == null) {
             record = new ExtendField();
             record.setEntityId(entityId);
             record.setEntityClass(entityClass);
             record.setKey(key);
             record.setValue(value);
-        }else{
+        } else {
             record.setValue(value);
         }
         save(record);
@@ -48,14 +47,14 @@ public class ExtendFieldServiceImpl extends BaseService<ExtendField,IExtendField
     @Override
     public Long getEntityId(String entityClass, EntityPathBase<? extends BaseEntity> entityPathBase, String key, String value) {
         return queryFactory.select(qExtendField.entityId).from(qExtendField)
-                .innerJoin(entityPathBase).on(qExtendField.entityId.eq((NumberPath<Long>) ReflectUtil.getFieldValue(entityPathBase,BaseEntity.Fields.id)))
+                .innerJoin(entityPathBase).on(qExtendField.entityId.eq((NumberPath<Long>) ReflectUtil.getFieldValue(entityPathBase, BaseEntity.Fields.id)))
                 .where(qExtendField.entityClass.eq(entityClass), qExtendField.key.eq(key), qExtendField.value.eq(value)).fetchFirst();
     }
 
     @Override
     public List<Long> getEntityIds(String entityClass, EntityPathBase<? extends BaseEntity> entityPathBase, String key, List<String> values) {
         return queryFactory.select(qExtendField.entityId).from(qExtendField)
-                .innerJoin(entityPathBase).on(qExtendField.entityId.eq((NumberPath<Long>) ReflectUtil.getFieldValue(entityPathBase,BaseEntity.Fields.id)))
+                .innerJoin(entityPathBase).on(qExtendField.entityId.eq((NumberPath<Long>) ReflectUtil.getFieldValue(entityPathBase, BaseEntity.Fields.id)))
                 .where(qExtendField.entityClass.eq(entityClass), qExtendField.key.eq(key), qExtendField.value.in(values)).fetch();
     }
 }

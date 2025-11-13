@@ -33,6 +33,7 @@ public class GetUsersInput extends PagedAndSortedInputDto {
     private EUnitType userType = EUnitType.Inner;
     @Schema(description = "显示离职账号")
     private boolean displayDimissionUsers;
+
     @Override
     protected Sort getSort() {
         if (StringUtils.isBlank(sorting)) {

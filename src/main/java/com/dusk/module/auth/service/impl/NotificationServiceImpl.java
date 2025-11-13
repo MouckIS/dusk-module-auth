@@ -11,7 +11,6 @@ import com.dusk.common.core.jpa.Specifications;
 import com.dusk.common.core.jpa.querydsl.QBeanBuilder;
 import com.dusk.common.core.model.UserContext;
 import com.dusk.common.core.service.impl.BaseService;
-import com.dusk.common.core.utils.MapperUtil;
 import com.dusk.common.core.utils.SecurityUtils;
 import com.dusk.common.mqs.utils.MqttUtils;
 import com.dusk.common.rpc.auth.dto.notification.CreateNotificationInput;
@@ -49,21 +48,18 @@ import java.util.List;
 @DubboService
 @Transactional
 public class NotificationServiceImpl extends BaseService<UserNotification, IUserNotificationRepository> implements INotificationRpcService, INotificationService {
+    private final static String MQTT_TOPIC_TEMPLATE = "T/{}/crux/{}/notification";
+    private final NotificationMapper mapper = NotificationMapper.INSTANCE;
+    private final QNotification qNotification = QNotification.notification;
+    private final QUserNotification qUserNotification = QUserNotification.userNotification;
     @Resource
-    private  MqttUtils mqttUtils;
+    private MqttUtils mqttUtils;
     @Resource
     private SecurityUtils securityUtils;
     @Resource
     private JPAQueryFactory queryFactory;
     @Resource
     private INotificationRepository notificationRepository;
-
-    private final NotificationMapper mapper = NotificationMapper.INSTANCE;
-
-    private final QNotification qNotification = QNotification.notification;
-    private final QUserNotification qUserNotification = QUserNotification.userNotification;
-
-    private final static String MQTT_TOPIC_TEMPLATE = "T/{}/crux/{}/notification";
 
     /**
      * 获取用户消息列表

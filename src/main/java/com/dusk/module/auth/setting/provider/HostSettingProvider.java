@@ -24,10 +24,10 @@ public class HostSettingProvider extends SettingProvider {
 
     @Override
     public List<SettingDefinition> getSettingDefinitions() {
-        return new ArrayList<>(){{
+        return new ArrayList<>() {{
             add(new SettingDefinition.Builder(HOST_SETTINGS, "").displayName("站点配置").scopes(SettingScopes.Application, SettingScopes.Tenant).inputType(null).build());
-            add(new SettingDefinition.Builder(HOST_DOMAIN,"").displayName("域名/IP").scopes(SettingScopes.Application, SettingScopes.Tenant).parent(HOST_SETTINGS).build());
-            add(new SettingDefinition.Builder(HOST_SCHEMA,"false").displayName("使用HTTPS").scopes(SettingScopes.Application, SettingScopes.Tenant).inputType(new CheckBox()).parent(HOST_SETTINGS).build());
+            add(new SettingDefinition.Builder(HOST_DOMAIN, "").displayName("域名/IP").scopes(SettingScopes.Application, SettingScopes.Tenant).parent(HOST_SETTINGS).build());
+            add(new SettingDefinition.Builder(HOST_SCHEMA, "false").displayName("使用HTTPS").scopes(SettingScopes.Application, SettingScopes.Tenant).inputType(new CheckBox()).parent(HOST_SETTINGS).build());
         }};
     }
 }

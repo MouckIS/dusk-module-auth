@@ -25,34 +25,24 @@ import java.util.List;
 @Slf4j
 public class EditionExcelExportWriter {
 
-    private SubscribableEdition edition;
-
-    @Setter
-    private List<String> editionPermissions;
-
-    @Setter
-    private List<Permission> definitionPermissions;
-
-    @Setter
-    private List<TenantFeature> editionFeatures;
-
-    @Getter
-    private Workbook workbook;
-
+    public final static int FEATURE_START_INDEX = 5;
+    public final static String SEPARATOR = "->";
     boolean hasWrite = false;
-
-    int maxPermissionDepth ;
-
-    Sheet sheet ;
+    int maxPermissionDepth;
+    Sheet sheet;
     Row row;
     Cell cell;
     int rowIdx = 0;
-
-    public final static int FEATURE_START_INDEX = 5;
-
-    public final static String SEPARATOR = "->";
-
     DataValidationHelper validationHelper;
+    private SubscribableEdition edition;
+    @Setter
+    private List<String> editionPermissions;
+    @Setter
+    private List<Permission> definitionPermissions;
+    @Setter
+    private List<TenantFeature> editionFeatures;
+    @Getter
+    private Workbook workbook;
 
 
     public EditionExcelExportWriter(SubscribableEdition edition) {
@@ -62,8 +52,8 @@ public class EditionExcelExportWriter {
         validationHelper = sheet.getDataValidationHelper();
     }
 
-    public void write(){
-        if(hasWrite){
+    public void write() {
+        if (hasWrite) {
             return;
         }
         List<InnerPermission> permissions = convertPermission();
@@ -71,12 +61,12 @@ public class EditionExcelExportWriter {
         int colIdx = 0;
         row = sheet.createRow(rowIdx++);
         cell = row.createCell(colIdx++);
-        sheet.setColumnHidden(0,true);
+        sheet.setColumnHidden(0, true);
         cell = row.createCell(colIdx++);
         cell.setCellValue("版本名称");
         cell = row.createCell(colIdx++);
         cell.setCellValue(edition.getDisplayName());
-        maxPermissionDepth = maxPermissionDepth==0?1:maxPermissionDepth;
+        maxPermissionDepth = maxPermissionDepth == 0 ? 1 : maxPermissionDepth;
         colIdx = 1;
         row = sheet.createRow(rowIdx++);
         cell = row.createCell(colIdx++);
@@ -85,9 +75,9 @@ public class EditionExcelExportWriter {
         cell.setCellValue("是否授予");
 
         writePermission(permissions);
-        if(rowIdx>2){
-            DataValidationConstraint constraint = validationHelper.createExplicitListConstraint(new String[] {"是", "否"});
-            DataValidation dataValidation = validationHelper.createValidation(constraint, new CellRangeAddressList(2,rowIdx-1,2,2));
+        if (rowIdx > 2) {
+            DataValidationConstraint constraint = validationHelper.createExplicitListConstraint(new String[]{"是", "否"});
+            DataValidation dataValidation = validationHelper.createValidation(constraint, new CellRangeAddressList(2, rowIdx - 1, 2, 2));
             sheet.addValidationData(dataValidation);
         }
 
@@ -102,28 +92,28 @@ public class EditionExcelExportWriter {
         cell.setCellValue("特性值");
         writeFeature(features);
 
-        sheet.setColumnHidden(FEATURE_START_INDEX,true);
+        sheet.setColumnHidden(FEATURE_START_INDEX, true);
         row = sheet.getRow(1);
         for (int i = 0; i < row.getLastCellNum(); i++) {
-            sheet.autoSizeColumn(i,true);
+            sheet.autoSizeColumn(i, true);
             sheet.setColumnWidth(i, sheet.getColumnWidth(i) * 17 / 10);
         }
     }
 
-    List<InnerPermission> convertPermission(){
+    List<InnerPermission> convertPermission() {
         List<InnerPermission> list = new ArrayList<>();
-        definitionPermissions.forEach(p->{
+        definitionPermissions.forEach(p -> {
             InnerPermission permission = new InnerPermission();
             permission.setName(p.getName());
             permission.setDisplayName(p.getDisplayName());
-            if(p.getParent()!=null){
+            if (p.getParent() != null) {
                 permission.setParentName(p.getParent().getName());
             }
             list.add(permission);
             Iterator<String> it = editionPermissions.iterator();
-            while (it.hasNext()){
+            while (it.hasNext()) {
                 String next = it.next();
-                if(StringUtils.equals(next,permission.getName())){
+                if (StringUtils.equals(next, permission.getName())) {
                     permission.setGranted(true);
                     it.remove();
                     break;
@@ -133,12 +123,12 @@ public class EditionExcelExportWriter {
         List<InnerPermission> clone = new ArrayList<>();
         clone.addAll(list);
         Iterator<InnerPermission> it = list.iterator();
-        while (it.hasNext()){
+        while (it.hasNext()) {
             InnerPermission parent = it.next();
             Iterator<InnerPermission> cloneIterator = clone.iterator();
-            while (cloneIterator.hasNext()){
+            while (cloneIterator.hasNext()) {
                 InnerPermission child = cloneIterator.next();
-                if(StringUtils.equals(parent.getName(),child.getParentName())){
+                if (StringUtils.equals(parent.getName(), child.getParentName())) {
                     parent.addChild(child);
                     child.setParent(parent);
                     cloneIterator.remove();
@@ -146,12 +136,12 @@ public class EditionExcelExportWriter {
             }
         }
         it = list.iterator();
-        while (it.hasNext()){
+        while (it.hasNext()) {
             InnerPermission next = it.next();
-            if(next.getParent()!=null){
+            if (next.getParent() != null) {
                 it.remove();
-                if(next.getChildren().isEmpty()){
-                    setParentPermissionDepth(next.getParent(),1);
+                if (next.getChildren().isEmpty()) {
+                    setParentPermissionDepth(next.getParent(), 1);
                 }
             }
         }
@@ -159,17 +149,17 @@ public class EditionExcelExportWriter {
         return list;
     }
 
-    void setParentPermissionDepth(InnerPermission parent, int depth){
-        if(parent.getDepth()<depth){
+    void setParentPermissionDepth(InnerPermission parent, int depth) {
+        if (parent.getDepth() < depth) {
             parent.setDepth(depth);
-            maxPermissionDepth = maxPermissionDepth<depth?depth:maxPermissionDepth;
-            if(parent.getParent()!=null){
-                setParentPermissionDepth(parent.getParent(),parent.getDepth()+1);
+            maxPermissionDepth = maxPermissionDepth < depth ? depth : maxPermissionDepth;
+            if (parent.getParent() != null) {
+                setParentPermissionDepth(parent.getParent(), parent.getDepth() + 1);
             }
         }
     }
 
-    void writePermission(List<InnerPermission> permissions){
+    void writePermission(List<InnerPermission> permissions) {
         for (InnerPermission permission : permissions) {
             int colIdx = 0;
             row = sheet.createRow(rowIdx++);
@@ -180,19 +170,19 @@ public class EditionExcelExportWriter {
             cell.setCellValue(permission.getFullPathName());
 
             cell = row.createCell(colIdx++);
-            cell.setCellValue(permission.isGranted()?"是":"否");
-            if(!permission.getChildren().isEmpty()){
+            cell.setCellValue(permission.isGranted() ? "是" : "否");
+            if (!permission.getChildren().isEmpty()) {
                 writePermission(permission.getChildren());
             }
         }
     }
 
-    List<InnerFeature> convertFeature(){
+    List<InnerFeature> convertFeature() {
         List<InnerFeature> list = new ArrayList<>();
-        BeanCopier copier = BeanCopier.create(TenantFeature.class,InnerFeature.class,false);
+        BeanCopier copier = BeanCopier.create(TenantFeature.class, InnerFeature.class, false);
         for (TenantFeature editionFeature : editionFeatures) {
             InnerFeature feature = new InnerFeature();
-            copier.copy(editionFeature,feature,null);
+            copier.copy(editionFeature, feature, null);
             list.add(feature);
         }
         List<InnerFeature> clone = new ArrayList<>();
@@ -201,28 +191,28 @@ public class EditionExcelExportWriter {
         while (iterator.hasNext()) {
             InnerFeature feature = iterator.next();
             Iterator<InnerFeature> it = clone.iterator();
-            while (it.hasNext()){
+            while (it.hasNext()) {
                 InnerFeature child = it.next();
-                if(StringUtils.equals(child.getParentName(),feature.getName())){
+                if (StringUtils.equals(child.getParentName(), feature.getName())) {
                     child.setParent(feature);
                     feature.addChild(child);
                     it.remove();
                 }
             }
-            if(StringUtils.isNotBlank(feature.getParentName())){
+            if (StringUtils.isNotBlank(feature.getParentName())) {
                 iterator.remove();
             }
         }
         return list;
     }
 
-    void writeFeature(List<InnerFeature> features){
+    void writeFeature(List<InnerFeature> features) {
         int rows = sheet.getPhysicalNumberOfRows();
         for (InnerFeature feature : features) {
             int colIdx = FEATURE_START_INDEX;
-            if(rowIdx<rows){
+            if (rowIdx < rows) {
                 row = sheet.getRow(rowIdx++);
-            }else{
+            } else {
                 row = sheet.createRow(rowIdx++);
             }
             cell = row.createCell(colIdx++);
@@ -231,30 +221,30 @@ public class EditionExcelExportWriter {
             cell.setCellValue(feature.getFullPathName());
             cell = row.createCell(colIdx++);
             InputType inputType = feature.getInputType();
-            if(inputType instanceof ComboBox){
+            if (inputType instanceof ComboBox) {
                 ItemSource source = inputType.getItemSource();
                 String value = feature.getFeatureValue();
                 String[] values = new String[source.getItems().size()];
                 int i = 0;
                 for (Item item : source.getItems()) {
-                    values[i++] = item.getValue()+SEPARATOR+item.getDisplayText();
-                    if(StringUtils.equals(item.getValue(),value)){
-                        value = item.getValue()+SEPARATOR+item.getDisplayText();
+                    values[i++] = item.getValue() + SEPARATOR + item.getDisplayText();
+                    if (StringUtils.equals(item.getValue(), value)) {
+                        value = item.getValue() + SEPARATOR + item.getDisplayText();
                     }
                 }
                 cell.setCellValue(value);
                 DataValidationConstraint constraint = validationHelper.createExplicitListConstraint(values);
-                DataValidation dataValidation = validationHelper.createValidation(constraint, new CellRangeAddressList(cell.getRowIndex(),cell.getRowIndex(),cell.getColumnIndex(),cell.getColumnIndex()));
+                DataValidation dataValidation = validationHelper.createValidation(constraint, new CellRangeAddressList(cell.getRowIndex(), cell.getRowIndex(), cell.getColumnIndex(), cell.getColumnIndex()));
                 sheet.addValidationData(dataValidation);
-            }else if(inputType instanceof CheckBox){
-                DataValidationConstraint constraint = validationHelper.createExplicitListConstraint(new String[]{"true","false"});
-                DataValidation dataValidation = validationHelper.createValidation(constraint, new CellRangeAddressList(cell.getRowIndex(),cell.getRowIndex(),cell.getColumnIndex(),cell.getColumnIndex()));
+            } else if (inputType instanceof CheckBox) {
+                DataValidationConstraint constraint = validationHelper.createExplicitListConstraint(new String[]{"true", "false"});
+                DataValidation dataValidation = validationHelper.createValidation(constraint, new CellRangeAddressList(cell.getRowIndex(), cell.getRowIndex(), cell.getColumnIndex(), cell.getColumnIndex()));
                 sheet.addValidationData(dataValidation);
                 cell.setCellValue(feature.getFeatureValue());
-            }else{
+            } else {
                 cell.setCellValue(feature.getFeatureValue());
             }
-            if(!feature.getChildren().isEmpty()){
+            if (!feature.getChildren().isEmpty()) {
                 writeFeature(feature.getChildren());
             }
         }
@@ -267,14 +257,15 @@ public class EditionExcelExportWriter {
         private String parentName;
         private String name;
         private String displayName;
-        private boolean granted ;
+        private boolean granted;
         private int depth;
         private List<InnerPermission> children;
 
         public InnerPermission() {
             this.children = new ArrayList<>();
         }
-        public void addChild(InnerPermission child){
+
+        public void addChild(InnerPermission child) {
             children.add(child);
         }
 
@@ -282,18 +273,18 @@ public class EditionExcelExportWriter {
             this.parent = parent;
         }
 
-        public String getFullPathName(){
-            if(parent==null){
+        public String getFullPathName() {
+            if (parent == null) {
                 return displayName;
-            }else{
-                return parent.getFullPathName()+SEPARATOR+displayName;
+            } else {
+                return parent.getFullPathName() + SEPARATOR + displayName;
             }
         }
     }
 
     @Setter
     @Getter
-    class InnerFeature implements Serializable{
+    class InnerFeature implements Serializable {
         InnerFeature parent;
         String parentName;
         String name;
@@ -308,15 +299,15 @@ public class EditionExcelExportWriter {
             children = new ArrayList<>();
         }
 
-        public void addChild(InnerFeature child){
+        public void addChild(InnerFeature child) {
             children.add(child);
         }
 
-        public String getFullPathName(){
-            if(parent==null){
+        public String getFullPathName() {
+            if (parent == null) {
                 return displayName;
-            }else{
-                return parent.getFullPathName()+SEPARATOR+displayName;
+            } else {
+                return parent.getFullPathName() + SEPARATOR + displayName;
             }
         }
     }

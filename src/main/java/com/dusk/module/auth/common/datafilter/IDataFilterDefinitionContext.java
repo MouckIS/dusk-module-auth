@@ -9,6 +9,7 @@ import java.util.Map;
  */
 public interface IDataFilterDefinitionContext {
     Map<String, List<Long>> getDataFilterDefinition();
+
     //刷新
     void refresh();
 }

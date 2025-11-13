@@ -24,7 +24,7 @@ public class DataDisplaySetAuthProvider extends AuthorizationProvider {
     @Override
     public void setPermissions(IPermissionDefinitionContext context) {
         Permission dataDisplaySet = context.createPermission(PAGES_DATA_DISPLAY_SET, "数据展示设置项管理", MultiTenancySides.Tenant);
-        dataDisplaySet.createChildPermission(PAGES_DATA_DISPLAY_SET_SAVE,"数据展示设置项的新增",MultiTenancySides.Tenant);
+        dataDisplaySet.createChildPermission(PAGES_DATA_DISPLAY_SET_SAVE, "数据展示设置项的新增", MultiTenancySides.Tenant);
 
     }
 }

@@ -20,7 +20,7 @@ public class ComboboxItemDto {
     @Schema(description = "是否选中")
     protected boolean isSelected;
 
-    public ComboboxItemDto(String value, String displayText){
+    public ComboboxItemDto(String value, String displayText) {
         this.value = value;
         this.displayText = displayText;
     }

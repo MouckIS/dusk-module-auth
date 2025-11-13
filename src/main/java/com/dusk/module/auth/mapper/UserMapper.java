@@ -1,11 +1,9 @@
 package com.dusk.module.auth.mapper;
 
 import com.dusk.common.rpc.auth.dto.*;
-import com.dusk.module.auth.dto.mobilelogin.MobileUserDto;
 import com.dusk.module.auth.dto.user.*;
 import com.dusk.module.auth.entity.User;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 @Mapper
 public interface UserMapper {

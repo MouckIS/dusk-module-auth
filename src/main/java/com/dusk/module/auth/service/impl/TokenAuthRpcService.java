@@ -29,9 +29,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @DubboService(retries = 0, timeout = 2000)
 public class TokenAuthRpcService implements ITokenAuthRpcService {
-    @Resource
-    private TokenAuthManager tokenAuthManager;
-
+    private static final String JWT_NONUSER_TOKEN_PREFIX = "CRUX:AUTH:NONUSER:TOKEN:";
     @Resource
     RedisUtil<String> redisUtil;
 
@@ -40,9 +38,8 @@ public class TokenAuthRpcService implements ITokenAuthRpcService {
 
     @Resource
     IRoleService roleService;
-
-    private static final String JWT_NONUSER_TOKEN_PREFIX = "CRUX:AUTH:NONUSER:TOKEN:";
-
+    @Resource
+    private TokenAuthManager tokenAuthManager;
 
     @Override
     public String generateTokenForNonUser(GenerateTokenForNonUserInput input) {

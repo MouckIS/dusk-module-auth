@@ -26,7 +26,7 @@ public class WxCpAppAccessTokenInfo {
 
     @NoArgsConstructor
     @Getter
-@Setter
+    @Setter
     public static class DealerCorpInfoDTO {
         private String corpid;
         private String corp_name;
@@ -34,7 +34,7 @@ public class WxCpAppAccessTokenInfo {
 
     @NoArgsConstructor
     @Getter
-@Setter
+    @Setter
     public static class AuthCorpInfoDTO {
         private String corpid;
         private String corp_name;
@@ -52,13 +52,13 @@ public class WxCpAppAccessTokenInfo {
 
     @NoArgsConstructor
     @Getter
-@Setter
+    @Setter
     public static class AuthInfoDTO {
         private List<AgentDTO> agent;
 
         @NoArgsConstructor
         @Getter
-@Setter
+        @Setter
         public static class AgentDTO {
             private Integer agentid;
             private String name;
@@ -72,7 +72,7 @@ public class WxCpAppAccessTokenInfo {
 
             @NoArgsConstructor
             @Getter
-@Setter
+            @Setter
             public static class PrivilegeDTO {
                 private Integer level;
                 private List<Integer> allow_party;
@@ -82,7 +82,7 @@ public class WxCpAppAccessTokenInfo {
 
             @NoArgsConstructor
             @Getter
-@Setter
+            @Setter
             public static class SharedFromDTO {
                 private String corpid;
                 private Integer share_type;
@@ -92,7 +92,7 @@ public class WxCpAppAccessTokenInfo {
 
     @NoArgsConstructor
     @Getter
-@Setter
+    @Setter
     public static class AuthUserInfoDTO {
         private String userid;
         private String open_userid;

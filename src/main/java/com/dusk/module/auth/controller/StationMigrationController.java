@@ -27,7 +27,7 @@ public class StationMigrationController extends CruxBaseController {
     @PostMapping("migration")
     @Operation(summary = "迁移厂站")
     public void migration() {
-        if(securityUtils.getCurrentUser() == null || securityUtils.getCurrentUser().getIsAdmin()){
+        if (securityUtils.getCurrentUser() == null || securityUtils.getCurrentUser().getIsAdmin()) {
             throw new BusinessException("无权限执行此操作");
         }
         migrationService.migration();

@@ -58,29 +58,22 @@ import java.util.stream.Collectors;
 @Transactional
 public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implements IRoleRpcService, IRoleService {
 
-    @Resource
-    private IRoleRepository repository;
-
-    @Resource
-    private IUserRepository userRepository;
-
-    @Resource
-    private IOrganizationUnitService organizationUnitService;
-
-    @Resource
-    private IGrantPermissionRepository permissionRepository;
-
-    @Resource
-    private IAuthPermissionManager authPermissionManager;
-
-    @Resource
-    private ITenantPermissionService tenantPermissionService;
-
-    @Resource
-    private JPAQueryFactory queryFactory;
-
     private final RoleMapper mapper = RoleMapper.INSTANCE;
     private final QRole qRole = QRole.role;
+    @Resource
+    private IRoleRepository repository;
+    @Resource
+    private IUserRepository userRepository;
+    @Resource
+    private IOrganizationUnitService organizationUnitService;
+    @Resource
+    private IGrantPermissionRepository permissionRepository;
+    @Resource
+    private IAuthPermissionManager authPermissionManager;
+    @Resource
+    private ITenantPermissionService tenantPermissionService;
+    @Resource
+    private JPAQueryFactory queryFactory;
 
     @Override
     public List<Role> getRoles() {

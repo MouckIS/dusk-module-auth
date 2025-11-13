@@ -24,6 +24,6 @@ public class Station extends TreeEntity {
      * 厂站关联的用户
      */
     @ManyToMany
-    @JoinTable(name = "sys_station_user", joinColumns = { @JoinColumn(name = "station_id") }, inverseJoinColumns = {@JoinColumn(name = "user_id")})
+    @JoinTable(name = "sys_station_user", joinColumns = {@JoinColumn(name = "station_id")}, inverseJoinColumns = {@JoinColumn(name = "user_id")})
     private List<User> users = new ArrayList<>();
 }

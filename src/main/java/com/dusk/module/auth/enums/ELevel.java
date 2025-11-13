@@ -4,6 +4,7 @@ import com.dusk.common.core.entity.BaseEnum;
 
 /**
  * 用户级别
+ *
  * @author kefuming
  * @CreateTime 2022-11-08
  */

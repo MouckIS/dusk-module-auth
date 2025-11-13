@@ -15,7 +15,6 @@ import com.dusk.module.auth.entity.dashboard.*;
 import com.dusk.module.auth.mapper.DashboardMapper;
 import com.dusk.module.auth.mapper.RoleMapper;
 import com.dusk.module.auth.repository.dashboard.*;
-import com.dusk.module.auth.service.IDashBoardModuleService;
 import com.dusk.module.auth.service.IDashBoardService;
 import com.querydsl.core.types.QBean;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -39,6 +38,10 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, IDashBoardThemeRepository> implements IDashBoardService {
 
+    private final DashboardMapper mapper = DashboardMapper.INSTANCE;
+    private final RoleMapper roleMapper = RoleMapper.INSTANCE;
+    @Resource
+    JPAQueryFactory queryFactory;
     @Resource
     private IDashBoardClassifyRepository classifyRepository;
     @Resource
@@ -53,24 +56,18 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
     private IDashBoardZoneRepository zoneRepository;
     @Resource
     private IDashBoardZoneItemRefRepository zoneItemRefRepository;
-    @Resource
-    JPAQueryFactory queryFactory;
-
     @DubboReference
     private IUserRpcService userRpcService;
     @DubboReference
     private IRoleRpcService roleRpcService;
-
-    private final DashboardMapper mapper = DashboardMapper.INSTANCE;
-    private final RoleMapper roleMapper = RoleMapper.INSTANCE;
 
     @Override
     public DashboardTheme saveTheme(CreateOrUpdateTheme input) {
         //检查主题名次是否重复
         List<DashboardTheme> themes = themeRepository.findAllByName(input.getName());
         themes.forEach(theme -> {
-            if(!theme.getId().equals(input.getId())) {
-                throw new BusinessException("已存在名称为["+input.getName()+"]的数据大屏!");
+            if (!theme.getId().equals(input.getId())) {
+                throw new BusinessException("已存在名称为[" + input.getName() + "]的数据大屏!");
             }
         });
 
@@ -99,16 +96,16 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
             query = query.where(qDashboardTheme.themeType.contains(input.getThemeType()));
         }
         var themePage = page(query, input.getPageable());
-        List<ThemeListDto> datas = (List<ThemeListDto>)themePage.getContent();
+        List<ThemeListDto> datas = (List<ThemeListDto>) themePage.getContent();
 
         //获取主题栏目
         List<Long> themeIds = datas.stream().map(ThemeListDto::getId).collect(Collectors.toList());
         List<DashboardClassify> classifies = classifyRepository.findAllByThemeIdIn(themeIds);
-        if(!classifies.isEmpty()) {
+        if (!classifies.isEmpty()) {
             Map<Long, List<DashboardClassify>> classifyMap = classifies.stream().collect(Collectors.groupingBy(DashboardClassify::getThemeId));
             datas.forEach((theme) -> {
                 List<DashboardClassify> themeClassify = classifyMap.get(theme.getId());
-                if(themeClassify != null) {
+                if (themeClassify != null) {
                     theme.setClassifies(MapperUtil.mapList(themeClassify, mapper::toDetailDto));
                 }
             });
@@ -137,10 +134,10 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
         //保存栏目
         DashboardClassify dashboardClassify;
         boolean isAdd = input.getId() == null;
-        if(isAdd) {
+        if (isAdd) {
             dashboardClassify = mapper.createDtoToEntity(input);
-        }else {
-            dashboardClassify = classifyRepository.findById(input.getId()).orElseThrow(() -> new BusinessException("未找到id为["+input.getId()+"]的栏目记录！"));
+        } else {
+            dashboardClassify = classifyRepository.findById(input.getId()).orElseThrow(() -> new BusinessException("未找到id为[" + input.getId() + "]的栏目记录！"));
             //mapper.map(input, dashboardClassify);
             BeanUtils.copyProperties(input, dashboardClassify);
         }
@@ -148,7 +145,7 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
 
         //更新区域列表
         zoneRepository.deleteAllByClassifyId(dashboardClassify.getId());
-        input.getZones().forEach((zone)-> {
+        input.getZones().forEach((zone) -> {
             saveZone(zone, dashboardClassify);
         });
 
@@ -163,8 +160,8 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
 
         //更新区域统计项
         zoneItemRefRepository.deleteAllByZoneId(input.getId());
-        if(input.getZoneItems() != null) {
-            input.getZoneItems().forEach((item)-> {
+        if (input.getZoneItems() != null) {
+            input.getZoneItems().forEach((item) -> {
                 saveZoneItemRef(item, zone);
             });
         }
@@ -180,7 +177,7 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
 
     @Override
     public ClassifyDetailDto classifyDetail(Long id) {
-        DashboardClassify classify = classifyRepository.findById(id).orElseThrow(()->new BusinessException("未找到id为["+id+"]的栏目记录！"));
+        DashboardClassify classify = classifyRepository.findById(id).orElseThrow(() -> new BusinessException("未找到id为[" + id + "]的栏目记录！"));
         ClassifyDetailDto classifyDto = mapper.toDetailDto(classify);
         classifyDto.setZones(findClassifyZones(classifyDto));
         return classifyDto;
@@ -199,7 +196,7 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
     private List<ZoneItemDetailDto> findZoneItemDetail(ZoneDetailDto zone) {
         List<DashboardZoneItemRef> itemRefs = zoneItemRefRepository.findAllByZoneId(zone.getId());
         List<ZoneItemDetailDto> itemRefDtos = MapperUtil.mapList(itemRefs, mapper::toZoneItemDetailDto);
-        itemRefDtos.forEach((ref)->{
+        itemRefDtos.forEach((ref) -> {
             DashboardModule module = moduleRepository.findById(ref.getModuleId()).orElse(null);
             DashboardModuleItem item = moduleItemRepository.findById(ref.getModuleItemId()).orElse(null);
             ref.setModule(module);
@@ -210,7 +207,7 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
 
     @Override
     public void removeClassify(Long id) {
-        DashboardClassify classify = classifyRepository.findById(id).orElseThrow(()->new BusinessException("未找到id为["+id+"]的栏目记录！"));
+        DashboardClassify classify = classifyRepository.findById(id).orElseThrow(() -> new BusinessException("未找到id为[" + id + "]的栏目记录！"));
         //删除栏目关联的区域
         deleteClassifyZones(classify);
         //删除栏目
@@ -250,10 +247,10 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
 
     @Override
     public void setDashBardPermission(CreateOrUpdateDashBoardPermission input) {
-        findById(input.getThemeId()).orElseThrow(() -> new BusinessException("未找到id为["+input.getThemeId()+"]的主题记录！"));
-        if(input.getRoleIds() != null) {
+        findById(input.getThemeId()).orElseThrow(() -> new BusinessException("未找到id为[" + input.getThemeId() + "]的主题记录！"));
+        if (input.getRoleIds() != null) {
             input.getRoleIds().forEach(roleId -> {
-                if(permissionRepository.findByThemeIdAndRoleId(input.getThemeId(), roleId) == null) {
+                if (permissionRepository.findByThemeIdAndRoleId(input.getThemeId(), roleId) == null) {
                     DashboardPermission dashboardPermission = new DashboardPermission(input.getThemeId(), roleId);
                     permissionRepository.save(dashboardPermission);
                 }
@@ -263,17 +260,17 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
 
     @Override
     public void removeDashBardPermission(RemoveDashBoardPermission input) {
-        findById(input.getThemeId()).orElseThrow(() -> new BusinessException("未找到id为["+input.getThemeId()+"]的主题记录！"));
+        findById(input.getThemeId()).orElseThrow(() -> new BusinessException("未找到id为[" + input.getThemeId() + "]的主题记录！"));
         permissionRepository.deleteByThemeIdAndRoleId(input.getThemeId(), input.getRoleId());
     }
 
     @Override
     public List<ThemeListDto> getDashBoardThemeByUserId(Long userId) {
         UserFullListDto user = userRpcService.getUserFullById(userId);
-        if(user == null) {
-            throw new BusinessException("id为["+userId+"]的用户不存在！");
+        if (user == null) {
+            throw new BusinessException("id为[" + userId + "]的用户不存在！");
         }
-        if(user.getUserRoles() == null || user.getUserRoles().size() == 0) {
+        if (user.getUserRoles() == null || user.getUserRoles().size() == 0) {
             return new ArrayList<>();
         }
         List<Long> roleIds = user.getUserRoles().stream().map(UserRoleDto::getId).collect(Collectors.toList());
@@ -285,13 +282,13 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
 
     @Override
     public List<RoleSimpleDto> getDashBoardThemeUser(Long themeId) {
-        findById(themeId).orElseThrow(() -> new BusinessException("未找到id为["+themeId+"]的主题记录！"));
+        findById(themeId).orElseThrow(() -> new BusinessException("未找到id为[" + themeId + "]的主题记录！"));
         List<DashboardPermission> permissions = permissionRepository.findAllByThemeId(themeId);
-        if(permissions.isEmpty()) {
+        if (permissions.isEmpty()) {
             return new ArrayList<>();
         }
         List<Long> roleIds = permissions.stream().map(DashboardPermission::getRoleId).filter(Objects::nonNull).collect(Collectors.toList());
-        if(roleIds.isEmpty()) {
+        if (roleIds.isEmpty()) {
             return new ArrayList<>();
         }
         List<RoleListDto> roleListDtos = roleRpcService.getRolesByIds(roleIds);
@@ -301,15 +298,15 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
     @Override
     public UserMainDashBoardDto getUserMainDashBoard(Long userId) {
         DashboardTheme dashboardTheme = themeRepository.findFirstByMainPage(true);
-        if(dashboardTheme == null) {
+        if (dashboardTheme == null) {
             return new UserMainDashBoardDto(null, false);
         }
 
         UserFullListDto user = userRpcService.getUserFullById(userId);
-        if(user == null) {
-            throw new BusinessException("id为["+userId+"]的用户不存在！");
+        if (user == null) {
+            throw new BusinessException("id为[" + userId + "]的用户不存在！");
         }
-        if(user.getUserRoles() == null || user.getUserRoles().isEmpty()) {
+        if (user.getUserRoles() == null || user.getUserRoles().isEmpty()) {
             return new UserMainDashBoardDto(null, false);
         }
         List<Long> roleIds = user.getUserRoles().stream().map(UserRoleDto::getId).collect(Collectors.toList());
@@ -318,7 +315,7 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
         long count = queryFactory.selectFrom(qDashboardPermission)
                 .where(qDashboardPermission.themeId.eq(dashboardTheme.getId())
                         .and(qDashboardPermission.roleId.in(roleIds))).fetchCount();
-        return new UserMainDashBoardDto(dashboardTheme.getId(), count>0);
+        return new UserMainDashBoardDto(dashboardTheme.getId(), count > 0);
     }
 
     @Override

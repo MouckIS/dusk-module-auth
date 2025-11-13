@@ -1,8 +1,6 @@
 package com.dusk.module.auth.dto.auditlog;
 
 import com.dusk.common.core.dto.EntityDto;
-import com.dusk.module.auth.entity.QAuditLog;
-import com.dusk.module.auth.entity.QUser;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;

@@ -34,6 +34,6 @@ public class TenantAuthProvider extends AuthorizationProvider {
         tenants.createChildPermission(PAGES_TENANTS_DELETE, "删除租户", MultiTenancySides.Host);
         tenants.createChildPermission(PAGES_TENANTS_IMPERSONATION, "租户登录", MultiTenancySides.Host);
         tenants.createChildPermission(PAGES_TENANTS_PRODUCTSMANAGEMENT, "租户产品管理", MultiTenancySides.Host);
-        tenants.createChildPermission(PAGES_TENANTS_CHANGEPASSWORD,"修改租户管理员密码",MultiTenancySides.Host);
+        tenants.createChildPermission(PAGES_TENANTS_CHANGEPASSWORD, "修改租户管理员密码", MultiTenancySides.Host);
     }
 }

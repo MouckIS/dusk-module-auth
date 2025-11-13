@@ -16,7 +16,7 @@ import lombok.experimental.FieldNameConstants;
 @Getter
 @Setter
 @FieldNameConstants
-public class ExtendField  extends FullAuditedEntity {
+public class ExtendField extends FullAuditedEntity {
     /**
      * 实体id
      */

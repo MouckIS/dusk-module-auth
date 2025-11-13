@@ -11,11 +11,16 @@ import java.util.List;
  */
 public interface IUserWxRelationRepository extends IBaseRepository<UserWxRelation> {
     UserWxRelation findByAppIdAndOpenId(String appId, String openId);
+
     UserWxRelation findFirstByUserIdAndAppId(Long userId, String appId);
+
     List<UserWxRelation> findAllByUserIdIn(List<Long> userIds);
+
     Integer countAllByUserId(Long userId);
+
     Integer countAllByOpenId(String openId);
 
     Integer countAllByUserIdAndOpenId(Long userId, String openId);
+
     void deleteAllByUserId(Long userId);
 }

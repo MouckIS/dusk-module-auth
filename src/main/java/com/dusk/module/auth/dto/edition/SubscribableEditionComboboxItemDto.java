@@ -11,11 +11,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class SubscribableEditionComboboxItemDto extends ComboboxItemDto{
+public class SubscribableEditionComboboxItemDto extends ComboboxItemDto {
     private Boolean isFree;
 
-    public SubscribableEditionComboboxItemDto(String value, String displayText, Boolean isFree)
-    {
+    public SubscribableEditionComboboxItemDto(String value, String displayText, Boolean isFree) {
         super(value, displayText);
         this.isFree = isFree;
     }

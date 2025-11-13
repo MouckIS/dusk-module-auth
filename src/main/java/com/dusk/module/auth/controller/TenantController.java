@@ -46,15 +46,14 @@ import java.util.List;
 @Tag(name = "租户", description = "Tenant")
 @Authorize(TenantAuthProvider.PAGES_TENANTS)
 public class TenantController extends CruxBaseController {
+    private final TenantMapper mapper = TenantMapper.INSTANCE;
+    private final UserMapper userMapper = UserMapper.INSTANCE;
     @Resource
     private ITenantService tenantService;
     @Resource
     private IUserService userService;
     @Resource
     private TokenAuthManager tokenAuthManager;
-
-    private final TenantMapper mapper = TenantMapper.INSTANCE;
-    private final UserMapper userMapper = UserMapper.INSTANCE;
 
     /**
      * 查询租户列表

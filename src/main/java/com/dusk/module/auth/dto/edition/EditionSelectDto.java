@@ -36,8 +36,7 @@ public class EditionSelectDto extends EntityDto {
     @Schema(description = "额外数据")
     private Map<SubscriptionPaymentGatewayType, Map<String, String>> additionalData;
 
-    public EditionSelectDto()
-    {
+    public EditionSelectDto() {
         additionalData = new HashMap<SubscriptionPaymentGatewayType, Map<String, String>>();
     }
 }

@@ -33,47 +33,46 @@ import java.util.Optional;
  */
 @Service
 public class AuditLogServiceImpl extends BaseService<AuditLog, IAuditLogRepository> implements IAuditLogService {
+    private final AuditLogMapper mapper = AuditLogMapper.INSTANCE;
     @Resource
     private JPAQueryFactory queryFactory;
-
-    private final AuditLogMapper mapper = AuditLogMapper.INSTANCE;
 
     @Override
     public Page<AuditLogListDto> findAuditLogs(GetAuditLogsInput input) {
         QAuditLog qLog = QAuditLog.auditLog;
         QUser qUser = QUser.user;
-        QBeanBuilder<AuditLogListDto> builder = QBeanBuilder.create(AuditLogListDto.class).appendQEntity(qLog,qUser);
+        QBeanBuilder<AuditLogListDto> builder = QBeanBuilder.create(AuditLogListDto.class).appendQEntity(qLog, qUser);
         JPAQuery<AuditLogListDto> query = queryFactory.select(builder.build()).from(qLog).leftJoin(qUser).on(qLog.createId.eq(qUser.id));
-        if(input.getStartDate()!=null){
+        if (input.getStartDate() != null) {
             query.where(qLog.executionTime.goe(input.getStartDate()));
         }
-        if(input.getEndDate()!=null){
+        if (input.getEndDate() != null) {
             query.where(qLog.executionTime.loe(input.getEndDate()));
         }
-        if(StringUtils.isNotBlank(input.getUserName())){
+        if (StringUtils.isNotBlank(input.getUserName())) {
             query.where(qUser.userName.contains(input.getUserName()));
         }
-        if(StringUtils.isNotBlank(input.getServiceName())){
+        if (StringUtils.isNotBlank(input.getServiceName())) {
             query.where(qLog.serviceName.contains(input.getServiceName()));
         }
-        if(StringUtils.isNotBlank(input.getMethodName())){
+        if (StringUtils.isNotBlank(input.getMethodName())) {
             query.where(qLog.methodName.contains(input.getMethodName()));
         }
-        if(StringUtils.isNotBlank(input.getBrowserInfo())){
+        if (StringUtils.isNotBlank(input.getBrowserInfo())) {
             query.where(qLog.browserInfo.contains(input.getBrowserInfo()));
         }
-        if(input.getMinExecutionDuration()!=null){
+        if (input.getMinExecutionDuration() != null) {
             query.where(qLog.executionDuration.goe(input.getMinExecutionDuration()));
         }
-        if(input.getMaxExecutionDuration()!=null){
+        if (input.getMaxExecutionDuration() != null) {
             query.where(qLog.executionDuration.loe(input.getMaxExecutionDuration()));
         }
-        if(input.getHasException()!=null){
-            query.where(BooleanUtils.isTrue(input.getHasException())?qLog.exception.isNotNull():qLog.exception.isNull());
+        if (input.getHasException() != null) {
+            query.where(BooleanUtils.isTrue(input.getHasException()) ? qLog.exception.isNotNull() : qLog.exception.isNull());
         }
 
         Pageable pageable = input.getPageable();
-        return (Page<AuditLogListDto>) page(query,pageable);
+        return (Page<AuditLogListDto>) page(query, pageable);
     }
 
     @Override
@@ -81,44 +80,44 @@ public class AuditLogServiceImpl extends BaseService<AuditLog, IAuditLogReposito
     public AuditLogDetailDto getAuditLogDetail(Long id) {
         QAuditLog qLog = QAuditLog.auditLog;
         QUser qUser = QUser.user;
-        QBeanBuilder<AuditLogDetailDto> builder = QBeanBuilder.create(AuditLogDetailDto.class).appendQEntity(qLog,qUser);
+        QBeanBuilder<AuditLogDetailDto> builder = QBeanBuilder.create(AuditLogDetailDto.class).appendQEntity(qLog, qUser);
         AuditLogDetailDto detailDto = queryFactory.select(builder.build()).from(qLog).leftJoin(qUser).on(qLog.createId.eq(qUser.id)).where(qLog.id.eq(id)).fetchFirst();
-        return Optional.ofNullable(detailDto).orElseThrow(()->new BusinessException("审计日志不存在或已被删除"));
+        return Optional.ofNullable(detailDto).orElseThrow(() -> new BusinessException("审计日志不存在或已被删除"));
     }
 
     @Override
     public void exportLog(ExportAuditLogsInput input, ServletOutputStream outputStream) {
         QAuditLog qLog = QAuditLog.auditLog;
         QUser qUser = QUser.user;
-        QBeanBuilder<AuditLogDetailDto> builder = QBeanBuilder.create(AuditLogDetailDto.class).appendQEntity(qLog,qUser);
+        QBeanBuilder<AuditLogDetailDto> builder = QBeanBuilder.create(AuditLogDetailDto.class).appendQEntity(qLog, qUser);
         JPAQuery<AuditLogDetailDto> query = queryFactory.select(builder.build()).from(qLog).leftJoin(qUser).on(qLog.createId.eq(qUser.id));
-        if(input.getStartDate()!=null){
+        if (input.getStartDate() != null) {
             query.where(qLog.executionTime.goe(input.getStartDate()));
         }
-        if(input.getEndDate()!=null){
+        if (input.getEndDate() != null) {
             query.where(qLog.executionTime.loe(input.getEndDate()));
         }
-        if(StringUtils.isNotBlank(input.getUserName())){
+        if (StringUtils.isNotBlank(input.getUserName())) {
             query.where(qUser.userName.contains(input.getUserName()));
         }
-        if(StringUtils.isNotBlank(input.getServiceName())){
+        if (StringUtils.isNotBlank(input.getServiceName())) {
             query.where(qLog.serviceName.contains(input.getServiceName()));
         }
-        if(StringUtils.isNotBlank(input.getMethodName())){
+        if (StringUtils.isNotBlank(input.getMethodName())) {
             query.where(qLog.methodName.contains(input.getMethodName()));
         }
-        if(StringUtils.isNotBlank(input.getBrowserInfo())){
+        if (StringUtils.isNotBlank(input.getBrowserInfo())) {
             query.where(qLog.browserInfo.contains(input.getBrowserInfo()));
         }
-        if(input.getHasException()!=null){
-            query.where(BooleanUtils.isTrue(input.getHasException())?qLog.exception.isNotNull():qLog.exception.isNull());
+        if (input.getHasException() != null) {
+            query.where(BooleanUtils.isTrue(input.getHasException()) ? qLog.exception.isNotNull() : qLog.exception.isNull());
         }
 
         query.orderBy(qLog.executionTime.desc());
 
         List<AuditLogDetailDto> detailList = query.fetch();
 
-        List<AuditLogExportDto> list = MapperUtil.mapList(detailList, mapper::detailDtoToExportDto,  (s, t) -> {
+        List<AuditLogExportDto> list = MapperUtil.mapList(detailList, mapper::detailDtoToExportDto, (s, t) -> {
             t.setTime(LocalDateTimeUtil.format(s.getExecutionTime(), "yyyy-MM-dd HH:mm:ss"));
         });
 

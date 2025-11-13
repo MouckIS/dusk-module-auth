@@ -11,6 +11,8 @@ import java.util.List;
  */
 public interface IDashBoardZoneRepository extends IBaseRepository<DashboardZone> {
     List<DashboardZone> findAllByClassifyIdIn(List<Long> classifyIds);
+
     List<DashboardZone> findAllByClassifyIdOrderByZonePosition(Long classifyId);
+
     void deleteAllByClassifyId(Long classifyId);
 }

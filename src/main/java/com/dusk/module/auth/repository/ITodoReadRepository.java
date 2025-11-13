@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface ITodoReadRepository extends IBaseRepository<TodoRead> {
 
-    Optional<TodoRead> findByTodoIdAndUserId(Long todoId,Long userId);
+    Optional<TodoRead> findByTodoIdAndUserId(Long todoId, Long userId);
 
     List<TodoRead> findByUserId(Long userId);
 }

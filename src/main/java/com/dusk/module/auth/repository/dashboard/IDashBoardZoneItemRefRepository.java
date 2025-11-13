@@ -11,8 +11,12 @@ import java.util.List;
  */
 public interface IDashBoardZoneItemRefRepository extends IBaseRepository<DashboardZoneItemRef> {
     List<DashboardZoneItemRef> findAllByModuleId(Long moduleId);
+
     List<DashboardZoneItemRef> findAllByModuleItemId(Long moduleItemId);
+
     List<DashboardZoneItemRef> findAllByZoneId(Long zoneId);
+
     void deleteAllByZoneIdIn(List<Long> zoneIds);
+
     void deleteAllByZoneId(Long zoneId);
 }

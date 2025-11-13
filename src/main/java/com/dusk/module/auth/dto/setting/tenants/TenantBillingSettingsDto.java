@@ -9,5 +9,5 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class TenantBillingSettingsDto extends TenantBillingSettingsEditDto{
+public class TenantBillingSettingsDto extends TenantBillingSettingsEditDto {
 }

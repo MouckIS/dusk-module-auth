@@ -23,9 +23,8 @@ import java.util.stream.Collectors;
 @Configuration
 @EnableConfigurationProperties(WxMaProperties.class)
 public class WxMaConfiguration {
-    private final WxMaProperties properties;
-
     private static Map<String, WxMaService> maServices = new HashMap<>();
+    private final WxMaProperties properties;
 
     @Autowired
     public WxMaConfiguration(WxMaProperties properties) {
@@ -34,6 +33,7 @@ public class WxMaConfiguration {
 
     /**
      * 找到指定的微信小程序配置
+     *
      * @param appid
      * @return
      */

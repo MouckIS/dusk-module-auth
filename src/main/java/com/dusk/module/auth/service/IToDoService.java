@@ -30,6 +30,7 @@ public interface IToDoService extends IBaseService<Todo, IToDoRepository> {
 
     /**
      * 当前用户忽略待办
+     *
      * @param todoId
      */
     void ignoreTodo(Long todoId);

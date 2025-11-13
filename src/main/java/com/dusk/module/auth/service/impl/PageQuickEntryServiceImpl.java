@@ -35,10 +35,9 @@ import java.util.Objects;
 @Transactional
 public class PageQuickEntryServiceImpl extends BaseService<PageQuickEntry, IPageQuickEntryRepository> implements IPageQuickEntryService {
 
+    private final PageQuickEntryMapper mapper = PageQuickEntryMapper.INSTANCE;
     @Resource
     private JPAQueryFactory queryFactory;
-
-    private final PageQuickEntryMapper mapper = PageQuickEntryMapper.INSTANCE;
 
     @Override
     public void updateQuickSet(List<UpdatePageQuickSetDto> input) {

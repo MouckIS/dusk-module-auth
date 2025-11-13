@@ -32,17 +32,17 @@ public class RoleDto extends EntityDto {
     @Schema(description = "权限列表")
     private List<RolePermissionDto> permissionList;
 
-    public RoleDto(){
+    public RoleDto() {
         permissionList = new ArrayList<>();
     }
 
-    public void addPermission(RolePermissionDto p){
+    public void addPermission(RolePermissionDto p) {
         permissionList.add(p);
     }
 
     public String getIsDefaultStr() {
-        if(isDefaultStr==null){
-            isDefaultStr = isDefault?"是":"否";
+        if (isDefaultStr == null) {
+            isDefaultStr = isDefault ? "是" : "否";
         }
         return isDefaultStr;
     }

@@ -20,10 +20,10 @@ public class ApplicationSettingProvider extends SettingProvider {
 
     @Override
     public List<SettingDefinition> getSettingDefinitions() {
-        return new ArrayList<>(){{
+        return new ArrayList<>() {{
             add(new SettingDefinition.Builder(APPLICATION_SETTINGS, "").displayName("系统设置").scopes(SettingScopes.Application).inputType(null).build());
-            add(new SettingDefinition.Builder(APPLICATION_SETTINGS_NAME,"权限管理中心").displayName("应用名称").scopes(SettingScopes.Application).parent(APPLICATION_SETTINGS).build());
-            add(new SettingDefinition.Builder(APPLICATION_SETTINGS_DESCRIPTION,"").displayName("应用描述").scopes(SettingScopes.Application).parent(APPLICATION_SETTINGS).build());
+            add(new SettingDefinition.Builder(APPLICATION_SETTINGS_NAME, "权限管理中心").displayName("应用名称").scopes(SettingScopes.Application).parent(APPLICATION_SETTINGS).build());
+            add(new SettingDefinition.Builder(APPLICATION_SETTINGS_DESCRIPTION, "").displayName("应用描述").scopes(SettingScopes.Application).parent(APPLICATION_SETTINGS).build());
         }};
     }
 }

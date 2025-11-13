@@ -49,13 +49,15 @@ import com.dusk.module.auth.mapper.OrganizationMapper;
 import com.dusk.module.auth.mapper.RoleMapper;
 import com.dusk.module.auth.mapper.UserMapper;
 import com.dusk.module.auth.push.INotificationPushManager;
-import com.dusk.module.auth.repository.*;
+import com.dusk.module.auth.repository.IGrantPermissionRepository;
+import com.dusk.module.auth.repository.IOrganizationManagerRepository;
+import com.dusk.module.auth.repository.ITenantRepository;
+import com.dusk.module.auth.repository.IUserRepository;
 import com.dusk.module.auth.service.*;
 import com.dusk.module.ddm.service.ISettingRpcService;
 import com.hankcs.hanlp.HanLP;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.SneakyThrows;
@@ -91,10 +93,46 @@ import java.util.stream.Collectors;
 @Transactional
 @Slf4j
 public class UserServiceImpl extends BaseService<User, IUserRepository> implements IUserService {
+    //登陆异常代码
+    public static final int CODE_USER_NOT_USE = 1000;   //用户未激活
+    public static final int CODE_USER_NOT_ACTIVE = 1001;   //用户未激活
+    public static final int CODE_USER_CHANGE_PASSWORD = 1002;  //首次登陆需要修改密码
+    public static final int CODE_USER_LOCKED = 1003;   //账户已经被锁定
+    public static final int CODE_USER_VALID = 1004;   //需要验证码
+    public static final int CODE_USER_DIMISSION = 1005; // 用户已离职
+    public static final String ERROR_USERS_DUPLICATE = "用户名已被占用！";
+    public static final String PERSONNEL_CONTROL_CONFIRM_ID_CARD = "Personnel.Control.Confirm.idCard";
+    public static final String PERSONNEL_CONTROL_CONFIRM_PHONE = "Personnel.Control.Confirm.phone";
     private final static String REDIS_KEY_RESET_PWD_CAPTCHA_KEY_PREFIX = "CRUX:PWD:RESET:";
     private final static String REDIS_KEY_RESET_PWD_CAPTCHA_SEND_KEY_PREFIX = "CRUX:PWD:RESET:SEND";
     private final static int RESET_PWD_CAPTCHA_TIME = 60 * 5;
-
+    private static final int HOST_MAX_ERROR_COUNT = 10; //宿主登陆账号最大错误次数
+    private static final int PASSWORD_ERROR_COUNT_VALID = 3;
+    //登陆异常提醒
+    private static final String ERROR_USER_NOT_FIND = "未找到用户!";
+    private static final String ERROR_USER_PASSWORD_ERROR = "密码错误!";
+    private static final String ERROR_USER_NOT_ACTIVE = "用户未激活!";
+    private static final String ERROR_USER_DIMISSION = "用户已离职!";
+    private static final String ERROR_USER_PHONE_NO = "手机号码格式错误!";
+    private static final String ERROR_USER_CHANGE_PASSWORD = "首次登陆需要修改密码";
+    private static final String ERROR_USER_LOCKED = "您的账户已经被锁定，请与管理员联系或者在24小时后重新登陆！";
+    private static final String ERROR_ACCOUNT_OR_PASSWORD = "帐户名或密码错误！";
+    private static final String ERROR_USER_NOT_USE = "账户不可用";
+    //其他异常提示信息
+    private static final String ERROR_USERS_LIMITED = "用户数超出当前限制！";
+    private static final String ERROR_MAIL_SEND_FAIL = "邮件发送失败！";
+    private static final String ERROR_WORKNUMBER_DUPLICATE = "工号已被占用！";
+    private static final String ERROR_ID_CARD_DUPLICATE = "身份证号码已被占用！";
+    private static final String REDIS_KEY_ACTIVE = "CRUX:AUTH:USER:ACTIVE:";
+    private static final String USER_IMAGE_TYPE_SIGNATURE = "signature";
+    private static final String USER_IMAGE_TYPE_PROFILE = "profile";
+    private static final QOrganizationManager qOrganizationManager = QOrganizationManager.organizationManager;
+    private static final QOrganizationUnit qOrganizationUnit = QOrganizationUnit.organizationUnit;
+    private final UserMapper mapper = UserMapper.INSTANCE;
+    private final RoleMapper roleMapper = RoleMapper.INSTANCE;
+    private final OrganizationMapper orgMapper = OrganizationMapper.INSTANCE;
+    @Resource
+    IGrantPermissionRepository grantPermissionRepository;
     @Resource
     private IUserRepository userRepository;
     @Resource
@@ -103,8 +141,6 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     private IRoleService roleService;
     @Resource
     private IOrganizationUnitService organizationUnitService;
-    @Resource
-    IGrantPermissionRepository grantPermissionRepository;
     @Resource
     private IFeatureChecker featureChecker;
     @Autowired(required = false)
@@ -133,59 +169,11 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     private ISettingRpcService settingRpcService;
     @Resource
     private RabbitMQUtils rabbitMQUtils;
-
-    private final UserMapper mapper = UserMapper.INSTANCE;
-    private final RoleMapper roleMapper = RoleMapper.INSTANCE;
-    private final OrganizationMapper orgMapper = OrganizationMapper.INSTANCE;
-
     //随机密码长度，可配置读取
     @Value("${app.setting.passwdLen}")
     private int passwdLen;
-
     @Value("${app.setting.mail.activeAddr}")
     private String activeAddr;
-
-    //登陆异常代码
-    public static final int CODE_USER_NOT_USE = 1000;   //用户未激活
-    public static final int CODE_USER_NOT_ACTIVE = 1001;   //用户未激活
-    public static final int CODE_USER_CHANGE_PASSWORD = 1002;  //首次登陆需要修改密码
-    public static final int CODE_USER_LOCKED = 1003;   //账户已经被锁定
-    public static final int CODE_USER_VALID = 1004;   //需要验证码
-    public static final int CODE_USER_DIMISSION = 1005; // 用户已离职
-
-    private static final int HOST_MAX_ERROR_COUNT = 10; //宿主登陆账号最大错误次数
-
-    private static final int PASSWORD_ERROR_COUNT_VALID = 3;
-
-    //登陆异常提醒
-    private static final String ERROR_USER_NOT_FIND = "未找到用户!";
-    private static final String ERROR_USER_PASSWORD_ERROR = "密码错误!";
-    private static final String ERROR_USER_NOT_ACTIVE = "用户未激活!";
-    private static final String ERROR_USER_DIMISSION = "用户已离职!";
-    private static final String ERROR_USER_PHONE_NO = "手机号码格式错误!";
-    private static final String ERROR_USER_CHANGE_PASSWORD = "首次登陆需要修改密码";
-    private static final String ERROR_USER_LOCKED = "您的账户已经被锁定，请与管理员联系或者在24小时后重新登陆！";
-    private static final String ERROR_ACCOUNT_OR_PASSWORD = "帐户名或密码错误！";
-    private static final String ERROR_USER_NOT_USE = "账户不可用";
-
-    //其他异常提示信息
-    private static final String ERROR_USERS_LIMITED = "用户数超出当前限制！";
-    public static final String ERROR_USERS_DUPLICATE = "用户名已被占用！";
-    private static final String ERROR_MAIL_SEND_FAIL = "邮件发送失败！";
-    private static final String ERROR_WORKNUMBER_DUPLICATE = "工号已被占用！";
-    private static final String ERROR_ID_CARD_DUPLICATE = "身份证号码已被占用！";
-
-    private static final String REDIS_KEY_ACTIVE = "CRUX:AUTH:USER:ACTIVE:";
-
-
-    private static final String USER_IMAGE_TYPE_SIGNATURE = "signature";
-    private static final String USER_IMAGE_TYPE_PROFILE = "profile";
-
-    public static final String PERSONNEL_CONTROL_CONFIRM_ID_CARD = "Personnel.Control.Confirm.idCard";
-    public static final String PERSONNEL_CONTROL_CONFIRM_PHONE = "Personnel.Control.Confirm.phone";
-
-    private static final QOrganizationManager qOrganizationManager = QOrganizationManager.organizationManager;
-    private static final QOrganizationUnit qOrganizationUnit = QOrganizationUnit.organizationUnit;
 
     //这里独立方法只有密码相关的校验，checkUserValid 是公共校验 方法是密码登陆入口
     @Override
@@ -524,6 +512,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
             return findSuperiorId(units.getFirst());
         }
     }
+
     /**
      * 递归查询用户上级
      */
@@ -726,7 +715,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
      * 更新厂站
      */
     private void updateUserStationRel(Long userId, List<Long> newStationIds) {
-        if(CollectionUtils.isEmpty(newStationIds)) {
+        if (CollectionUtils.isEmpty(newStationIds)) {
             return;
         }
         List<Long> oldStationIds = stationService.getStationsForFrontByUserId(userId).stream().map(StationsOfLoginUserDto::getValue).collect(Collectors.toList());
@@ -758,7 +747,8 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
 
     /**
      * 更新组织机构与用户关联关系
-     * @param user 用户
+     *
+     * @param user            用户
      * @param organizationIds 组织机构id列表
      */
     private void updateOrganizationRelation(User user, List<Long> organizationIds) {
@@ -838,7 +828,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
         //userFaceRpcService.removeFace(id);
         //删除门禁权限
         CancelAuthDto cancelAuthDto = new CancelAuthDto(TenantContextHolder.getTenantId(), Collections.singletonList(id));
-        rabbitMQUtils.publishMsgAsync(RabbitConstant.CANCEL_USER_AUTH_FANOUT_EXCHANGE_V1,"", cancelAuthDto);
+        rabbitMQUtils.publishMsgAsync(RabbitConstant.CANCEL_USER_AUTH_FANOUT_EXCHANGE_V1, "", cancelAuthDto);
     }
 
     @Override
@@ -899,12 +889,12 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
         userList.forEach(user -> user.setUserStatus(input.getStatus()));
         saveAll(userList);
         if (input.getStatus().equals(UserStatus.Dimission)) {
-            for(Long id : userIds) {
+            for (Long id : userIds) {
                 //删除人脸
                 //userFaceRpcService.removeFace(id);
             }
             CancelAuthDto cancelAuthDto = new CancelAuthDto(TenantContextHolder.getTenantId(), userIds);
-            rabbitMQUtils.publishMsgAsync(RabbitConstant.CANCEL_USER_AUTH_FANOUT_EXCHANGE_V1,"", cancelAuthDto);
+            rabbitMQUtils.publishMsgAsync(RabbitConstant.CANCEL_USER_AUTH_FANOUT_EXCHANGE_V1, "", cancelAuthDto);
         }
     }
 
@@ -959,19 +949,19 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
         }
 
         //用户激活校验
-//        if (!user.isActive()) {
-//            UserLoginException result = new UserLoginException(ERROR_USER_NOT_ACTIVE);
-//            result.setCode(CODE_USER_NOT_ACTIVE);
-//            throw result;
-//        } else {
-//            //如果存在激活开始和结束 则继续判断
-//            LocalDateTime now = LocalDateTime.now();
-//            if ((user.getActiveStartDate() != null && now.isBefore(user.getActiveStartDate().atStartOfDay())) || (user.getActiveEndDate() != null && !now.isBefore(user.getActiveEndDate().plusDays(1).atStartOfDay()))) {
-//                UserLoginException result = new UserLoginException(ERROR_USER_NOT_ACTIVE);
-//                result.setCode(CODE_USER_NOT_ACTIVE);
-//                throw result;
-//            }
-//        }
+        //        if (!user.isActive()) {
+        //            UserLoginException result = new UserLoginException(ERROR_USER_NOT_ACTIVE);
+        //            result.setCode(CODE_USER_NOT_ACTIVE);
+        //            throw result;
+        //        } else {
+        //            //如果存在激活开始和结束 则继续判断
+        //            LocalDateTime now = LocalDateTime.now();
+        //            if ((user.getActiveStartDate() != null && now.isBefore(user.getActiveStartDate().atStartOfDay())) || (user.getActiveEndDate() != null && !now.isBefore(user.getActiveEndDate().plusDays(1).atStartOfDay()))) {
+        //                UserLoginException result = new UserLoginException(ERROR_USER_NOT_ACTIVE);
+        //                result.setCode(CODE_USER_NOT_ACTIVE);
+        //                throw result;
+        //            }
+        //        }
         // 检查员工是否离职
         if (UserStatus.Dimission.equals(user.getUserStatus())) {
             UserLoginException loginException = new UserLoginException(ERROR_USER_DIMISSION);
@@ -1355,8 +1345,8 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
         //设置角色
         List<Long> roleList = createOrUpdateUserInput.getAssignedRoleIds();
         if (roleList != null) {
-//            List<Long> defaultRoles = roleService.getDefaultRoleIds();
-//            defaultRoles.addAll(roleList);
+            //            List<Long> defaultRoles = roleService.getDefaultRoleIds();
+            //            defaultRoles.addAll(roleList);
             List<Role> roles = roleService.findAllById(roleList);
             user.setUserRoles(roles);
         }
@@ -1395,9 +1385,10 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
 
     /**
      * 获取所有用户的组织机构
+     *
      * @return
      */
-    private Map<Long, List<String>> getAllUserOrgMap(){
+    private Map<Long, List<String>> getAllUserOrgMap() {
         List<OrganizationUnit> orgList = organizationUnitService.findAll();
         Map<Long, String> orgNamePathMap = new HashMap<>();
         for (OrganizationUnit organizationUnit : orgList) {
@@ -1431,7 +1422,8 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
 
     /**
      * 更新组织管理层关系
-     * @param level 员工级别
+     *
+     * @param level  员工级别
      * @param orgIds 组织id列表
      * @param userId user id
      */

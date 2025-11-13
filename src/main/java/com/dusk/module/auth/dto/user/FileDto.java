@@ -18,8 +18,10 @@ public class FileDto {
     private String fileType;
     private String fileToken;
 
-    public FileDto(){}
-    public FileDto(String fileName, String fileType){
+    public FileDto() {
+    }
+
+    public FileDto(String fileName, String fileType) {
         this.fileName = fileName;
         this.fileType = fileType;
     }

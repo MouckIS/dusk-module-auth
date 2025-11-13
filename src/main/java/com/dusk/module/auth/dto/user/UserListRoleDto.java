@@ -12,6 +12,6 @@ import java.io.Serializable;
 @Getter
 @Setter
 public class UserListRoleDto implements Serializable {
-    private String id;
     public String roleName;
+    private String id;
 }

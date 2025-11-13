@@ -36,78 +36,85 @@ public class FeatureController extends CruxBaseController {
 
     /**
      * 获取租户特性值，用于getAll接口
+     *
      * @return Map<String, Map<String,String>>
      */
     @Operation(summary = "获取当前租户特性值")
-    @RequestMapping(value="/getTenantFeatures",method = RequestMethod.GET)
-    public Map<String, Map<String,String>> getTenantFeatures(){
+    @RequestMapping(value = "/getTenantFeatures", method = RequestMethod.GET)
+    public Map<String, Map<String, String>> getTenantFeatures() {
         return featureService.getTenantFeatures();
     }
 
     /**
      * 获取租户特性值，用于编辑界面
+     *
      * @param entityDto 租户id
      */
     @Operation(summary = "通过租户id获取特性值")
-    @RequestMapping(value="/getFeaturesForEdit",method = RequestMethod.GET)
-    public List<TenantFeature> getTenantFeaturesForEdit(@Parameter(description = "租户id") @Valid EntityDto entityDto){
+    @RequestMapping(value = "/getFeaturesForEdit", method = RequestMethod.GET)
+    public List<TenantFeature> getTenantFeaturesForEdit(@Parameter(description = "租户id") @Valid EntityDto entityDto) {
         return featureService.getTenantFeaturesForEdit(entityDto.getId());
     }
 
     /**
      * 获取版本特性值，用于编辑界面
+     *
      * @param entityDto 版本id
      * @return List<TenantFeature>
      */
     @Operation(summary = "通过版本id获取特性值")
-    @RequestMapping(value="/getTenantFeaturesByEdition",method = RequestMethod.GET)
-    public List<TenantFeature> getTenantFeaturesByEdition(@Parameter(description = "版本id") @Valid EntityDto entityDto){
+    @RequestMapping(value = "/getTenantFeaturesByEdition", method = RequestMethod.GET)
+    public List<TenantFeature> getTenantFeaturesByEdition(@Parameter(description = "版本id") @Valid EntityDto entityDto) {
         return featureService.getTenantFeaturesByEdition(entityDto.getId());
     }
 
     /**
      * 获取默认租户特性
+     *
      * @return List<TenantFeature>
      */
     @Operation(summary = "获取默认的所有特性列表")
-    @RequestMapping(value="/getDefaultFeatures",method = RequestMethod.GET)
-    public List<TenantFeature> getDefaultFeatures(){
+    @RequestMapping(value = "/getDefaultFeatures", method = RequestMethod.GET)
+    public List<TenantFeature> getDefaultFeatures() {
 
         return featureService.getDefaultFeatures();
     }
 
     /**
      * 生成版本特性
+     *
      * @param feaInput 版本特性
      */
     @Operation(summary = "更新/保存版本特性")
-    @RequestMapping(value="/setEditionFeatures",method = RequestMethod.POST)
+    @RequestMapping(value = "/setEditionFeatures", method = RequestMethod.POST)
     @Authorize(EditionAuthProvider.PAGES_EDITIONS_FEATURE)
     public void setEditionFeatures(
-            @Parameter(description = "版本特性") @Valid @RequestBody EditionFeatureInputDto feaInput){
-        featureService.setEditionFeatures(feaInput.getEditionId(),feaInput.getFeatureList());
+            @Parameter(description = "版本特性") @Valid @RequestBody EditionFeatureInputDto feaInput) {
+        featureService.setEditionFeatures(feaInput.getEditionId(), feaInput.getFeatureList());
     }
 
     /**
      * 修改租户特性
+     *
      * @param feaInput 租户特性
      */
     @Operation(summary = "更新/保存租户特性")
-    @RequestMapping(value="/updateTenantFeatures",method = RequestMethod.POST)
+    @RequestMapping(value = "/updateTenantFeatures", method = RequestMethod.POST)
     @Authorize(TenantAuthProvider.PAGES_TENANTS_CHANGEFEATURES)
     public void updateTenantFeatures(
-            @Parameter(description = "租户特性") @Valid @RequestBody TenantFeatureInputDto feaInput){
-        featureService.updateTenantFeatures(feaInput.getTenantId(),feaInput.getFeatureList());
+            @Parameter(description = "租户特性") @Valid @RequestBody TenantFeatureInputDto feaInput) {
+        featureService.updateTenantFeatures(feaInput.getTenantId(), feaInput.getFeatureList());
     }
 
     /**
      * 重置租户特性
+     *
      * @param entityDto 租户id
      */
     @Operation(summary = "重置租户特性")
-    @RequestMapping(value="/resetTenantSpecificFeatures",method = RequestMethod.POST)
+    @RequestMapping(value = "/resetTenantSpecificFeatures", method = RequestMethod.POST)
     @Authorize(TenantAuthProvider.PAGES_TENANTS_CHANGEFEATURES)
-    public void resetTenantSpecificFeatures(@Parameter(description = "租户id") @Valid @RequestBody EntityDto entityDto){
+    public void resetTenantSpecificFeatures(@Parameter(description = "租户id") @Valid @RequestBody EntityDto entityDto) {
         featureService.resetTenantSpecificFeatures(entityDto.getId());
     }
 

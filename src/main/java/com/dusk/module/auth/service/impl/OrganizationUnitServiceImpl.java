@@ -59,6 +59,7 @@ import java.util.stream.Collectors;
 @DubboService
 @Transactional
 public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, IOrganizationUnitRepository> implements IOrganizationUnitRpcService, IOrganizationUnitService {
+    private final OrganizationMapper mapper = OrganizationMapper.INSTANCE;
     @Resource
     private JPAQueryFactory queryFactory;
     @Resource
@@ -68,8 +69,6 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
     @Resource
     private IOrganizationManagerRepository organizationManagerRepository;
 
-    private final OrganizationMapper mapper = OrganizationMapper.INSTANCE;
-
     @Override
     public ListResultDto<OrganizationStationUnitDto> getExternalOrganizationUnits() {
         Long userId = LoginUserIdContextHolder.getUserId();
@@ -78,7 +77,7 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
         Map<Long, Long> map = organizationManagerRepository.findAll().stream().collect(Collectors.toMap(OrganizationManager::getOrgId, OrganizationManager::getUserId));
         // 本单位人员获取所有的外部组织机构
         if (user.getUserType() == EUnitType.Inner) {
-            organizationUnitList = findAll(Specifications.where(e->e.eq(OrganizationUnit.Fields.type, EUnitType.External)),
+            organizationUnitList = findAll(Specifications.where(e -> e.eq(OrganizationUnit.Fields.type, EUnitType.External)),
                     Sort.by(TreeEntity.Fields.sortIndex, TreeEntity.Fields.displayName));
         } else {
             // 外部单位人员获取所属的组织机构
@@ -189,7 +188,8 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
 
     /**
      * 更新组织管理层更新
-     * @param orgId 组织id
+     *
+     * @param orgId  组织id
      * @param userId user id
      */
     private void updateOrgManager(Long orgId, Long userId) {
@@ -348,9 +348,9 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
         List<OrganizationUnit> stations = this.getStationsByUserId(id);
         User u = userRepository.findById(id).orElseThrow(() -> new BusinessException("未找到用户!"));
         return MapperUtil.mapList(stations, mapper::toStationsOfLoginUserDto, (s, t) -> {
-           t.setValue(s.getId());
-           t.setName(s.getDisplayName());
-           t.setDefaultBy(s.getId().equals(u.getDefaultStation()));
+            t.setValue(s.getId());
+            t.setName(s.getDisplayName());
+            t.setDefaultBy(s.getId().equals(u.getDefaultStation()));
         });
     }
 
@@ -631,7 +631,7 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
                 saveAll(units);
                 orgNameIdMap.set(units.stream().collect(Collectors.toMap(OrganizationUnit::getDisplayName, OrganizationUnit::getId)));
             });
-        }catch (IOException ioException) {
+        } catch (IOException ioException) {
             throw new BusinessException(ioException.getMessage());
         }
 
@@ -657,13 +657,13 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
     /**
      * 同一层级名称唯一性校验
      */
-    private void validDisplayNameUnique(OrganizationUnit org){
+    private void validDisplayNameUnique(OrganizationUnit org) {
         List<OrganizationUnit> list = findAll(Specifications.where(e -> {
             e.eq(TreeEntity.Fields.displayName, org.getDisplayName());
             e.isNull(org.getParentId() == null, TreeEntity.Fields.parentId);
             e.eq(org.getParentId() != null, TreeEntity.Fields.parentId, org.getParentId());
         }));
-        if(list.size() > 1){
+        if (list.size() > 1) {
             throw new BusinessException("该层级下已存在相同名称的组织机构！");
         }
     }

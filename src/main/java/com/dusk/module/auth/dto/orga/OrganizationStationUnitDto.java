@@ -12,7 +12,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class OrganizationStationUnitDto  extends OrganizationUnitDto {
+public class OrganizationStationUnitDto extends OrganizationUnitDto {
     @Schema(description = "厂站是否可用")
     private boolean stationEnabled = false;
     @Schema(description = "组织类型")

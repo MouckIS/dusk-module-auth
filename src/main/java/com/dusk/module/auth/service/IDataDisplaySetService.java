@@ -21,12 +21,14 @@ public interface IDataDisplaySetService extends IBaseService<DataDisplaySet, IDa
 
     /**
      * 数据展示设置项的新增
+     *
      * @param input
      */
-    void updateDisplaySetItem(List<UpdateDataDisplaySetDto>  input);
+    void updateDisplaySetItem(List<UpdateDataDisplaySetDto> input);
 
     /**
      * 获取到数据展示设置项的列表信息
+     *
      * @param input
      * @return
      */

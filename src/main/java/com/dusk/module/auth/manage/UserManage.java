@@ -49,7 +49,7 @@ public class UserManage implements IUserManage {
     @Override
     public User getCurrentUser() {
         UserContext userContext = securityUtils.getCurrentUser();
-        return (userContext == null ||  userContext.getId() == null ) ? null : getUserInfo(userContext.getId());
+        return (userContext == null || userContext.getId() == null) ? null : getUserInfo(userContext.getId());
     }
 
     @Override

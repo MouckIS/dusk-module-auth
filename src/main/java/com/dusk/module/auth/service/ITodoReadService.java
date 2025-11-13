@@ -6,7 +6,7 @@ import com.dusk.module.auth.repository.ITodoReadRepository;
 
 import java.util.List;
 
-public interface ITodoReadService extends IBaseService<TodoRead,ITodoReadRepository> {
+public interface ITodoReadService extends IBaseService<TodoRead, ITodoReadRepository> {
 
     void read(Long todoId);
 

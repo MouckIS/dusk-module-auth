@@ -26,10 +26,10 @@ public class RoleCreateOrEditDto extends EntityDto {
     @Schema(description = "是否是默认权限")
     private boolean isDefault;
 
-//    @Schema(description = "权限列表")
-//    private List<CreateOrEditRolePermissionDto>  permissions;
+    //    @Schema(description = "权限列表")
+    //    private List<CreateOrEditRolePermissionDto>  permissions;
 
-//    public RoleCreateOrEditDto(){
-//        permissions = new ArrayList<>();
-//    }
+    //    public RoleCreateOrEditDto(){
+    //        permissions = new ArrayList<>();
+    //    }
 }

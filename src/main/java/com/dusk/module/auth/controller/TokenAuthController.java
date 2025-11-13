@@ -39,11 +39,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "TokenAuth", description = "登陆相关")
 public class TokenAuthController extends CruxBaseController {
     @Resource
-    private TokenAuthManager tokenAuthManager;
-    @Resource
     ICaptchaService captchaService;
-    @Resource
-    private AuthenticationManager authenticationManager;
     @Resource
     IScanCodeLoginService scanCodeLoginService;
     @Resource
@@ -54,6 +50,10 @@ public class TokenAuthController extends CruxBaseController {
     ISsoTokenService ssoTokenService;
     @Resource
     ITokenService tokenService;
+    @Resource
+    private TokenAuthManager tokenAuthManager;
+    @Resource
+    private AuthenticationManager authenticationManager;
 
     @AllowAnonymous
     @RequestMapping(value = "authenticate", method = RequestMethod.POST)

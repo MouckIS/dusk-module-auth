@@ -27,16 +27,15 @@ import java.util.Optional;
  */
 @Component
 public class SettingManagerDefault implements ISettingManager {
+    private final SettingMapper mapper = SettingMapper.INSTANCE;
     @Resource
     protected ISettingsCache settingsCache;
     @Resource
     protected ITenantService tenantService;
     @Resource
-    private ISettingRepository settingRepository;
-    @Resource
     protected MultiTenancyConfig multiTenancyConfig;
-
-    private final SettingMapper mapper = SettingMapper.INSTANCE;
+    @Resource
+    private ISettingRepository settingRepository;
 
     @Override
     public String getSettingValue(String name) {
@@ -298,6 +297,7 @@ public class SettingManagerDefault implements ISettingManager {
 
     /**
      * 当前租户id
+     *
      * @return
      */
     protected Long getTenantId() {
@@ -306,6 +306,7 @@ public class SettingManagerDefault implements ISettingManager {
 
     /**
      * 当前厂站id
+     *
      * @return
      */
     protected Long getStationId() {
