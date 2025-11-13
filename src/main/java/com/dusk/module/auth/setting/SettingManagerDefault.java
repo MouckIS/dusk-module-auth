@@ -1,5 +1,6 @@
 package com.dusk.module.auth.setting;
 
+import cn.hutool.core.util.StrUtil;
 import com.dusk.common.core.auth.authentication.LoginUserIdContextHolder;
 import com.dusk.common.core.datafilter.DataFilterContextHolder;
 import com.dusk.common.core.jpa.Specifications;
@@ -11,7 +12,6 @@ import com.dusk.module.auth.repository.ISettingRepository;
 import com.dusk.module.auth.service.ITenantService;
 import com.dusk.module.auth.setting.config.MultiTenancyConfig;
 import com.dusk.module.ddm.enums.SettingScopes;
-import io.seata.common.util.StringUtils;
 import jakarta.annotation.Resource;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
@@ -321,7 +321,7 @@ public class SettingManagerDefault implements ISettingManager {
         return Specifications.where(e -> {
             e.eq(tenantId != null, Setting.Fields.tenantId, tenantId).isNull(tenantId == null, Setting.Fields.tenantId).eq(stationId != null, Setting.Fields.stationId, stationId)
                     .isNull(stationId == null, Setting.Fields.stationId).eq(userId != null, Setting.Fields.userId, userId).isNull(userId == null, Setting.Fields.userId)
-                    .eq(StringUtils.isNotBlank(name), Setting.Fields.name, name);
+                    .eq(StrUtil.isNotBlank(name), Setting.Fields.name, name);
         });
     }
 

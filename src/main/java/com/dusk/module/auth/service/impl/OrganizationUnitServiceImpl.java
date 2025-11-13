@@ -39,7 +39,6 @@ import com.querydsl.core.types.QBean;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.annotation.Resource;
-import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
@@ -362,7 +361,7 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
 
     @Override
     public OrganizationUnitDto findOneByDisplayName(String displayName) {
-        if (StringUtils.isBlank(displayName)) {
+        if (StrUtil.isBlank(displayName)) {
             return null;
         }
         Specification<OrganizationUnit> spec = Specifications.where(e -> {
