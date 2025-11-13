@@ -18,12 +18,12 @@ public class SkipPathRequestMatcher {
     private IPermissionCache permissionCache;
 
 
-    public boolean matches(String applicationName, String url){
+    public boolean matches(String applicationName, String url) {
         List<String> anonymousPath = permissionCache.getAllowAnonymousPath().get(applicationName);
-        AntPathMatcher pathMatcher=new AntPathMatcher();
-        if(anonymousPath != null && anonymousPath.size()>0){
-            for(String path:anonymousPath){
-                if(pathMatcher.match(path,url)){
+        AntPathMatcher pathMatcher = new AntPathMatcher();
+        if (anonymousPath != null && !anonymousPath.isEmpty()) {
+            for (String path : anonymousPath) {
+                if (pathMatcher.match(path, url)) {
                     return true;
                 }
             }

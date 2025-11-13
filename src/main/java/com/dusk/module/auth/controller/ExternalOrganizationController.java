@@ -25,10 +25,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("externalOrganization")
 @Authorize(ExternalManagerAuthProvider.PAGES_EXTERNAL_ORGANIZATION)
 public class ExternalOrganizationController extends CruxBaseController {
+    private final OrganizationMapper mapper = OrganizationMapper.INSTANCE;
     @Resource
     private IOrganizationUnitService organizationUnitService;
-
-    private final OrganizationMapper mapper = OrganizationMapper.INSTANCE;
 
     @GetMapping("getExternalOrganizationUnits")
     @Operation(summary = "获取外单位所有组织机构")

@@ -41,6 +41,6 @@ public class LoginFeatureProvider extends FeatureProvider {
         forgetPwdOptions.add(new Item("mobileOrEmail", "通过手机号或邮箱找回"));
         context.createChildren(APP_LOGIN_FORGET_PWD, "false", "忘记密码", "", new ComboBox(forgetPwdOptions));
 
-        context.createChildren(APP_LOGIN_IGNORE_CASE, "false", "登录名忽略大小写","",new CheckBox());
+        context.createChildren(APP_LOGIN_IGNORE_CASE, "false", "登录名忽略大小写", "", new CheckBox());
     }
 }

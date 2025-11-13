@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page;
 
 import java.util.List;
 
-public interface IStationService extends ITreeService<Station,IStationRepository> {
+public interface IStationService extends ITreeService<Station, IStationRepository> {
 
     /**
      * 创建厂站
@@ -51,6 +51,7 @@ public interface IStationService extends ITreeService<Station,IStationRepository
 
     /**
      * 获取所有厂站
+     *
      * @return
      */
     List<StationDto> getAllStations();

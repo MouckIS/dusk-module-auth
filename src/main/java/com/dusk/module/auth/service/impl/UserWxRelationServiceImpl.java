@@ -9,7 +9,6 @@ import com.dusk.module.auth.entity.UserWxRelation;
 import com.dusk.module.auth.repository.IUserWxRelationRepository;
 import com.dusk.module.auth.service.IUserWxRelationService;
 import jakarta.annotation.Resource;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
@@ -57,12 +56,12 @@ public class UserWxRelationServiceImpl extends BaseService<UserWxRelation, IUser
         sourceAll.forEach(source -> {
             userWxRelationList.stream().filter(target -> target.getUserId().equals(source.getUserId()) && target.getAppId().equals(source.getAppId()))
                     .findFirst().ifPresent(target -> {
-                UtBeanUtils.copyNotNullProperties(source, target);
-                UtBeanUtils.copyNotNullProperties(target, source);
-            });
+                        UtBeanUtils.copyNotNullProperties(source, target);
+                        UtBeanUtils.copyNotNullProperties(target, source);
+                    });
         });
         saveAll(userWxRelationList);
-        
+
         userWxRelationList.forEach(relation -> {
             userWxRelationCacheService.saveWxRelation(relation.getUserId(), relation.getAppId(), relation.getOpenId());
         });

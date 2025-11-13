@@ -47,6 +47,7 @@ import java.util.stream.Collectors;
 @RequestMapping("organizationUnit")
 @Tag(name = "OrganizationUnit", description = "组织机构")
 public class OrganizationUnitController extends CruxBaseController {
+    private final OrganizationMapper mapper = OrganizationMapper.INSTANCE;
     @Resource
     private IOrganizationUnitService organizationUnitService;
     @Resource
@@ -54,13 +55,11 @@ public class OrganizationUnitController extends CruxBaseController {
     @Resource
     private IStationService stationService;
 
-    private final OrganizationMapper mapper = OrganizationMapper.INSTANCE;
-
     @GetMapping("getOrganizationUnits")
     @Operation(summary = "获取本单位所有组织机构")
     public ListResultDto<OrganizationStationUnitDto> getOrganizationUnits() {
         List<OrganizationUnit> organizationUnitList = organizationUnitService.findAll(
-                Specifications.where(e->e.eq(OrganizationUnit.Fields.type, EUnitType.Inner)),
+                Specifications.where(e -> e.eq(OrganizationUnit.Fields.type, EUnitType.Inner)),
                 Sort.by(TreeEntity.Fields.sortIndex, TreeEntity.Fields.displayName));
         Map<Long, Long> map = organizationManagerRepository.findAll().stream()
                 .collect(Collectors.toMap(OrganizationManager::getOrgId, OrganizationManager::getUserId));

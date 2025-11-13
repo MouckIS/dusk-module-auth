@@ -50,11 +50,10 @@ import java.util.List;
 @Authorize(RoleAuthProvider.PAGES_ROLES)
 public class RoleController extends CruxBaseController {
 
-    @Resource
-    private IRoleService roleService;
-
     private final RoleMapper mapper = RoleMapper.INSTANCE;
     private final UserMapper userMapper = UserMapper.INSTANCE;
+    @Resource
+    private IRoleService roleService;
 
     @GetMapping("/getAllRoles")
     @Operation(summary = "获取所有角色")
@@ -104,48 +103,48 @@ public class RoleController extends CruxBaseController {
 
     @Operation(summary = "导出角色")
     @GetMapping("export/{id}")
-    public void exportRole(@Parameter(description = "角色ID")  @PathVariable long id, HttpServletResponse response)throws IOException {
+    public void exportRole(@Parameter(description = "角色ID") @PathVariable long id, HttpServletResponse response) throws IOException {
         response.setContentType("application/vnd.ms-excel;charset=utf-8");
         response.setCharacterEncoding("utf-8");
         String fileName = URLEncoder.encode("角色信息导出", StandardCharsets.UTF_8).replaceAll("\\+", "%20");
         response.setHeader("Content-Disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
-        roleService.exportRole(id,response.getOutputStream());
+        roleService.exportRole(id, response.getOutputStream());
     }
 
     @Operation(summary = "导入角色")
     @PostMapping("import")
     @Authorize(RoleAuthProvider.PAGES_ROLES_CREATEOREDIT)
-    public void importRole(@Parameter(description = "Excel文件",required = true) MultipartFile file){
+    public void importRole(@Parameter(description = "Excel文件", required = true) MultipartFile file) {
         InputStream stream = null;
         RoleDto roleDto = null;
-        try{
+        try {
             stream = file.getInputStream();
             RolePermissionImportListener listener = new RolePermissionImportListener();
             EasyExcel.read(stream, listener).autoCloseStream(true).extraRead(CellExtraTypeEnum.MERGE).sheet().headRowNumber(0).autoTrim(true).doReadSync();
             roleDto = listener.getRoleDto();
-        }catch (Exception e){
-            if(e instanceof BusinessException){
-                throw (BusinessException)e;
-            }else{
-                throw new BusinessException("导入失败:"+e.getMessage(),e);
+        } catch (Exception e) {
+            if (e instanceof BusinessException) {
+                throw (BusinessException) e;
+            } else {
+                throw new BusinessException("导入失败:" + e.getMessage(), e);
             }
-        }finally {
+        } finally {
             IOUtils.closeQuietly(stream);
         }
         String msg = validateRoleDto(roleDto);
-        if(StringUtils.isNotBlank(msg)){
+        if (StringUtils.isNotBlank(msg)) {
             throw new BusinessException(msg);
         }
         roleService.importRole(roleDto);
     }
 
     @Operation(summary = "批量导入角色")
-    @PostMapping(value = "import/batch",headers = "Content-Type=multipart/form-data")
+    @PostMapping(value = "import/batch", headers = "Content-Type=multipart/form-data")
     @Authorize(RoleAuthProvider.PAGES_ROLES_CREATEOREDIT)
-    public void batchImportRole(@Parameter(description = "Excel文件", schema = @Schema(type = "string", format = "binary")) @RequestParam("files") MultipartFile[] files){
+    public void batchImportRole(@Parameter(description = "Excel文件", schema = @Schema(type = "string", format = "binary")) @RequestParam("files") MultipartFile[] files) {
         List<RoleDto> roleDtoList = new ArrayList<>();
         InputStream stream = null;
-        try{
+        try {
             for (MultipartFile excel : files) {
                 RolePermissionImportListener listener = new RolePermissionImportListener();
                 stream = excel.getInputStream();
@@ -153,20 +152,20 @@ public class RoleController extends CruxBaseController {
                 stream.close();
                 RoleDto roleDto = listener.getRoleDto();
                 String msg = validateRoleDto(roleDto);
-                if(StringUtils.isNotBlank(msg)){
-                    throw new BusinessException(excel.getOriginalFilename()+" "+msg);
+                if (StringUtils.isNotBlank(msg)) {
+                    throw new BusinessException(excel.getOriginalFilename() + " " + msg);
                 }
                 roleDtoList.add(roleDto);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new BusinessException("Excel解析失败", e);
-        }finally {
+        } finally {
             IOUtils.closeQuietly(stream);
         }
         roleService.batchImportRole(roleDtoList);
     }
 
-    String validateRoleDto(RoleDto roleDto){
+    String validateRoleDto(RoleDto roleDto) {
         if (StringUtils.isBlank(roleDto.getRoleCode())) {
             return "角色代码不能为空";
         }

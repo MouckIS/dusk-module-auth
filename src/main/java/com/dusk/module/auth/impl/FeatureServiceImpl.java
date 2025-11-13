@@ -12,7 +12,6 @@ import com.dusk.module.auth.entity.Tenant;
 import com.dusk.module.auth.repository.IFeatureValueRepository;
 import com.dusk.module.auth.repository.ITenantRepository;
 import com.dusk.module.auth.service.IFeatureService;
-import com.dusk.module.auth.service.ITenantService;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -213,7 +212,7 @@ public class FeatureServiceImpl extends CruxBaseServiceImpl implements IFeatureS
     //将特性值与默认特性合并到列表返回给前端
     private List<TenantFeature> mergeFeatureValueToList(List<TenantFeature> createFeatureList, List<FeatureValue> featureList) {
         List<TenantFeature> temFdList = new ArrayList<>();
-//        List<TenantFeature> tflist = new ArrayList<>();
+        //        List<TenantFeature> tflist = new ArrayList<>();
         createFeatureList.forEach(cf -> {
             TenantFeature temF = new TenantFeature();
             BeanUtils.copyProperties(cf, temF);

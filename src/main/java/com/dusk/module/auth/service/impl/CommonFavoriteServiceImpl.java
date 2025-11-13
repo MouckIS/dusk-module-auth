@@ -43,7 +43,7 @@ public class CommonFavoriteServiceImpl extends BaseService<CommonFavorite, IComm
 
     @SneakyThrows
     @Override
-    public  CommonFavoriteDto save(@Valid CommonFavoriteDto dto) {
+    public CommonFavoriteDto save(@Valid CommonFavoriteDto dto) {
         CommonFavorite commonFavorite = null;
         if (dto.getId() == null) {
             long count = queryFactory.selectFrom(qCommonFavorite).where(qCommonFavorite.name.eq(dto.getName()).and(qCommonFavorite.type.eq(dto.getType()))).fetchCount();
@@ -74,26 +74,26 @@ public class CommonFavoriteServiceImpl extends BaseService<CommonFavorite, IComm
     @Override
     public void deleteById(Long id, String type) {
         Optional<CommonFavorite> optional = findById(id);
-        if(optional.isPresent()){
+        if (optional.isPresent()) {
             CommonFavorite favorite = optional.get();
-           if(!StringUtils.equals(type,favorite.getType())){
-               throw new BusinessException("指定删除收藏数据类型不匹配");
-           }
-           if(Objects.nonNull(favorite.getCreateId()) && !Objects.equals(favorite.getCreateId(), LoginUserIdContextHolder.getUserId())){
-               throw new BusinessException("不能删除他人的收藏");
-           }
-           delete(favorite);
+            if (!StringUtils.equals(type, favorite.getType())) {
+                throw new BusinessException("指定删除收藏数据类型不匹配");
+            }
+            if (Objects.nonNull(favorite.getCreateId()) && !Objects.equals(favorite.getCreateId(), LoginUserIdContextHolder.getUserId())) {
+                throw new BusinessException("不能删除他人的收藏");
+            }
+            delete(favorite);
         }
     }
 
     @Override
     public void setPublic(Long id, boolean isPublic) {
         Optional<CommonFavorite> optional = findById(id);
-        if(optional.isEmpty()){
+        if (optional.isEmpty()) {
             throw new BusinessException("该收藏不存在或已被删除");
         }
         CommonFavorite favorite = optional.get();
-        if(Objects.nonNull(favorite.getCreateId()) && !Objects.equals(favorite.getCreateId(), LoginUserIdContextHolder.getUserId())){
+        if (Objects.nonNull(favorite.getCreateId()) && !Objects.equals(favorite.getCreateId(), LoginUserIdContextHolder.getUserId())) {
             throw new BusinessException("不能设置他人的收藏是否公开");
         }
         favorite.setIsPublic(isPublic);
@@ -105,7 +105,7 @@ public class CommonFavoriteServiceImpl extends BaseService<CommonFavorite, IComm
     public CommonFavoriteDto get(Long id, String type) {
         QBean<CommonFavoriteDto> qBean = QBeanBuilder.create(CommonFavoriteDto.class).appendQEntity(qCommonFavorite).build();
         CommonFavoriteDto dto = queryFactory.select(qBean).from(qCommonFavorite).where(qCommonFavorite.id.eq(id).and(qCommonFavorite.type.eq(type))).fetchOne();
-        if(Objects.isNull(dto)){
+        if (Objects.isNull(dto)) {
             throw new BusinessException("该收藏不存在或已被删除");
         }
         return dto;
@@ -115,12 +115,12 @@ public class CommonFavoriteServiceImpl extends BaseService<CommonFavorite, IComm
     public PagedResultDto<CommonFavoriteDto> list(boolean onlyMine, PagedAndSortedInputDto pageDto, String... types) {
         QBean<CommonFavoriteDto> qBean = QBeanBuilder.create(CommonFavoriteDto.class).appendQEntity(qCommonFavorite).build();
         JPAQuery<CommonFavoriteDto> query = queryFactory.select(qBean).from(qCommonFavorite).where(qCommonFavorite.type.in(types));
-        if(onlyMine){
+        if (onlyMine) {
             query.where(qCommonFavorite.createId.eq(LoginUserIdContextHolder.getUserId()));
-        }else{
+        } else {
             query.where(qCommonFavorite.createId.eq(LoginUserIdContextHolder.getUserId()).or(qCommonFavorite.isPublic.eq(true)));
         }
-        Page<CommonFavoriteDto> page = (Page<CommonFavoriteDto>) page(query,pageDto.getPageable());
-        return new PagedResultDto<>(page.getTotalElements(),page.getContent());
+        Page<CommonFavoriteDto> page = (Page<CommonFavoriteDto>) page(query, pageDto.getPageable());
+        return new PagedResultDto<>(page.getTotalElements(), page.getContent());
     }
 }

@@ -20,13 +20,15 @@ import java.util.List;
 public interface IPageQuickEntryService extends IBaseService<PageQuickEntry, IPageQuickEntryRepository> {
 
     /**
-     *  快捷入口设置项的新增
+     * 快捷入口设置项的新增
+     *
      * @param input
      */
     void updateQuickSet(List<UpdatePageQuickSetDto> input);
 
     /**
      * 快捷入口设置项的列表信息
+     *
      * @param input
      * @return
      */

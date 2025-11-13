@@ -1,7 +1,6 @@
 package com.dusk.module.auth.enums;
 
 import com.dusk.common.core.entity.BaseEnum;
-import lombok.Getter;
 
 /**
  * @author kefuming

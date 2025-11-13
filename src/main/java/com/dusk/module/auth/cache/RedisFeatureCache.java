@@ -22,11 +22,9 @@ import java.util.Map;
 @Component
 @Primary
 public class RedisFeatureCache implements IFeatureCache {
+    private final String AUTH_FEATURE_MAP_KEY = "CRUX:AUTH:FEATURE";
     @Resource
     private RedisUtil<Object> redisUtil;
-
-    private final String AUTH_FEATURE_MAP_KEY = "CRUX:AUTH:FEATURE";
-
 
     @Override
     @Lock4j

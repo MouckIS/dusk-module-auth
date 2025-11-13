@@ -37,14 +37,13 @@ import java.util.stream.Collectors;
 @DubboService
 @Transactional
 public class SettingServiceImpl implements ISettingRpcService, ISettingService {
+    private final SettingMapper mapper = SettingMapper.INSTANCE;
     @Resource
     private ISettingRepository repository;
     @Resource
     private ISettingsCache settingsCache;
     @Resource
     private ISettingManager settingManager;
-
-    private final SettingMapper mapper = SettingMapper.INSTANCE;
 
     @Override
     public List<SettingDto> getApplicationSettings() {
@@ -105,7 +104,7 @@ public class SettingServiceImpl implements ISettingRpcService, ISettingService {
 
     @Override
     public Map<String, Map<String, String>> getAllSettingsForInit() {
-        if(LoginUserIdContextHolder.getUserId() == null){
+        if (LoginUserIdContextHolder.getUserId() == null) {
             return getPublicSettings();
         }
         return getLoginAccessableSettings();
@@ -183,7 +182,7 @@ public class SettingServiceImpl implements ISettingRpcService, ISettingService {
     @Override
     public String getValue(String name, Long tenantId) {
         Setting setting = repository.findSettingByNameAndTenantId(name, tenantId);
-        return setting!=null ? setting.getValue() : null;
+        return setting != null ? setting.getValue() : null;
     }
 
     private void handlerFileInput(List<SettingDto> settings) {
@@ -214,19 +213,19 @@ public class SettingServiceImpl implements ISettingRpcService, ISettingService {
     }
 
 
-    private Map<String, SettingDefinition> getPublicSettingDefinitions(){
+    private Map<String, SettingDefinition> getPublicSettingDefinitions() {
         return filterDefinitions(SettingAccessLevel.Public);
     }
 
-    private Map<String, SettingDefinition> getLoginAccessableSettingDefinitions(){
+    private Map<String, SettingDefinition> getLoginAccessableSettingDefinitions() {
         return filterDefinitions(SettingAccessLevel.Login);
     }
 
-    private Map<String, SettingDefinition> filterDefinitions(SettingAccessLevel accessLevel){
+    private Map<String, SettingDefinition> filterDefinitions(SettingAccessLevel accessLevel) {
         Map<String, SettingDefinition> result = new HashMap<>();
         Map<String, SettingDefinition> all = settingsCache.getAllSettingDefinitions();
         all.forEach((k, definition) -> {
-            if(definition.getAccessLevel().getValue() <= accessLevel.getValue()){
+            if (definition.getAccessLevel().getValue() <= accessLevel.getValue()) {
                 result.put(k, definition);
             }
         });

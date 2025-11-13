@@ -31,6 +31,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
+    private static final String AUTHENTICATION_URL = "/login";
     @Resource
     private ObjectMapper objectMapper;
     @Resource
@@ -43,8 +44,6 @@ public class SecurityConfiguration {
     private DefaultAuthenticationProvider authenticationProvider;
     @Resource
     private DefaultAuthenticationFailureHandler authenticationFailureHandler;
-
-    private static final String AUTHENTICATION_URL = "/login";
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

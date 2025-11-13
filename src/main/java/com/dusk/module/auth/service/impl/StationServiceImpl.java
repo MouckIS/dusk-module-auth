@@ -32,15 +32,14 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class StationServiceImpl extends TreeService<Station,IStationRepository> implements IStationService  {
+public class StationServiceImpl extends TreeService<Station, IStationRepository> implements IStationService {
+    private final StationMapper mapper = StationMapper.INSTANCE;
     @Resource
     private IUserRepository userRepository;
     @Resource
     private IDataFilterDefinitionContext dataFilterDefinitionContext;
     @Resource
     private ISerialNoService serialNoService;
-
-    private final StationMapper mapper = StationMapper.INSTANCE;
 
     @Override
     public Station createOrUpdate(CreateOrUpdateStationInput input) {
@@ -160,13 +159,13 @@ public class StationServiceImpl extends TreeService<Station,IStationRepository> 
     /**
      * 同一层级名称唯一性校验
      */
-    private void validDisplayNameUnique(Station station){
+    private void validDisplayNameUnique(Station station) {
         List<Station> list = findAll(Specifications.where(e -> {
             e.eq(TreeEntity.Fields.displayName, station.getDisplayName());
             e.isNull(station.getParentId() == null, TreeEntity.Fields.parentId);
             e.eq(station.getParentId() != null, TreeEntity.Fields.parentId, station.getParentId());
         }));
-        if(list.size() > 1){
+        if (list.size() > 1) {
             throw new BusinessException("该层级下已存在相同名称的厂站！");
         }
     }

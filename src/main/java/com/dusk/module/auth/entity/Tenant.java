@@ -122,40 +122,37 @@ public class Tenant extends CreationEntity {
     private String appDownloadUrl;
 
 
-    public boolean HasLogo()
-    {
-        return StringUtils.isNotBlank(logoId) &&  StringUtils.isNotBlank(logoFileType);
+    public boolean HasLogo() {
+        return StringUtils.isNotBlank(logoId) && StringUtils.isNotBlank(logoFileType);
     }
 
-    public void ClearLogo()
-    {
+    public void ClearLogo() {
         logoId = null;
         logoFileType = null;
     }
 
     /**
      * 租户是否可用
+     *
      * @return
      */
-    public boolean enabled(){
+    public boolean enabled() {
         return active && (
-                 subscriptionEndDateUtc == null  //无限订阅
-                || subscriptionEndDateUtc.isAfter(LocalDateTime.now()) //在订阅时间内
-         ) ;
+                subscriptionEndDateUtc == null  //无限订阅
+                        || subscriptionEndDateUtc.isAfter(LocalDateTime.now()) //在订阅时间内
+        );
     }
 
-    public Long getEditionId(){
+    public Long getEditionId() {
         return edition == null ? null : edition.getId();
     }
 
-    public String getEditionDisplayName(){
+    public String getEditionDisplayName() {
         return edition == null ? "" : edition.getDisplayName();
     }
 
-    public void updateSubscriptionDateForPayment(PaymentPeriodType paymentPeriodType, EditionPaymentType editionPaymentType)
-    {
-        switch (editionPaymentType)
-        {
+    public void updateSubscriptionDateForPayment(PaymentPeriodType paymentPeriodType, EditionPaymentType editionPaymentType) {
+        switch (editionPaymentType) {
             case NewRegistration, BuyNow -> {
                 subscriptionEndDateUtc = LocalDateTime.now().plusDays(paymentPeriodType.getDays());
             }
@@ -163,8 +160,7 @@ public class Tenant extends CreationEntity {
                 extendSubscriptionDate(paymentPeriodType);
             }
             case Upgrade -> {
-                if (subscriptionEndDateUtc == null)
-                {
+                if (subscriptionEndDateUtc == null) {
                     subscriptionEndDateUtc = LocalDateTime.now().plusDays(paymentPeriodType.getDays());
                 }
             }
@@ -174,29 +170,24 @@ public class Tenant extends CreationEntity {
         }
     }
 
-    private void extendSubscriptionDate(PaymentPeriodType paymentPeriodType)
-    {
-        if (subscriptionEndDateUtc == null)
-        {
+    private void extendSubscriptionDate(PaymentPeriodType paymentPeriodType) {
+        if (subscriptionEndDateUtc == null) {
             throw new BusinessException("无限订阅不需要续期!");
         }
 
-        if (isSubscriptionEnded())
-        {
+        if (isSubscriptionEnded()) {
             subscriptionEndDateUtc = LocalDateTime.now();
         }
 
         subscriptionEndDateUtc = subscriptionEndDateUtc.plusDays(paymentPeriodType.getDays());
     }
 
-    private boolean isSubscriptionEnded()
-    {
+    private boolean isSubscriptionEnded() {
         return subscriptionEndDateUtc.isBefore(LocalDateTime.now());
     }
 
-    public long calculateRemainingDayCount()
-    {
-        if(subscriptionEndDateUtc == null){
+    public long calculateRemainingDayCount() {
+        if (subscriptionEndDateUtc == null) {
             return 0;
         }
 

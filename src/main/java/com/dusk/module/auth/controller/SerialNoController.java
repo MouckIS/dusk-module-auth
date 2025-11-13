@@ -32,10 +32,9 @@ import java.util.List;
 @RequestMapping("/serialNo")
 @Tag(name = "序列号", description = "SerialNo")
 public class SerialNoController extends CruxBaseController {
+    private final SerialNoMapper mapper = SerialNoMapper.INSTANCE;
     @Resource
     private ISerialNoService serialNoService;
-
-    private final SerialNoMapper mapper = SerialNoMapper.INSTANCE;
 
     @GetMapping("/getPageData")
     @Operation(summary = "分页查询序列号（需要权限）")

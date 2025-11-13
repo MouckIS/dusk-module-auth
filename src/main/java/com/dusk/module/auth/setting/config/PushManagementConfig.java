@@ -15,17 +15,18 @@ import org.springframework.context.annotation.Configuration;
 @Setter
 public class PushManagementConfig {
     private Mobile mobile = new Mobile();
+
     @Getter
-@Setter
-    public static class Mobile{
+    @Setter
+    public static class Mobile {
         private String iosAppKey;
         private String androidAppKey;
         private String secret;
         private Pages pages = new Pages();
 
         @Getter
-@Setter
-        public static class Pages{
+        @Setter
+        public static class Pages {
             private String keyCabinetDetail;
             private String wireCabinetDetail;
             private String safetyWearDetail;

@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 @Slf4j
 public class TokenAuthManager {
+    private static final String JWT_TOKEN_PREFIX = "CRUX:AUTH:TOKEN:";
     @Resource
     private RedisUtil<String> redisUtil;
     @Resource
@@ -34,8 +35,6 @@ public class TokenAuthManager {
     private Sequence sequence;
     @Resource
     private JwtHeaderTokenExtractor jwtHeaderTokenExtractor;
-
-    private static final String JWT_TOKEN_PREFIX = "CRUX:AUTH:TOKEN:";
 
     /**
      * 生成登陆token，并缓存

@@ -34,10 +34,9 @@ import java.util.Objects;
 @Transactional
 public class DataDisplaySetServiceImpl extends BaseService<DataDisplaySet, IDataDisplaySetRepository> implements IDataDisplaySetService {
 
+    private final DataDisplaySetMapper mapper = DataDisplaySetMapper.INSTANCE;
     @Resource
     private JPAQueryFactory queryFactory;
-
-    private final DataDisplaySetMapper mapper = DataDisplaySetMapper.INSTANCE;
 
     @Override
     public void updateDisplaySetItem(List<UpdateDataDisplaySetDto> input) {

@@ -40,13 +40,11 @@ import java.util.List;
 @Tag(name = "用户", description = "User")
 @Authorize(AdminUserAuthProvider.PAGES_ADMINISTRATION_USERS)
 public class UserController extends CruxBaseController {
+    private final UserMapper mapper = UserMapper.INSTANCE;
     @Resource
     private IUserService userService;
     @Resource
     private IFeatureChecker featureChecker;
-
-    private final UserMapper mapper = UserMapper.INSTANCE;
-
 
     @Operation(summary = "获取用户列表")
     @RequestMapping(value = "/getUsers", method = RequestMethod.GET)

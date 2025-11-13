@@ -19,11 +19,11 @@ public class SafetyOperationSettingProvider extends SettingProvider {
     public static final String SAFE_MANAGEMENT_OPERATION = "Safe.Management.Operaton";
     public static final String SAFE_MANAGEMENT_IS_OPERATON = "Safe.Management.Is.SafeOperaion";
     public static final String SAFE_MANAGEMENT_PREVIEW_TIME = "Safe.Management.PreviewTime";
-    
+
     @Override
     public List<SettingDefinition> getSettingDefinitions() {
         ArrayList<SettingDefinition> list = new ArrayList<>();
-        
+
         list.add(new SettingDefinition.Builder(SAFE_MANAGEMENT_OPERATION, "").displayName("安全运行").scopes(SettingScopes.Tenant).inputType(null).build());
         list.add(new SettingDefinition.Builder(SAFE_MANAGEMENT_IS_OPERATON, "").displayName("是否启动安全运行时间").scopes(SettingScopes.Tenant).parent(SAFE_MANAGEMENT_OPERATION)
                 .inputType(new CheckBox()).build());

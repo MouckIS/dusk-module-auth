@@ -11,6 +11,8 @@ import java.util.List;
  */
 public interface IDashBoardClassifyRepository extends IBaseRepository<DashboardClassify> {
     List<DashboardClassify> findAllByThemeId(Long themeId);
+
     List<DashboardClassify> findAllByThemeIdIn(List<Long> themeIds);
+
     void deleteAllByThemeId(Long themeId);
 }

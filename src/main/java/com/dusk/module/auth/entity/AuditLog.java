@@ -45,7 +45,7 @@ public class AuditLog extends BaseEntity {
     private String parameters;
 
     @ManyToOne(targetEntity = User.class)
-    @JoinColumn(name= EntityConstant.CREATE_ID, referencedColumnName = BaseEntity.Fields.id, insertable = false, updatable = false)
+    @JoinColumn(name = EntityConstant.CREATE_ID, referencedColumnName = BaseEntity.Fields.id, insertable = false, updatable = false)
     private User createUser;
 
     /**
@@ -58,7 +58,7 @@ public class AuditLog extends BaseEntity {
 
 
     public String toString() {
-        String loggedUserId = createId!=null
+        String loggedUserId = createId != null
                 ? "user " + createId
                 : "an anonymous user";
 
@@ -66,6 +66,6 @@ public class AuditLog extends BaseEntity {
                 ? "exception: " + exception
                 : "succeed";
 
-        return String.format("AUDIT LOG: %s.%s is executed by %s in %s ms from %s IP address with %s.",serviceName,methodName,loggedUserId,executionDuration,clientIpAddress,exceptionOrSuccessMessage);
+        return String.format("AUDIT LOG: %s.%s is executed by %s in %s ms from %s IP address with %s.", serviceName, methodName, loggedUserId, executionDuration, clientIpAddress, exceptionOrSuccessMessage);
     }
 }

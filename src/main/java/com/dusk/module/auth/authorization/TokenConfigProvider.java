@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Token配置
+ *
  * @author caiwenjun
  * @date 2023/5/31 9:24
  */

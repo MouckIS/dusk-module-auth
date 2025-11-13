@@ -23,17 +23,15 @@ import java.util.Map;
  **/
 @Service
 public class AdministrativeRegionsServiceImpl implements IAdministrativeRegionsService {
-    @Resource
-    private RedisUtil<Object> redisUtil;
-    @Resource
-    private ObjectMapper objectMapper;
-
     private static final String PROVINCE_PATH = "/regions/province.json";
     private static final String CITY_PATH = "/regions/city.json";
     private static final String AREA_PATH = "/regions/area.json";
     private static final String STREET_PATH = "/regions/street.json";
-
     private final List<RegionsDto> regionsList = new ArrayList<>();
+    @Resource
+    private RedisUtil<Object> redisUtil;
+    @Resource
+    private ObjectMapper objectMapper;
 
     @SneakyThrows
     @PostConstruct

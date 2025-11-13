@@ -6,6 +6,7 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 
 /**
  * app消息推送就地部署
+ *
  * @author kefuming
  * @date 2022/11/24 7:49
  */

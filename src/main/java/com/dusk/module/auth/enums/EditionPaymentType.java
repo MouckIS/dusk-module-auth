@@ -1,4 +1,5 @@
 package com.dusk.module.auth.enums;
+
 /**
  * @author kefuming
  * @date 2020-05-19 9:50
@@ -9,7 +10,8 @@ public enum EditionPaymentType {
      */
     NewRegistration,
 
-    /**'
+    /**
+     * '
      * Purchasing by an existing tenant that currently using trial version of a paid edition.
      */
     BuyNow,

@@ -12,10 +12,9 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class UserFingerprintCacheServiceImpl implements IUserFingerprintCacheService {
+    private final String USER_SEQ_REDIS_KEY = "CRUX:AUTH:FINGERPRINT:USERSEQ:{}";
     @Resource
     private RedisUtil<Integer> redisUtil;
-
-    private final String USER_SEQ_REDIS_KEY = "CRUX:AUTH:FINGERPRINT:USERSEQ:{}";
 
     @Override
     public Integer getUserSeq(Long userId) {

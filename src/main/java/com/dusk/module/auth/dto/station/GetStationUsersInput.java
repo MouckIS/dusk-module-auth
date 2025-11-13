@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * @author kefuming
- * @date  2022/9/21 20:46
+ * @date 2022/9/21 20:46
  */
 @Getter
 @Setter
@@ -34,16 +34,16 @@ public class GetStationUsersInput extends PagedAndSortedInputDto {
 
     @Override
     protected Sort getSort() {
-        if(StringUtils.isBlank(sorting)){
+        if (StringUtils.isBlank(sorting)) {
             return Sort.unsorted();
         }
         String sortingStr = sorting;
 
-        if(StationUserListDto.Fields.stationId.equals(sorting)){
+        if (StationUserListDto.Fields.stationId.equals(sorting)) {
             sortingStr = BaseEntity.Fields.id;
-        }else if(StationUserListDto.Fields.stationName.equals(sorting)){
+        } else if (StationUserListDto.Fields.stationName.equals(sorting)) {
             sortingStr = TreeEntity.Fields.displayName;
-        }else{
+        } else {
             sortingStr = "u." + sorting;
         }
 

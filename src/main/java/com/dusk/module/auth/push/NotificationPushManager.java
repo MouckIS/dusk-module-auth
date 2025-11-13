@@ -13,7 +13,6 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.Queue;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.scheduling.annotation.Async;
@@ -27,29 +26,23 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Conditional(RabbitMQEnableCondition.class)
 public class NotificationPushManager implements INotificationPushManager {
+    //#region 常量
+    private final static String MOBILE_PUSH_QUEUE_NAME = "push.aliyun";
+    private final static String SMS_PUSH_QUEUE_NAME = "sms.aliyun";
     @Resource
     private RabbitMQUtils rabbitMQUtils;
     @Resource
     private AmqpAdmin amqpAdmin;
-
-
     /**
      * IOS系统App的Key
      */
     @Value("${aliyun-push.iosAppKey}")
     private String iosAppKey;
-
     /**
      * Android系统App的Key
      */
     @Value("${aliyun-push.androidAppKey}")
     private String androidAppKey;
-
-    //#region 常量
-    private final static String MOBILE_PUSH_QUEUE_NAME = "push.aliyun";
-
-    private final static String SMS_PUSH_QUEUE_NAME = "sms.aliyun";
-
 
     @PostConstruct
     public void declareQueue() {

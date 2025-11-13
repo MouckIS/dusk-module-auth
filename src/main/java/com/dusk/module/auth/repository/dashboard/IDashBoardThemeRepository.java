@@ -11,6 +11,8 @@ import java.util.List;
  */
 public interface IDashBoardThemeRepository extends IBaseRepository<DashboardTheme> {
     List<DashboardTheme> findAllByIdIn(List<Long> ids);
+
     DashboardTheme findFirstByMainPage(Boolean mainPage);
+
     List<DashboardTheme> findAllByName(String name);
 }

@@ -12,9 +12,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class CockpitAuthProvider extends AuthorizationProvider {
-    
+
     public static final String PAGES_COCKPIT = "Pages.Cockpit";
-    
+
     @Override
     public void setPermissions(IPermissionDefinitionContext context) {
         Permission administration = context.getPermissionOrNull(AdministrationAuthProvider.PAGES_ADMINISTRATION);

@@ -17,9 +17,31 @@ import java.util.Map;
 @Component
 @Slf4j
 public class OkHttpTask {
+    public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private final static OkHttpClient client = new OkHttpClient();
 
-    public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    @SneakyThrows
+    private static void validateResponse(Response response) {
+        if (response.isSuccessful()) {
+            return;
+        }
+
+        int httpStatus = response.code();
+        if (200 != httpStatus) {
+
+            String msg = null;
+            try {
+                msg = response.body().string();
+            } catch (IOException e) {
+                log.error("Http请求异常", e);
+                throw new BusinessException("http请求调用异常");
+            }
+
+            log.error(msg);
+            throw new BusinessException(msg);
+        }
+    }
+
     public String dataTask(OkHttpTaskParam param) throws IOException {
         Request request = requestOf(param);
         Response response = client.newCall(request).execute();
@@ -30,7 +52,7 @@ public class OkHttpTask {
     public String formTask(OkHttpTaskParam param) throws IOException {
         // 构建表单数据
         MultipartBody.Builder builder = new MultipartBody.Builder();
-        if(param.getQuery()!=null) {
+        if (param.getQuery() != null) {
             param.getQuery().forEach(builder::addFormDataPart);
         }
         MultipartBody requestBody = builder.setType(MultipartBody.FORM).build();
@@ -74,7 +96,6 @@ public class OkHttpTask {
                 .build();
     }
 
-
     private Request postRequest(OkHttpTaskParam param) {
         Map<String, String> header = param.getHeader();
 
@@ -89,34 +110,12 @@ public class OkHttpTask {
     private RequestBody getRequestBody(OkHttpTaskParam param) {
         if (!StringUtils.isEmpty(param.getBody())) {
             return RequestBody.create(JSON, param.getBody());
-        }else {
+        } else {
             FormBody.Builder builder = new FormBody.Builder();
-            if(param.getQuery()!=null) {
+            if (param.getQuery() != null) {
                 param.getQuery().forEach((key, value) -> builder.add(key, value));
             }
             return builder.build();
-        }
-    }
-
-    @SneakyThrows
-    private static void validateResponse(Response response) {
-        if (response.isSuccessful()) {
-            return;
-        }
-
-        int httpStatus = response.code();
-        if (200 != httpStatus) {
-
-            String msg = null;
-            try {
-                msg = response.body().string();
-            } catch (IOException e) {
-                log.error("Http请求异常", e);
-                throw new BusinessException("http请求调用异常");
-            }
-
-            log.error(msg);
-            throw new BusinessException(msg);
         }
     }
 }

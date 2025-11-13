@@ -20,5 +20,5 @@ public interface IToDoRepository extends IBaseRepository<Todo> {
     Page<Todo> findAll(Specification<Todo> spec, Pageable pageable);
 
     @EntityGraph(value = "todo.permissions")
-    List<Todo> findByTypeAndBusinessIdAndFinish(String type , String businessId,boolean finish);
+    List<Todo> findByTypeAndBusinessIdAndFinish(String type, String businessId, boolean finish);
 }

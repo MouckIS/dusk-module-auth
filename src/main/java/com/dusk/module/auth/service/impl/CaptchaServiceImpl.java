@@ -27,11 +27,6 @@ import java.util.concurrent.TimeUnit;
 @Service
 @Slf4j
 public class CaptchaServiceImpl implements ICaptchaService {
-    @Resource
-    private RedisUtil<Object> redisUtil;
-    @Resource
-    private IFeatureChecker featureChecker;
-
     //region  帐户名密码登陆相关参数
     private final static String REDIS_KEY_CAPTCHA_PREFIX = "CRUX:LOGIN:CAPTCHA:KEY:";
     private final static String REDIS_KEY_NEED_CAPTCHA_PREFIX = "CRUX:LOGIN:CAPTCHA:IP:";
@@ -43,12 +38,15 @@ public class CaptchaServiceImpl implements ICaptchaService {
     private final static int ERROR_COUNT_MAX_DELAY = 2;
     //ip显示验证码保留N小时
     private final static int IP_NEED_CAPTCHA_TIME = 1;
-    //endregion
-
     //region 手机登陆验证码相关
     private final static String REDIS_KEY_IP_SEND_KEY_PREFIX = "CRUX:IP:SEND:";
     //独立ip每分钟内最多发送30条，超过则需要验证码
     private final int IP_MAX_SEND_COUNT = 30;
+    //endregion
+    @Resource
+    private RedisUtil<Object> redisUtil;
+    @Resource
+    private IFeatureChecker featureChecker;
     //endregion
 
     @Override

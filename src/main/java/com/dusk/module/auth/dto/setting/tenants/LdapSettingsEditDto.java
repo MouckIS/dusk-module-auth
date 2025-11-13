@@ -10,21 +10,21 @@ import lombok.Setter;
 @Getter
 @Setter
 public class LdapSettingsEditDto {
-    private boolean moduleEnabled ;
+    private boolean moduleEnabled;
 
-    private boolean enabled ;
+    private boolean enabled;
 
-    private String domain ;
+    private String domain;
 
-    private String userName ;
+    private String userName;
 
-    private String password ;
+    private String password;
 
-    public LdapSettingsEditDto(){
+    public LdapSettingsEditDto() {
 
     }
 
-    public LdapSettingsEditDto(boolean moduleEnabled){
+    public LdapSettingsEditDto(boolean moduleEnabled) {
         this.moduleEnabled = moduleEnabled;
     }
 }

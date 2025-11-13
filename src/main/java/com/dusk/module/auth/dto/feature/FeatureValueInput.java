@@ -11,7 +11,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class FeatureValueInput{
+public class FeatureValueInput {
     /**
      * 特性名称
      */

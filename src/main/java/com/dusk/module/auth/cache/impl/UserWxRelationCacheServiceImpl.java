@@ -15,13 +15,12 @@ import java.util.concurrent.TimeUnit;
  */
 @Service
 public class UserWxRelationCacheServiceImpl implements IUserWxRelationCacheService {
-    @Autowired(required = false)
-    private RedisTemplate<String, String> redisTemplate;
     //CRUX:AUTH:WX:RELATION:{用户id}
     final String REDIS_KEY = "CRUX:AUTH:WX:RELATION:{}";
     //缓存时间
     final long EXPIRE_TIME = 30;
-
+    @Autowired(required = false)
+    private RedisTemplate<String, String> redisTemplate;
 
     @Override
     public void saveWxRelation(Long userId, String appId, String openId) {

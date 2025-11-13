@@ -44,15 +44,15 @@ public class StationMigrationService implements IStationMigrationService {
 
 
     @PostConstruct
-    public void autoMigration(){
+    public void autoMigration() {
         boolean needMigration = SpringContextUtils.getBean(StationMigrationService.class).needMigration();//忽略租户过滤
-        if(needMigration){ //新的厂站表没有数据的时候执行一次迁移
+        if (needMigration) { //新的厂站表没有数据的时候执行一次迁移
             migration();
         }
     }
 
     @DisableTenantFilter
-    public boolean needMigration(){
+    public boolean needMigration() {
         return stationService.count() == 0;
     }
 
@@ -61,12 +61,12 @@ public class StationMigrationService implements IStationMigrationService {
         List<Tenant> all = tenantService.findAll();
         for (Tenant tenant : all) {
             TenantContextHolder.setTenantId(tenant.getId());
-            log.info(StrUtil.format("==============同步厂站数据，tenant={}=========",  tenant.getName()));
+            log.info(StrUtil.format("==============同步厂站数据，tenant={}=========", tenant.getName()));
             try {
                 syncStations();
-            }catch (Exception e){
-                log.info("同步厂站数据出错",e);
-            }finally {
+            } catch (Exception e) {
+                log.info("同步厂站数据出错", e);
+            } finally {
                 TenantContextHolder.clear();
             }
         }
@@ -74,14 +74,14 @@ public class StationMigrationService implements IStationMigrationService {
         log.info("==============迁移厂站完成===========");
     }
 
-    private void syncStations(){
+    private void syncStations() {
         List<OrganizationUnit> list = organizationUnitService.findAll(Sort.by(Sort.Order.asc(TreeEntity.Fields.sortIndex), Sort.Order.desc(CreationEntity.Fields.createTime)));
         List<OrganizationUnit> rootList = list.stream().filter(e -> e.getParentId() == null).toList();
         for (OrganizationUnit unit : rootList) {
-            if(unit.getStation()){
+            if (unit.getStation()) {
                 Station station = syncStation(unit, null);
                 syncStation(unit, list, station);
-            }else{
+            } else {
                 syncStation(unit, list, null);
             }
         }
@@ -89,17 +89,18 @@ public class StationMigrationService implements IStationMigrationService {
 
     /**
      * 从当前组织机构中同步厂站信息到厂站表
-     * @param parent 父组织机构
-     * @param all 所有组织机构
+     *
+     * @param parent     父组织机构
+     * @param all        所有组织机构
      * @param preStation 前一个创建的厂站，用作后续创建厂站的父级
      */
-    private void syncStation(OrganizationUnit parent, List<OrganizationUnit> all, Station preStation){
+    private void syncStation(OrganizationUnit parent, List<OrganizationUnit> all, Station preStation) {
         List<OrganizationUnit> children = getChildren(parent, all);
         for (OrganizationUnit child : children) {
-            if(child.getStation()){
+            if (child.getStation()) {
                 Station station = syncStation(child, preStation);
                 syncStation(child, all, station);
-            }else{
+            } else {
                 syncStation(child, all, preStation);
             }
 
@@ -108,34 +109,35 @@ public class StationMigrationService implements IStationMigrationService {
 
     /**
      * 同步厂站信息
+     *
      * @param organizationUnit 当前组织机构
-     * @param parentStation 前一个厂站
+     * @param parentStation    前一个厂站
      */
-    private Station syncStation(OrganizationUnit organizationUnit, Station parentStation){
+    private Station syncStation(OrganizationUnit organizationUnit, Station parentStation) {
         Station station = stationService.findById(organizationUnit.getId()).orElse(null);
-        if(station == null){
+        if (station == null) {
             station = new Station();
             station.setId(organizationUnit.getId());
             station.setDisplayName(organizationUnit.getDisplayName());
             station.setSortIndex(organizationUnit.getSortIndex());
             station.setUsers(getOrgUsers(organizationUnit));
-            if(parentStation != null){
+            if (parentStation != null) {
                 station.setParentId(parentStation.getId());
             }
             station = stationService.save(station);
         }
         log.info(StrUtil.format("同步厂站：id={}, parentId={}, name={}, path={}, parentStationId={}, parentStationName={},parentStationPath={}", organizationUnit.getId(), organizationUnit.getParentId(), organizationUnit.getDisplayName(), organizationUnit.getPath()
-                , parentStation==null ? "" : parentStation.getId(), parentStation==null ? "" : parentStation.getDisplayName(), parentStation==null ? "" : parentStation.getPath()));
+                , parentStation == null ? "" : parentStation.getId(), parentStation == null ? "" : parentStation.getDisplayName(), parentStation == null ? "" : parentStation.getPath()));
         return station;
     }
 
-    private List<User> getOrgUsers(OrganizationUnit org){
+    private List<User> getOrgUsers(OrganizationUnit org) {
         QUser qUser = QUser.user;
         return queryFactory.select(qUser).from(qUser).where(qUser.organizationUnit.any().id.eq(org.getId())).fetch();
     }
 
 
-    private List<OrganizationUnit> getChildren(OrganizationUnit parent, List<OrganizationUnit> all){
+    private List<OrganizationUnit> getChildren(OrganizationUnit parent, List<OrganizationUnit> all) {
         return all.stream().filter(e -> parent.getId().equals(e.getParentId())).collect(Collectors.toList());
     }
 

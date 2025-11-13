@@ -12,7 +12,7 @@ import java.util.List;
  */
 @Getter
 @Setter
-public class OrganizationStationUnitTreeDto extends OrganizationStationUnitDto{
+public class OrganizationStationUnitTreeDto extends OrganizationStationUnitDto {
     private List<OrganizationStationUnitTreeDto> children;
 
     private List<User> userList;

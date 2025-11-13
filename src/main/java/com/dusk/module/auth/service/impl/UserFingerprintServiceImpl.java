@@ -35,6 +35,11 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class UserFingerprintServiceImpl extends BaseService<UserFingerprint, IUserFingerprintRepository> implements IUserFingerprintService {
+    //注册指纹开始{指纹仪序列号}
+    private final String TOPIC_REGISTER_START = "Fingerprint/{}/Register/Start";
+    //验证指纹开始{指纹仪序列号}
+    private final String TOPIC_IDENTIFY_START = "Fingerprint/{}/Identify/Start";
+    private final UserFingerprintMapper mapper = UserFingerprintMapper.INSTANCE;
     @Resource
     private IUserFingerprintCacheService userFingerprintCacheService;
     @Resource
@@ -43,12 +48,6 @@ public class UserFingerprintServiceImpl extends BaseService<UserFingerprint, IUs
     private SecurityUtils securityUtils;
     @DubboReference
     private ISerialNoRpcService serialNoRpcService;
-
-    //注册指纹开始{指纹仪序列号}
-    private final String TOPIC_REGISTER_START = "Fingerprint/{}/Register/Start";
-    //验证指纹开始{指纹仪序列号}
-    private final String TOPIC_IDENTIFY_START = "Fingerprint/{}/Identify/Start";
-    private final UserFingerprintMapper mapper = UserFingerprintMapper.INSTANCE;
 
     @Override
     public void registerFingerprint(RegisterFingerprintInputDto inputDto) {
@@ -65,7 +64,7 @@ public class UserFingerprintServiceImpl extends BaseService<UserFingerprint, IUs
             e.eq(UserFingerprint.Fields.name, inputDto.getName());
             e.ne(inputDto.getId() != null, BaseEntity.Fields.id, inputDto.getId());
         }));
-        if(sameFingerCount > 0){
+        if (sameFingerCount > 0) {
             throw new BusinessException(StrUtil.format("已存在【{}】指纹！", inputDto.getName()));
         }
 
@@ -123,8 +122,8 @@ public class UserFingerprintServiceImpl extends BaseService<UserFingerprint, IUs
             if (!fingerprint.getCreateId().equals(securityUtils.getCurrentUser().getId())) {
                 throw new BusinessException("不允许新增/保存他人指纹记录");
             }
-        } else{
-            if(!securityUtils.getCurrentUser().getId().equals(inputDto.getUserId())) {
+        } else {
+            if (!securityUtils.getCurrentUser().getId().equals(inputDto.getUserId())) {
                 throw new BusinessException("不允许新增/保存他人指纹记录");
             }
         }

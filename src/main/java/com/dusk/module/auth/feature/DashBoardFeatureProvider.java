@@ -1,4 +1,3 @@
-
 package com.dusk.module.auth.feature;
 
 import com.dusk.module.auth.impl.FeatureProvider;

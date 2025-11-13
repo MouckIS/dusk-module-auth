@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class TodoIgnoreServiceImpl extends BaseService<TodoIgnore,ITodoIgnoreRepository> implements ITodoIgnoreService  {
+public class TodoIgnoreServiceImpl extends BaseService<TodoIgnore, ITodoIgnoreRepository> implements ITodoIgnoreService {
 
     @Override
     public boolean ignoreTodo(Long todoId) {
