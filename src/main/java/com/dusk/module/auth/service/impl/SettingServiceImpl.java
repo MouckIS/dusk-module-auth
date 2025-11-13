@@ -1,5 +1,6 @@
 package com.dusk.module.auth.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.dusk.common.core.auth.authentication.LoginUserIdContextHolder;
 import com.dusk.common.core.datafilter.DataFilterContextHolder;
 import com.dusk.common.core.dto.NameValueDto;
@@ -17,7 +18,6 @@ import com.dusk.module.ddm.dto.ui.FileInput;
 import com.dusk.module.ddm.dto.ui.InputType;
 import com.dusk.module.ddm.enums.SettingAccessLevel;
 import com.dusk.module.ddm.service.ISettingRpcService;
-import io.seata.common.util.StringUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -243,7 +243,7 @@ public class SettingServiceImpl implements ISettingRpcService, ISettingService {
             temMap.put("value", value);
             InputType inputType = v.getInputType();
             if (inputType != null && FileInput.NAME.equals(inputType.getName())) {
-                if (StringUtils.isNotBlank(value)) {
+                if (StrUtil.isNotBlank(value)) {
                     fileMapList.add(temMap);
                 }
             }
