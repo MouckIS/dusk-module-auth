@@ -11,4 +11,5 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class NotificationOutput extends NotificationListOutput { }
+public class NotificationOutput extends NotificationListOutput {
+}

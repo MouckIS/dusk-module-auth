@@ -11,9 +11,14 @@ import java.util.List;
  */
 public interface IDashBoardPermissionRepository extends IBaseRepository<DashboardPermission> {
     void deleteByThemeId(Long themeId);
+
     void deleteByThemeIdAndRoleId(Long themeId, Long roleId);
+
     DashboardPermission findByThemeIdAndRoleId(Long themeId, Long roleId);
+
     List<DashboardPermission> findAllByRoleId(Long roleId);
+
     List<DashboardPermission> findAllByRoleIdIn(List<Long> roleId);
+
     List<DashboardPermission> findAllByThemeId(Long themeId);
 }

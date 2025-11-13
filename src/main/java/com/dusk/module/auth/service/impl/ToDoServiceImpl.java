@@ -46,6 +46,8 @@ import java.util.stream.Collectors;
 @Transactional
 @Slf4j
 public class ToDoServiceImpl extends BaseService<Todo, IToDoRepository> implements IToDoService {
+    private static final int TITLE_MAX_LENGTH = 200;
+    private final TodoMapper mapper = TodoMapper.INSTANCE;
     @Resource
     private JPAQueryFactory queryFactory;
     @Resource
@@ -59,22 +61,19 @@ public class ToDoServiceImpl extends BaseService<Todo, IToDoRepository> implemen
     @Resource
     private ITodoReadService todoReadService;
 
-    private static final int TITLE_MAX_LENGTH = 200;
-    private final TodoMapper mapper = TodoMapper.INSTANCE;
-
     @Override
     public void addTodo(@Valid ToDoDto input) {
         //校验数据有效性
         Todo data = mapper.toEntity(input);
-        if(input.getTitle().length() > TITLE_MAX_LENGTH){
+        if (input.getTitle().length() > TITLE_MAX_LENGTH) {
             data.setTitle(StrUtil.sub(input.getTitle(), 0, TITLE_MAX_LENGTH) + "...");
         }
 
         User currentUser = userManage.getCurrentUser();
-        if(StrUtil.isEmpty(input.getStarter()) && currentUser != null){//设置默认发起人信息
+        if (StrUtil.isEmpty(input.getStarter()) && currentUser != null) {//设置默认发起人信息
             data.setStarter(currentUser.getName());
         }
-        if(currentUser != null){//设置上一提交人信息
+        if (currentUser != null) {//设置上一提交人信息
             data.setPreHandler(currentUser.getName());
         }
 
@@ -112,7 +111,7 @@ public class ToDoServiceImpl extends BaseService<Todo, IToDoRepository> implemen
     public void ignoreTodo(Long todoId) {
         findById(todoId).ifPresent(todo -> {
             boolean flag = todoIgnoreService.ignoreTodo(todoId);
-            if(flag){
+            if (flag) {
                 toDoPushService.pushIgnoreMsg(todo, LoginUserIdContextHolder.getUserId());
             }
         });
@@ -176,12 +175,12 @@ public class ToDoServiceImpl extends BaseService<Todo, IToDoRepository> implemen
         QTodoPermission qTodoPermission = QTodoPermission.todoPermission;
         QBean<TodoInfoDto> qBean = QBeanBuilder.create(TodoInfoDto.class).appendQEntity(qTodo).build();
         JPAQuery<TodoInfoDto> query = queryFactory.select(qBean).from(qTodo)
-                                                  .leftJoin(qTodoPermission).on(QTodo.todo.id.eq(QTodoPermission.todoPermission.todoId))
-                                                  .where(expression).distinct();
+                .leftJoin(qTodoPermission).on(QTodo.todo.id.eq(QTodoPermission.todoPermission.todoId))
+                .where(expression).distinct();
         Page<TodoInfoDto> page = (Page<TodoInfoDto>) page(query, input.getPageable());
         List<TodoInfoDto> todoList = page.getContent();
         List<TodoRead> todoReadList = todoReadService.findByUserId(currentUser.getId());
-        todoList.forEach(todo->{
+        todoList.forEach(todo -> {
             boolean anyMatch = todoReadList.stream().anyMatch(read -> read.getTodoId().equals(todo.getId()));
             todo.setHasRead(anyMatch);
         });

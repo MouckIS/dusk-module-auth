@@ -34,7 +34,8 @@ public class GetNotAssignedStationUsersInput extends PagedAndSortedInputDto {
         if (StringUtils.isBlank(sorting)) {
             return Sort.unsorted();
         }
-        String sortingStr = "u." + sorting;;
+        String sortingStr = "u." + sorting;
+        ;
         return Sort.by(sortingDirection, sortingStr);
     }
 }

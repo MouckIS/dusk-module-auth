@@ -22,18 +22,15 @@ import java.util.concurrent.TimeUnit;
  */
 @Service
 public class SsoTokenServiceImpl implements ISsoTokenService {
+    private static final String SSO_KEY = "CRUX:AUTH:SSO:SM4:{}";
+    @Value("${sso.time-diff}")
+    int timeDiff;
     @Resource
     private IUserService userService;
     @Resource
     private AppAuthConfig appAuthConfig;
-
     @Autowired(required = false)
     private RedisUtil<String> redisUtil;
-
-    @Value("${sso.time-diff}")
-    int timeDiff;
-
-    private static final String SSO_KEY = "CRUX:AUTH:SSO:SM4:{}";
 
     @Override
     public String ssoSm4Token(String encryptStr) {

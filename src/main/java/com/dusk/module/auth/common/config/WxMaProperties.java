@@ -18,7 +18,7 @@ public class WxMaProperties {
 
 
     @Getter
-@Setter
+    @Setter
     public static class Config {
         /**
          * 设置微信小程序的appid

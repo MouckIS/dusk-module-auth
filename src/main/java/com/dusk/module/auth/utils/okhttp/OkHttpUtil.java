@@ -7,13 +7,14 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+
 /**
  * @author jianjianhong
  * @date 2023/10/27
  */
 public class OkHttpUtil {
-     /**
-      *  X509TrustManager instance which ignored SSL certification
+    /**
+     * X509TrustManager instance which ignored SSL certification
      */
     public static final X509TrustManager IGNORE_SSL_TRUST_MANAGER_X509 = new X509TrustManager() {
         @Override
@@ -26,7 +27,7 @@ public class OkHttpUtil {
 
         @Override
         public X509Certificate[] getAcceptedIssuers() {
-            return new X509Certificate[] {};
+            return new X509Certificate[]{};
         }
     };
 
@@ -40,7 +41,7 @@ public class OkHttpUtil {
     @SneakyThrows
     public static SSLContext getIgnoreInitedSslContext() {
         var sslContext = SSLContext.getInstance("SSL");
-        sslContext.init(null, new TrustManager[] { IGNORE_SSL_TRUST_MANAGER_X509 }, new SecureRandom());
+        sslContext.init(null, new TrustManager[]{IGNORE_SSL_TRUST_MANAGER_X509}, new SecureRandom());
         return sslContext;
     }
 

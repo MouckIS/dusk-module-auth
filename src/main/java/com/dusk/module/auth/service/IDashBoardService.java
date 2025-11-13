@@ -20,6 +20,7 @@ public interface IDashBoardService extends IBaseService<DashboardTheme, IDashBoa
 
     /**
      * 新增或更新主题
+     *
      * @param input
      * @return
      */
@@ -27,6 +28,7 @@ public interface IDashBoardService extends IBaseService<DashboardTheme, IDashBoa
 
     /**
      * 获取主题列表
+     *
      * @param input
      * @return
      */
@@ -34,6 +36,7 @@ public interface IDashBoardService extends IBaseService<DashboardTheme, IDashBoa
 
     /**
      * 主题详情
+     *
      * @param id
      * @return
      */
@@ -41,6 +44,7 @@ public interface IDashBoardService extends IBaseService<DashboardTheme, IDashBoa
 
     /**
      * 新增或更新模块大类
+     *
      * @param input
      * @return
      */
@@ -48,6 +52,7 @@ public interface IDashBoardService extends IBaseService<DashboardTheme, IDashBoa
 
     /**
      * 大类详情
+     *
      * @param id
      * @return
      */
@@ -55,30 +60,35 @@ public interface IDashBoardService extends IBaseService<DashboardTheme, IDashBoa
 
     /**
      * 删除栏目
+     *
      * @param id
      */
     void removeClassify(Long id);
 
     /**
      * 删除主题
+     *
      * @param id
      */
     void removeTheme(Long id);
 
     /**
      * 设置主题权限
+     *
      * @param input
      */
     void setDashBardPermission(CreateOrUpdateDashBoardPermission input);
 
     /**
      * 删除主题权限
+     *
      * @param input
      */
     void removeDashBardPermission(RemoveDashBoardPermission input);
 
     /**
      * 获取用户的主题列表
+     *
      * @param userId
      * @return
      */
@@ -86,6 +96,7 @@ public interface IDashBoardService extends IBaseService<DashboardTheme, IDashBoa
 
     /**
      * 根据主题已授权的角色列表
+     *
      * @param themeId
      * @return
      */
@@ -93,6 +104,7 @@ public interface IDashBoardService extends IBaseService<DashboardTheme, IDashBoa
 
     /**
      * 获取用户首页大屏
+     *
      * @param userId
      * @return
      */
@@ -100,6 +112,7 @@ public interface IDashBoardService extends IBaseService<DashboardTheme, IDashBoa
 
     /**
      * 检查首页大屏是否正确
+     *
      * @param themeId
      * @return
      */

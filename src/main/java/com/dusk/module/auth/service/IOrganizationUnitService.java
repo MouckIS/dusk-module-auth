@@ -25,6 +25,7 @@ public interface IOrganizationUnitService extends IBaseService<OrganizationUnit,
 
     /**
      * 获取外单位的所有组织
+     *
      * @return
      */
     ListResultDto<OrganizationStationUnitDto> getExternalOrganizationUnits();
@@ -64,6 +65,7 @@ public interface IOrganizationUnitService extends IBaseService<OrganizationUnit,
 
     /**
      * 创建外单位组织机构
+     *
      * @param input
      * @return
      */
@@ -87,6 +89,7 @@ public interface IOrganizationUnitService extends IBaseService<OrganizationUnit,
 
     /**
      * 级联删除子节点
+     *
      * @param orgId
      */
     void deleteOrgById(Long orgId);
@@ -147,10 +150,12 @@ public interface IOrganizationUnitService extends IBaseService<OrganizationUnit,
 
     /**
      * 根据用户id获取用户的厂站  获取所有的
+     *
      * @param id
      * @return
      */
     List<OrganizationUnit> getAllStationsByUserId(Long id);
+
     /**
      * 给前端右上角用的厂站列表，包含默认厂站
      *
@@ -177,6 +182,7 @@ public interface IOrganizationUnitService extends IBaseService<OrganizationUnit,
 
     /**
      * 根据编码查询
+     *
      * @param codes
      * @return
      */
@@ -185,7 +191,7 @@ public interface IOrganizationUnitService extends IBaseService<OrganizationUnit,
     void deleteByCodes(List<String> deleteBizOrgIds);
 
     //设置厂站可用/不可用
-    void setStationEnabled(Long id,boolean enabled);
+    void setStationEnabled(Long id, boolean enabled);
 
     void importUnitByExcel(MultipartFile file);
 }

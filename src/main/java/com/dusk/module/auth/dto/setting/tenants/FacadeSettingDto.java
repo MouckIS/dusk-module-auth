@@ -10,7 +10,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class FacadeSettingDto extends FacadeSettingEditDto{
+public class FacadeSettingDto extends FacadeSettingEditDto {
     @Schema(description = "css样式文件名")
     private String cssFileName;
     @Schema(description = "css样式文件下载地址")

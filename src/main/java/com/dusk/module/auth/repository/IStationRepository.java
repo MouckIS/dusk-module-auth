@@ -10,7 +10,6 @@ import com.dusk.module.auth.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Set;
@@ -24,6 +23,7 @@ public interface IStationRepository extends IBaseRepository<Station> {
 
     /**
      * 查询厂站下的用户，stationIds为-1时查询所有用户
+     *
      * @param stationIds
      * @param filter
      * @param pageable
@@ -37,6 +37,7 @@ public interface IStationRepository extends IBaseRepository<Station> {
 
     /**
      * 查询厂站下的用户，queryStationIds为-1时查询所有用户
+     *
      * @param queryStationIds
      * @param filter
      * @param pageable

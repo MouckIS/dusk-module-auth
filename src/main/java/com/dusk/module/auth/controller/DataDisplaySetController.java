@@ -36,7 +36,7 @@ public class DataDisplaySetController extends CruxBaseController {
     @PostMapping("/updateDisplaySetItem")
     @Operation(summary = "数据展示设置的更新")
     @Authorize(DataDisplaySetAuthProvider.PAGES_DATA_DISPLAY_SET_SAVE)
-    public void updateDisplaySetItem(@RequestBody List<UpdateDataDisplaySetDto> input){
+    public void updateDisplaySetItem(@RequestBody List<UpdateDataDisplaySetDto> input) {
         dataDisplaySetService.updateDisplaySetItem(input);
     }
 

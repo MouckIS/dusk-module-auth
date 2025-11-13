@@ -10,13 +10,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FlatPermissionDto {
-    private String parentName;
-
-    private String name;
-
-    private String displayName;
-
-    private String description;
-
     public boolean isGrantedByDefault;
+    private String parentName;
+    private String name;
+    private String displayName;
+    private String description;
 }

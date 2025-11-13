@@ -39,8 +39,8 @@ public class UserFeatureProvider extends FeatureProvider {
         context.createChildren(feature, APP_USER_MAX_USERS_NUMBER, "100", "最大用户数", "", new SingerLineString());
         context.createChildren(APP_USER_LOCK_ON_LOGIN, "false", "登陆失败锁定用户", "", new CheckBox());
         context.createChildren(APP_USER_LOCK_ON_LOGIN_COUNT, "5", "允许登陆失败次数", "", new SingerLineString());
-        TenantFeature loginContext = context.createChildren(APP_USER_LOGIN_SHOW_DROPDOWN_LIST,"false","登陆显示人员下拉列表","",new CheckBox());
-        context.createChildren(loginContext, APP_USER_ALLOW_GET_USERS_FOR_LOGIN_BY_ANONYMOUS,"false","匿名获取用户名称列表(勾选) / 获取历史登录记录(不勾选)","",new CheckBox());
+        TenantFeature loginContext = context.createChildren(APP_USER_LOGIN_SHOW_DROPDOWN_LIST, "false", "登陆显示人员下拉列表", "", new CheckBox());
+        context.createChildren(loginContext, APP_USER_ALLOW_GET_USERS_FOR_LOGIN_BY_ANONYMOUS, "false", "匿名获取用户名称列表(勾选) / 获取历史登录记录(不勾选)", "", new CheckBox());
         context.createChildren(APP_USER_ALLOW_MOBILE_LOGIN, "false", "允许手机登录", "", new CheckBox());
         context.createChildren(APP_USER_ALLOW_SCANNING_LOGIN, "false", "允许扫码登录", "", new CheckBox());
         context.createChildren(APP_USER_ALLOW_FACE_LOGIN, "false", "允许刷脸登录", "", new CheckBox());

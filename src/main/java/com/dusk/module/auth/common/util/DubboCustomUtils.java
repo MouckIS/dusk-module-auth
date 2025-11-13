@@ -18,6 +18,7 @@ public class DubboCustomUtils {
 
     /**
      * Dubbo 3.x：尝试使用 ApplicationModel / ConsumerModel 的反射访问
+     *
      * @param serviceUniqueName 微服务名称
      * @return 该微服务是否有可用的提供者
      */
@@ -32,7 +33,8 @@ public class DubboCustomUtils {
                     Method m = appModelCls.getMethod(mName);
                     appModel = m.invoke(null);
                     if (appModel != null) break;
-                } catch (NoSuchMethodException ignored) {}
+                } catch (NoSuchMethodException ignored) {
+                }
             }
 
             // 如果没有拿到 appModel，也尝试直接使用静态方法 getAllConsumerModels/getConsumerModel
@@ -45,7 +47,8 @@ public class DubboCustomUtils {
                     if (checkConsumerModelInvokers(consumerModel)) {
                         return true;
                     }
-                } catch (NoSuchMethodException ignored) {}
+                } catch (NoSuchMethodException ignored) {
+                }
             }
 
             // 若有 appModel 实例，尝试从 appModel 中拿到所有 consumer models
@@ -66,7 +69,8 @@ public class DubboCustomUtils {
                                 }
                             }
                         }
-                    } catch (NoSuchMethodException ignored) {}
+                    } catch (NoSuchMethodException ignored) {
+                    }
                 }
             }
         } catch (ClassNotFoundException e) {
@@ -95,6 +99,7 @@ public class DubboCustomUtils {
 
     /**
      * 给定 ConsumerModel 实例，反射查找其中的 invoker 列表并判断任一 invoker 是否可用
+     *
      * @param consumerModel ConsumerModel 实例
      * @return 是否有可用的 invoker
      */
@@ -107,7 +112,8 @@ public class DubboCustomUtils {
                 try {
                     Object res = m.invoke(consumerModel);
                     if (isInvokerCollectionAvailable(res)) return true;
-                } catch (IllegalAccessException | InvocationTargetException ignored) {}
+                } catch (IllegalAccessException | InvocationTargetException ignored) {
+                }
             }
         }
         return false;
@@ -115,6 +121,7 @@ public class DubboCustomUtils {
 
     /**
      * 通过反射尝试调用 invoker.isAvailable()
+     *
      * @param invoker invoker 对象
      * @return 是否可用
      */
@@ -131,15 +138,18 @@ public class DubboCustomUtils {
                     Method isAvailable = iface.getMethod("isAvailable");
                     Object r = isAvailable.invoke(invoker);
                     return r instanceof Boolean && (Boolean) r;
-                } catch (Throwable ignored) {}
+                } catch (Throwable ignored) {
+                }
             }
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) {
+        }
         return false;
     }
 
     /**
      * 判断 consumerModel 是否与 serviceUniqueName 匹配（尝试若干可能的属性方法）
-     * @param consumerModel ConsumerModel 实例
+     *
+     * @param consumerModel     ConsumerModel 实例
      * @param serviceUniqueName 微服务唯一名称
      * @return 是否匹配
      */
@@ -153,7 +163,8 @@ public class DubboCustomUtils {
                 if (val != null && serviceUniqueName.equals(val.toString())) {
                     return true;
                 }
-            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) {}
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) {
+            }
         }
         return false;
     }

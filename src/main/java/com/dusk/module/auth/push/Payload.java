@@ -54,6 +54,77 @@ public class Payload {
     @Getter
     @JsonProperty(value = "iOSExtParameters")
     private final String iOSExtParameters;
+    /**
+     * App Key
+     */
+    @Getter
+    @Setter
+    @JsonProperty(value = "AppKey")
+    private String appKey;
+    /**
+     * 推送目标: DEVICE:按设备推送 ALIAS : 按别名推送 ACCOUNT:按帐号推送  TAG:按标签推送; ALL: 广播推送
+     */
+    @Getter
+    @Setter
+    @JsonProperty(value = "Target")
+    private String target;
+    /**
+     * 根据Target来设定，如Target=DEVICE, 则对应的值为 设备id1,设备id2. 多个值使用逗号分隔.(帐号与设备有一次最多100个的限制)
+     */
+    @Getter
+    @Setter
+    @JsonProperty(value = "TargetValue")
+    private String targetValue;
+    /**
+     * 消息类型 MESSAGE NOTICE
+     */
+    @Getter
+    @Setter
+    @JsonProperty(value = "PushType")
+    private String pushType;
+    /**
+     * 设备类型 ANDROID iOS ALL.
+     */
+    @Getter
+    @Setter
+    @JsonProperty(value = "DeviceType")
+    private String deviceType;
+    /**
+     * 标题
+     */
+    @Getter
+    @Setter
+    @JsonProperty(value = "Title")
+    private String title;
+    /**
+     * 内容
+     */
+    @Getter
+    @Setter
+    @JsonProperty(value = "Body")
+    private String body;
+    /**
+     * 推送控制
+     * 可以设置成你指定固定时间
+     */
+    @Getter
+    @Setter
+    @JsonProperty(value = "PushTime")
+    private String pushTime;
+    /**
+     * 离线消息是否保存,若保存, 在推送时候，用户即使不在线，下一次上线则会收到
+     */
+    @Getter
+    @Setter
+    @JsonProperty(value = "StoreOffline")
+    private boolean storeOffline;
+    /**
+     * 离线消息的过期时间，过期则不会再被发送。离线消息最长保存72小时，过期时间时长不会超过发送时间加72小时。
+     */
+    @Getter
+    @Setter
+    @JsonProperty(value = "ExpireTime")
+    private String expireTime;
 
     public Payload(
             PushType pushType,
@@ -80,86 +151,5 @@ public class Payload {
         androidXiaoMiNotifyTitle = title;
         androidXiaoMiNotifyBody = body;
     }
-
-    /**
-     * App Key
-     */
-    @Getter
-    @Setter
-    @JsonProperty(value = "AppKey")
-    private String appKey;
-
-    /**
-     * 推送目标: DEVICE:按设备推送 ALIAS : 按别名推送 ACCOUNT:按帐号推送  TAG:按标签推送; ALL: 广播推送
-     */
-    @Getter
-    @Setter
-    @JsonProperty(value = "Target")
-    private String target;
-
-    /**
-     * 根据Target来设定，如Target=DEVICE, 则对应的值为 设备id1,设备id2. 多个值使用逗号分隔.(帐号与设备有一次最多100个的限制)
-     */
-    @Getter
-    @Setter
-    @JsonProperty(value = "TargetValue")
-    private String targetValue;
-
-    /**
-     * 消息类型 MESSAGE NOTICE
-     */
-    @Getter
-    @Setter
-    @JsonProperty(value = "PushType")
-    private String pushType;
-
-    /**
-     * 设备类型 ANDROID iOS ALL.
-     */
-    @Getter
-    @Setter
-    @JsonProperty(value = "DeviceType")
-    private String deviceType;
-
-    /**
-     * 标题
-     */
-    @Getter
-    @Setter
-    @JsonProperty(value = "Title")
-    private String title;
-
-    /**
-     * 内容
-     */
-    @Getter
-    @Setter
-    @JsonProperty(value = "Body")
-    private String body;
-
-    /**
-     * 推送控制
-     * 可以设置成你指定固定时间
-     */
-    @Getter
-    @Setter
-    @JsonProperty(value = "PushTime")
-    private String pushTime;
-
-    /**
-     * 离线消息是否保存,若保存, 在推送时候，用户即使不在线，下一次上线则会收到
-     */
-    @Getter
-    @Setter
-    @JsonProperty(value = "StoreOffline")
-    private boolean storeOffline;
-
-    /**
-     * 离线消息的过期时间，过期则不会再被发送。离线消息最长保存72小时，过期时间时长不会超过发送时间加72小时。
-     */
-    @Getter
-    @Setter
-    @JsonProperty(value = "ExpireTime")
-    private String expireTime;
 
 }

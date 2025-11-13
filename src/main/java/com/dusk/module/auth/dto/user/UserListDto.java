@@ -15,6 +15,10 @@ import java.util.List;
 @Getter
 @Setter
 public class UserListDto extends EntityDto {
+    @Schema(description = "工号")
+    public String workNumber;
+    @Schema(description = "签字图片")
+    public Long signaturePictureId;
     @Schema(description = "姓名")
     private String name;
     @Schema(description = "姓名拼音")
@@ -39,8 +43,4 @@ public class UserListDto extends EntityDto {
     private boolean lock;
     @Schema(description = "创建时间")
     private LocalDateTime createTime;
-    @Schema(description = "工号")
-    public String workNumber;
-    @Schema(description = "签字图片")
-    public Long signaturePictureId;
 }

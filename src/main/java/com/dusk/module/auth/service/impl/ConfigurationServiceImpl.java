@@ -170,7 +170,7 @@ public class ConfigurationServiceImpl extends CruxBaseServiceImpl implements ICo
 
     private FeatureConfigDto getFeatureConfig() {
         FeatureConfigDto featureConfig = new FeatureConfigDto();
-//        featureConfig.setFeatureDto(featureService.getTenantFeatures());
+        //        featureConfig.setFeatureDto(featureService.getTenantFeatures());
         featureConfig.setAllFeatures(featureService.getTenantFeatures());
         return featureConfig;
     }

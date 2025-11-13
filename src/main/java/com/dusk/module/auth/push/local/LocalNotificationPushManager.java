@@ -29,18 +29,15 @@ import org.springframework.stereotype.Component;
 @Conditional(LocalNotificationCondition.class)
 @Primary
 public class LocalNotificationPushManager implements INotificationPushManager {
+    private static final String TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
     @Value("${app.notification.local.publish-url:}")
     private String publishUrl;
-
     @Value("${app.notification.local.timeout:2000}")
     private int timeout;
 
-    private static final String TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
-
-
     @Override
     public void mobilePush(PushMessage pushMessage, NotificationOption option, PushType pushType, Navigation navigation) {
-        try{
+        try {
             NotificationContent content = new NotificationContent();
             content.setTitle(pushMessage.getTitle());
             content.setBody(pushMessage.getBody());
@@ -59,10 +56,10 @@ public class LocalNotificationPushManager implements INotificationPushManager {
 
             String msgStr = JSONUtil.toJsonStr(msg);
             HttpResponse response = HttpUtil.createPost(publishUrl).timeout(timeout).body(msgStr).execute();
-            if(!response.isOk()){
-                log.error(StrUtil.format("消息发送失败,msg={}, 错误信息：{}",msgStr , response.body()));
+            if (!response.isOk()) {
+                log.error(StrUtil.format("消息发送失败,msg={}, 错误信息：{}", msgStr, response.body()));
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("消息发送失败：", e);
         }
 

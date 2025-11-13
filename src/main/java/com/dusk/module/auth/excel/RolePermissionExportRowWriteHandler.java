@@ -13,7 +13,7 @@ import org.apache.poi.ss.util.CellRangeAddressList;
  */
 public class RolePermissionExportRowWriteHandler implements RowWriteHandler {
     private boolean isNewRow = false;
-    private Integer newRowIndex ;
+    private Integer newRowIndex;
 
 
     @Override
@@ -31,20 +31,20 @@ public class RolePermissionExportRowWriteHandler implements RowWriteHandler {
         cellStyle.setBorderRight(BorderStyle.THIN);
         cellStyle.setBorderTop(BorderStyle.THIN);
         cellStyle.setBorderBottom(BorderStyle.THIN);
-        for (int i=0; i<8; i++){
+        for (int i = 0; i < 8; i++) {
             Cell cell = row.createCell(i);
-            if(i==7){
+            if (i == 7) {
                 CellRangeAddressList cellRangeAddressList = new CellRangeAddressList(row.getRowNum(), row.getRowNum(), 7, 7);
                 DataValidationHelper helper = writeSheetHolder.getSheet().getDataValidationHelper();
-                DataValidationConstraint constraint = helper.createExplicitListConstraint(new String[] {"是", "否"});
+                DataValidationConstraint constraint = helper.createExplicitListConstraint(new String[]{"是", "否"});
                 DataValidation dataValidation = helper.createValidation(constraint, cellRangeAddressList);
                 writeSheetHolder.getSheet().addValidationData(dataValidation);
             }
             cell.setCellStyle(cellStyle);
         }
-        CellRangeAddress rangeAddress = new CellRangeAddress(row.getRowNum(),row.getRowNum(),0,3);
+        CellRangeAddress rangeAddress = new CellRangeAddress(row.getRowNum(), row.getRowNum(), 0, 3);
         sheet.addMergedRegion(rangeAddress);
-        rangeAddress = new CellRangeAddress(row.getRowNum(),row.getRowNum(),4,6);
+        rangeAddress = new CellRangeAddress(row.getRowNum(), row.getRowNum(), 4, 6);
         sheet.addMergedRegion(rangeAddress);
     }
 

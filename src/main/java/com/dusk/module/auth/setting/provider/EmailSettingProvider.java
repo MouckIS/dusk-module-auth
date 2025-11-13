@@ -27,16 +27,16 @@ public class EmailSettingProvider extends SettingProvider {
 
     @Override
     public List<SettingDefinition> getSettingDefinitions() {
-        return new ArrayList<>(){{
+        return new ArrayList<>() {{
             add(new SettingDefinition.Builder(MAIL_SMTP, "").displayName("SMTP邮箱配置").scopes(SettingScopes.Application, SettingScopes.Tenant).inputType(null).build());
-            add(new SettingDefinition.Builder(SMTP_HOST,"").displayName("SMTP服务器").scopes(SettingScopes.Application, SettingScopes.Tenant).parent(MAIL_SMTP).build());
-            add(new SettingDefinition.Builder(SMTP_PORT,"25").displayName("SMTP端口").scopes(SettingScopes.Application, SettingScopes.Tenant).parent(MAIL_SMTP).build());
-            add(new SettingDefinition.Builder(SMTP_USER_NAME,"").displayName("用户名").scopes(SettingScopes.Application, SettingScopes.Tenant).parent(MAIL_SMTP).build());
-            add(new SettingDefinition.Builder(SMTP_PASSWORD,"").displayName("密码").scopes(SettingScopes.Application, SettingScopes.Tenant).parent(MAIL_SMTP).build());
-            add(new SettingDefinition.Builder(SMTP_ENABLE_SSL,"false").displayName("使用SSL").scopes(SettingScopes.Application, SettingScopes.Tenant).inputType(new CheckBox()).parent(MAIL_SMTP).build());
-            add(new SettingDefinition.Builder(SMTP_USE_DEFAULT_CREDENTIALS,"true").displayName("默认身份验证").scopes(SettingScopes.Application, SettingScopes.Tenant).inputType(new CheckBox()).parent(MAIL_SMTP).build());
-            add(new SettingDefinition.Builder(SMTP_DEFAULT_FROM_ADDRESS,"").displayName("发送邮箱地址").scopes(SettingScopes.Application, SettingScopes.Tenant).parent(MAIL_SMTP).build());
-            add(new SettingDefinition.Builder(SMTP_DEFAULT_FROM_DISPLAY_NAME,"").displayName("发送人名字").scopes(SettingScopes.Application, SettingScopes.Tenant).parent(MAIL_SMTP).build());
+            add(new SettingDefinition.Builder(SMTP_HOST, "").displayName("SMTP服务器").scopes(SettingScopes.Application, SettingScopes.Tenant).parent(MAIL_SMTP).build());
+            add(new SettingDefinition.Builder(SMTP_PORT, "25").displayName("SMTP端口").scopes(SettingScopes.Application, SettingScopes.Tenant).parent(MAIL_SMTP).build());
+            add(new SettingDefinition.Builder(SMTP_USER_NAME, "").displayName("用户名").scopes(SettingScopes.Application, SettingScopes.Tenant).parent(MAIL_SMTP).build());
+            add(new SettingDefinition.Builder(SMTP_PASSWORD, "").displayName("密码").scopes(SettingScopes.Application, SettingScopes.Tenant).parent(MAIL_SMTP).build());
+            add(new SettingDefinition.Builder(SMTP_ENABLE_SSL, "false").displayName("使用SSL").scopes(SettingScopes.Application, SettingScopes.Tenant).inputType(new CheckBox()).parent(MAIL_SMTP).build());
+            add(new SettingDefinition.Builder(SMTP_USE_DEFAULT_CREDENTIALS, "true").displayName("默认身份验证").scopes(SettingScopes.Application, SettingScopes.Tenant).inputType(new CheckBox()).parent(MAIL_SMTP).build());
+            add(new SettingDefinition.Builder(SMTP_DEFAULT_FROM_ADDRESS, "").displayName("发送邮箱地址").scopes(SettingScopes.Application, SettingScopes.Tenant).parent(MAIL_SMTP).build());
+            add(new SettingDefinition.Builder(SMTP_DEFAULT_FROM_DISPLAY_NAME, "").displayName("发送人名字").scopes(SettingScopes.Application, SettingScopes.Tenant).parent(MAIL_SMTP).build());
         }};
     }
 }

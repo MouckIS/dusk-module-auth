@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * app顶部消息推送特性
+ *
  * @author kefuming
  * @date 2022/11/26 13:06
  */

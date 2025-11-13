@@ -13,7 +13,7 @@ import java.util.List;
  * @version 0.0.1
  * @date 2020/4/29 16:05
  */
-public interface IFeatureValueRepository extends JpaRepository<FeatureValue,String>, JpaSpecificationExecutor<FeatureValue> {
+public interface IFeatureValueRepository extends JpaRepository<FeatureValue, String>, JpaSpecificationExecutor<FeatureValue> {
 
     public List<FeatureValue> findAllByTenantId(Long tenantId);
 

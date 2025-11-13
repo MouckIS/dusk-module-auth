@@ -19,10 +19,10 @@ import lombok.experimental.FieldNameConstants;
 public class TodoPermission extends CreationEntity {
     private String permission;
 
-    @Column(insertable = false,updatable = false)
+    @Column(insertable = false, updatable = false)
     private Long todoId;
 
     @ManyToOne(targetEntity = Todo.class, optional = false)
-    @JoinColumn(name = Fields.todoId ,referencedColumnName = BaseEntity.Fields.id)
+    @JoinColumn(name = Fields.todoId, referencedColumnName = BaseEntity.Fields.id)
     private Todo todo;
 }

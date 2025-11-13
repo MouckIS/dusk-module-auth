@@ -27,7 +27,7 @@ public class TodoController extends CruxBaseController {
     @Operation(summary = "查询待办清单")
     public PagedResultDto<TodoInfoDto> getTodos(@RequestBody GetTodosInput input) {
         Page<TodoInfoDto> todos = toDoService.getTodos(input);
-        return new PagedResultDto<>(todos.getTotalElements(),todos.getContent());
+        return new PagedResultDto<>(todos.getTotalElements(), todos.getContent());
     }
 
     @PostMapping("/ignore/{id}")
@@ -44,7 +44,7 @@ public class TodoController extends CruxBaseController {
 
     @PostMapping("/read/{id}")
     @Operation(summary = "打开待办")
-    public void read(@PathVariable Long id){
+    public void read(@PathVariable Long id) {
         toDoService.read(id);
     }
 

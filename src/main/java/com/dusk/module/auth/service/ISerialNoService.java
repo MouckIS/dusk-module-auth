@@ -17,6 +17,7 @@ public interface ISerialNoService extends ISerialNoRpcService {
 
     /**
      * 根据条件获取当前的序列号
+     *
      * @param now
      * @param dateFormat
      * @param nextNo
@@ -27,6 +28,7 @@ public interface ISerialNoService extends ISerialNoRpcService {
 
     /**
      * 更新
+     *
      * @param input
      */
     void update(SerialNoEditInput input);

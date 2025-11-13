@@ -19,13 +19,11 @@ public class IsTenantAvailableOutput {
     @Schema(description = "租户id")
     public Long tenantId;
 
-    public IsTenantAvailableOutput(TenantAvailabilityState state)
-    {
+    public IsTenantAvailableOutput(TenantAvailabilityState state) {
         this.state = state;
     }
 
-    public IsTenantAvailableOutput(TenantAvailabilityState state, Long tenantId)
-    {
+    public IsTenantAvailableOutput(TenantAvailabilityState state, Long tenantId) {
         this.state = state;
         this.tenantId = tenantId;
     }

@@ -9,6 +9,7 @@ import java.util.Map;
 
 /**
  * TODO:实现特性
+ *
  * @author kefuming
  * @date 2020-05-07 15:26
  */
@@ -17,5 +18,5 @@ import java.util.Map;
 public class FeatureConfigDto implements Serializable {
     @Serial
     private static final long serialVersionUID = -5127662938662005864L;
-    private Map<String,Map<String,String>> allFeatures;
+    private Map<String, Map<String, String>> allFeatures;
 }

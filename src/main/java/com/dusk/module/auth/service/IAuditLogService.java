@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 public interface IAuditLogService extends IBaseService<AuditLog, IAuditLogRepository> {
     /**
      * 查询审计日志
+     *
      * @param input
      * @return
      */
@@ -26,6 +27,7 @@ public interface IAuditLogService extends IBaseService<AuditLog, IAuditLogReposi
 
     /**
      * 导出审计日志
+     *
      * @param input
      * @param outputStream
      */

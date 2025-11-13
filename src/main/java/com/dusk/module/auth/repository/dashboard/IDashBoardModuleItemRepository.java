@@ -11,7 +11,10 @@ import java.util.List;
  */
 public interface IDashBoardModuleItemRepository extends IBaseRepository<DashboardModuleItem> {
     void deleteByModuleId(Long moduleId);
+
     List<DashboardModuleItem> findAllByModuleId(Long moduleId);
+
     List<DashboardModuleItem> findAllByModuleIdOrderByCreateTime(Long moduleId);
+
     List<DashboardModuleItem> findAllByModuleIdAndName(Long moduleId, String name);
 }

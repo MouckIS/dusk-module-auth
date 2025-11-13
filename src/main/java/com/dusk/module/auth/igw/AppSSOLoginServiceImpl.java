@@ -25,9 +25,14 @@ import java.util.Map;
 @ConditionalOnProperty(name = "igwsso.enable", havingValue = "true")
 @Slf4j
 public class AppSSOLoginServiceImpl implements IAppSSOLoginService {
+    // http请求超时时长  3秒超时
+    private final static int TIME_OUT_MILLISECONDS = 3000;
+    // i国网获取token url
+    private final static String ACCESSTOKEN_URL = "zuul/sgid-provider-console/res/iscMincroService/getAccessToken";
+    // i国网转换ticket
+    private final static String TICKET_URL = "zuul/sgid-frontmv/identity/getUserInfoByTicket";
     @Resource
     private IUserService userService;
-
     @Value("${igwsso.iscAppId}")
     private String iscAppId;
     @Value("${igwsso.iscSecret}")
@@ -36,17 +41,6 @@ public class AppSSOLoginServiceImpl implements IAppSSOLoginService {
     private String service;
     @Value("${igwsso.address}")
     private String address;
-
-
-    // http请求超时时长  3秒超时
-    private final static int TIME_OUT_MILLISECONDS = 3000;
-    // i国网获取token url
-    private final static String ACCESSTOKEN_URL = "zuul/sgid-provider-console/res/iscMincroService/getAccessToken";
-    // i国网转换ticket
-    private final static String TICKET_URL = "zuul/sgid-frontmv/identity/getUserInfoByTicket";
-
-
-
 
     /**
      * 从i国网获取accesstoken

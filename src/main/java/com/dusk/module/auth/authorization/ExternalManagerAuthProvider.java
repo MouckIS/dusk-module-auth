@@ -31,7 +31,6 @@ public class ExternalManagerAuthProvider extends AuthorizationProvider {
     public static final String PAGES_INNER_USERS = "Pages.Inner.Users";
 
 
-
     @Override
     public void setPermissions(IPermissionDefinitionContext context) {
         Permission permission = context.createPermission(PAGES_EXTERNAL_MANAGER, "人员管控", MultiTenancySides.Tenant);

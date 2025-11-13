@@ -56,7 +56,7 @@ public class SubscribableEdition extends CreationEntity {
     private BigDecimal annualPrice;
 
     /**
-     *试用天数
+     * 试用天数
      */
     private Integer trialDayCount;
 
@@ -79,32 +79,28 @@ public class SubscribableEdition extends CreationEntity {
     @Column(name = EntityConstant.DR)
     private int dr;
 
-    public boolean isFree(){
+    public boolean isFree() {
         return (monthlyPrice == null || monthlyPrice.compareTo(BigDecimal.ZERO) == 0)
-               && (annualPrice == null || annualPrice.compareTo(BigDecimal.ZERO) == 0);
+                && (annualPrice == null || annualPrice.compareTo(BigDecimal.ZERO) == 0);
     }
 
-    public boolean hasTrial()
-    {
-        if (isFree())
-        {
+    public boolean hasTrial() {
+        if (isFree()) {
             return false;
         }
         return trialDayCount != null && trialDayCount > 0;
     }
 
     public BigDecimal getPaymentAmount(PaymentPeriodType paymentPeriodType) throws Exception {
-        switch (paymentPeriodType){
+        switch (paymentPeriodType) {
             case Monthly -> {
-                if (monthlyPrice == null)
-                {
+                if (monthlyPrice == null) {
                     throw new Exception("No price information found for " + displayName + " edition!");
                 }
                 return monthlyPrice;
             }
             case Annual -> {
-                if (annualPrice == null)
-                {
+                if (annualPrice == null) {
                     throw new Exception("No price information found for " + displayName + " edition!");
                 }
                 return annualPrice;
@@ -114,8 +110,7 @@ public class SubscribableEdition extends CreationEntity {
         throw new Exception("Edition does not support payment type: " + paymentPeriodType);
     }
 
-    public boolean hasSamePrice(SubscribableEdition edition)
-    {
+    public boolean hasSamePrice(SubscribableEdition edition) {
         return !isFree() && monthlyPrice.equals(edition.getMonthlyPrice()) && annualPrice.equals(edition.getAnnualPrice());
     }
 

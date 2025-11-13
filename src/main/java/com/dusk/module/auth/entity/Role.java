@@ -48,28 +48,23 @@ import java.util.stream.Collectors;
         })
 public class Role extends FullAuditedEntity {
     private static final long serialVersionUID = -1718814251722841234L;
-
-    public Role() {
-        permissions = new ArrayList<>();
-    }
-
     //code
     private String roleCode;
     //name
     private String roleName;
-
     private boolean isDefault;
-
     @OneToOne(targetEntity = User.class, fetch = FetchType.LAZY)
     @JoinColumn(name = CreationEntity.Fields.createId, referencedColumnName = BaseEntity.Fields.id, insertable = false, updatable = false)
     private User createUser;
-
     @OneToMany(targetEntity = GrantPermission.class, mappedBy = GrantPermission.Fields.role, cascade = CascadeType.ALL)
     private List<GrantPermission> permissions;
-
     @ManyToMany
     @JoinTable(name = "sys_user_role", joinColumns = {@JoinColumn(name = "role_id")}, inverseJoinColumns = {@JoinColumn(name = "user_id")})
     private List<User> userRoles;
+
+    public Role() {
+        permissions = new ArrayList<>();
+    }
 
     public void addPermission(GrantPermission p) {
         permissions.add(p);

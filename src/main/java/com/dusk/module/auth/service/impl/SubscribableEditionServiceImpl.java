@@ -24,7 +24,6 @@ import com.dusk.module.auth.repository.ITenantRepository;
 import com.dusk.module.auth.service.IFeatureService;
 import com.dusk.module.auth.service.ISubscribableEditionService;
 import com.dusk.module.auth.service.ITenantPermissionService;
-import com.dusk.module.auth.service.ITenantService;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
@@ -46,6 +45,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class SubscribableEditionServiceImpl extends BaseService<SubscribableEdition, ISubscribableEditionRepository> implements ISubscribableEditionService {
+    private final SubscribableEditionMapper mapper = SubscribableEditionMapper.INSTANCE;
     @Resource
     private ITenantRepository tenantRepository;
     @Resource
@@ -60,8 +60,6 @@ public class SubscribableEditionServiceImpl extends BaseService<SubscribableEdit
     private ITenantPermissionService tenantPermissionService;
     @Resource
     private JPAQueryFactory queryFactory;
-
-    private final SubscribableEditionMapper mapper = SubscribableEditionMapper.INSTANCE;
 
     @Override
     public SubscribableEdition createEdition(EditionEditDto input) {

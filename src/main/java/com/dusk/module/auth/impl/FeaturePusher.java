@@ -2,7 +2,6 @@ package com.dusk.module.auth.impl;
 
 
 import com.dusk.common.mqs.config.AppConfig;
-import com.dusk.module.auth.common.util.DubboCustomUtils;
 import com.dusk.module.auth.dto.TenantFeature;
 import com.dusk.module.auth.service.IFeatureDefinitionContext;
 import com.dusk.module.auth.service.IFeaturePusher;
@@ -22,11 +21,10 @@ import java.util.List;
 @Component
 @Slf4j
 public class FeaturePusher implements IFeaturePusher {
-    @Resource
-    private AppConfig appConfig;
-
     @DubboReference
     IFeatureRpcService featureRpcService;
+    @Resource
+    private AppConfig appConfig;
 
     @Async
     @Override

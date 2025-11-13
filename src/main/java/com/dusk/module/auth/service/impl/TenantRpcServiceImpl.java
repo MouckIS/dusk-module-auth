@@ -19,10 +19,9 @@ import java.util.Optional;
  */
 @DubboService
 public class TenantRpcServiceImpl implements ITenantRpcService {
+    private final TenantMapper mapper = TenantMapper.INSTANCE;
     @Resource
     private ITenantRepository tenantRepository;
-
-    private final TenantMapper mapper = TenantMapper.INSTANCE;
 
     @Override
     public TenantInfoDto findById(Long id) {

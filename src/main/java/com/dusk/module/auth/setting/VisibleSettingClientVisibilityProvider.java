@@ -10,10 +10,11 @@ import com.dusk.module.ddm.provider.ISettingClientVisibilityProvider;
 public class VisibleSettingClientVisibilityProvider implements ISettingClientVisibilityProvider {
     private static VisibleSettingClientVisibilityProvider INSTANCE;
 
-    private VisibleSettingClientVisibilityProvider(){}
+    private VisibleSettingClientVisibilityProvider() {
+    }
 
-    public static VisibleSettingClientVisibilityProvider getInstance(){
-        if(INSTANCE == null){
+    public static VisibleSettingClientVisibilityProvider getInstance() {
+        if (INSTANCE == null) {
             INSTANCE = new VisibleSettingClientVisibilityProvider();
         }
         return INSTANCE;

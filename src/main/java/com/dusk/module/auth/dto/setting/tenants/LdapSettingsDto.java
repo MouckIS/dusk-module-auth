@@ -11,8 +11,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class LdapSettingsDto extends LdapSettingsEditDto{
-    public LdapSettingsDto(boolean moduleEnabled){
+public class LdapSettingsDto extends LdapSettingsEditDto {
+    public LdapSettingsDto(boolean moduleEnabled) {
         super(moduleEnabled);
     }
 }

@@ -17,6 +17,7 @@ public interface IDashBoardModuleService extends IBaseService<DashboardModule, I
 
     /**
      * 新增或更新模块
+     *
      * @param input
      * @return
      */
@@ -24,6 +25,7 @@ public interface IDashBoardModuleService extends IBaseService<DashboardModule, I
 
     /**
      * 拷贝模块
+     *
      * @param input
      * @return
      */
@@ -31,12 +33,14 @@ public interface IDashBoardModuleService extends IBaseService<DashboardModule, I
 
     /**
      * 拷贝模块统计项
+     *
      * @param input
      */
     void copyModuleItems(CopyModuleItemsInput input);
 
     /**
      * 获取模块列表
+     *
      * @param input
      * @return
      */
@@ -44,6 +48,7 @@ public interface IDashBoardModuleService extends IBaseService<DashboardModule, I
 
     /**
      * 模块详情
+     *
      * @param id
      * @return
      */
@@ -51,12 +56,14 @@ public interface IDashBoardModuleService extends IBaseService<DashboardModule, I
 
     /**
      * 删除模块
+     *
      * @param id
      */
     void deleteModule(Long id);
 
     /**
      * 新增或更新模块统计项
+     *
      * @param input
      * @return
      */
@@ -64,18 +71,21 @@ public interface IDashBoardModuleService extends IBaseService<DashboardModule, I
 
     /**
      * 删除模块统计项
+     *
      * @param id
      */
     void removeModuleItem(Long id);
 
     /**
      * 导出模块配置【文本格式】
+     *
      * @param response
      */
     void exportModule(HttpServletResponse response);
 
     /**
      * 导入模块配置【文本格式】
+     *
      * @param uploadFile
      */
     void importModule(MultipartFile uploadFile, ModuleItemPermissionInput permissionInput);

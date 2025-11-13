@@ -23,12 +23,11 @@ import java.util.List;
  */
 @DubboService
 public class StationRpcService implements IStationRpcService {
+    private final StationMapper mapper = StationMapper.INSTANCE;
     @Resource
     private IStationService stationService;
     @Resource
     private IStationRepository stationRepository;
-
-    private final StationMapper mapper = StationMapper.INSTANCE;
 
     @Override
     public List<StationDto> getAllStations() {

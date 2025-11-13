@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 @Transactional
 @Slf4j
 public class TenantPermissionServiceImpl extends BaseService<TenantPermission, ITenantPermissionRepository> implements ITenantPermissionService {
+    private final PermissionMapper mapper = PermissionMapper.INSTANCE;
     @Resource
     private IAuthPermissionManager authPermissionManager;
     @Resource
@@ -44,8 +45,6 @@ public class TenantPermissionServiceImpl extends BaseService<TenantPermission, I
     private ITenantRepository tenantRepository;
     @Resource
     private AppAuthConfig appAuthConfig;
-
-    private final PermissionMapper mapper = PermissionMapper.INSTANCE;
 
     @Override
     public List<RolePermissionDto> getEditionPermissions(Long editionId) {
@@ -147,7 +146,7 @@ public class TenantPermissionServiceImpl extends BaseService<TenantPermission, I
      */
     private List<String> getGrantedPermissionByEditionId(Long editionId) {
         List<TenantPermission> permissions = getPermissionByEditionId(editionId);
-        return permissions.stream().map(p -> p.getName()).collect(Collectors.toList());
+        return permissions.stream().map(TenantPermission::getName).collect(Collectors.toList());
     }
 
 

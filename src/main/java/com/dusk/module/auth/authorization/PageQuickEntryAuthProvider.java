@@ -22,6 +22,6 @@ public class PageQuickEntryAuthProvider extends AuthorizationProvider {
     @Override
     public void setPermissions(IPermissionDefinitionContext context) {
         Permission quickEntryPermission = context.createPermission(PAGES_QUICK_ENTRY, "快捷入口设置项管理", MultiTenancySides.Tenant);
-        quickEntryPermission.createChildPermission(PAGES_QUICK_ENTRY_SAVE,"快捷入口设置项新增",MultiTenancySides.Tenant);
+        quickEntryPermission.createChildPermission(PAGES_QUICK_ENTRY_SAVE, "快捷入口设置项新增", MultiTenancySides.Tenant);
     }
 }

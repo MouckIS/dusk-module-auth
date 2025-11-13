@@ -34,7 +34,7 @@ public class OrganizationUnit extends TreeEntity {
     private Boolean station = false;
 
     /**
-     *  厂站是否可用，仅作用厂站字段
+     * 厂站是否可用，仅作用厂站字段
      */
     private Boolean stationEnabled = true;
 
@@ -42,7 +42,7 @@ public class OrganizationUnit extends TreeEntity {
      * 组织机构管理的用户
      */
     @ManyToMany
-    @JoinTable(name = "sys_org_user", joinColumns = { @JoinColumn(name = "org_id") }, inverseJoinColumns = {@JoinColumn(name = "user_id")})
+    @JoinTable(name = "sys_org_user", joinColumns = {@JoinColumn(name = "org_id")}, inverseJoinColumns = {@JoinColumn(name = "user_id")})
     private List<User> users = new ArrayList<>();
 
     /**

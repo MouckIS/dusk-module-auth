@@ -8,6 +8,7 @@ public interface ISsoTokenService {
 
     /**
      * 国密4加密快速签发token
+     *
      * @param encryptStr
      * @return
      */

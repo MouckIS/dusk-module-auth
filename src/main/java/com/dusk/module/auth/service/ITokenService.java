@@ -9,10 +9,11 @@ import com.dusk.module.auth.dto.token.TokenSign;
 public interface ITokenService {
     /**
      * 长久Token签发
-     * @author caiwenjun
-     * @date 2023/5/31 10:29
+     *
      * @param tokenSign
      * @return String
+     * @author caiwenjun
+     * @date 2023/5/31 10:29
      */
     String foreverTokenSign(TokenSign tokenSign);
 }

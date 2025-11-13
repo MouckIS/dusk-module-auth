@@ -7,16 +7,13 @@ import com.dusk.common.core.redis.RedisCacheCondition;
 import com.dusk.common.core.redis.RedisUtil;
 import com.dusk.module.auth.common.permission.IPermissionCache;
 import com.dusk.module.auth.common.permission.PermissionUtil;
-import com.dusk.module.auth.repository.IGrantPermissionRepository;
 import com.dusk.module.auth.service.IGrantPermissionService;
 import com.dusk.module.auth.service.ITenantPermissionService;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 

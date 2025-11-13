@@ -110,7 +110,7 @@ public class DashBoardController extends CruxBaseController {
 
     @GetMapping("/checkMainDashBoard")
     @Operation(summary = "检查首页大屏是否正确")
-    public Boolean checkMainDashBoard(@RequestParam(value = "themeId",required = false) Long themeId) {
+    public Boolean checkMainDashBoard(@RequestParam(value = "themeId", required = false) Long themeId) {
         return service.checkMainDashBoard(themeId);
     }
 }

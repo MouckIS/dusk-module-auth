@@ -48,6 +48,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DashBoardModuleServiceImpl extends CreateOrUpdateService<DashboardModule, IDashBoardModuleRepository> implements IDashBoardModuleService {
 
+    private final DashboardMapper mapper = DashboardMapper.INSTANCE;
     @Resource
     private IDashBoardModuleRepository moduleRepository;
     @Resource
@@ -57,24 +58,22 @@ public class DashBoardModuleServiceImpl extends CreateOrUpdateService<DashboardM
     @Resource
     private JPAQueryFactory queryFactory;
 
-    private final DashboardMapper mapper = DashboardMapper.INSTANCE;
-
     @Override
     public DashboardModule saveModule(CreateOrUpdateModule input) {
-        if(input.getCenterModule() == null) {
+        if (input.getCenterModule() == null) {
             input.setCenterModule(false);
         }
         DashboardModule module = moduleRepository.findByName(input.getName());
-        if(module != null && (input.getId() == null || module.getId().longValue() != input.getId().longValue())) {
-            throw new BusinessException("["+input.getName()+"]已存在!");
+        if (module != null && (input.getId() == null || module.getId().longValue() != input.getId().longValue())) {
+            throw new BusinessException("[" + input.getName() + "]已存在!");
         }
         return createOrUpdate(input, input.getId(), DashboardModule.class);
     }
 
     @Override
     public void copyItem(CopyModuleItemInput input) {
-        DashboardModuleItem sourceModuleItem = moduleItemRepository.findById(input.getSourceModuleItemId()).orElseThrow(()->new BusinessException("未找到id为[" + input.getSourceModuleItemId() + "]的统计项记录！"));
-        DashboardModule targetModule = moduleRepository.findById(input.getTargetModuleId()).orElseThrow(()->new BusinessException("未找到id为[" + input.getTargetModuleId() + "]的模块记录！"));
+        DashboardModuleItem sourceModuleItem = moduleItemRepository.findById(input.getSourceModuleItemId()).orElseThrow(() -> new BusinessException("未找到id为[" + input.getSourceModuleItemId() + "]的统计项记录！"));
+        DashboardModule targetModule = moduleRepository.findById(input.getTargetModuleId()).orElseThrow(() -> new BusinessException("未找到id为[" + input.getTargetModuleId() + "]的模块记录！"));
 
         DashboardModuleItem moduleItem = new DashboardModuleItem();
         moduleItem.setChartType(sourceModuleItem.getChartType());
@@ -155,8 +154,8 @@ public class DashBoardModuleServiceImpl extends CreateOrUpdateService<DashboardM
         //检查统计项名称是否重复
         List<DashboardModuleItem> items = moduleItemRepository.findAllByModuleIdAndName(input.getModuleId(), input.getName());
         items.forEach(item -> {
-            if(!item.getId().equals(input.getId())) {
-                throw new BusinessException("已存在名称为["+input.getName()+"]的统计项!");
+            if (!item.getId().equals(input.getId())) {
+                throw new BusinessException("已存在名称为[" + input.getName() + "]的统计项!");
             }
         });
 
@@ -175,7 +174,7 @@ public class DashBoardModuleServiceImpl extends CreateOrUpdateService<DashboardM
 
     @Override
     public void removeModuleItem(Long id) {
-        DashboardModuleItem item = moduleItemRepository.findById(id).orElseThrow(()->new BusinessException("未找到id为[" + id + "]的记录！"));
+        DashboardModuleItem item = moduleItemRepository.findById(id).orElseThrow(() -> new BusinessException("未找到id为[" + id + "]的记录！"));
         List<DashboardZoneItemRef> zoneItemRefs = zoneItemRefRepository.findAllByModuleItemId(item.getId());
         if (zoneItemRefs.isEmpty()) {
             moduleItemRepository.delete(item);
@@ -213,7 +212,7 @@ public class DashBoardModuleServiceImpl extends CreateOrUpdateService<DashboardM
             output.close();
         } catch (IOException e) {
             log.error("导出数据大屏模块配置异常", e);
-            throw new BusinessException("导出模块配置失败:"+e.getMessage());
+            throw new BusinessException("导出模块配置失败:" + e.getMessage());
         }
 
     }
@@ -226,26 +225,26 @@ public class DashBoardModuleServiceImpl extends CreateOrUpdateService<DashboardM
             String templateStr = FileUtil.readString(file, "utf-8");
             List<ModuleDetailDto> updateModuleDetails = JSONUtil.toList(templateStr, ModuleDetailDto.class);
 
-            if(updateModuleDetails == null || updateModuleDetails.size() == 0) {
+            if (updateModuleDetails == null || updateModuleDetails.size() == 0) {
                 throw new BusinessException("导入数据大屏模块配置失败:配置为空");
             }
 
             //已有的模块
             List<ModuleDetailDto> moduleDetailList = getModuleDetailList();
-            Map<String, ModuleDetailDto> moduleMap = moduleDetailList.stream().collect(Collectors.toMap(ModuleDetailDto::getName, a->a, (k1, k2)->k1));
+            Map<String, ModuleDetailDto> moduleMap = moduleDetailList.stream().collect(Collectors.toMap(ModuleDetailDto::getName, a -> a, (k1, k2) -> k1));
 
             //模块更新
             updateModuleDetails.forEach(module -> {
-                if(StringUtils.isBlank(module.getCode())) {
+                if (StringUtils.isBlank(module.getCode())) {
                     throw new BusinessException("导入数据大屏模块配置失败:格式不正确");
                 }
                 boolean hasModule = moduleMap.containsKey(module.getName());
 
                 //更新模块
                 DashboardModule newModule;
-                if(!hasModule){
+                if (!hasModule) {
                     newModule = mapper.detailDtoToEntity(module);
-                }else {
+                } else {
                     newModule = moduleRepository.findByName(module.getName());
                     newModule.setCenterModule(module.getCenterModule());
                     newModule.setCode(module.getCode());
@@ -253,19 +252,19 @@ public class DashBoardModuleServiceImpl extends CreateOrUpdateService<DashboardM
                 save(newModule);
 
                 //更新模块统计项
-                if(hasModule){
+                if (hasModule) {
                     List<ModuleItemListDto> itemList = moduleMap.get(module.getName()).getModuleItems();
-                    Map<String, ModuleItemListDto> itemMap = itemList.stream().collect(Collectors.toMap(ModuleItemListDto::getCode, a->a, (k1, k2)->k1));
+                    Map<String, ModuleItemListDto> itemMap = itemList.stream().collect(Collectors.toMap(ModuleItemListDto::getCode, a -> a, (k1, k2) -> k1));
                     module.getModuleItems().forEach(item -> {
-                        if(itemMap.containsKey(item.getCode())) {
+                        if (itemMap.containsKey(item.getCode())) {
                             //更新统计项
                             CreateOrUpdateModuleItem updateItem = mapper.listDtoToCreateDto(item);
                             updateItem.setId(itemMap.get(item.getCode()).getId());
                             updateItem.setModuleId(newModule.getId());
                             saveModuleItem(updateItem);
-                        }else {
+                        } else {
                             //判断新增统计项是否有权限
-                            if(hasPermission(permissionInput, module, item)) {
+                            if (hasPermission(permissionInput, module, item)) {
                                 CreateOrUpdateModuleItem addItem = mapper.listDtoToCreateDto(item);
                                 addItem.setId(null);
                                 addItem.setModuleId(newModule.getId());
@@ -273,10 +272,10 @@ public class DashBoardModuleServiceImpl extends CreateOrUpdateService<DashboardM
                             }
                         }
                     });
-                }else {
+                } else {
                     List<DashboardModuleItem> addItemList = new ArrayList<>();
                     module.getModuleItems().forEach(item -> {
-                        if(hasPermission(permissionInput, module, item)) {
+                        if (hasPermission(permissionInput, module, item)) {
                             DashboardModuleItem addItem = mapper.listDtoToEntity(item);
                             addItem.setId(null);
                             addItem.setModuleId(newModule.getId());
@@ -289,7 +288,7 @@ public class DashBoardModuleServiceImpl extends CreateOrUpdateService<DashboardM
 
         } catch (IOException e) {
             log.error("导入数据大屏模块配置异常", e);
-            throw new BusinessException("导入模块配置失败:"+e.getMessage());
+            throw new BusinessException("导入模块配置失败:" + e.getMessage());
         }
     }
 
@@ -297,6 +296,6 @@ public class DashBoardModuleServiceImpl extends CreateOrUpdateService<DashboardM
         List<String> centerItemPermissions = permissionInput.getCenterItemPermission();
         List<String> businessItemPermissions = permissionInput.getBusinessItemPermission();
         return (module.getCenterModule() && centerItemPermissions != null && centerItemPermissions.contains(item.getCode()))
-                || (!module.getCenterModule() && businessItemPermissions!=null && businessItemPermissions.contains(item.getCode()));
+                || (!module.getCenterModule() && businessItemPermissions != null && businessItemPermissions.contains(item.getCode()));
     }
 }

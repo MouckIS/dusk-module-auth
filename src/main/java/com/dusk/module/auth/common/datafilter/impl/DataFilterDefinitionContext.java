@@ -21,12 +21,11 @@ import java.util.stream.Collectors;
  */
 @Component
 public class DataFilterDefinitionContext implements IDataFilterDefinitionContext {
+    private final Map<String, List<Long>> dataFilterDefinition = new HashMap<>();
     @Resource
     IStationRepository stationRepository;
     @Resource
     SpringContextUtils springUtil;
-
-    private final Map<String, List<Long>> dataFilterDefinition = new HashMap<>();
 
     /**
      * 组织机构变动都需要重新初始化

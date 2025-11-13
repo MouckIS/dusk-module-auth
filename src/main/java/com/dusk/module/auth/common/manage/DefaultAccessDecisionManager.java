@@ -30,6 +30,6 @@ public class DefaultAccessDecisionManager {
                     return true;
             }
         }
-       return  false;
+        return false;
     }
 }

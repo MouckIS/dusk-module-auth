@@ -39,6 +39,7 @@ public interface ICaptchaService {
 
     /**
      * 设置发送次数缓存
+     *
      * @param request
      */
     void setMobileSendCaptchaCount(HttpServletRequest request);

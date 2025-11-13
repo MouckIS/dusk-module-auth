@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class TodoReadServiceImpl extends BaseService<TodoRead,ITodoReadRepository> implements ITodoReadService  {
+public class TodoReadServiceImpl extends BaseService<TodoRead, ITodoReadRepository> implements ITodoReadService {
 
     @Resource
     private ITodoReadRepository todoReadRepository;

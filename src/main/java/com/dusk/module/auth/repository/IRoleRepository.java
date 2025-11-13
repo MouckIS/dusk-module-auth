@@ -26,13 +26,13 @@ public interface IRoleRepository extends IBaseRepository<Role> {
     @EntityGraph(value = "role.permission")
     Optional<Role> findById(long id);
 
-//    @EntityGraph(value = "role.all")
-//    Optional<Role> findByIdEquals(String id);
+    //    @EntityGraph(value = "role.all")
+    //    Optional<Role> findByIdEquals(String id);
 
     Optional<Role> findByRoleName(String name);
 
     List<Role> findAllByIdIn(List<Long> ids);
-    
+
 }
 
 

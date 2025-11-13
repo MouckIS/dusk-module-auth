@@ -11,7 +11,6 @@ import com.dusk.module.auth.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Set;
@@ -23,6 +22,7 @@ import java.util.Set;
 public interface IOrganizationUnitRepository extends IBaseRepository<OrganizationUnit> {
     /**
      * 查询组织机构下的用户，queryOrgaIds为-1时查询所有用户
+     *
      * @param queryOrgaIds
      * @param filter
      * @param pageable
@@ -36,6 +36,7 @@ public interface IOrganizationUnitRepository extends IBaseRepository<Organizatio
             "and (:type is null or orga.type = :type)" +
             "and (u.userStatus = 'OnJob')")
     Page<OrganizationUnitUserListDto> getOrganizationUnitUsers(Set<Long> queryOrgaIds, String filter, Pageable pageable, EUnitType type);
+
     @Query("select new com.dusk.module.auth.dto.orga.OrganizationUnitUserInfoListDto(" +
             "u.id, u.name, u.userName, u.emailAddress, orga.id, orga.displayName, u.job, u.phoneNo, u.userStatus) " +
             "from OrganizationUnit orga inner join orga.users u " +
@@ -53,13 +54,14 @@ public interface IOrganizationUnitRepository extends IBaseRepository<Organizatio
 
     List<OrganizationUnit> findByStation(boolean station);
 
-    List<OrganizationUnit> findByStationAndStationEnabled(boolean station,boolean stationEnabled);
+    List<OrganizationUnit> findByStationAndStationEnabled(boolean station, boolean stationEnabled);
 
     @DisableGlobalFilter
     List<OrganizationUnit> findAllByDr(int dr);
 
     /**
      * 查询组织机构下的用户，queryOrgaIds为-1时查询所有用户
+     *
      * @param queryOrgaIds
      * @param filter
      * @param pageable
@@ -74,9 +76,10 @@ public interface IOrganizationUnitRepository extends IBaseRepository<Organizatio
 
     /**
      * 基于组织id和用户名称模糊查询获取用户id列表
+     *
      * @param queryOrgaIds 查询的组织id
-     * @param name 模糊查询用户名称
-     * @param type 组织类型
+     * @param name         模糊查询用户名称
+     * @param type         组织类型
      */
     @Query("select u.id from OrganizationUnit orga inner join orga.users u " +
             "where ((:queryOrgaIds) is null or orga.id in (:queryOrgaIds)) " +

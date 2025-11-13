@@ -8,7 +8,7 @@ import com.querydsl.core.types.dsl.EntityPathBase;
 
 import java.util.List;
 
-public interface IExtendFieldService extends IBaseService<ExtendField,IExtendFieldRepository> {
+public interface IExtendFieldService extends IBaseService<ExtendField, IExtendFieldRepository> {
 
     void addOrUpdateField(Long entityId, String entityClass, String key, String value);
 

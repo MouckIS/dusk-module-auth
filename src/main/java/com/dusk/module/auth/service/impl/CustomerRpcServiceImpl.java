@@ -22,18 +22,17 @@ import java.util.List;
 @DubboService
 @Transactional
 public class CustomerRpcServiceImpl implements ICustomerRpcService {
+    private final OrganizationMapper mapper = OrganizationMapper.INSTANCE;
     @Resource
     private IOrganizationUnitService organizationUnitService;
-
-    private final OrganizationMapper mapper = OrganizationMapper.INSTANCE;
 
     @Override
     public void saveCustomer(OrganizationUnitDto input) {
         OrganizationUnit org;
-        if(input.getId() != null){
+        if (input.getId() != null) {
             UpdateOrganizationUnitInput updateOrganizationUnitInput = mapper.toUpdateInput(input);
             org = organizationUnitService.update(updateOrganizationUnitInput);
-        }else{
+        } else {
             CreateOrganizationUnitInput createOrganizationUnitInput = mapper.toCreateInput(input);
             org = organizationUnitService.create(createOrganizationUnitInput);
         }

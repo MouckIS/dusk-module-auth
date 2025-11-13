@@ -15,7 +15,7 @@ public class UpdateRolePermissionDto extends EntityDto {
     @Schema(description = "权限列表")
     private List<CreateOrEditRolePermissionDto> permissions;
 
-    public UpdateRolePermissionDto(){
+    public UpdateRolePermissionDto() {
         permissions = new ArrayList<>();
     }
 }

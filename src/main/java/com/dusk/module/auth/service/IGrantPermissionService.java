@@ -23,6 +23,7 @@ public interface IGrantPermissionService extends IBaseService<GrantPermission, I
 
     /**
      * 添加动态权限
+     *
      * @param name
      * @param roleIds
      * @param businessKey

@@ -13,7 +13,7 @@ import lombok.Setter;
 public class TenantTicketSettingsEditDto {
     @Schema(description = "不解析挂拆牌术语")
     private boolean unAnalyzeDeviceBoardTerm;
-    
+
     @Schema(description = "过滤备品备件")
     private boolean filterSpareParts;
 }

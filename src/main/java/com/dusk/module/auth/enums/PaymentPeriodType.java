@@ -9,11 +9,12 @@ public enum PaymentPeriodType {
     Annual(365);
 
     private final int days;
-    PaymentPeriodType(int days){
+
+    PaymentPeriodType(int days) {
         this.days = days;
     }
 
-    public int getDays(){
+    public int getDays() {
         return days;
     }
 }
