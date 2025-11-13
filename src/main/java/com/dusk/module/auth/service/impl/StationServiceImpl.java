@@ -1,5 +1,6 @@
 package com.dusk.module.auth.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.dusk.common.core.entity.BaseEntity;
 import com.dusk.common.core.entity.TreeEntity;
 import com.dusk.common.core.exception.BusinessException;
@@ -17,9 +18,7 @@ import com.dusk.module.auth.repository.IStationRepository;
 import com.dusk.module.auth.repository.IUserRepository;
 import com.dusk.module.auth.service.ISerialNoService;
 import com.dusk.module.auth.service.IStationService;
-import com.dusk.module.auth.service.IUserService;
 import jakarta.annotation.Resource;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -130,7 +129,7 @@ public class StationServiceImpl extends TreeService<Station,IStationRepository> 
 
     @Override
     public StationDto findOneByDisplayName(String displayName) {
-        if (StringUtils.isBlank(displayName)) {
+        if (StrUtil.isBlank(displayName)) {
             return null;
         }
         Specification<Station> spec = Specifications.where(e -> {
