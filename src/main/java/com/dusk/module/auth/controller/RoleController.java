@@ -46,7 +46,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/role")
-@Tag(name = "角色", description = "Role")
+@Tag(name = "Role", description = "角色")
 @Authorize(RoleAuthProvider.PAGES_ROLES)
 public class RoleController extends CruxBaseController {
 

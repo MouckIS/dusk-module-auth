@@ -23,7 +23,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/Settings")
-@Tag(name = "配置", description = "settings")
+@Tag(name = "settings", description = "配置")
 public class SettingsController extends CruxBaseController {
     @Resource
     private ISettingService settingService;

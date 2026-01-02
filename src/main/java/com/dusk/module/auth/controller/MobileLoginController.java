@@ -21,7 +21,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("mobile")
-@Tag(name = "手机登录", description = "AuthMobile")
+@Tag(name = "AuthMobile", description = "手机登录")
 public class MobileLoginController extends CruxBaseController {
 
     @Resource

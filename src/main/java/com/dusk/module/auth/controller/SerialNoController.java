@@ -30,7 +30,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/serialNo")
-@Tag(name = "序列号", description = "SerialNo")
+@Tag(name = "SerialNo", description = "序列号")
 public class SerialNoController extends CruxBaseController {
     private final SerialNoMapper mapper = SerialNoMapper.INSTANCE;
     @Resource
