@@ -26,7 +26,7 @@ import java.util.Map;
  * @author kefuming
  * @date 2020/4/30 14:44
  */
-@Tag(name = "特性", description = "Feature")
+@Tag(name = "Feature", description = "特性")
 @RequestMapping("/feature")
 @RestController
 public class FeatureController extends CruxBaseController {

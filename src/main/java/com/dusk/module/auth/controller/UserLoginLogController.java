@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("userLoginLog")
-@Tag(name = "用户日志管理", description = "UserLoginLog")
+@Tag(name = "UserLoginLog", description = "用户日志管理")
 @Authorize(UserLoginLogAuthProvider.PAGES_USER_LOGIN_LOG)
 public class UserLoginLogController extends CruxBaseController {
     @Resource

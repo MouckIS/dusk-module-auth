@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("edition")
-@Tag(name = "版本", description = "Edition")
+@Tag(name = "Edition", description = "版本")
 @Authorize(EditionAuthProvider.PAGES_EDITIONS)
 public class SubscribableEditionController extends CruxBaseController {
     private final SubscribableEditionMapper mapper = SubscribableEditionMapper.INSTANCE;
