@@ -21,7 +21,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/permission")
-@Tag(name = "租户权限", description = "TenantPermission")
+@Tag(name = "TenantPermission", description = "租户权限")
 public class TenantPermissionController extends CruxBaseController {
     @Resource
     private ITenantPermissionService tenantPermissionService;

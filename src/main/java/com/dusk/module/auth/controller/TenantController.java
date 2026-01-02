@@ -43,7 +43,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("tenant")
-@Tag(name = "租户", description = "Tenant")
+@Tag(name = "Tenant", description = "租户")
 @Authorize(TenantAuthProvider.PAGES_TENANTS)
 public class TenantController extends CruxBaseController {
     private final TenantMapper mapper = TenantMapper.INSTANCE;

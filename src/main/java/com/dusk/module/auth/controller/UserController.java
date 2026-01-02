@@ -37,7 +37,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("user")
-@Tag(name = "用户", description = "User")
+@Tag(name = "User", description = "用户")
 @Authorize(AdminUserAuthProvider.PAGES_ADMINISTRATION_USERS)
 public class UserController extends CruxBaseController {
     private final UserMapper mapper = UserMapper.INSTANCE;

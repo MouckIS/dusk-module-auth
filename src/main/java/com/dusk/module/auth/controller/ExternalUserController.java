@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("externalUser")
-@Tag(name = "外单位用户", description = "externalUser")
+@Tag(name = "externalUser", description = "外单位用户")
 @Authorize(ExternalManagerAuthProvider.PAGES_EXTERNAL_USERS)
 public class ExternalUserController extends CruxBaseController {
     @Resource
