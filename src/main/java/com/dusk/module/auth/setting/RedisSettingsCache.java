@@ -6,6 +6,7 @@ import com.dusk.common.core.redis.RedisUtil;
 import com.dusk.module.ddm.dto.SettingDefinition;
 import com.dusk.module.ddm.enums.SettingScopes;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
