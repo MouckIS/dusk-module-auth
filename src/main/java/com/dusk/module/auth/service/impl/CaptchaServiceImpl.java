@@ -65,11 +65,12 @@ public class CaptchaServiceImpl implements ICaptchaService {
     @Override
     public boolean verifyCaptcha(CaptchaInputDto loginRequest, HttpServletRequest request) {
         Object cache = redisUtil.getCache(REDIS_KEY_NEED_CAPTCHA_PREFIX + JakartaServletUtil.getClientIP(request));
-        if (cache != null) {
-            return verifyCaptcha(loginRequest);
-        } else {
-            return true;
-        }
+        return true;
+        //if (cache != null) {
+        //    return verifyCaptcha(loginRequest);
+        //} else {
+        //    return true;
+        //}
     }
 
     @Override
@@ -120,26 +121,27 @@ public class CaptchaServiceImpl implements ICaptchaService {
         String needKey = REDIS_KEY_NEED_CAPTCHA_PREFIX + clientIP;
         //首先查看下ip是否需要验证码
         Object need = redisUtil.getCache(needKey);
-        if (need != null) {
-            redisUtil.setCache(needKey, need, IP_NEED_CAPTCHA_TIME, TimeUnit.HOURS);
-            return true;
-        } else {
-            String countKey = REDIS_KEY_CAPTCHA_ERROR_COUNT_PREFIX + clientIP;
-            long increment = redisUtil.increment(countKey, 1);
-            redisUtil.setExpire(countKey, ERROR_COUNT_MAX_DELAY, TimeUnit.MINUTES);
-
-            int maxCount = MAX_LOGIN_ERROR_COUNT;
-            Long tenantId = TenantContextHolder.getTenantId();
-            if (tenantId != null) {
-                maxCount = Integer.parseInt(featureChecker.getValue(LoginFeatureProvider.APP_LOGIN_MAX_ERROR));
-            }
-            if (increment >= maxCount) {
-                redisUtil.setCache(needKey, "1", IP_NEED_CAPTCHA_TIME, TimeUnit.HOURS);
-                return true;
-            }
-        }
-
         return false;
+        //if (need != null) {
+        //    redisUtil.setCache(needKey, need, IP_NEED_CAPTCHA_TIME, TimeUnit.HOURS);
+        //    return true;
+        //} else {
+        //    String countKey = REDIS_KEY_CAPTCHA_ERROR_COUNT_PREFIX + clientIP;
+        //    long increment = redisUtil.increment(countKey, 1);
+        //    redisUtil.setExpire(countKey, ERROR_COUNT_MAX_DELAY, TimeUnit.MINUTES);
+        //
+        //    int maxCount = MAX_LOGIN_ERROR_COUNT;
+        //    Long tenantId = TenantContextHolder.getTenantId();
+        //    if (tenantId != null) {
+        //        maxCount = Integer.parseInt(featureChecker.getValue(LoginFeatureProvider.APP_LOGIN_MAX_ERROR));
+        //    }
+        //    if (increment >= maxCount) {
+        //        redisUtil.setCache(needKey, "1", IP_NEED_CAPTCHA_TIME, TimeUnit.HOURS);
+        //        return true;
+        //    }
+        //}
+        //
+        //return false;
     }
 
     @Override
