@@ -32,7 +32,7 @@ public class AdministrativeRegionsController {
 
     @GetMapping("getStreet/{id}")
     @Operation(summary = "获取街道")
-    public List<RegionsDto> getStreet(@PathVariable String id) {
+    public List<RegionsDto> getStreet(@PathVariable("id") String id) {
         return administrativeRegionsService.getStreet(id);
     }
 }
