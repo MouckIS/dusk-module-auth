@@ -5,6 +5,7 @@ import com.dusk.common.core.repository.IBaseRepository;
 import com.dusk.module.auth.entity.GrantPermission;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -24,5 +25,5 @@ public interface IGrantPermissionRepository extends IBaseRepository<GrantPermiss
     List<GrantPermission> findAll();
 
     @Query("select gp.role.id from GrantPermission gp where gp.name = :name")
-    List<Long> findRoleIdsByPermissionName(String name);
+    List<Long> findRoleIdsByPermissionName(@Param("name") String name);
 }

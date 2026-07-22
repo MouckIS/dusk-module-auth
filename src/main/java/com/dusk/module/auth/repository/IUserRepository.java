@@ -7,6 +7,7 @@ import com.dusk.module.auth.entity.User;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -54,8 +55,8 @@ public interface IUserRepository extends IBaseRepository<User> {
     void deleteByIdIn(List<Long> ids);
 
     @Query("select distinct a.id from User a inner join a.userRoles b inner join b.permissions c where c.name in (:permissions) and a.userType in (:userTypes) and (a.userStatus = 'OnJob')")
-    List<Long> getUserIdsByPermissions(String[] permissions, List<EUnitType> userTypes);
+    List<Long> getUserIdsByPermissions(@Param("permissions") String[] permissions, @Param("userTypes") List<EUnitType> userTypes);
 
     @Query("select new com.dusk.module.auth.dto.user.UserIdAndPermissionDto(a.id,c.name) from User a inner join a.userRoles b inner join b.permissions c where c.name in (:permissions) and a.userType in (:userTypes) and (a.userStatus = 'OnJob')")
-    List<UserIdAndPermissionDto> getUserIdsByPermissionsAnd(String[] permissions, List<EUnitType> userTypes);
+    List<UserIdAndPermissionDto> getUserIdsByPermissionsAnd(@Param("permissions") String[] permissions, @Param("userTypes") List<EUnitType> userTypes);
 }
