@@ -45,27 +45,22 @@ jobs:
               <server>
                 <id>github-dusk-dependencies</id>
                 <username>MouckIS</username>
-                <password>${env.GH_PAT}</password>
+                <password>${{ env.GH_PAT }}</password>
               </server>
               <server>
                 <id>github-dusk-module-parent</id>
                 <username>MouckIS</username>
-                <password>${env.GH_PAT}</password>
-              </server>
-              <server>
-                <id>github-dusk-module-shared-parent</id>
-                <username>MouckIS</username>
-                <password>${env.GH_PAT}</password>
+                <password>${{ env.GH_PAT }}</password>
               </server>
               <server>
                 <id>github-dusk-common</id>
                 <username>MouckIS</username>
-                <password>${env.GH_PAT}</password>
+                <password>${{ env.GH_PAT }}</password>
               </server>
               <server>
                 <id>github-dusk-module-ddm</id>
                 <username>MouckIS</username>
-                <password>${env.GH_PAT}</password>
+                <password>${{ env.GH_PAT }}</password>
               </server>
             </servers>
             <repositories>
@@ -80,10 +75,6 @@ jobs:
               <repository>
                 <id>github-dusk-module-parent</id>
                 <url>https://maven.pkg.github.com/MouckIS/dusk-module-parent</url>
-              </repository>
-              <repository>
-                <id>github-dusk-module-shared-parent</id>
-                <url>https://maven.pkg.github.com/MouckIS/dusk-module-shared-parent</url>
               </repository>
               <repository>
                 <id>github-dusk-common</id>
