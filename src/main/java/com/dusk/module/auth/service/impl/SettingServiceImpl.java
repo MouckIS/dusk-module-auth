@@ -169,10 +169,10 @@ public class SettingServiceImpl implements ISettingRpcService, ISettingService {
         }
     }
 
-    //@Override
-    //public void publishSettings(String applicationName, List<SettingDefinition> settingDefinitions) {
-    //    settingsCache.addSettingDefinitions(applicationName, settingDefinitions);
-    //}
+    @Override
+    public void publishSettings(String applicationName, List<SettingDefinition> settingDefinitions) {
+        settingsCache.addSettingDefinitions(applicationName, settingDefinitions);
+    }
 
     @Override
     public String getValue(String name) {
