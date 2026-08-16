@@ -12,6 +12,7 @@ concurrency:
 
 permissions:
   contents: write
+  packages: write
 
 env:
   GH_PAT: ${{ secrets.TOKEN }}
