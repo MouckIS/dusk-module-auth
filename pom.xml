@@ -243,24 +243,24 @@
     <repositories>
         <repository>
             <id>github-dusk-module-parent</id>
-            <url>https://maven.pkg.github.com/MouckIS/dusk-module-parent</url>
+            <url>https://maven.pkg.github.com/mouckis/dusk-module-parent</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
         </repository>
         <repository>
             <id>github-dusk-common</id>
-            <url>https://maven.pkg.github.com/MouckIS/dusk-common</url>
+            <url>https://maven.pkg.github.com/mouckis/dusk-common</url>
         </repository>
         <repository>
             <id>github-dusk-module-ddm</id>
-            <url>https://maven.pkg.github.com/MouckIS/dusk-module-ddm</url>
+            <url>https://maven.pkg.github.com/mouckis/dusk-module-ddm</url>
         </repository>
     </repositories>
     <distributionManagement>
         <repository>
             <id>github-dusk-module-auth</id>
-            <url>https://maven.pkg.github.com/MouckIS/dusk-module-auth</url>
+            <url>https://maven.pkg.github.com/mouckis/dusk-module-auth</url>
         </repository>
     </distributionManagement>
 </project>
