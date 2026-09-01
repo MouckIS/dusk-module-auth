@@ -1,11 +1,11 @@
-package com.dusk.module.auth.common.rabbitmq;
+package com.dusk.module.auth.common.topic;
 
 /**
  *
- * @author caiwenjun
+ * @author kefuming
  * @date 2024/1/23 10:33
  */
-public class RabbitConstant {
+public class MqTopicConstant {
 
     /**
      * 人员取消门禁授权消息推送路由
