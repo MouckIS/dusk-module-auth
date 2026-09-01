@@ -54,13 +54,6 @@ spring:
         username: ${NACOS_USERNAME:nacos}
         password: ${NACOS_PASSWORD:dusk}
         namespace: sit
-  rabbitmq:
-    is-enabled: ${SPRING_RABBITMQ_ISENABLED:true}
-    username: admin
-    password: DuskTech#rabbitmq
-    addresses: localhost:5672
-    host: localhost
-
   flyway:
     enabled: false
     table: flyway_schema_history_auth
@@ -103,7 +96,7 @@ app:
 
 
 mqtt:
-  is-enabled: true
+  is-enabled: false
 
 # 这是单机配置，不适合集群
 seata:

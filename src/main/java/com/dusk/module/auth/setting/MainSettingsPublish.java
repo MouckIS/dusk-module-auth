@@ -1,10 +1,10 @@
 package com.dusk.module.auth.setting;
 
-import com.dusk.common.mqs.config.AppConfig;
 import com.dusk.module.ddm.service.ISettingDefinitionManager;
 import com.dusk.module.ddm.service.ISettingsPublish;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
@@ -19,11 +19,11 @@ public class MainSettingsPublish implements ISettingsPublish {
     private ISettingDefinitionManager settingDefinitionManager;
     @Resource
     private ISettingsCache settingsCache;
-    @Resource
-    private AppConfig appConfig;
+    @Value("${spring.application.name}")
+    private String applicationName;
 
     @Override
     public void publishSettings() {
-        settingsCache.addSettingDefinitions(appConfig.getApplicationName(), settingDefinitionManager.getAllSettingDefinitions());
+        settingsCache.addSettingDefinitions(applicationName, settingDefinitionManager.getAllSettingDefinitions());
     }
 }
