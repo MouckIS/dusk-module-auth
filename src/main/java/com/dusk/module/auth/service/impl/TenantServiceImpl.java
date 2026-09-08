@@ -109,10 +109,7 @@ public class TenantServiceImpl extends BaseService<Tenant, ITenantRepository> im
      */
     private boolean notUniqueTenantName(Long id, String tenantName) {
         Optional<Tenant> tenantOptional = findByTenantName(tenantName);
-        if (tenantOptional.isEmpty()) {
-            return false;
-        }
-        return !tenantOptional.get().getId().equals(id);
+        return tenantOptional.filter(tenant -> !tenant.getId().equals(id)).isPresent();
     }
 
     private Tenant addTenant(CreateTenantInput input) {
@@ -135,8 +132,8 @@ public class TenantServiceImpl extends BaseService<Tenant, ITenantRepository> im
         adminUser.setPassword(password);
         adminUser.setAdmin(true);
         adminUser.setShouldChangePasswordOnNextLogin(input.isShouldChangePasswordOnNextLogin());
-        adminUser.setUserType(EUnitType.Inner);
-        adminUser.setUserStatus(UserStatus.OnJob);
+        adminUser.setUserType(EUnitType.INNER);
+        adminUser.setUserStatus(UserStatus.ON_JOB);
         iUserRepository.save(adminUser);
         return adminUser;
     }
@@ -158,9 +155,7 @@ public class TenantServiceImpl extends BaseService<Tenant, ITenantRepository> im
 
     @Override
     public long countTenantsByEdition(Long editionId) {
-        Specification<Tenant> spec = Specifications.where(e -> {
-            e.eq(Tenant.Fields.edition + "." + BaseEntity.Fields.id, editionId);
-        });
+        Specification<Tenant> spec = Specifications.where(e -> e.eq(Tenant.Fields.edition + "." + BaseEntity.Fields.id, editionId));
 
         return repository.count(spec);
     }
@@ -194,8 +189,7 @@ public class TenantServiceImpl extends BaseService<Tenant, ITenantRepository> im
         if (editionId == null) {
             return null;
         }
-        SubscribableEdition edition = editionService.findById(editionId).orElseThrow(() -> new BusinessException("未找到相应的版本信息"));
-        return edition;
+        return editionService.findById(editionId).orElseThrow(() -> new BusinessException("未找到相应的版本信息"));
     }
 
 }

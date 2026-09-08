@@ -33,18 +33,18 @@ public class ExternalManagerAuthProvider extends AuthorizationProvider {
 
     @Override
     public void setPermissions(IPermissionDefinitionContext context) {
-        Permission permission = context.createPermission(PAGES_EXTERNAL_MANAGER, "人员管控", MultiTenancySides.Tenant);
+        Permission permission = context.createPermission(PAGES_EXTERNAL_MANAGER, "人员管控", MultiTenancySides.TENANT);
         Permission organizationUnits = permission.createChildPermission(PAGES_EXTERNAL_ORGANIZATION, "管理外单位组织机构");
         organizationUnits.createChildPermission(PAGES_EXTERNAL_ORGANIZATION_MANAGE_ORGANIZATION_TREE, "管理外单位组织机构树");
 
-        var users = permission.createChildPermission(PAGES_EXTERNAL_USERS, "外单位用户", MultiTenancySides.Tenant);
-        users.createChildPermission(PAGES_EXTERNAL_USERS_CREATE, "创建新外单位用户", MultiTenancySides.Tenant);
-        users.createChildPermission(PAGES_EXTERNAL_USERS_EDIT, "编辑外单位用户", MultiTenancySides.Tenant);
-        users.createChildPermission(PAGES_EXTERNAL_USERS_DELETE, "删除外单位用户", MultiTenancySides.Tenant);
-        users.createChildPermission(PAGES_EXTERNAL_USERS_CHANGEPERMISSIONS, "修改权限", MultiTenancySides.Tenant);
-        users.createChildPermission(PAGES_EXTERNAL_USERS_IMPERSONATION, "外单位用户登录", MultiTenancySides.Tenant);
+        var users = permission.createChildPermission(PAGES_EXTERNAL_USERS, "外单位用户", MultiTenancySides.TENANT);
+        users.createChildPermission(PAGES_EXTERNAL_USERS_CREATE, "创建新外单位用户", MultiTenancySides.TENANT);
+        users.createChildPermission(PAGES_EXTERNAL_USERS_EDIT, "编辑外单位用户", MultiTenancySides.TENANT);
+        users.createChildPermission(PAGES_EXTERNAL_USERS_DELETE, "删除外单位用户", MultiTenancySides.TENANT);
+        users.createChildPermission(PAGES_EXTERNAL_USERS_CHANGEPERMISSIONS, "修改权限", MultiTenancySides.TENANT);
+        users.createChildPermission(PAGES_EXTERNAL_USERS_IMPERSONATION, "外单位用户登录", MultiTenancySides.TENANT);
 
-        permission.createChildPermission(PAGES_INNER_USERS, "本单位人员管理", MultiTenancySides.Tenant);
+        permission.createChildPermission(PAGES_INNER_USERS, "本单位人员管理", MultiTenancySides.TENANT);
 
     }
 }

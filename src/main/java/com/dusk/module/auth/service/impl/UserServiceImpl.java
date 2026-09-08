@@ -80,6 +80,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -196,7 +197,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
             throw new UsernameNotFoundException(ERROR_ACCOUNT_OR_PASSWORD);
         }
         try {
-            password = SmUtil.sm4(HexUtil.decodeHex(appAuthConfig.getLoginEncryptKey())).decryptStr(password);
+            SmUtil.sm4(HexUtil.decodeHex(appAuthConfig.getLoginEncryptKey())).decryptStr(password);
         } catch (Exception ex) {
             log.warn("国密4解密失败：{}", ex.getMessage());
         }
@@ -238,7 +239,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
 
                     List<Long> fetch =
                             queryFactory.select(q_role.id).from(q_role).where(q_role.roleName.contains(input.filter)).fetch();
-                    if (fetch.size() > 0) {
+                    if (!fetch.isEmpty()) {
                         e2.in(User.Fields.userRoles + "." + BaseEntity.Fields.id, fetch);
                     }
                 });
@@ -264,9 +265,9 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
                 e.eq(User.Fields.userType, input.getUserType());
             }
             if (!input.isDisplayDimissionUsers()) {
-                e.eq(User.Fields.userStatus, UserStatus.OnJob);
+                e.eq(User.Fields.userStatus, UserStatus.ON_JOB);
             }
-            e.ge(input.isOnlyLockedUsers(), User.Fields.lockoutEndDateUtc, LocalDateTime.now());
+            e.ge(input.isOnlyLockedUsers(), User.Fields.lockoutEndDateUtc, LocalDateTime.now(ZoneId.systemDefault()));
             e.getQuery().distinct(true);
         });
         return findAll(spec, input.getPageable());
@@ -276,7 +277,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     public PagedResultDto<UserListDto> getUsersList(GetUsersInput getUserInput) {
         Page<User> page = getUsers(getUserInput);
         return MapperUtil.mapToPagedResultDto(page, mapper::toListDto, (s, t) -> {
-            if (s.getLockoutEndDateUtc() != null && s.getLockoutEndDateUtc().compareTo(LocalDateTime.now()) > 0) {
+            if (s.getLockoutEndDateUtc() != null && s.getLockoutEndDateUtc().isAfter(LocalDateTime.now(ZoneId.systemDefault()))) {
                 t.setLock(true);
             }
             t.setActive(checkUserIsActive(s));
@@ -304,8 +305,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
         if (role != null) {
             query.where(qUser.userRoles.contains(role));
         }
-        Page<User> page = (Page<User>) page(query, input.getPageable());
-        return page;
+        return (Page<User>) page(query, input.getPageable());
     }
 
     @Override
@@ -347,7 +347,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     @Override
     public List<User> getAllInnerUsers() {
         QUser qUser = QUser.user;
-        return queryFactory.selectFrom(qUser).where(qUser.userType.eq(EUnitType.Inner)).fetch();
+        return queryFactory.selectFrom(qUser).where(qUser.userType.eq(EUnitType.INNER)).fetch();
     }
 
     @Override
@@ -358,7 +358,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     @Override
     public void getUsersToExcel(HttpServletResponse response) {
         String fileName = "userlist.xlsx";
-        List<User> userList = userRepository.findAll(Specifications.where(e -> e.ne(User.Fields.userType, EUnitType.Visitor)), Sort.by(User.Fields.surName));
+        List<User> userList = userRepository.findAll(Specifications.where(e -> e.ne(User.Fields.userType, EUnitType.VISITOR)), Sort.by(User.Fields.surName));
         Map<Long, List<String>> orgNamePathMap = getAllUserOrgMap();
 
         //先去掉Role里面关联字段，以免序列化时出错
@@ -577,7 +577,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     public void createOrUpdateUserExistByUserName(CreateOrUpdateUserInput createOrUpdateUserInput) {
         Long userId = createOrUpdateUserInput.getUser().getId();
         if (userId == null) {
-            createUser(createOrUpdateUserInput, EUnitType.Inner);
+            createUser(createOrUpdateUserInput, EUnitType.INNER);
         } else {
             //第二个参数为null时默认根据id判断唯一
             updateUser(createOrUpdateUserInput, "userName", "password");
@@ -589,7 +589,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     public void createOrUpdateUserExistByUserName(CreateOrUpdateUserInfoInput input) {
         Long userId = input.getUser().getId();
         if (userId == null) {
-            userId = createUser(input, EUnitType.Inner);
+            userId = createUser(input, EUnitType.INNER);
         } else {
             //第二个参数为null时默认根据id判断唯一
             updateUser(input, "userName", "password");
@@ -606,8 +606,8 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     public Long createExternalUser(CreateExternalUserInput input) {
         Long userId;
         User user = mapper.CreateExternalUserInputToEntity(input);
-        user.setUserType(EUnitType.External);
-        user.setUserStatus(UserStatus.OnJob);
+        user.setUserType(EUnitType.EXTERNAL);
+        user.setUserStatus(UserStatus.ON_JOB);
 
         Long tenantId = TenantContextHolder.getTenantId();
         if (tenantId != null) {
@@ -757,7 +757,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
             List<OrganizationUnit> units = organizationUnitService.findAllById(organizationIds);
             user.setOrganizationUnit(units);
             // 如果组织机构是厂站且唯一，则设置为默认厂站
-            List<OrganizationUnit> stations = units.stream().filter(p -> Boolean.TRUE.equals(p.getStation())).collect(Collectors.toList());
+            List<OrganizationUnit> stations = units.stream().filter(p -> Boolean.TRUE.equals(p.getStation())).toList();
             if (stations.size() == 1) {
                 user.setDefaultStation(units.getFirst().getId());
             } else {
@@ -784,7 +784,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
         }
         User user = mapper.editDtoToEntity(createOrUpdateUserInput.getUser());
         user.setUserType(type);
-        user.setUserStatus(UserStatus.OnJob);
+        user.setUserStatus(UserStatus.ON_JOB);
         //仅在创建用户设置密码
         if (createOrUpdateUserInput.isSetRandomPassword()) {
             String randomPwd = generatePassword(passwdLen);
@@ -893,7 +893,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
         List<User> userList = findAllById(userIds);
         userList.forEach(user -> user.setUserStatus(input.getStatus()));
         saveAll(userList);
-        if (input.getStatus().equals(UserStatus.Dimission)) {
+        if (input.getStatus().equals(UserStatus.DIMISSION)) {
             for (Long id : userIds) {
                 //删除人脸
                 //userFaceRpcService.removeFace(id);
@@ -950,7 +950,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     @Override
     public void checkUserValid(User user) {
         //用户锁定校验
-        if (null != user.getLockoutEndDateUtc() && user.getLockoutEndDateUtc().isAfter(LocalDateTime.now())) {
+        if (null != user.getLockoutEndDateUtc() && user.getLockoutEndDateUtc().isAfter(LocalDateTime.now(ZoneId.systemDefault()))) {
             UserLoginException result = new UserLoginException(ERROR_USER_LOCKED);
             result.setCode(CODE_USER_LOCKED);
             throw result;
@@ -963,7 +963,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
         //            throw result;
         //        } else {
         //            //如果存在激活开始和结束 则继续判断
-        //            LocalDateTime now = LocalDateTime.now();
+        //            LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
         //            if ((user.getActiveStartDate() != null && now.isBefore(user.getActiveStartDate().atStartOfDay())) || (user.getActiveEndDate() != null && !now.isBefore(user.getActiveEndDate().plusDays(1).atStartOfDay()))) {
         //                UserLoginException result = new UserLoginException(ERROR_USER_NOT_ACTIVE);
         //                result.setCode(CODE_USER_NOT_ACTIVE);
@@ -971,7 +971,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
         //            }
         //        }
         // 检查员工是否离职
-        if (UserStatus.Dimission.equals(user.getUserStatus())) {
+        if (UserStatus.DIMISSION.equals(user.getUserStatus())) {
             UserLoginException loginException = new UserLoginException(ERROR_USER_DIMISSION);
             loginException.setCode(CODE_USER_DIMISSION);
             throw loginException;
@@ -1131,11 +1131,8 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
 
     @Override
     public boolean checkUserIsActive(User user) {
-        LocalDateTime now = LocalDateTime.now();
-        if (user.isActive() && !((user.getActiveStartDate() != null && now.isBefore(user.getActiveStartDate().atStartOfDay())) || (user.getActiveEndDate() != null && !now.isBefore(user.getActiveEndDate().plusDays(1).atStartOfDay())))) {
-            return true;
-        }
-        return false;
+        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
+        return user.isActive() && !((user.getActiveStartDate() != null && now.isBefore(user.getActiveStartDate().atStartOfDay())) || (user.getActiveEndDate() != null && !now.isBefore(user.getActiveEndDate().plusDays(1).atStartOfDay())));
     }
 
     @Override
@@ -1239,7 +1236,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
             checkMobilePhone(phoneNo);
         } else {
             String value = settingRpcService.getValue(PERSONNEL_CONTROL_CONFIRM_PHONE);
-            if (EUnitType.External.equals(type) && Boolean.TRUE.toString().equals(value)) {
+            if (EUnitType.EXTERNAL.equals(type) && Boolean.TRUE.toString().equals(value)) {
                 throw new BusinessException("手机号码不能为空");
             }
         }
@@ -1254,7 +1251,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
             checkIdCard(idCard);
         } else {
             String value = settingRpcService.getValue(PERSONNEL_CONTROL_CONFIRM_ID_CARD);
-            if (EUnitType.External.equals(type) && Boolean.TRUE.toString().equals(value)) {
+            if (EUnitType.EXTERNAL.equals(type) && Boolean.TRUE.toString().equals(value)) {
                 throw new BusinessException("身份证号码不能为空");
             }
         }
@@ -1307,14 +1304,14 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
                 msg = "密码错误，您还有" + (maxCount - count++) + "次机会";
                 user.setAccessFailedCount(count);
             } else {
-                LocalDateTime localDateTime = LocalDateTime.now();
+                LocalDateTime localDateTime = LocalDateTime.now(ZoneId.systemDefault());
                 user.setLockoutEndDateUtc(localDateTime.plusHours(24L));
                 msg = ERROR_USER_LOCKED;
             }
             userRepository.save(user);
         }
         //锁定日期不为null并且早于当前（说明锁定时间已过，需要解锁用户）
-        else if (!lockDateTime.isAfter(LocalDateTime.now())) {
+        else if (!lockDateTime.isAfter(LocalDateTime.now(ZoneId.systemDefault()))) {
             unlockUser(new EntityDto(user.getId()));
             msg = "密码错误，您还有" + maxCount + "次机会";
         }
@@ -1335,7 +1332,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
             user.setActiveEndDate(null);
         } else {
             if (user.getActiveStartDate() != null && user.getActiveEndDate() != null) {
-                if (user.getActiveEndDate().compareTo(user.getActiveStartDate()) < 0) {
+                if(user.getActiveEndDate().isBefore(user.getActiveStartDate())) {
                     throw new BusinessException("账号激活结束日期必须大于起始日期");
                 }
             }
@@ -1366,7 +1363,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
             // 2020/5/18 发送邮件激活。
             String url = activeAddr + "?userId=" + user.getId();
             if (redisUtil != null) {
-                String key = REDIS_KEY_ACTIVE + UUID.randomUUID().toString();
+                String key = REDIS_KEY_ACTIVE + UUID.randomUUID();
                 String code = UUID.randomUUID().toString();
                 url += "&key=" + key + "&code=" + code;
                 redisUtil.setCache(key, code, 15 * 60);

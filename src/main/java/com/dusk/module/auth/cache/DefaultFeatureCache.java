@@ -19,12 +19,11 @@ public class DefaultFeatureCache implements IFeatureCache {
 
     @Override
     public synchronized void addDefaultFeature(String applicationName, List<TenantFeature> tenantFeatureList) {
-        Map<String, Map<String, TenantFeature>> defaultFeature = tenantFeatureMap;
         Map<String, TenantFeature> temFeatureMap = new HashMap<>();
         for (TenantFeature feature : tenantFeatureList) {
             temFeatureMap.put(feature.getName(), feature);
         }
-        defaultFeature.put(applicationName, temFeatureMap);
+        tenantFeatureMap.put(applicationName, temFeatureMap);
     }
 
     @Override

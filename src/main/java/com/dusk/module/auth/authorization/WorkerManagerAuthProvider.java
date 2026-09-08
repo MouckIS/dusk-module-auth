@@ -20,8 +20,8 @@ public class WorkerManagerAuthProvider extends AuthorizationProvider {
     @Override
     public void setPermissions(IPermissionDefinitionContext context) {
         Permission administration = context.getPermissionOrNull(AdministrationAuthProvider.PAGES_ADMINISTRATION);
-        Permission _3dPermission = administration.createChildPermission(PAGES_ADMINISTRATION_3D, "3D", MultiTenancySides.Tenant);
-        _3dPermission.createChildPermission(PAGES_ADMINISTRATION_3D_WORKER_MANAGER, "3D作业人员管理", MultiTenancySides.Tenant);
-        _3dPermission.createChildPermission(PAGES_ADMINISTRATION_3D_TAG_MANAGER, "3D标签管理", MultiTenancySides.Tenant);
+        Permission _3dPermission = administration.createChildPermission(PAGES_ADMINISTRATION_3D, "3D", MultiTenancySides.TENANT);
+        _3dPermission.createChildPermission(PAGES_ADMINISTRATION_3D_WORKER_MANAGER, "3D作业人员管理", MultiTenancySides.TENANT);
+        _3dPermission.createChildPermission(PAGES_ADMINISTRATION_3D_TAG_MANAGER, "3D标签管理", MultiTenancySides.TENANT);
     }
 }

@@ -76,7 +76,7 @@ public class Role extends FullAuditedEntity {
 
     public void clearPermission() {
         //modify by wangji 仅仅移除businessKey为空部分得
-        List<GrantPermission> collect = permissions.stream().filter(p -> StrUtil.isEmpty(p.getBusinessKey())).collect(Collectors.toList());
+        List<GrantPermission> collect = permissions.stream().filter(p -> StrUtil.isEmpty(p.getBusinessKey())).toList();
         permissions.removeAll(collect);
     }
 

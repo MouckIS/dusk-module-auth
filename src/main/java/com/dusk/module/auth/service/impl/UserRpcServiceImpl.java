@@ -89,9 +89,7 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
     @Override
     public PagedResultDto<UserFullListSyncDto> getUsersForSync(PagedAndSortedInputDto input) {
         Page<User> pageResult = repository.findAll(input.getPageable());
-        return MapperUtil.mapToPagedResultDto(pageResult, mapper::toFullListSyncDto, (s, t) -> {
-            t.setOrgIds(s.getOrganizationUnit().stream().map(BaseEntity::getId).collect(Collectors.toList()));
-        });
+        return MapperUtil.mapToPagedResultDto(pageResult, mapper::toFullListSyncDto, (s, t) -> t.setOrgIds(s.getOrganizationUnit().stream().map(BaseEntity::getId).collect(Collectors.toList())));
     }
 
     @Override
@@ -117,29 +115,29 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
     @Override
     public List<Long> getUserIdsByNameLike(String name) {
         List<User> all = findAll(Specifications.where(e -> {
-            e.eq(User.Fields.userStatus, UserStatus.OnJob);
+            e.eq(User.Fields.userStatus, UserStatus.ON_JOB);
             e.contains(User.Fields.name, name);
-            e.in(User.Fields.userType, EUnitType.Inner);
+            e.in(User.Fields.userType, EUnitType.INNER);
         }));
         return all.stream().map(BaseEntity::getId).collect(Collectors.toList());
     }
 
     @Override
     public List<UserFullListDto> getUsersByUserNameStartWith(String head) {
-        return getUsersByUserNameStartWith(head, Collections.singletonList(EUnitType.Inner));
+        return getUsersByUserNameStartWith(head, Collections.singletonList(EUnitType.INNER));
     }
 
 
     @Override
     public List<UserFullListDto> getUsersByUserNameStartWith(String head, List<EUnitType> userTypes) {
-        JPAQuery<User> query = queryFactory.selectFrom(qUser).where(qUser.userName.startsWith(head).and(qUser.userType.in(userTypes)).and(qUser.userStatus.eq(UserStatus.OnJob)));
+        JPAQuery<User> query = queryFactory.selectFrom(qUser).where(qUser.userName.startsWith(head).and(qUser.userType.in(userTypes)).and(qUser.userStatus.eq(UserStatus.ON_JOB)));
         List<User> users = query.fetch();
         return MapperUtil.mapList(users, mapper::toFullListDto);
     }
 
     @Override
     public List<Long> getUserIdsByPermissionsAnd(String[] permissions) {
-        return getUserIdsByPermissionsAnd(permissions, Collections.singletonList(EUnitType.Inner));
+        return getUserIdsByPermissionsAnd(permissions, Collections.singletonList(EUnitType.INNER));
     }
 
     @Override
@@ -148,7 +146,7 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
         List<UserIdAndPermissionDto> data = repository.getUserIdsByPermissionsAnd(permissions, userTypes);
         Map<Long, List<UserIdAndPermissionDto>> collect = data.stream().collect(Collectors.groupingBy(UserIdAndPermissionDto::getId));
         collect.forEach((key, value) -> {
-            List<String> all = value.stream().map(UserIdAndPermissionDto::getName).collect(Collectors.toList());
+            List<String> all = value.stream().map(UserIdAndPermissionDto::getName).toList();
             long count = Arrays.stream(permissions).filter(p -> !all.contains(p)).count();
             if (count == 0 && !result.contains(key)) {
                 result.add(key);
@@ -159,7 +157,7 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
 
     @Override
     public List<Long> getUserIdsByPermissionsOr(String[] permissions) {
-        return getUserIdsByPermissionsOr(permissions, Collections.singletonList(EUnitType.Inner));
+        return getUserIdsByPermissionsOr(permissions, Collections.singletonList(EUnitType.INNER));
     }
 
     @Override
@@ -215,9 +213,7 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
 
     @Override
     public void createOrUpdateUsers(List<CreateOrUpdateUserInput> inputList) {
-        inputList.forEach(param -> {
-            userService.createOrUpdateUser(param);
-        });
+        inputList.forEach(param -> userService.createOrUpdateUser(param));
     }
 
     @Override
@@ -249,7 +245,7 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
 
     @Override
     public List<UserFullListDto> getUsersContainsName(String name) {
-        return getUsersContainsName(name, Collections.singletonList(EUnitType.Inner));
+        return getUsersContainsName(name, Collections.singletonList(EUnitType.INNER));
     }
 
     @Override
@@ -257,7 +253,7 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
         List<User> users = repository.findAll(Specifications.where(e -> {
             e.contains(User.Fields.name, name);
             e.in(User.Fields.userType, userTypes);
-            e.eq(User.Fields.userStatus, UserStatus.OnJob);
+            e.eq(User.Fields.userStatus, UserStatus.ON_JOB);
         }));
         return MapperUtil.mapList(users, mapper::toFullListDto);
     }
@@ -567,7 +563,7 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
     @Override
     public void syncUserByWeChatFromLdap(UserSimpleDto userDto, List<OrganizationUnitDto> employeeOrgList, OrganizationUnitUserDto orgUserDto) {
         var optional = findById(userDto.getId());
-        User user = null;
+        User user;
         if (optional.isPresent()) {
             user = optional.get();
             UtBeanUtils.copyNotNullProperties(userDto, user);
@@ -580,7 +576,7 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
         int i = 0;
         for (OrganizationUnitDto unitDto : employeeOrgList) {
             Optional<OrganizationUnit> op = organizationUnitService.findById(unitDto.getId());
-            OrganizationUnit org = null;
+            OrganizationUnit org;
             org = op.orElseGet(() -> organizationMapper.toEntity(unitDto));
             if (unitDto.getParentId() == null) {
                 org.setParentId(null);
@@ -638,7 +634,7 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
 
     @Override
     public List<UserSimpleDto> getUserSimpleDto(Collection<Long> userId) {
-        if (Objects.isNull(userId) || userId.size() == 0) {
+        if (Objects.isNull(userId) || userId.isEmpty()) {
             return new ArrayList<>();
         }
         List<UserSimpleDto> list;
@@ -660,7 +656,7 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
 
     @Override
     public List<UserFullListDto> getUsersByRoleName(String roleName) {
-        return getUsersByRoleName(roleName, Collections.singletonList(EUnitType.Inner));
+        return getUsersByRoleName(roleName, Collections.singletonList(EUnitType.INNER));
     }
 
     @Override
@@ -671,17 +667,17 @@ public class UserRpcServiceImpl extends BaseService<User, IUserRepository> imple
         }
         List<UserFullListDto> users = MapperUtil.mapList(role.getUserRoles(), mapper::toFullListDto);
 
-        return users.stream().filter(dto -> userTypes.contains(dto.getUserType()) && UserStatus.OnJob.equals(dto.getUserStatus())).collect(Collectors.toList());
+        return users.stream().filter(dto -> userTypes.contains(dto.getUserType()) && UserStatus.ON_JOB.equals(dto.getUserStatus())).collect(Collectors.toList());
     }
 
     @Override
     public List<UserFullListDto> getUsersByRoleName(String roleName, boolean filterByStation) {
-        return getUsersByRoleName(roleName, Collections.singletonList(EUnitType.Inner));
+        return getUsersByRoleName(roleName, Collections.singletonList(EUnitType.INNER));
     }
 
     @Override
     public List<UserFullListDto> getUsersByRoleName(String roleName, boolean filterByStation, List<EUnitType> userTypes) {
-        JPAQuery<User> query = queryFactory.selectFrom(qUser).where(qUser.userRoles.any().roleName.eq(roleName).and(qUser.userType.in(userTypes)).and(qUser.userStatus.eq(UserStatus.OnJob)));
+        JPAQuery<User> query = queryFactory.selectFrom(qUser).where(qUser.userRoles.any().roleName.eq(roleName).and(qUser.userType.in(userTypes)).and(qUser.userStatus.eq(UserStatus.ON_JOB)));
         if (filterByStation) {
             String[] idStrings = DataFilterContextHolder.getDataFilterId().split(",");
             List<Long> ids = Arrays.stream(idStrings).map(Long::parseLong).collect(Collectors.toList());

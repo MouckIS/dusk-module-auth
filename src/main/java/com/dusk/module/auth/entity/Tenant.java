@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 /**
  * 租户表
@@ -139,7 +140,7 @@ public class Tenant extends CreationEntity {
     public boolean enabled() {
         return active && (
                 subscriptionEndDateUtc == null  //无限订阅
-                        || subscriptionEndDateUtc.isAfter(LocalDateTime.now()) //在订阅时间内
+                        || subscriptionEndDateUtc.isAfter(LocalDateTime.now(ZoneId.systemDefault())) //在订阅时间内
         );
     }
 
@@ -153,20 +154,14 @@ public class Tenant extends CreationEntity {
 
     public void updateSubscriptionDateForPayment(PaymentPeriodType paymentPeriodType, EditionPaymentType editionPaymentType) {
         switch (editionPaymentType) {
-            case NewRegistration, BuyNow -> {
-                subscriptionEndDateUtc = LocalDateTime.now().plusDays(paymentPeriodType.getDays());
-            }
-            case Extend -> {
-                extendSubscriptionDate(paymentPeriodType);
-            }
+            case NewRegistration, BuyNow -> subscriptionEndDateUtc = LocalDateTime.now(ZoneId.systemDefault()).plusDays(paymentPeriodType.getDays());
+            case Extend -> extendSubscriptionDate(paymentPeriodType);
             case Upgrade -> {
                 if (subscriptionEndDateUtc == null) {
-                    subscriptionEndDateUtc = LocalDateTime.now().plusDays(paymentPeriodType.getDays());
+                    subscriptionEndDateUtc = LocalDateTime.now(ZoneId.systemDefault()).plusDays(paymentPeriodType.getDays());
                 }
             }
-            default -> {
-                throw new IllegalArgumentException();
-            }
+            default -> throw new IllegalArgumentException();
         }
     }
 
@@ -176,14 +171,14 @@ public class Tenant extends CreationEntity {
         }
 
         if (isSubscriptionEnded()) {
-            subscriptionEndDateUtc = LocalDateTime.now();
+            subscriptionEndDateUtc = LocalDateTime.now(ZoneId.systemDefault());
         }
 
         subscriptionEndDateUtc = subscriptionEndDateUtc.plusDays(paymentPeriodType.getDays());
     }
 
     private boolean isSubscriptionEnded() {
-        return subscriptionEndDateUtc.isBefore(LocalDateTime.now());
+        return subscriptionEndDateUtc.isBefore(LocalDateTime.now(ZoneId.systemDefault()));
     }
 
     public long calculateRemainingDayCount() {
@@ -191,7 +186,7 @@ public class Tenant extends CreationEntity {
             return 0;
         }
 
-        Duration duration = Duration.between(subscriptionEndDateUtc, LocalDateTime.now());
+        Duration duration = Duration.between(subscriptionEndDateUtc, LocalDateTime.now(ZoneId.systemDefault()));
         long remainingDays = duration.toDays();
         return remainingDays > 0 ? remainingDays : 0;
     }

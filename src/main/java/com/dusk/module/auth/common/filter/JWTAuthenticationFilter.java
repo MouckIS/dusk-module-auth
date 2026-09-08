@@ -30,6 +30,7 @@ import org.springframework.util.StopWatch;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 /**
  * @author kefuming
@@ -62,17 +63,17 @@ public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFil
     //由于 /login 这种 无法被全局aop拦截，这里手动暴露下日志
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
-        UsernamePasswordAuthenticationToken token = null;
+        UsernamePasswordAuthenticationToken token;
         AuditLogDto auditLog = new AuditLogDto();
         StopWatch sw = new StopWatch();
         sw.start();
-        auditLog.setExecutionTime(LocalDateTime.now());
+        auditLog.setExecutionTime(LocalDateTime.now(ZoneId.systemDefault()));
         auditLog.setBrowserInfo(request.getHeader("User-Agent"));
         auditLog.setClientIpAddress(JakartaServletUtil.getClientIP(request));
         auditLog.setMethodName("login");
         auditLog.setServiceName("login");
 
-        LogInOutEvent logInOutEvent = new LogInOutEvent(LoginLogType.LOGIN_IN, LocalDateTime.now(), false);
+        LogInOutEvent logInOutEvent = new LogInOutEvent(LoginLogType.LOGIN_IN, LocalDateTime.now(ZoneId.systemDefault()), false);
         logInOutEvent.setIp(JakartaServletUtil.getClientIP(request));
         logInOutEvent.setBrowserInfo(request.getHeader("User-Agent"));
         try {

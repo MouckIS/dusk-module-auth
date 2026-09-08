@@ -90,9 +90,7 @@ public class SubscribableEditionServiceImpl extends BaseService<SubscribableEdit
             var updatingSubscribableEdition = mapper.editDtoToEntity(input);
             if (existingSubscribableEdition.isFree() &&
                     !updatingSubscribableEdition.isFree() &&
-                    repository.findOne(Specifications.where(e -> {
-                        e.eq(SubscribableEdition.Fields.expiringEditionId, existingSubscribableEdition.getId());
-                    })).isPresent()) {
+                    repository.findOne(Specifications.where(e -> e.eq(SubscribableEdition.Fields.expiringEditionId, existingSubscribableEdition.getId()))).isPresent()) {
                 throw new BusinessException(("此版本用作其他版本订阅到期后版本。如果你想让这个版本付费，你应该先从其他版本中删除它。"));
             }
 
@@ -111,17 +109,12 @@ public class SubscribableEditionServiceImpl extends BaseService<SubscribableEdit
      */
     private boolean notUniqueDisplayName(Long id, String displayName) {
         var optional = findByDisplayName(displayName);
-        if (optional.isEmpty()) {
-            return false;
-        }
-        return !optional.get().getId().equals(id);
+        return optional.filter(subscribableEdition -> !subscribableEdition.getId().equals(id)).isPresent();
     }
 
     @Override
     public Page<SubscribableEdition> getEditions(GetEditionInput input) {
-        Specification<SubscribableEdition> spec = Specifications.where(e -> {
-            e.contains(StringUtils.isNotBlank(input.getFilter()), SubscribableEdition.Fields.displayName, input.getFilter());
-        });
+        Specification<SubscribableEdition> spec = Specifications.where(e -> e.contains(StringUtils.isNotBlank(input.getFilter()), SubscribableEdition.Fields.displayName, input.getFilter()));
         return repository.findAll(spec, input.getPageable());
     }
 
@@ -134,9 +127,7 @@ public class SubscribableEditionServiceImpl extends BaseService<SubscribableEdit
     @Override
     public void deleteEdition(Long editionId) {
         repository.findById(editionId).orElseThrow(() -> new BusinessException("数据不存在"));
-        Specification<Tenant> spec = Specifications.where(e -> {
-            e.eq(Tenant.Fields.edition + "." + BaseEntity.Fields.id, editionId);
-        });
+        Specification<Tenant> spec = Specifications.where(e -> e.eq(Tenant.Fields.edition + "." + BaseEntity.Fields.id, editionId));
 
         long count = tenantRepository.count(spec);
         if (count > 0) {
@@ -163,7 +154,7 @@ public class SubscribableEditionServiceImpl extends BaseService<SubscribableEdit
 
     @Override
     public void importEdition(InputStream in) {
-        List<Map<Integer, String>> list = null;
+        List<Map<Integer, String>> list;
         try {
             list = EasyExcel.read(in).sheet().headRowNumber(0).doReadSync();
         } catch (Exception e) {
@@ -223,7 +214,7 @@ public class SubscribableEditionServiceImpl extends BaseService<SubscribableEdit
 
         EditionPermissionInputDto input = new EditionPermissionInputDto();
         input.setId(edition.getId());
-        input.setPermissions(finalGrantedPermission.stream().collect(Collectors.toList()));
+        input.setPermissions(new ArrayList<>(finalGrantedPermission));
         tenantPermissionService.setEditionPermissions(input);
 
         featureService.setEditionFeatures(edition.getId(), features);

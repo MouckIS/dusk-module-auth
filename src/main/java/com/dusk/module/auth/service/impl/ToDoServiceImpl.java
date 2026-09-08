@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -98,13 +99,11 @@ public class ToDoServiceImpl extends BaseService<Todo, IToDoRepository> implemen
 
         long execute = queryFactory.update(todo).set(todo.finish, true)
                 .set(todo.finishUseId, securityUtils.getCurrentUser() == null ? null : securityUtils.getCurrentUser().getId())
-                .set(todo.finishTime, LocalDateTime.now())
+                .set(todo.finishTime, LocalDateTime.now(ZoneId.systemDefault()))
                 .where(todo.type.eq(type).and(todo.businessId.eq(businessId).and(todo.finish.eq(false)))).execute();
-        log.info("成功完成 待办类型：" + type + " 业务id：" + businessId + "的待办" + execute + "条");
+        log.info("成功完成 待办类型：{} 业务id：{}的待办{}条", type, businessId, execute);
 
-        todos.forEach(p -> {
-            toDoPushService.pushMqttMsg(p, ToDoMQTTTypeEnum.FINISH);
-        });
+        todos.forEach(p -> toDoPushService.pushMqttMsg(p, ToDoMQTTTypeEnum.FINISH));
     }
 
     @Override
@@ -142,21 +141,21 @@ public class ToDoServiceImpl extends BaseService<Todo, IToDoRepository> implemen
         if (StringUtils.isNotBlank(input.getTitle())) {
             expression = expression.and(QTodo.todo.title.contains(input.getTitle()));
         }
-        if (input.getType() != null && input.getType().size() > 0) {
+        if (input.getType() != null && !input.getType().isEmpty()) {
             expression = expression.and(QTodo.todo.type.in(input.getType()).or(QTodo.todo.subType.in(input.getType())));
         }
         QTodoPermission todoPermission = QTodoPermission.todoPermission;
         User currentUser = userManage.getCurrentUser();
-        BooleanExpression permissionExpression = QTodo.todo.targetType.eq(ToDoTargetType.UserId).and(todoPermission.permission.eq(currentUser.getId().toString()));
+        BooleanExpression permissionExpression = QTodo.todo.targetType.eq(ToDoTargetType.USER_ID).and(todoPermission.permission.eq(currentUser.getId().toString()));
         List<String> roles = currentUser.getUserRoles().stream().map(Role::getRoleName).collect(Collectors.toList());
         if (!roles.isEmpty()) {
-            permissionExpression = permissionExpression.or(QTodo.todo.targetType.eq(ToDoTargetType.Role).and(todoPermission.permission.in(roles)));
+            permissionExpression = permissionExpression.or(QTodo.todo.targetType.eq(ToDoTargetType.ROLE).and(todoPermission.permission.in(roles)));
         }
 
-        BooleanExpression temp = QTodo.todo.targetType.eq(ToDoTargetType.Permission);
+        BooleanExpression temp = QTodo.todo.targetType.eq(ToDoTargetType.PERMISSION);
         if (!currentUser.isAdmin()) {
             List<String> currentUserPermissions = userManage.getCurrentUserPermissions();
-            if (currentUserPermissions.size() > 0) {
+            if (!currentUserPermissions.isEmpty()) {
                 temp = temp.and(todoPermission.permission.in(currentUserPermissions));
                 permissionExpression = permissionExpression.or(temp);
             }

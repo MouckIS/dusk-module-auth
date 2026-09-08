@@ -63,15 +63,13 @@ public class GrantPermissionServiceImpl extends BaseService<GrantPermission, IGr
     public void addDynamicPermission(List<String> name, List<Long> roleIds, String businessKey) {
         List<Role> fetch = queryFactory.selectFrom(QRole.role).where(QRole.role.id.in(roleIds)).fetch();
         List<GrantPermission> addPermissions = new ArrayList<>();
-        name.forEach(q -> {
-            fetch.forEach(p -> {
-                GrantPermission permission = new GrantPermission();
-                permission.setBusinessKey(businessKey);
-                permission.setRole(p);
-                permission.setName(q);
-                addPermissions.add(permission);
-            });
-        });
+        name.forEach(q -> fetch.forEach(p -> {
+            GrantPermission permission = new GrantPermission();
+            permission.setBusinessKey(businessKey);
+            permission.setRole(p);
+            permission.setName(q);
+            addPermissions.add(permission);
+        }));
         if (!addPermissions.isEmpty()) {
             repository.saveAll(addPermissions);
             //authPermissionManager.refreshAll();

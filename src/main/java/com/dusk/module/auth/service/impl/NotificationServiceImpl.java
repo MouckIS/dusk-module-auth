@@ -131,9 +131,9 @@ public class NotificationServiceImpl extends BaseService<UserNotification, IUser
                 .fetchResults();
 
         if (queryResults.isEmpty()) {
-            log.warn("ID为" + input.getId() + "的用户消息不存在");
+            log.warn("ID为{}的用户消息不存在", input.getId());
         } else {
-            output = queryResults.getResults().get(0);
+            output = queryResults.getResults().getFirst();
             //将消息自动置为已读
             UserNotification userNotification = repository.getOne(output.getId());
             userNotification.setRead(true);
@@ -220,15 +220,11 @@ public class NotificationServiceImpl extends BaseService<UserNotification, IUser
      */
     public void setNotificationAsRead(SetNotificationAsReadInput input) {
         final Specification<UserNotification> query =
-                Specifications.where(e -> {
-                    e.in(BaseEntity.Fields.id, input.getIds());
-                });
+                Specifications.where(e -> e.in(BaseEntity.Fields.id, input.getIds()));
 
         List<UserNotification> notifications = repository.findAll(query);
         if (ArrayUtil.isNotEmpty(notifications)) {
-            notifications.forEach(n -> {
-                n.setRead(true);
-            });
+            notifications.forEach(n -> n.setRead(true));
             repository.saveAll(notifications);
         }
     }
@@ -255,9 +251,7 @@ public class NotificationServiceImpl extends BaseService<UserNotification, IUser
     @Override
     public void batchDeleteNotification(BatchDeleteNotificationInput input) {
         final Specification<UserNotification> query =
-                Specifications.where(e -> {
-                    e.in(BaseEntity.Fields.id, input.getIds());
-                });
+                Specifications.where(e -> e.in(BaseEntity.Fields.id, input.getIds()));
         List<UserNotification> notifications = repository.findAll(query);
         if (ArrayUtil.isNotEmpty(notifications)) {
             deleteInBatch(notifications);

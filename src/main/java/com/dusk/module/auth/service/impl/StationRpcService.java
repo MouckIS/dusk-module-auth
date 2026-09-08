@@ -48,9 +48,7 @@ public class StationRpcService implements IStationRpcService {
     @Override
     public List<StationDto> findByIds(List<Long> ids) {
         if (ids != null) {
-            Specification<Station> spec = Specifications.where(e -> {
-                e.in(BaseEntity.Fields.id, ids);
-            });
+            Specification<Station> spec = Specifications.where(e -> e.in(BaseEntity.Fields.id, ids));
             List<Station> list = stationService.findAll(spec);
             return MapperUtil.mapList(list, mapper::toDto);
         }

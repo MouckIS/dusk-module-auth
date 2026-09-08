@@ -249,7 +249,7 @@ public class SettingServiceImpl implements ISettingRpcService, ISettingService {
             resultMap.put(name, temMap);
         });
         if (!fileMapList.isEmpty()) {
-            List<Long> fileIds = fileMapList.stream().map(temMap -> Long.valueOf(temMap.get("value"))).collect(Collectors.toList());
+            List<Long> fileIds = fileMapList.stream().map(temMap -> Long.valueOf(temMap.get("value"))).toList();
             //try {
             //    List<GetDownloadUrlOutput> downloadUrls = minioRpcService.getDownloadUrls(fileIds);
             //    fileMapList.forEach(temMap -> {

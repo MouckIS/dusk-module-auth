@@ -117,9 +117,7 @@ public class AuditLogServiceImpl extends BaseService<AuditLog, IAuditLogReposito
 
         List<AuditLogDetailDto> detailList = query.fetch();
 
-        List<AuditLogExportDto> list = MapperUtil.mapList(detailList, mapper::detailDtoToExportDto, (s, t) -> {
-            t.setTime(LocalDateTimeUtil.format(s.getExecutionTime(), "yyyy-MM-dd HH:mm:ss"));
-        });
+        List<AuditLogExportDto> list = MapperUtil.mapList(detailList, mapper::detailDtoToExportDto, (s, t) -> t.setTime(LocalDateTimeUtil.format(s.getExecutionTime(), "yyyy-MM-dd HH:mm:ss")));
 
         EasyExcel.write(outputStream, AuditLogExportDto.class).sheet().doWrite(list);
     }

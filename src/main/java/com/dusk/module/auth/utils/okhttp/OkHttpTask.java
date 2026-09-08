@@ -29,7 +29,7 @@ public class OkHttpTask {
         int httpStatus = response.code();
         if (200 != httpStatus) {
 
-            String msg = null;
+            String msg;
             try {
                 msg = response.body().string();
             } catch (IOException e) {
@@ -71,7 +71,6 @@ public class OkHttpTask {
         return switch (param.getMethod()) {
             case GET -> getRequest(param);
             case POST -> postRequest(param);
-            default -> throw new BusinessException("请求方式不能为空");
         };
     }
 
@@ -113,7 +112,7 @@ public class OkHttpTask {
         } else {
             FormBody.Builder builder = new FormBody.Builder();
             if (param.getQuery() != null) {
-                param.getQuery().forEach((key, value) -> builder.add(key, value));
+                param.getQuery().forEach(builder::add);
             }
             return builder.build();
         }

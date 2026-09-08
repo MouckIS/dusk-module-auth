@@ -98,15 +98,13 @@ public class ToDoPushServiceImpl implements ToDoPushService {
         List<Long> userIds = new ArrayList<>();
         List<TodoPermission> todoPermissions = todo.getTodoPermissions();
         switch (targetType) {
-            case UserId:
-                todoPermissions.forEach(p -> {
-                    userIds.add(Long.valueOf(p.getPermission()));
-                });
+            case USER_ID:
+                todoPermissions.forEach(p -> userIds.add(Long.valueOf(p.getPermission())));
                 break;
-            case Role:
+            case ROLE:
                 userIds.addAll(userManage.getUserIdsByRoleName(todoPermissions.stream().map(TodoPermission::getPermission).collect(Collectors.toList())));
                 break;
-            case Permission:
+            case PERMISSION:
                 String[] permissions = todoPermissions.stream().map(TodoPermission::getPermission).toArray(String[]::new);
                 userIds.addAll(userRpcService.getUserIdsByPermissionsOr(permissions));
                 break;
@@ -118,8 +116,6 @@ public class ToDoPushServiceImpl implements ToDoPushService {
 
     private void pushMqtt(Todo todo, List<Long> userIds, ToDoMQTTTypeEnum mqttTypeEnum) {
         TodoInfoDto msg = mapper.toInfoDto(todo);
-        userIds.forEach(p -> {
-            mqttUtils.publishMsgAsync(StrUtil.format(TODO_TOPIC, p), new ToDoMQTTContent(msg, mqttTypeEnum), 0);
-        });
+        userIds.forEach(p -> mqttUtils.publishMsgAsync(StrUtil.format(TODO_TOPIC, p), new ToDoMQTTContent(msg, mqttTypeEnum), 0));
     }
 }

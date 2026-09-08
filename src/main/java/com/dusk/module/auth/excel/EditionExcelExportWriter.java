@@ -120,8 +120,7 @@ public class EditionExcelExportWriter {
                 }
             }
         });
-        List<InnerPermission> clone = new ArrayList<>();
-        clone.addAll(list);
+        List<InnerPermission> clone = new ArrayList<>(list);
         Iterator<InnerPermission> it = list.iterator();
         while (it.hasNext()) {
             InnerPermission parent = it.next();
@@ -152,7 +151,7 @@ public class EditionExcelExportWriter {
     void setParentPermissionDepth(InnerPermission parent, int depth) {
         if (parent.getDepth() < depth) {
             parent.setDepth(depth);
-            maxPermissionDepth = maxPermissionDepth < depth ? depth : maxPermissionDepth;
+            maxPermissionDepth = Math.max(maxPermissionDepth, depth);
             if (parent.getParent() != null) {
                 setParentPermissionDepth(parent.getParent(), parent.getDepth() + 1);
             }
@@ -185,8 +184,7 @@ public class EditionExcelExportWriter {
             copier.copy(editionFeature, feature, null);
             list.add(feature);
         }
-        List<InnerFeature> clone = new ArrayList<>();
-        clone.addAll(list);
+        List<InnerFeature> clone = new ArrayList<>(list);
         Iterator<InnerFeature> iterator = list.iterator();
         while (iterator.hasNext()) {
             InnerFeature feature = iterator.next();
@@ -252,6 +250,7 @@ public class EditionExcelExportWriter {
 
     @Setter
     @Getter
+    static
     class InnerPermission implements Serializable {
         private InnerPermission parent;
         private String parentName;
@@ -269,10 +268,6 @@ public class EditionExcelExportWriter {
             children.add(child);
         }
 
-        public void setParent(InnerPermission parent) {
-            this.parent = parent;
-        }
-
         public String getFullPathName() {
             if (parent == null) {
                 return displayName;
@@ -284,6 +279,7 @@ public class EditionExcelExportWriter {
 
     @Setter
     @Getter
+    static
     class InnerFeature implements Serializable {
         InnerFeature parent;
         String parentName;

@@ -76,8 +76,8 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
         List<OrganizationUnit> organizationUnitList;
         Map<Long, Long> map = organizationManagerRepository.findAll().stream().collect(Collectors.toMap(OrganizationManager::getOrgId, OrganizationManager::getUserId));
         // 本单位人员获取所有的外部组织机构
-        if (user.getUserType() == EUnitType.Inner) {
-            organizationUnitList = findAll(Specifications.where(e -> e.eq(OrganizationUnit.Fields.type, EUnitType.External)),
+        if (user.getUserType() == EUnitType.INNER) {
+            organizationUnitList = findAll(Specifications.where(e -> e.eq(OrganizationUnit.Fields.type, EUnitType.EXTERNAL)),
                     Sort.by(TreeEntity.Fields.sortIndex, TreeEntity.Fields.displayName));
         } else {
             // 外部单位人员获取所属的组织机构
@@ -131,7 +131,7 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
             query.where(qOrganizationUnit.type.eq(input.getType()));
         }
         if (!input.isDisplayDimissionUsers()) {
-            query.where(qUser.userStatus.eq(UserStatus.OnJob));
+            query.where(qUser.userStatus.eq(UserStatus.ON_JOB));
         }
         // 默认排序
         if (CharSequenceUtil.isBlank(input.getSorting())) {
@@ -180,7 +180,7 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
     public OrganizationUnit createExternalOrganization(CreateOrganizationUnitInput input) {
         Long id = LoginUserIdContextHolder.getUserId();
         User user = userRepository.findById(id).orElseThrow();
-        if (input.getParentId() == null && user.getUserType() == EUnitType.External) {
+        if (input.getParentId() == null && user.getUserType() == EUnitType.EXTERNAL) {
             throw new BusinessException("外部单位人员不允许创建根节点");
         }
         return create(input);
@@ -234,8 +234,7 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
 
     @Override
     public <S extends OrganizationUnit> List<S> saveAll(Iterable<S> iterable) {
-        List<S> result = super.saveAll(iterable);
-        return result;
+        return super.saveAll(iterable);
     }
 
     /**
@@ -327,9 +326,7 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
     public List<OrganizationUnit> getStationsByUserId(Long id) {
         List<OrganizationUnit> userOrgas = repository.getOrganizationUnitsByUser(id);
         Set<Long> queryIds = getQueryOrgaIds(userOrgas.stream().map(BaseEntity::getId).distinct().collect(Collectors.toList()), true);
-        Specification<OrganizationUnit> spec = Specifications.where(e -> {
-            e.in(BaseEntity.Fields.id, queryIds).eq(OrganizationUnit.Fields.station, true).eq(OrganizationUnit.Fields.stationEnabled, true);
-        });
+        Specification<OrganizationUnit> spec = Specifications.where(e -> e.in(BaseEntity.Fields.id, queryIds).eq(OrganizationUnit.Fields.station, true).eq(OrganizationUnit.Fields.stationEnabled, true));
         return findAll(spec);
     }
 
@@ -337,9 +334,7 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
     public List<OrganizationUnit> getAllStationsByUserId(Long id) {
         List<OrganizationUnit> userOrgas = repository.getOrganizationUnitsByUser(id);
         Set<Long> queryIds = getQueryOrgaIds(userOrgas.stream().map(BaseEntity::getId).distinct().collect(Collectors.toList()), true);
-        Specification<OrganizationUnit> spec = Specifications.where(e -> {
-            e.in(BaseEntity.Fields.id, queryIds).eq(OrganizationUnit.Fields.station, true);
-        });
+        Specification<OrganizationUnit> spec = Specifications.where(e -> e.in(BaseEntity.Fields.id, queryIds).eq(OrganizationUnit.Fields.station, true));
         return findAll(spec);
     }
 
@@ -364,9 +359,7 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
         if (StrUtil.isBlank(displayName)) {
             return null;
         }
-        Specification<OrganizationUnit> spec = Specifications.where(e -> {
-            e.eq(TreeEntity.Fields.displayName, displayName);
-        });
+        Specification<OrganizationUnit> spec = Specifications.where(e -> e.eq(TreeEntity.Fields.displayName, displayName));
         List<OrganizationUnit> list = findAll(spec);
 
         return list.isEmpty() ? null : mapper.toDto(list.getFirst());
@@ -453,7 +446,7 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
             if (result.stream().noneMatch(e -> e.getId().equals(station.getId()))) {
                 result.add(station);
                 List<OrganizationUnit> descendants = findDescendants(station.getId());
-                List<OrganizationUnit> children = descendants.stream().filter(e -> station.getId().equals(e.getParentId())).collect(Collectors.toList());
+                List<OrganizationUnit> children = descendants.stream().filter(e -> station.getId().equals(e.getParentId())).toList();
                 for (OrganizationUnit child : children) {
                     addMatchChildrenToList(child, listDescendants(child, descendants), result);
                 }
@@ -475,7 +468,7 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
         }
         if (descendants.stream().anyMatch(e -> BooleanUtil.isTrue(e.getStation()))) {
             targetList.add(org);
-            List<OrganizationUnit> children = descendants.stream().filter(e -> org.getId().equals(e.getParentId())).collect(Collectors.toList());
+            List<OrganizationUnit> children = descendants.stream().filter(e -> org.getId().equals(e.getParentId())).toList();
             for (OrganizationUnit child : children) {
                 addMatchChildrenToList(child, listDescendants(child, descendants), targetList);
             }
@@ -510,9 +503,7 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
 
     @Override
     public List<OrganizationUnit> findByCodes(List<String> codes) {
-        Specification<OrganizationUnit> spec = Specifications.where(e -> {
-            e.isNotNull(OrganizationUnit.Fields.code).in(OrganizationUnit.Fields.code, codes);
-        });
+        Specification<OrganizationUnit> spec = Specifications.where(e -> e.isNotNull(OrganizationUnit.Fields.code).in(OrganizationUnit.Fields.code, codes));
         return findAll(spec);
     }
 
@@ -560,10 +551,10 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
                     setParent(t, parentId);
                 }
                 return t;
-            }).collect(Collectors.toList()));
+            }).toList());
         }
         if (!updateList.isEmpty()) {
-            List<Long> idList = updateList.stream().map(i -> i.getId()).collect(Collectors.toList());
+            List<Long> idList = updateList.stream().map(EntityDto::getId).collect(Collectors.toList());
             List<OrganizationUnit> organizationUnitList = repository.findAllById(idList);
             organizationUnitList.forEach(i -> {
                 Optional<OrganizationUnitDto> optional = updateList.stream().filter(dto -> i.getId().equals(dto.getId())).findAny();
@@ -605,8 +596,8 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
             CreateOrganizationUnitInput externalInput = new CreateOrganizationUnitInput();
             innerInput.setDisplayName(rootUnitName);
             externalInput.setDisplayName(rootUnitName + 1);
-            innerInput.setType(EUnitType.Inner);
-            externalInput.setType(EUnitType.External);
+            innerInput.setType(EUnitType.INNER);
+            externalInput.setType(EUnitType.EXTERNAL);
             OrganizationUnit innerRoot = create(innerInput);
             OrganizationUnit externalOrganization = createExternalOrganization(externalInput);
 
@@ -615,14 +606,14 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
                 List<OrganizationUnit> units;
                 if (deep == 1) {
                     units = MapperUtil.mapList(list, mapper::excelImportDtoToEntity, (s, t) -> {
-                        EUnitType unitType = "Inner".equals(s.getTypeStr()) ? EUnitType.Inner : EUnitType.External;
-                        Long parentId = "Inner".equals(s.getTypeStr()) ? innerRoot.getId() : externalOrganization.getId();
+                        EUnitType unitType = "INNER".equals(s.getTypeStr()) ? EUnitType.INNER : EUnitType.EXTERNAL;
+                        Long parentId = "INNER".equals(s.getTypeStr()) ? innerRoot.getId() : externalOrganization.getId();
                         t.setType(unitType);
                         t.setParentId(parentId);
                     });
                 } else {
                     units = MapperUtil.mapList(list, mapper::excelImportDtoToEntity, (s, t) -> {
-                        EUnitType unitType = "Inner".equals(s.getTypeStr()) ? EUnitType.Inner : EUnitType.External;
+                        EUnitType unitType = "INNER".equals(s.getTypeStr()) ? EUnitType.INNER : EUnitType.EXTERNAL;
                         t.setType(unitType);
                         Long parentId = orgNameIdMap.get().get(s.getParentOrg());
                         t.setParentId(parentId);
@@ -645,7 +636,7 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
      */
     @Override
     protected String[] getSerialNos(int count) {
-        String[] serialNos = serialNoService.getSerialNos(getEntityClass().getName(), EnumResetType.Never, "", 12, count);
+        String[] serialNos = serialNoService.getSerialNos(getEntityClass().getName(), EnumResetType.NEVER, "", 12, count);
         String[] result = new String[count];
         for (int i = 0; i < serialNos.length; i++) {
             result[i] = Integer.parseInt(serialNos[i]) + "";

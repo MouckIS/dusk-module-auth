@@ -93,7 +93,7 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
 
     @Override
     public Role createOrUpdate(RoleCreateOrEditDto dto) {
-        Role entity = null;
+        Role entity;
         if (dto.getId() != null) {
             entity = repository.findById(dto.getId()).orElseThrow(() -> new BusinessException("此角色不存在"));
             mapper.updateEntityFromDto(dto, entity);
@@ -154,8 +154,7 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
         RoleDto roleDto = getRoleDetails(new EntityDto(roleId));
         List<RolePermissionDto> rolePermission = roleDto.getPermissionList();
         List<ExportRolePermissionDto> permissionList = rolePermission.stream().map(ExportRolePermissionDto::new).collect(Collectors.toList());
-        List<ExportRolePermissionDto> clone = new ArrayList<>();
-        clone.addAll(permissionList);
+        List<ExportRolePermissionDto> clone = new ArrayList<>(permissionList);
         permissionList.forEach(parent -> {
             var it = clone.iterator();
             while (it.hasNext()) {
@@ -166,11 +165,9 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
                 }
             }
         });
-        permissionList = permissionList.stream().filter(e -> StringUtils.isBlank(e.getParentName())).collect(Collectors.toList());
+        permissionList = permissionList.stream().filter(e -> StringUtils.isBlank(e.getParentName())).toList();
         clone.clear();
-        permissionList.forEach(e -> {
-            appendRolePermissionExcelDataList(clone, e, 0);
-        });
+        permissionList.forEach(e -> appendRolePermissionExcelDataList(clone, e, 0));
         ExcelWriter excelWriter = null;
         InputStream templateStream = null;
         try {
@@ -192,25 +189,21 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
 
     @Override
     public void importRole(RoleDto roleDto) {
-        List<Role> roles = findAll(Specifications.where(e -> {
-            e.eq(Role.Fields.roleName, roleDto.getRoleName());
-        }));
-        Role role = null;
+        List<Role> roles = findAll(Specifications.where(e -> e.eq(Role.Fields.roleName, roleDto.getRoleName())));
+        Role role;
         if (roles.isEmpty()) {
             role = new Role();
         } else {
-            role = roles.get(0);
+            role = roles.getFirst();
         }
         UtBeanUtils.copyNotNullProperties(roleDto, role);
         validateRoleCodeAndNameUnique(role);
 
-        List<RolePermissionDto> permissionDtoList = roleDto.getPermissionList().stream().filter(e -> e.isGranted()).collect(Collectors.toList());
+        List<RolePermissionDto> permissionDtoList = roleDto.getPermissionList().stream().filter(RolePermissionDto::isGranted).toList();
         Set<String> permissionSet = new HashSet<>();
 
         List<RolePermissionDto> tenantGrantedPermissions = getTenantGrantedPermissions();
-        permissionDtoList.forEach(p -> {
-            appendTenantPermission(p.getName(), permissionSet, tenantGrantedPermissions);
-        });
+        permissionDtoList.forEach(p -> appendTenantPermission(p.getName(), permissionSet, tenantGrantedPermissions));
         List<GrantPermission> deletePermissions = new ArrayList<>();
         var it = role.getPermissions().iterator();
         while (it.hasNext()) {
@@ -330,7 +323,7 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
         }
 
         List<User> userList = userRepository.findAllById(input.getUserIds());
-        userList = userList.stream().filter((e) -> role.getUserRoles().stream().noneMatch(u -> u.getId().equals(e.getId()))).collect(Collectors.toList());
+        userList = userList.stream().filter((e) -> role.getUserRoles().stream().noneMatch(u -> u.getId().equals(e.getId()))).toList();
         role.getUserRoles().addAll(userList);
         save(role);
     }
@@ -439,7 +432,7 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
             });
         } else {
             List<RolePermissionDto> tenantPermissions = tenantPermissionService.getTenantPermissions(TenantContextHolder.getTenantId());
-            result.addAll(tenantPermissions.stream().filter(RolePermissionDto::isGranted).collect(Collectors.toList()));
+            result.addAll(tenantPermissions.stream().filter(RolePermissionDto::isGranted).toList());
         }
         return result;
     }
@@ -453,7 +446,7 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
      */
     private List<RolePermissionDto> getRoleRealPermission(List<GrantPermission> rolePermission, List<RolePermissionDto> tenantPermission) {
         List<RolePermissionDto> result = new ArrayList<>();
-        List<String> granted = rolePermission.stream().map(s -> s.getName()).collect(Collectors.toList());
+        List<String> granted = rolePermission.stream().map(GrantPermission::getName).toList();
         tenantPermission.forEach(s -> {
             RolePermissionDto dto = new RolePermissionDto();
             dto.setGranted(granted.contains(s.getName()));
@@ -496,11 +489,7 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
     }
 
     void appendRolePermissionExcelDataList(List<ExportRolePermissionDto> dataList, ExportRolePermissionDto permission, int level) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 4 * level; i++) {
-            sb.append(" ");
-        }
-        permission.setDisplayName(sb.toString() + permission.getDisplayName());
+        permission.setDisplayName(" ".repeat(Math.max(0, 4 * level)) + permission.getDisplayName());
         dataList.add(permission);
         for (ExportRolePermissionDto child : permission.getChildren()) {
             appendRolePermissionExcelDataList(dataList, child, level + 1);
@@ -508,9 +497,7 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
     }
 
     void appendTenantPermission(String permission, Set<String> permissionSet, List<RolePermissionDto> tenantPermissions) {
-        var it = tenantPermissions.iterator();
-        while (it.hasNext()) {
-            var next = it.next();
+        for (RolePermissionDto next : tenantPermissions) {
             if (StringUtils.equals(permission, next.getName())) {
                 permissionSet.add(permission);
                 if (StringUtils.isNotBlank(next.getParentName())) {
@@ -548,7 +535,7 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
 
     @Override
     public List<RoleSimpleDto> getRoleSimple(Collection<Long> roleIds) {
-        if (Objects.isNull(roleIds) || roleIds.size() == 0) {
+        if (Objects.isNull(roleIds) || roleIds.isEmpty()) {
             return new ArrayList<>();
         }
         List<RoleSimpleDto> result;

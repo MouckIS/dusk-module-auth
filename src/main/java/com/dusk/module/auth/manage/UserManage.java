@@ -75,10 +75,10 @@ public class UserManage implements IUserManage {
         if (userInfo.isAdmin()) {
             return permissions;
         } else {
-            List<Long> roleIds = userInfo.getUserRoles().stream().map(BaseEntity::getId).collect(Collectors.toList());
-            if (roleIds.size() > 0) {
+            List<Long> roleIds = userInfo.getUserRoles().stream().map(BaseEntity::getId).toList();
+            if (!roleIds.isEmpty()) {
                 List<GrantPermission> grantPermissionList = grantPermissionRepository.findDistinctByRoleIdIn(roleIds.toArray(new Long[0]));
-                return grantPermissionList.stream().filter(p -> permissions.contains(p.getName())).map(GrantPermission::getName).collect(Collectors.toList());
+                return grantPermissionList.stream().map(GrantPermission::getName).filter(name -> permissions.contains(name)).collect(Collectors.toList());
             }
         }
         return new ArrayList<>();

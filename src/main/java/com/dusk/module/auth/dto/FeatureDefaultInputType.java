@@ -1,4 +1,4 @@
-package com.dusk.module.ddm.dto;
+package com.dusk.module.auth.dto;
 
 import com.dusk.module.ddm.dto.ui.Item;
 import lombok.experimental.UtilityClass;

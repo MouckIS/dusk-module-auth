@@ -45,36 +45,26 @@ public class AdministrativeRegionsServiceImpl implements IAdministrativeRegionsS
         Map<String, List<Map<String, Object>>> streetMap = objectMapper.readValue(this.getClass().getResourceAsStream(STREET_PATH), new TypeReference<>() {
         });
 
-        provinceList.forEach(i -> {
-            regionsList.add(new RegionsDto(
-                    (Integer) i.get("id"),
-                    (String) i.get("name"),
-                    null,
-                    cityMap.containsKey(i.get("id").toString())
-            ));
-        });
+        provinceList.forEach(i -> regionsList.add(new RegionsDto(
+                (Integer) i.get("id"),
+                (String) i.get("name"),
+                null,
+                cityMap.containsKey(i.get("id").toString())
+        )));
 
-        cityMap.forEach((k, v) -> {
-            v.forEach(i -> {
-                regionsList.add(new RegionsDto(
-                        (Integer) i.get("id"),
-                        (String) i.get("name"),
-                        Integer.valueOf(k),
-                        areaMap.containsKey(i.get("id").toString())
-                ));
-            });
-        });
+        cityMap.forEach((k, v) -> v.forEach(i -> regionsList.add(new RegionsDto(
+                (Integer) i.get("id"),
+                (String) i.get("name"),
+                Integer.valueOf(k),
+                areaMap.containsKey(i.get("id").toString())
+        ))));
 
-        areaMap.forEach((k, v) -> {
-            v.forEach(i -> {
-                regionsList.add(new RegionsDto(
-                        (Integer) i.get("id"),
-                        (String) i.get("name"),
-                        Integer.valueOf(k),
-                        streetMap.containsKey(i.get("id").toString())
-                ));
-            });
-        });
+        areaMap.forEach((k, v) -> v.forEach(i -> regionsList.add(new RegionsDto(
+                (Integer) i.get("id"),
+                (String) i.get("name"),
+                Integer.valueOf(k),
+                streetMap.containsKey(i.get("id").toString())
+        ))));
     }
 
     @Override
@@ -96,14 +86,12 @@ public class AdministrativeRegionsServiceImpl implements IAdministrativeRegionsS
         List<RegionsDto> regionsList = new ArrayList<>();
 
         if (street != null) {
-            street.forEach(i -> {
-                regionsList.add(new RegionsDto(
-                        (Integer) i.get("id"),
-                        (String) i.get("name"),
-                        null,
-                        false
-                ));
-            });
+            street.forEach(i -> regionsList.add(new RegionsDto(
+                    (Integer) i.get("id"),
+                    (String) i.get("name"),
+                    null,
+                    false
+            )));
         }
 
         return regionsList;

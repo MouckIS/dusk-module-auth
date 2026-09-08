@@ -21,10 +21,10 @@ public class ImportAuthProvider extends AuthorizationProvider {
     @Override
     public void setPermissions(IPermissionDefinitionContext context) {
         Permission administration = context.getPermissionOrNull(AdministrationAuthProvider.PAGES_ADMINISTRATION);
-        Permission permission = administration.createChildPermission(PAGES_IMPORT, "账号批量导入导出", MultiTenancySides.Tenant);
-        permission.createChildPermission(PAGES_IMPORT_USERS, "批量导入用户", MultiTenancySides.Tenant);
-        permission.createChildPermission(PAGES_EXPORT_USERS, "批量导出用户", MultiTenancySides.Tenant);
-        permission.createChildPermission(PAGES_DELETE_USERS, "批量删除用户（一次删除所有外单位或者本单位）", MultiTenancySides.Tenant);
-        permission.createChildPermission(PAGES_IMPORT_ORGANIZATION, "批量导入组织", MultiTenancySides.Tenant);
+        Permission permission = administration.createChildPermission(PAGES_IMPORT, "账号批量导入导出", MultiTenancySides.TENANT);
+        permission.createChildPermission(PAGES_IMPORT_USERS, "批量导入用户", MultiTenancySides.TENANT);
+        permission.createChildPermission(PAGES_EXPORT_USERS, "批量导出用户", MultiTenancySides.TENANT);
+        permission.createChildPermission(PAGES_DELETE_USERS, "批量删除用户（一次删除所有外单位或者本单位）", MultiTenancySides.TENANT);
+        permission.createChildPermission(PAGES_IMPORT_ORGANIZATION, "批量导入组织", MultiTenancySides.TENANT);
     }
 }

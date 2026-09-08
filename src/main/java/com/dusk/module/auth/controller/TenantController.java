@@ -35,6 +35,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 /**
@@ -139,7 +140,7 @@ public class TenantController extends CruxBaseController {
         try {
             Page<User> page = userService.getUsers(input);
             List<UserListDto> list = MapperUtil.mapList(page.getContent(), userMapper::toListDto, (s, t) -> {
-                if (s.getLockoutEndDateUtc() != null && s.getLockoutEndDateUtc().isAfter(LocalDateTime.now())) {
+                if (s.getLockoutEndDateUtc() != null && s.getLockoutEndDateUtc().isAfter(LocalDateTime.now(ZoneId.systemDefault()))) {
                     t.setLock(true);
                 }
             });

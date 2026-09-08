@@ -20,6 +20,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 /**
  * @author kefuming
@@ -38,11 +39,11 @@ public class UserLogAspect {
 
     @Around("execution(* com.dusk.module.auth.common.manage.TokenAuthManager.removeToken(..))")
     public void logLogOut(ProceedingJoinPoint joinPoint) throws Throwable {
-        LogInOutEvent logInOutEvent = new LogInOutEvent(LoginLogType.LOGIN_OUT, LocalDateTime.now(), true);
+        LogInOutEvent logInOutEvent = new LogInOutEvent(LoginLogType.LOGIN_OUT, LocalDateTime.now(ZoneId.systemDefault()), true);
         try {
             fillLog(logInOutEvent, (String) joinPoint.getArgs()[0]);
         } catch (Exception e) {
-            log.error("日志初始化参数异常：" + e.getMessage());
+            log.error("日志初始化参数异常：{}", e.getMessage());
         }
 
         try {
@@ -58,7 +59,7 @@ public class UserLogAspect {
 
     //@Around("execution(* com.dusk.module.auth.controller.FaceController.authenticate(..))")
     //public Object logFaceLogIn(ProceedingJoinPoint joinPoint) throws Throwable {
-    //    LogInOutEvent logInOutEvent = new LogInOutEvent(LoginLogType.LOGIN_IN, LocalDateTime.now(), false);
+    //    LogInOutEvent logInOutEvent = new LogInOutEvent(LoginLogType.LOGIN_IN, LocalDateTime.now(ZoneId.systemDefault()), false);
     //    Object result;
     //    try {
     //        result = joinPoint.proceed();

@@ -155,7 +155,7 @@ public class MobileLoginServiceImpl implements IMobileLoginService {
             }
 
         }
-        if (list.size() == 0) {
+        if (list.isEmpty()) {
             throw new MobileAccountNotFoundException("系统无此手机号账户");
         }
         return list;

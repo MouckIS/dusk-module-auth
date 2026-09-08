@@ -94,9 +94,7 @@ public class StationServiceImpl extends TreeService<Station, IStationRepository>
     private List<Station> getAllStationsByUserId(Long id) {
         List<Station> stations = repository.getStationsByUser(id);
         Set<Long> queryIds = getQueryStationIds(stations.stream().map(BaseEntity::getId).distinct().collect(Collectors.toList()), true);
-        Specification<Station> spec = Specifications.where(e -> {
-            e.in(BaseEntity.Fields.id, queryIds);
-        });
+        Specification<Station> spec = Specifications.where(e -> e.in(BaseEntity.Fields.id, queryIds));
         return findAll(spec);
     }
 
@@ -131,9 +129,7 @@ public class StationServiceImpl extends TreeService<Station, IStationRepository>
         if (StrUtil.isBlank(displayName)) {
             return null;
         }
-        Specification<Station> spec = Specifications.where(e -> {
-            e.eq(TreeEntity.Fields.displayName, displayName);
-        });
+        Specification<Station> spec = Specifications.where(e -> e.eq(TreeEntity.Fields.displayName, displayName));
         List<Station> list = findAll(spec);
 
         return list.isEmpty() ? null : mapper.toDto(list.getFirst());
@@ -147,7 +143,7 @@ public class StationServiceImpl extends TreeService<Station, IStationRepository>
      */
     @Override
     protected String[] getSerialNos(int count) {
-        String[] serialNos = serialNoService.getSerialNos(getEntityClass().getName(), EnumResetType.Never, "", 12, count);
+        String[] serialNos = serialNoService.getSerialNos(getEntityClass().getName(), EnumResetType.NEVER, "", 12, count);
         String[] result = new String[count];
         for (int i = 0; i < serialNos.length; i++) {
             result[i] = Integer.parseInt(serialNos[i]) + "";
