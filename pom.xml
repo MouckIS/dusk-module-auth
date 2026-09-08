@@ -10,7 +10,7 @@
     <parent>
         <groupId>com.dusk</groupId>
         <artifactId>dusk-module-parent</artifactId>
-        <version>1.1.0-SNAPSHOT</version>
+        <version>1.2.0-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
@@ -18,19 +18,13 @@
         <!--        用于flyway 插件迁移自定义迁移表名-->
         <flyway.table>flyway_schema_history_auth</flyway.table>
         <!--        crux依赖-->
-        <dusk-common.version>1.1.0-SNAPSHOT</dusk-common.version>
+        <dusk-common.version>1.2.0-SNAPSHOT</dusk-common.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.dusk</groupId>
             <artifactId>dusk-common-core</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.plugin</groupId>
-                    <artifactId>spring-plugin-core</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.dusk</groupId>
@@ -50,11 +44,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
         </dependency>
 
         <dependency>
@@ -96,36 +85,15 @@
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <!-- 1.15 版本解决了 Base64 decode 最后字符错误问题。1.9也没问题，但1.14就有bug -->
-            <version>1.15</version>
+            <!-- 1.15 起解决 Base64 decode 最后字符错误问题，1.22.1 为当前最新 GA -->
+            <version>1.22.1</version>
         </dependency>
 
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20200518</version>
+            <version>20260814</version>
         </dependency>
-        <dependency>
-            <groupId>fr.opensagres.xdocreport</groupId>
-            <artifactId>fr.opensagres.xdocreport.core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>fr.opensagres.xdocreport</groupId>
-            <artifactId>fr.opensagres.xdocreport.document</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>fr.opensagres.xdocreport</groupId>
-            <artifactId>fr.opensagres.xdocreport.template</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>fr.opensagres.xdocreport</groupId>
-            <artifactId>fr.opensagres.xdocreport.document.docx</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>fr.opensagres.xdocreport</groupId>
-            <artifactId>fr.opensagres.xdocreport.template.freemarker</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
@@ -135,12 +103,6 @@
         <!--     <artifactId>lombok</artifactId> -->
         <!--     <version>1.18.36</version> -->
         <!-- </dependency> -->
-        <dependency>
-            <groupId>org.springframework.plugin</groupId>
-            <artifactId>spring-plugin-core</artifactId>
-            <version>2.0.0.RELEASE</version>
-        </dependency>
-
         <!-- 仅迁移期使用，启动后控制台会打印所有需要改的 key -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -189,7 +151,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.10</version>
+                <version>0.8.15</version>
                 <executions>
                     <execution>
                         <goals>
