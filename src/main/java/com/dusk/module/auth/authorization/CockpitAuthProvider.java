@@ -18,6 +18,6 @@ public class CockpitAuthProvider extends AuthorizationProvider {
     @Override
     public void setPermissions(IPermissionDefinitionContext context) {
         Permission administration = context.getPermissionOrNull(AdministrationAuthProvider.PAGES_ADMINISTRATION);
-        administration.createChildPermission(PAGES_COCKPIT, "App驾驶舱", MultiTenancySides.TENANT);
+        administration.createChildPermission(PAGES_COCKPIT, "App驾驶舱", MultiTenancySides.Tenant);
     }
 }

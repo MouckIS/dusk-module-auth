@@ -45,20 +45,20 @@ public class AuthPermissionManager implements IAuthPermissionManager {
     @Override
     public List<String> getDefinitionPermission(boolean tenantFilter) {
         if (tenantFilter) {
-            return allFlatPermission().values().stream().filter(p -> p.getMultiTenancySides().equals(MultiTenancySides.ALL) || p.getMultiTenancySides().equals(MultiTenancySides.TENANT))
+            return allFlatPermission().values().stream().filter(p -> p.getMultiTenancySides().equals(MultiTenancySides.All) || p.getMultiTenancySides().equals(MultiTenancySides.Tenant))
                     .map(Permission::getName).collect(Collectors.toList());
         }
-        return allFlatPermission().values().stream().filter(p -> p.getMultiTenancySides().equals(MultiTenancySides.HOST) || p.getMultiTenancySides().equals(MultiTenancySides.ALL))
+        return allFlatPermission().values().stream().filter(p -> p.getMultiTenancySides().equals(MultiTenancySides.Host) || p.getMultiTenancySides().equals(MultiTenancySides.All))
                 .map(Permission::getName).collect(Collectors.toList());
     }
 
     @Override
     public List<Permission> getDefinitionPermissionTree(boolean tenantFilter) {
         if (tenantFilter) {
-            return allFlatPermission().values().stream().filter(p -> p.getMultiTenancySides().equals(MultiTenancySides.ALL) || p.getMultiTenancySides().equals(MultiTenancySides.TENANT))
+            return allFlatPermission().values().stream().filter(p -> p.getMultiTenancySides().equals(MultiTenancySides.All) || p.getMultiTenancySides().equals(MultiTenancySides.Tenant))
                     .collect(Collectors.toList());
         }
-        return allFlatPermission().values().stream().filter(p -> p.getMultiTenancySides().equals(MultiTenancySides.HOST) || p.getMultiTenancySides().equals(MultiTenancySides.ALL))
+        return allFlatPermission().values().stream().filter(p -> p.getMultiTenancySides().equals(MultiTenancySides.Host) || p.getMultiTenancySides().equals(MultiTenancySides.All))
                 .collect(Collectors.toList());
     }
 

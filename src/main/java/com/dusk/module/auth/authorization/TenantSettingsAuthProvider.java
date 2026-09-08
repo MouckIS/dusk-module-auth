@@ -19,7 +19,7 @@ public class TenantSettingsAuthProvider extends AuthorizationProvider {
     @Override
     public void setPermissions(IPermissionDefinitionContext context) {
         Permission administration = context.getPermissionOrNull(AdministrationAuthProvider.PAGES_ADMINISTRATION);
-        administration.createChildPermission(PAGES_ADMINISTRATION_TENANT_SETTINGS, "系统设置", MultiTenancySides.TENANT);
-        administration.createChildPermission(PAGES_ADMINISTRATION_STATION_SETTINGS, "厂站设置", MultiTenancySides.TENANT);
+        administration.createChildPermission(PAGES_ADMINISTRATION_TENANT_SETTINGS, "系统设置", MultiTenancySides.Tenant);
+        administration.createChildPermission(PAGES_ADMINISTRATION_STATION_SETTINGS, "厂站设置", MultiTenancySides.Tenant);
     }
 }

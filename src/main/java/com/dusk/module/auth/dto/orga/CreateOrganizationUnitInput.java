@@ -28,7 +28,7 @@ public class CreateOrganizationUnitInput {
     private int sortIndex;
 
     @Schema(description = "组织的类型")
-    private EUnitType type = EUnitType.INNER;
+    private EUnitType type = EUnitType.Inner;
 
     @Schema(description = "组织标签")
     private OrgLabel label;

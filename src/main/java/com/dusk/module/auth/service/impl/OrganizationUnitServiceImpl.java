@@ -76,8 +76,8 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
         List<OrganizationUnit> organizationUnitList;
         Map<Long, Long> map = organizationManagerRepository.findAll().stream().collect(Collectors.toMap(OrganizationManager::getOrgId, OrganizationManager::getUserId));
         // 本单位人员获取所有的外部组织机构
-        if (user.getUserType() == EUnitType.INNER) {
-            organizationUnitList = findAll(Specifications.where(e -> e.eq(OrganizationUnit.Fields.type, EUnitType.EXTERNAL)),
+        if (user.getUserType() == EUnitType.Inner) {
+            organizationUnitList = findAll(Specifications.where(e -> e.eq(OrganizationUnit.Fields.type, EUnitType.External)),
                     Sort.by(TreeEntity.Fields.sortIndex, TreeEntity.Fields.displayName));
         } else {
             // 外部单位人员获取所属的组织机构
@@ -131,7 +131,7 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
             query.where(qOrganizationUnit.type.eq(input.getType()));
         }
         if (!input.isDisplayDimissionUsers()) {
-            query.where(qUser.userStatus.eq(UserStatus.ON_JOB));
+            query.where(qUser.userStatus.eq(UserStatus.OnJob));
         }
         // 默认排序
         if (CharSequenceUtil.isBlank(input.getSorting())) {
@@ -180,7 +180,7 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
     public OrganizationUnit createExternalOrganization(CreateOrganizationUnitInput input) {
         Long id = LoginUserIdContextHolder.getUserId();
         User user = userRepository.findById(id).orElseThrow();
-        if (input.getParentId() == null && user.getUserType() == EUnitType.EXTERNAL) {
+        if (input.getParentId() == null && user.getUserType() == EUnitType.External) {
             throw new BusinessException("外部单位人员不允许创建根节点");
         }
         return create(input);
@@ -596,8 +596,8 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
             CreateOrganizationUnitInput externalInput = new CreateOrganizationUnitInput();
             innerInput.setDisplayName(rootUnitName);
             externalInput.setDisplayName(rootUnitName + 1);
-            innerInput.setType(EUnitType.INNER);
-            externalInput.setType(EUnitType.EXTERNAL);
+            innerInput.setType(EUnitType.Inner);
+            externalInput.setType(EUnitType.External);
             OrganizationUnit innerRoot = create(innerInput);
             OrganizationUnit externalOrganization = createExternalOrganization(externalInput);
 
@@ -606,14 +606,14 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
                 List<OrganizationUnit> units;
                 if (deep == 1) {
                     units = MapperUtil.mapList(list, mapper::excelImportDtoToEntity, (s, t) -> {
-                        EUnitType unitType = "INNER".equals(s.getTypeStr()) ? EUnitType.INNER : EUnitType.EXTERNAL;
+                        EUnitType unitType = "INNER".equals(s.getTypeStr()) ? EUnitType.Inner : EUnitType.External;
                         Long parentId = "INNER".equals(s.getTypeStr()) ? innerRoot.getId() : externalOrganization.getId();
                         t.setType(unitType);
                         t.setParentId(parentId);
                     });
                 } else {
                     units = MapperUtil.mapList(list, mapper::excelImportDtoToEntity, (s, t) -> {
-                        EUnitType unitType = "INNER".equals(s.getTypeStr()) ? EUnitType.INNER : EUnitType.EXTERNAL;
+                        EUnitType unitType = "INNER".equals(s.getTypeStr()) ? EUnitType.Inner : EUnitType.External;
                         t.setType(unitType);
                         Long parentId = orgNameIdMap.get().get(s.getParentOrg());
                         t.setParentId(parentId);
@@ -636,7 +636,7 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
      */
     @Override
     protected String[] getSerialNos(int count) {
-        String[] serialNos = serialNoService.getSerialNos(getEntityClass().getName(), EnumResetType.NEVER, "", 12, count);
+        String[] serialNos = serialNoService.getSerialNos(getEntityClass().getName(), EnumResetType.Never, "", 12, count);
         String[] result = new String[count];
         for (int i = 0; i < serialNos.length; i++) {
             result[i] = Integer.parseInt(serialNos[i]) + "";

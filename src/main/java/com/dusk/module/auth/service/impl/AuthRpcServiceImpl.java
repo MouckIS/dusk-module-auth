@@ -29,7 +29,6 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.dubbo.rpc.RpcContext;
-import org.springframework.security.access.ConfigAttribute;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
@@ -178,7 +177,7 @@ public class AuthRpcServiceImpl implements IAuthRpcService {
         if (userContext == null) {
             throw new UserContextException("尚未登陆");
         }
-        Collection<ConfigAttribute> attributes = metadataSource.getAttributes(applicationName, url);
+        Collection<String> attributes = metadataSource.getAttributes(applicationName, url);
         return accessDecisionManager.decide(userContext, attributes);
     }
 

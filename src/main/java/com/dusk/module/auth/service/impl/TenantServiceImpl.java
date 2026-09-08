@@ -132,8 +132,8 @@ public class TenantServiceImpl extends BaseService<Tenant, ITenantRepository> im
         adminUser.setPassword(password);
         adminUser.setAdmin(true);
         adminUser.setShouldChangePasswordOnNextLogin(input.isShouldChangePasswordOnNextLogin());
-        adminUser.setUserType(EUnitType.INNER);
-        adminUser.setUserStatus(UserStatus.ON_JOB);
+        adminUser.setUserType(EUnitType.Inner);
+        adminUser.setUserStatus(UserStatus.OnJob);
         iUserRepository.save(adminUser);
         return adminUser;
     }

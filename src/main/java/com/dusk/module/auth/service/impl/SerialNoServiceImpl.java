@@ -65,15 +65,15 @@ public class SerialNoServiceImpl extends BaseService<SerialNo, ISerialNoReposito
 
             LocalDateTime lastUpdateTime = serialNo.getLastUpdateTime();
             switch (resetType) {
-                case DAY:
+                case Day:
                     if (now.getDayOfMonth() != lastUpdateTime.getDayOfMonth()) {
                         currentNo = 0;
                     }
-                case MONTH:
+                case Month:
                     if (now.getMonthValue() != lastUpdateTime.getMonthValue()) {
                         currentNo = 0;
                     }
-                case YEAR:
+                case Year:
                     if (now.getYear() != lastUpdateTime.getYear()) {
                         currentNo = 0;
                     }
