@@ -24,8 +24,8 @@ public class HostSettingsAuthProvider extends AuthorizationProvider {
     @Override
     public void setPermissions(IPermissionDefinitionContext context) {
         Permission administration = context.getPermissionOrNull(AdministrationAuthProvider.PAGES_ADMINISTRATION);
-        administration.createChildPermission(PAGES_ADMINISTRATION_HOST_SETTINGS, "设置", MultiTenancySides.Host);
-        administration.createChildPermission(PAGES_ADMINISTRATION_HOST_MAINTENANCE, "维护系统设置", multiTenancyConfig.isEnable() ? MultiTenancySides.Host : MultiTenancySides.Tenant);
-        administration.createChildPermission(PAGES_ADMINISTRATION_HOST_DASHBOARD, "工作台", MultiTenancySides.Host);
+        administration.createChildPermission(PAGES_ADMINISTRATION_HOST_SETTINGS, "设置", MultiTenancySides.HOST);
+        administration.createChildPermission(PAGES_ADMINISTRATION_HOST_MAINTENANCE, "维护系统设置", multiTenancyConfig.isEnable() ? MultiTenancySides.HOST : MultiTenancySides.TENANT);
+        administration.createChildPermission(PAGES_ADMINISTRATION_HOST_DASHBOARD, "工作台", MultiTenancySides.HOST);
     }
 }

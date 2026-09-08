@@ -56,7 +56,7 @@ public class UserLoginLogServiceImpl extends BaseService<UserLoginLog, IUserLogi
             query.where(qLog.operationTime.before(input.getEndTime()));
         }
         Page<UserLoginLogDto> page = (Page<UserLoginLogDto>) page(query, input.getPageable());
-        page.getContent().stream().forEach(e -> e.setLogTypeName(e.getLogType().getDisplayName()));
+        page.getContent().forEach(e -> e.setLogTypeName(e.getLogType().getDisplayName()));
         return new PagedResultDto<>(page.getTotalElements(), page.getContent());
     }
 }

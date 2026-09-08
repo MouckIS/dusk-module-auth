@@ -53,17 +53,13 @@ public class UserWxRelationServiceImpl extends BaseService<UserWxRelation, IUser
         List<UserWxRelation> sourceAll = findAll(Specifications.where(e ->
                 e.in(UserWxRelation.Fields.userId, userWxRelationList.stream().map(UserWxRelation::getUserId).collect(Collectors.toList()))));
 
-        sourceAll.forEach(source -> {
-            userWxRelationList.stream().filter(target -> target.getUserId().equals(source.getUserId()) && target.getAppId().equals(source.getAppId()))
-                    .findFirst().ifPresent(target -> {
-                        UtBeanUtils.copyNotNullProperties(source, target);
-                        UtBeanUtils.copyNotNullProperties(target, source);
-                    });
-        });
+        sourceAll.forEach(source -> userWxRelationList.stream().filter(target -> target.getUserId().equals(source.getUserId()) && target.getAppId().equals(source.getAppId()))
+                .findFirst().ifPresent(target -> {
+                    UtBeanUtils.copyNotNullProperties(source, target);
+                    UtBeanUtils.copyNotNullProperties(target, source);
+                }));
         saveAll(userWxRelationList);
 
-        userWxRelationList.forEach(relation -> {
-            userWxRelationCacheService.saveWxRelation(relation.getUserId(), relation.getAppId(), relation.getOpenId());
-        });
+        userWxRelationList.forEach(relation -> userWxRelationCacheService.saveWxRelation(relation.getUserId(), relation.getAppId(), relation.getOpenId()));
     }
 }

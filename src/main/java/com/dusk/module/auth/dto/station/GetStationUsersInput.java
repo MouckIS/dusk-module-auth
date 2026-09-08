@@ -37,7 +37,7 @@ public class GetStationUsersInput extends PagedAndSortedInputDto {
         if (StringUtils.isBlank(sorting)) {
             return Sort.unsorted();
         }
-        String sortingStr = sorting;
+        String sortingStr;
 
         if (StationUserListDto.Fields.stationId.equals(sorting)) {
             sortingStr = BaseEntity.Fields.id;

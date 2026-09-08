@@ -54,7 +54,7 @@ public class WxLoginAspect {
             userWxRelation.setUserId(user.getId());
             userWxRelationList.add(userWxRelation);
         });
-        if (userWxRelationList.size() > 0) {
+        if (!userWxRelationList.isEmpty()) {
             userWxRelationService.saveRelationList(userWxRelationList);
         }
     }

@@ -27,24 +27,24 @@ public class DashBoardAuthProvider extends AuthorizationProvider {
     public void setPermissions(IPermissionDefinitionContext context) {
         Permission administration = context.getPermissionOrNull(AdministrationAuthProvider.PAGES_ADMINISTRATION);
 
-        Permission dashBoard = administration.createChildPermission(PAGES_DASHBOARD, "数据大屏", MultiTenancySides.Tenant);
+        Permission dashBoard = administration.createChildPermission(PAGES_DASHBOARD, "数据大屏", MultiTenancySides.TENANT);
 
         /**
          * 主题管理
          */
-        Permission theme = dashBoard.createChildPermission(PAGES_DASHBOARD_THEME, "主题管理", MultiTenancySides.Tenant);
-        theme.createChildPermission(PAGES_DASHBOARD_THEME_EDIT, "创建或修改主题", MultiTenancySides.Tenant);
-        theme.createChildPermission(PAGES_DASHBOARD_THEME_DELETE, "删除主题", MultiTenancySides.Tenant);
+        Permission theme = dashBoard.createChildPermission(PAGES_DASHBOARD_THEME, "主题管理", MultiTenancySides.TENANT);
+        theme.createChildPermission(PAGES_DASHBOARD_THEME_EDIT, "创建或修改主题", MultiTenancySides.TENANT);
+        theme.createChildPermission(PAGES_DASHBOARD_THEME_DELETE, "删除主题", MultiTenancySides.TENANT);
 
         /**
          * 模块管理
          */
-        Permission module = dashBoard.createChildPermission(PAGES_DASHBOARD_THEME_MODULE, "数据模块", MultiTenancySides.Tenant);
-        module.createChildPermission(PAGES_DASHBOARD_THEME_MODULE_EDIT, "新增或修改数据模块", MultiTenancySides.Tenant);
-        module.createChildPermission(PAGES_DASHBOARD_THEME_MODULE_IMPORT, "导入模块配置", MultiTenancySides.Tenant);
-        module.createChildPermission(PAGES_DASHBOARD_THEME_MODULE_EXPORT, "导出模块配置", MultiTenancySides.Tenant);
-        module.createChildPermission(PAGES_DASHBOARD_THEME_MODULE_DELETE, "删除数据模块", MultiTenancySides.Tenant);
-        module.createChildPermission(PAGES_DASHBOARD_THEME_MODULE_ROUTE, "数据模块路由", MultiTenancySides.Tenant);
+        Permission module = dashBoard.createChildPermission(PAGES_DASHBOARD_THEME_MODULE, "数据模块", MultiTenancySides.TENANT);
+        module.createChildPermission(PAGES_DASHBOARD_THEME_MODULE_EDIT, "新增或修改数据模块", MultiTenancySides.TENANT);
+        module.createChildPermission(PAGES_DASHBOARD_THEME_MODULE_IMPORT, "导入模块配置", MultiTenancySides.TENANT);
+        module.createChildPermission(PAGES_DASHBOARD_THEME_MODULE_EXPORT, "导出模块配置", MultiTenancySides.TENANT);
+        module.createChildPermission(PAGES_DASHBOARD_THEME_MODULE_DELETE, "删除数据模块", MultiTenancySides.TENANT);
+        module.createChildPermission(PAGES_DASHBOARD_THEME_MODULE_ROUTE, "数据模块路由", MultiTenancySides.TENANT);
     }
 
 }

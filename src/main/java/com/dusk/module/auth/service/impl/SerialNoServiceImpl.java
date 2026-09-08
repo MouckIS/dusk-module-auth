@@ -25,6 +25,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 /**
  * @author kefuming
@@ -49,7 +50,7 @@ public class SerialNoServiceImpl extends BaseService<SerialNo, ISerialNoReposito
         SerialNo serialNo = queryFactory.selectFrom(QSerialNo.serialNo).where(QSerialNo.serialNo.billType.eq(billType)).fetchFirst();
         long currentNo = 0;
         String[] bill_nos = new String[count];
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
         if (serialNo != null) {
             currentNo = serialNo.getCurrentNo();
             if (!codeFirst) {
@@ -64,15 +65,15 @@ public class SerialNoServiceImpl extends BaseService<SerialNo, ISerialNoReposito
 
             LocalDateTime lastUpdateTime = serialNo.getLastUpdateTime();
             switch (resetType) {
-                case Day:
+                case DAY:
                     if (now.getDayOfMonth() != lastUpdateTime.getDayOfMonth()) {
                         currentNo = 0;
                     }
-                case Month:
+                case MONTH:
                     if (now.getMonthValue() != lastUpdateTime.getMonthValue()) {
                         currentNo = 0;
                     }
-                case Year:
+                case YEAR:
                     if (now.getYear() != lastUpdateTime.getYear()) {
                         currentNo = 0;
                     }
@@ -96,7 +97,7 @@ public class SerialNoServiceImpl extends BaseService<SerialNo, ISerialNoReposito
             serialNo.setCurrentNo(nextNo);
             serialNo.setLastNo(bill_nos[i]);
         }
-        serialNo.setLastUpdateTime(LocalDateTime.now());
+        serialNo.setLastUpdateTime(LocalDateTime.now(ZoneId.systemDefault()));
 
         save(serialNo);
         return bill_nos;

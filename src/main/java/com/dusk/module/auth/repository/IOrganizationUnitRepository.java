@@ -47,7 +47,7 @@ public interface IOrganizationUnitRepository extends IBaseRepository<Organizatio
             "and (u.userStatus = 'OnJob')")
     Page<OrganizationUnitUserInfoListDto> getOrganizationUnitUsersInfo(@Param("queryOrgaIds") Set<Long> queryOrgaIds, @Param("filter") String filter, Pageable pageable, @Param("type") EUnitType type);
 
-    @Query("select distinct new com.dusk.module.auth.dto.orga.OrganizationUnitUserForSelectDto(u.id,u.name,u.userName) from User u where u.id not in (select u2.id from OrganizationUnit orga inner join orga.users u2 where orga.id = :orgId) and (:filter is null or :filter = '' or u.name like %:filter% or u.userName like %:filter%) and u.userType = 'Inner' and u.organizationUnit is empty")
+    @Query("select distinct new com.dusk.module.auth.dto.orga.OrganizationUnitUserForSelectDto(u.id,u.name,u.userName) from User u where u.id not in (select u2.id from OrganizationUnit orga inner join orga.users u2 where orga.id = :orgId) and (:filter is null or :filter = '' or u.name like %:filter% or u.userName like %:filter%) and u.userType = 'INNER' and u.organizationUnit is empty")
     Page<OrganizationUnitUserForSelectDto> getOrganizationUnitUsersForSelect(@Param("orgId") Long orgId, @Param("filter") String filter, Pageable pageable);
 
     @Query("select orga from OrganizationUnit orga inner join orga.users u where u.id = :userId ")

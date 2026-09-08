@@ -26,20 +26,12 @@ public class RolePermissionImportListener extends AnalysisEventListener<LinkedHa
     @Override
     public void invoke(LinkedHashMap<Integer, String> data, AnalysisContext context) {
         switch (currentRow) {
-            case 0 -> {
-                readRoleCode(data);
-            }
-            case 1 -> {
-                readRoleName(data);
-            }
-            case 2 -> {
-                readRoleDefault(data);
-            }
+            case 0 -> readRoleCode(data);
+            case 1 -> readRoleName(data);
+            case 2 -> readRoleDefault(data);
             case 3 -> {
             }
-            default -> {
-                readRolePermission(data);
-            }
+            default -> readRolePermission(data);
         }
         currentRow++;
     }
@@ -54,11 +46,7 @@ public class RolePermissionImportListener extends AnalysisEventListener<LinkedHa
 
     void readRoleDefault(LinkedHashMap<Integer, String> data) {
         String value = data.get(2);
-        if (StringUtils.equals("是", value)) {
-            roleDto.setDefault(true);
-        } else {
-            roleDto.setDefault(false);
-        }
+        roleDto.setDefault(StringUtils.equals("是", value));
     }
 
     void readRolePermission(LinkedHashMap<Integer, String> data) {

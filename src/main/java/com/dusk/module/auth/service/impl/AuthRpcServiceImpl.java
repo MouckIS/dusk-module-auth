@@ -112,7 +112,7 @@ public class AuthRpcServiceImpl implements IAuthRpcService {
                         List<StationsOfLoginUserDto> stations = stationService.getStationsForFrontByUserId(userContext.getId());
                         if (featureChecker.isEnabled(CenterControlFeatureProvider.STATION_CENTER_CONTROL)) {
                             List<Long> allOrg = new ArrayList<>();
-                            List<Long> collect = stations.stream().map(NameValueDto::getValue).collect(Collectors.toList());
+                            List<Long> collect = stations.stream().map(NameValueDto::getValue).toList();
                             collect.forEach(p -> {
                                 List<Long> linkOrgs = dataFilterDefinitionContext.getDataFilterDefinition().get(p.toString());
                                 linkOrgs.forEach(q -> {
@@ -121,7 +121,7 @@ public class AuthRpcServiceImpl implements IAuthRpcService {
                                     }
                                 });
                             });
-                            if (allOrg.size() > 0) {
+                            if (!allOrg.isEmpty()) {
                                 return CollectionUtil.join(allOrg, ",");
                             }
                             return null;
@@ -131,8 +131,8 @@ public class AuthRpcServiceImpl implements IAuthRpcService {
                             if (defaultStation.isPresent()) {
                                 orgId = defaultStation.get().getValue().toString();
                             } else {
-                                if (stations.size() > 0) {
-                                    orgId = stations.get(0).getValue().toString();
+                                if (!stations.isEmpty()) {
+                                    orgId = stations.getFirst().getValue().toString();
                                 }
                             }
                         }
@@ -145,7 +145,7 @@ public class AuthRpcServiceImpl implements IAuthRpcService {
         }
         if (!StringUtils.isEmpty(orgId)) {
             List<Long> ids = dataFilterDefinitionContext.getDataFilterDefinition().get(orgId);
-            if (ids != null && ids.size() > 0) {
+            if (ids != null && !ids.isEmpty()) {
                 Long[] orgIdArr = new Long[ids.size()];
                 ids.toArray(orgIdArr);
                 return ArrayUtil.join(orgIdArr, ",");

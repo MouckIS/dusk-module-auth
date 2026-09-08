@@ -319,11 +319,9 @@ public class SettingManagerDefault implements ISettingManager {
     }
 
     private Specification<Setting> createQuery(Long tenantId, Long stationId, Long userId, String name) {
-        return Specifications.where(e -> {
-            e.eq(tenantId != null, Setting.Fields.tenantId, tenantId).isNull(tenantId == null, Setting.Fields.tenantId).eq(stationId != null, Setting.Fields.stationId, stationId)
-                    .isNull(stationId == null, Setting.Fields.stationId).eq(userId != null, Setting.Fields.userId, userId).isNull(userId == null, Setting.Fields.userId)
-                    .eq(StrUtil.isNotBlank(name), Setting.Fields.name, name);
-        });
+        return Specifications.where(e -> e.eq(tenantId != null, Setting.Fields.tenantId, tenantId).isNull(tenantId == null, Setting.Fields.tenantId).eq(stationId != null, Setting.Fields.stationId, stationId)
+                .isNull(stationId == null, Setting.Fields.stationId).eq(userId != null, Setting.Fields.userId, userId).isNull(userId == null, Setting.Fields.userId)
+                .eq(StrUtil.isNotBlank(name), Setting.Fields.name, name));
     }
 
     private SettingInfo getSettingOrNull(Long tenantId, Long stationId, Long userId, String name) {

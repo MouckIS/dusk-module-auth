@@ -116,7 +116,7 @@ public class RoleController extends CruxBaseController {
     @Authorize(RoleAuthProvider.PAGES_ROLES_CREATEOREDIT)
     public void importRole(@Parameter(description = "Excel文件", required = true) MultipartFile file) {
         InputStream stream = null;
-        RoleDto roleDto = null;
+        RoleDto roleDto;
         try {
             stream = file.getInputStream();
             RolePermissionImportListener listener = new RolePermissionImportListener();

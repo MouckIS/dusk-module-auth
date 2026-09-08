@@ -37,6 +37,6 @@ public class EditionSelectDto extends EntityDto {
     private Map<SubscriptionPaymentGatewayType, Map<String, String>> additionalData;
 
     public EditionSelectDto() {
-        additionalData = new HashMap<SubscriptionPaymentGatewayType, Map<String, String>>();
+        additionalData = new HashMap<>();
     }
 }

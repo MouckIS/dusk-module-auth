@@ -44,7 +44,7 @@ public class CommonFavoriteServiceImpl extends BaseService<CommonFavorite, IComm
     @SneakyThrows
     @Override
     public CommonFavoriteDto save(@Valid CommonFavoriteDto dto) {
-        CommonFavorite commonFavorite = null;
+        CommonFavorite commonFavorite;
         if (dto.getId() == null) {
             long count = queryFactory.selectFrom(qCommonFavorite).where(qCommonFavorite.name.eq(dto.getName()).and(qCommonFavorite.type.eq(dto.getType()))).fetchCount();
             if (count > 0) {

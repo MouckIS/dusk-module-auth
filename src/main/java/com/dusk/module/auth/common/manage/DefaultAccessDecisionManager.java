@@ -18,12 +18,10 @@ import java.util.Iterator;
 public class DefaultAccessDecisionManager {
 
     public boolean decide(UserContext authentication, Collection<ConfigAttribute> configAttributes) throws AccessDeniedException, InsufficientAuthenticationException {
-        if (configAttributes == null || configAttributes.size() == 0) {
+        if (configAttributes == null || configAttributes.isEmpty()) {
             return true;
         }
-        Iterator<ConfigAttribute> ite = configAttributes.iterator();
-        while (ite.hasNext()) {
-            ConfigAttribute ca = ite.next();
+        for (ConfigAttribute ca : configAttributes) {
             String needRole = ca.getAttribute();
             for (GrantedAuthority ga : authentication.getAuthorities()) {
                 if (needRole.equals(ga.getAuthority()))

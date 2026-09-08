@@ -47,9 +47,7 @@ public class CustomerRpcServiceImpl implements ICustomerRpcService {
 
     @Override
     public List<OrganizationUnitDto> getCustomerList(String code) {
-        List<OrganizationUnit> organizationUnitList = organizationUnitService.findAll(Specifications.where(e -> {
-            e.startingWith(OrganizationUnit.Fields.code, code);
-        }));
+        List<OrganizationUnit> organizationUnitList = organizationUnitService.findAll(Specifications.where(e -> e.startingWith(OrganizationUnit.Fields.code, code)));
         return MapperUtil.mapList(organizationUnitList, mapper::toDto);
     }
 

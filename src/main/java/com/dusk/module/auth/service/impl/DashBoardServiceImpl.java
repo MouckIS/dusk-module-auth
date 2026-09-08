@@ -123,9 +123,7 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
         List<ClassifyDetailDto> sortedClassifies = classifyDetailDtos.stream().sorted(Comparator.comparing(ClassifyDetailDto::getSeq)).collect(Collectors.toList());
         themeDto.setClassifyList(sortedClassifies);
 
-        sortedClassifies.forEach((classify) -> {
-            classify.setZones(findClassifyZones(classify));
-        });
+        sortedClassifies.forEach((classify) -> classify.setZones(findClassifyZones(classify)));
         return themeDto;
     }
 
@@ -145,9 +143,7 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
 
         //更新区域列表
         zoneRepository.deleteAllByClassifyId(dashboardClassify.getId());
-        input.getZones().forEach((zone) -> {
-            saveZone(zone, dashboardClassify);
-        });
+        input.getZones().forEach((zone) -> saveZone(zone, dashboardClassify));
 
         return dashboardClassify;
     }
@@ -161,9 +157,7 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
         //更新区域统计项
         zoneItemRefRepository.deleteAllByZoneId(input.getId());
         if (input.getZoneItems() != null) {
-            input.getZoneItems().forEach((item) -> {
-                saveZoneItemRef(item, zone);
-            });
+            input.getZoneItems().forEach((item) -> saveZoneItemRef(item, zone));
         }
         return zone;
     }
@@ -187,9 +181,7 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
         List<DashboardZone> zones = zoneRepository.findAllByClassifyIdOrderByZonePosition(classifyDto.getId());
         List<ZoneDetailDto> zoneDtos = MapperUtil.mapList(zones, mapper::toZoneDetailDto);
 
-        zoneDtos.forEach((zone) -> {
-            zone.setZoneItems(findZoneItemDetail(zone));
-        });
+        zoneDtos.forEach((zone) -> zone.setZoneItems(findZoneItemDetail(zone)));
         return zoneDtos;
     }
 
@@ -270,7 +262,7 @@ public class DashBoardServiceImpl extends CreateOrUpdateService<DashboardTheme, 
         if (user == null) {
             throw new BusinessException("id为[" + userId + "]的用户不存在！");
         }
-        if (user.getUserRoles() == null || user.getUserRoles().size() == 0) {
+        if (user.getUserRoles() == null || user.getUserRoles().isEmpty()) {
             return new ArrayList<>();
         }
         List<Long> roleIds = user.getUserRoles().stream().map(UserRoleDto::getId).collect(Collectors.toList());

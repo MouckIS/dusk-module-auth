@@ -93,13 +93,13 @@ public class SubscribableEdition extends CreationEntity {
 
     public BigDecimal getPaymentAmount(PaymentPeriodType paymentPeriodType) throws Exception {
         switch (paymentPeriodType) {
-            case Monthly -> {
+            case MONTHLY -> {
                 if (monthlyPrice == null) {
                     throw new Exception("No price information found for " + displayName + " edition!");
                 }
                 return monthlyPrice;
             }
-            case Annual -> {
+            case ANNUAL -> {
                 if (annualPrice == null) {
                     throw new Exception("No price information found for " + displayName + " edition!");
                 }

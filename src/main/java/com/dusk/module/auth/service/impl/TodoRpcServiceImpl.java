@@ -63,10 +63,8 @@ public class TodoRpcServiceImpl implements ITodoRpcService {
                     toDoService.finishTodo(p.getType(), p.getBusinessId());
                 }
             });
-            if (input.size() > 0) {
-                input.forEach(p -> {
-                    toDoService.addTodo(p);
-                });
+            if (!input.isEmpty()) {
+                input.forEach(p -> toDoService.addTodo(p));
             }
         }
     }
@@ -83,10 +81,8 @@ public class TodoRpcServiceImpl implements ITodoRpcService {
                     toDoService.finishTodo(p.getType(), p.getBusinessId());
                 }
             });
-            if (input.size() > 0) {
-                input.forEach(p -> {
-                    toDoService.addTodo(p);
-                });
+            if (!input.isEmpty()) {
+                input.forEach(p -> toDoService.addTodo(p));
             }
         }
     }
@@ -104,8 +100,7 @@ public class TodoRpcServiceImpl implements ITodoRpcService {
         query.where(subQuery.exists());
         return query.fetch().stream().map(s -> {
             String[] targetData = s.getTodoPermissions().stream().map(TodoPermission::getPermission).toArray(String[]::new);
-            ToDoDto t = new ToDoDto(s.getType(), s.getTypeName(), s.getTitle(), s.getState(), s.getTargetType(), targetData, s.getBusinessId(), s.getExtensions());
-            return t;
+            return new ToDoDto(s.getType(), s.getTypeName(), s.getTitle(), s.getState(), s.getTargetType(), targetData, s.getBusinessId(), s.getExtensions());
         }).collect(Collectors.toList());
     }
 }

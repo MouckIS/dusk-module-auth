@@ -90,7 +90,7 @@ public class UserFingerprintServiceImpl extends BaseService<UserFingerprint, IUs
     @Override
     public List<UserFingerprintDto> getAll(GetAllInputDto inputDto) {
         List<UserFingerprint> all = findAll(Specifications.where(e -> {
-            e.in(inputDto.getUserIds().size() > 0, UserFingerprint.Fields.userId, inputDto.getUserIds());
+            e.in(!inputDto.getUserIds().isEmpty(), UserFingerprint.Fields.userId, inputDto.getUserIds());
             e.contains(StrUtil.isNotBlank(inputDto.getFilter()), UserFingerprint.Fields.name, inputDto.getFilter());
             e.eq(inputDto.getFingerprintId() != null, BaseEntity.Fields.id, inputDto.getFingerprintId());
         }), Sort.by(BaseEntity.Fields.id));
@@ -109,11 +109,11 @@ public class UserFingerprintServiceImpl extends BaseService<UserFingerprint, IUs
             throw new BusinessException("未找到用户指纹数据");
         }
 
-        List<String> dataList = fingerprintList.stream().map(UserFingerprint::getData).collect(Collectors.toList());
+        List<String> dataList = fingerprintList.stream().map(UserFingerprint::getData).toList();
         String[] dataArr = dataList.toArray(new String[]{});
 
         mqttUtils.publishMsgAsync(StrUtil.format(TOPIC_IDENTIFY_START, inputDto.getDeviceNo())
-                , new IdentifyFingerprintStartPayload(fingerprintList.get(0).getUserSeq(), dataArr));
+                , new IdentifyFingerprintStartPayload(fingerprintList.getFirst().getUserSeq(), dataArr));
     }
 
     @Override
@@ -157,10 +157,10 @@ public class UserFingerprintServiceImpl extends BaseService<UserFingerprint, IUs
                     e.isNotNull(UserFingerprint.Fields.userSeq);
                 }));
 
-                if (userFingerprintList.size() > 0) {
-                    userSeq = userFingerprintList.get(0).getUserSeq();
+                if (!userFingerprintList.isEmpty()) {
+                    userSeq = userFingerprintList.getFirst().getUserSeq();
                 } else {
-                    userSeq = Integer.parseInt(serialNoRpcService.getSerialNo("userSeq", EnumResetType.Never,
+                    userSeq = Integer.parseInt(serialNoRpcService.getSerialNo("userSeq", EnumResetType.NEVER,
                             null, 5));
                 }
 

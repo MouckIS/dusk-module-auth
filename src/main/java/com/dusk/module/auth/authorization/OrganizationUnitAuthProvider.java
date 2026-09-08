@@ -23,6 +23,6 @@ public class OrganizationUnitAuthProvider extends AuthorizationProvider {
         Permission organizationUnits = administration.createChildPermission(PAGES_ADMINISTRATION_ORGANIZATIONUNITS, "管理组织机构");
         organizationUnits.createChildPermission(PAGES_ADMINISTRATION_ORGANIZATIONUNITS_MANAGEORGANIZATIONTREE, "管理组织机构树");
         organizationUnits.createChildPermission(PAGES_ADMINISTRATION_ORGANIZATIONUNITS_MANAGEMEMBERS, "管理成员");
-        organizationUnits.createChildPermission(PAGES_ADMINISTRATION_ORGANIZATIONUNITS_STATION_ENABLED, "设置厂站可用/不可用", MultiTenancySides.Tenant);
+        organizationUnits.createChildPermission(PAGES_ADMINISTRATION_ORGANIZATIONUNITS_STATION_ENABLED, "设置厂站可用/不可用", MultiTenancySides.TENANT);
     }
 }

@@ -9,10 +9,7 @@ import com.dusk.common.mqs.pusher.NotificationOption;
 import com.dusk.common.mqs.pusher.PushMessage;
 import com.dusk.common.mqs.pusher.PushSMS;
 import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.AmqpAdmin;
-import org.springframework.amqp.core.Queue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -30,8 +27,7 @@ public class NotificationPushManager implements INotificationPushManager {
     private final static String SMS_PUSH_QUEUE_NAME = "sms.aliyun";
     @Autowired(required = false)
     private MessageSender sender;
-    @Resource
-    private AmqpAdmin amqpAdmin;
+
     /**
      * IOS系统App的Key
      */
@@ -45,11 +41,11 @@ public class NotificationPushManager implements INotificationPushManager {
 
     @PostConstruct
     public void declareQueue() {
-        if (amqpAdmin == null) {
-            return;
-        }
-        amqpAdmin.declareQueue(new Queue(MOBILE_PUSH_QUEUE_NAME));
-        amqpAdmin.declareQueue(new Queue(SMS_PUSH_QUEUE_NAME));
+        //if (amqpAdmin == null) {
+        //    return;
+        //}
+        //amqpAdmin.declareQueue(new Queue(MOBILE_PUSH_QUEUE_NAME));
+        //amqpAdmin.declareQueue(new Queue(SMS_PUSH_QUEUE_NAME));
         log.info("推送服务正常启动");
     }
 

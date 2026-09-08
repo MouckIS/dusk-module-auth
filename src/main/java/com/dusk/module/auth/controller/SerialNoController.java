@@ -22,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 /**
@@ -54,7 +55,7 @@ public class SerialNoController extends CruxBaseController {
     @GetMapping("/testNo")
     @Operation(summary = "测试票号配置，获取当前配置的序列号结果")
     public String testNo(String noFormat, int serialLength) {
-        return serialNoService.getCurrentNo(LocalDateTime.now(), noFormat, 1, serialLength);
+        return serialNoService.getCurrentNo(LocalDateTime.now(ZoneId.systemDefault()), noFormat, 1, serialLength);
     }
 
 
@@ -62,7 +63,7 @@ public class SerialNoController extends CruxBaseController {
     @Operation(summary = "测试获取下一个票号（不占用序列号）")
     public String testNextNo(@PathVariable Long id) {
         SerialNo data = serialNoService.getOneById(id);
-        return serialNoService.getCurrentNo(LocalDateTime.now(), data.getDateFormat(), data.getCurrentNo() + 1, data.getNoLength());
+        return serialNoService.getCurrentNo(LocalDateTime.now(ZoneId.systemDefault()), data.getDateFormat(), data.getCurrentNo() + 1, data.getNoLength());
     }
 
     @GetMapping("/getEnum")

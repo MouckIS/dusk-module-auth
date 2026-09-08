@@ -18,6 +18,6 @@ public class AdministrationAuthProvider extends AuthorizationProvider {
 
     @Override
     public void setPermissions(IPermissionDefinitionContext context) {
-        context.createPermission(PAGES_ADMINISTRATION, "系统管理", MultiTenancySides.All);
+        context.createPermission(PAGES_ADMINISTRATION, "系统管理", MultiTenancySides.ALL);
     }
 }

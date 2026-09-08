@@ -27,13 +27,13 @@ public class TenantAuthProvider extends AuthorizationProvider {
     @Override
     public void setPermissions(IPermissionDefinitionContext context) {
         Permission administration = context.getPermissionOrNull(AdministrationAuthProvider.PAGES_ADMINISTRATION);
-        Permission tenants = administration.createChildPermission(PAGES_TENANTS, "租户", MultiTenancySides.Host);
-        tenants.createChildPermission(PAGES_TENANTS_CREATE, "新增租户", MultiTenancySides.Host);
-        tenants.createChildPermission(PAGES_TENANTS_EDIT, "编辑租户", MultiTenancySides.Host);
-        tenants.createChildPermission(PAGES_TENANTS_CHANGEFEATURES, "修改租户特性", MultiTenancySides.Host);
-        tenants.createChildPermission(PAGES_TENANTS_DELETE, "删除租户", MultiTenancySides.Host);
-        tenants.createChildPermission(PAGES_TENANTS_IMPERSONATION, "租户登录", MultiTenancySides.Host);
-        tenants.createChildPermission(PAGES_TENANTS_PRODUCTSMANAGEMENT, "租户产品管理", MultiTenancySides.Host);
-        tenants.createChildPermission(PAGES_TENANTS_CHANGEPASSWORD, "修改租户管理员密码", MultiTenancySides.Host);
+        Permission tenants = administration.createChildPermission(PAGES_TENANTS, "租户", MultiTenancySides.HOST);
+        tenants.createChildPermission(PAGES_TENANTS_CREATE, "新增租户", MultiTenancySides.HOST);
+        tenants.createChildPermission(PAGES_TENANTS_EDIT, "编辑租户", MultiTenancySides.HOST);
+        tenants.createChildPermission(PAGES_TENANTS_CHANGEFEATURES, "修改租户特性", MultiTenancySides.HOST);
+        tenants.createChildPermission(PAGES_TENANTS_DELETE, "删除租户", MultiTenancySides.HOST);
+        tenants.createChildPermission(PAGES_TENANTS_IMPERSONATION, "租户登录", MultiTenancySides.HOST);
+        tenants.createChildPermission(PAGES_TENANTS_PRODUCTSMANAGEMENT, "租户产品管理", MultiTenancySides.HOST);
+        tenants.createChildPermission(PAGES_TENANTS_CHANGEPASSWORD, "修改租户管理员密码", MultiTenancySides.HOST);
     }
 }

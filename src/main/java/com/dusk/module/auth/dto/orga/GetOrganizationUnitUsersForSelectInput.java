@@ -31,7 +31,7 @@ public class GetOrganizationUnitUsersForSelectInput extends PagedAndSortedInputD
         if (StringUtils.isBlank(sorting)) {
             return Sort.unsorted();
         }
-        String sortingStr = sorting;
+        String sortingStr;
 
         if (OrganizationUnitUserListDto.Fields.organizationUnitId.equals(sorting)) {
             sortingStr = BaseEntity.Fields.id;

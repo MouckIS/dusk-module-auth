@@ -70,7 +70,7 @@ public class TenantPermissionServiceImpl extends BaseService<TenantPermission, I
                 tenantPermission.setName(p);
                 saveDatas.add(tenantPermission);
             });
-            if (saveDatas.size() > 0) {
+            if (!saveDatas.isEmpty()) {
                 repository.saveAll(saveDatas);
             }
         }
@@ -111,9 +111,7 @@ public class TenantPermissionServiceImpl extends BaseService<TenantPermission, I
         Map<String, List<Long>> resultMap = new HashMap<>();
         if (appAuthConfig.isDisableTenantAuthFilter()) {
             List<Long> fetch = jpaQueryFactory.select(qTenant.id).from(qTenant).fetch();
-            allPermission.forEach(p -> {
-                resultMap.put(p, fetch);
-            });
+            allPermission.forEach(p -> resultMap.put(p, fetch));
         } else {
             Map<String, List<Tuple>> editionMap = jpaQueryFactory.select(qTenant.id, qTenantPermission.name).from(qTenant).innerJoin(qTenantPermission)
                     .on(qTenant.edition.id.eq(qTenantPermission.editionId)).where(qTenantPermission.editionId.isNotNull()).fetch().stream().collect(Collectors.groupingBy(p -> p.get(qTenantPermission.name)));
@@ -133,8 +131,7 @@ public class TenantPermissionServiceImpl extends BaseService<TenantPermission, I
 
     private List<TenantPermission> getPermissionByEditionId(Long editionId) {
         QTenantPermission qTenantPermission = QTenantPermission.tenantPermission;
-        List<TenantPermission> fetch = jpaQueryFactory.selectFrom(qTenantPermission).where(qTenantPermission.editionId.eq(editionId)).fetch();
-        return fetch;
+        return jpaQueryFactory.selectFrom(qTenantPermission).where(qTenantPermission.editionId.eq(editionId)).fetch();
     }
 
 

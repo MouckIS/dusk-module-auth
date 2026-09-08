@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -61,7 +62,7 @@ public class SubscribableEditionController extends CruxBaseController {
     public void exportEdition(@PathVariable Long id, HttpServletResponse response) throws Exception {
         response.setContentType("application/vnd.ms-excel;charset=utf-8");
         response.setCharacterEncoding("utf-8");
-        String fileName = URLEncoder.encode("版本信息导出", "UTF-8").replaceAll("\\+", "%20");
+        String fileName = URLEncoder.encode("版本信息导出", StandardCharsets.UTF_8).replaceAll("\\+", "%20");
         response.setHeader("Content-Disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
         Workbook workbook = editionService.export(id);
         workbook.write(response.getOutputStream());
@@ -131,27 +132,25 @@ public class SubscribableEditionController extends CruxBaseController {
             @RequestParam(defaultValue = "false") Boolean onlyFreeItems) {
         var editions = editionService.findAll();
         var subscribableEditions = editions.stream()
-                .filter(e -> {
-                    return !onlyFreeItems || e.isFree();
-                })
-                .collect(Collectors.toList());
+                .filter(e -> !onlyFreeItems || e.isFree())
+                .toList();
 
         var editionItems = subscribableEditions.stream()
                 .map(e -> new SubscribableEditionComboboxItemDto(String.valueOf(e.getId()), e.getDisplayName(), e.isFree()))
                 .collect(Collectors.toList());
 
         var defaultItem = new SubscribableEditionComboboxItemDto("", "没有分配", null);
-        editionItems.add(0, defaultItem);
+        editionItems.addFirst(defaultItem);
 
         if (addAllItem) {
-            editionItems.add(0, new SubscribableEditionComboboxItemDto("-1", "- " + "全部" + " -", null));
+            editionItems.addFirst(new SubscribableEditionComboboxItemDto("-1", "- " + "全部" + " -", null));
         }
 
         if (StringUtils.isNoneBlank(selectedEditionId)) {
             var selectedEdition = editionItems.stream().filter(e -> selectedEditionId.equals(e.getValue())).findFirst();
             selectedEdition.ifPresent(subscribableEditionComboboxItemDto -> subscribableEditionComboboxItemDto.setSelected(true));
         } else {
-            editionItems.get(0).setSelected(true);
+            editionItems.getFirst().setSelected(true);
         }
         return editionItems;
     }
