@@ -2,12 +2,11 @@ package com.dusk.module.auth.impl;
 
 
 import com.dusk.common.core.tenant.TenantContextHolder;
-import com.dusk.common.mqs.config.AppConfig;
 import com.dusk.module.auth.service.IFeatureChecker;
 import com.dusk.module.auth.service.IFeatureRpcService;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -19,8 +18,9 @@ import org.springframework.stereotype.Service;
 public class FeatureChecker implements IFeatureChecker {
     @DubboReference
     private IFeatureRpcService featureRpcService;
-    @Resource
-    private AppConfig appConfig;
+
+    @Value("${spring.application.name}")
+    private String applicationName;
 
     @Override
     public String getValue(String name) {
@@ -49,6 +49,6 @@ public class FeatureChecker implements IFeatureChecker {
 
 
     private String getFeatureValue(Long tenantId, String name) {
-        return featureRpcService.getValue(appConfig.getApplicationName(), tenantId, name);
+        return featureRpcService.getValue(applicationName, tenantId, name);
     }
 }

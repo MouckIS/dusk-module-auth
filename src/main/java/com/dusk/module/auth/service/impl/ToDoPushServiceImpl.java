@@ -40,7 +40,7 @@ public class ToDoPushServiceImpl implements ToDoPushService {
     public final static String TODO_TOPIC = "T/{}/crux/todo";
     public final TodoMapper mapper = TodoMapper.INSTANCE;
 
-    @Resource
+    @Autowired(required = false)
     private MqttUtils mqttUtils;
     @Resource
     private IUserManage userManage;

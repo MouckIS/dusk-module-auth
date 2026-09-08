@@ -30,6 +30,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,7 +53,7 @@ public class NotificationServiceImpl extends BaseService<UserNotification, IUser
     private final NotificationMapper mapper = NotificationMapper.INSTANCE;
     private final QNotification qNotification = QNotification.notification;
     private final QUserNotification qUserNotification = QUserNotification.userNotification;
-    @Resource
+    @Autowired(required = false)
     private MqttUtils mqttUtils;
     @Resource
     private SecurityUtils securityUtils;

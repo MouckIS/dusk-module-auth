@@ -23,10 +23,11 @@ import com.dusk.common.core.service.impl.BaseService;
 import com.dusk.common.core.tenant.TenantContextHolder;
 import com.dusk.common.core.utils.MapperUtil;
 import com.dusk.common.core.utils.SecurityUtils;
+import com.dusk.common.mqs.core.MessageSender;
+import com.dusk.common.mqs.core.MqMessage;
 import com.dusk.common.mqs.pusher.PushSMS;
 import com.dusk.common.mqs.pusher.SmsPushConfig;
 import com.dusk.common.mqs.pusher.SmsTemplateParam;
-import com.dusk.common.mqs.utils.RabbitMQUtils;
 import com.dusk.common.rpc.auth.dto.ChangePwdInput;
 import com.dusk.common.rpc.auth.dto.CreateOrUpdateUserInput;
 import com.dusk.common.rpc.auth.dto.UserEditDto;
@@ -35,7 +36,7 @@ import com.dusk.common.rpc.auth.dto.orga.GetOrganizationUnitUsersInput;
 import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitUserListDto;
 import com.dusk.module.auth.common.config.AppAuthConfig;
 import com.dusk.module.auth.common.manage.TokenAuthManager;
-import com.dusk.module.auth.common.rabbitmq.RabbitConstant;
+import com.dusk.module.auth.common.topic.MqTopicConstant;
 import com.dusk.module.auth.common.util.LoginUtils;
 import com.dusk.module.auth.dto.station.AddUsersToStationInput;
 import com.dusk.module.auth.dto.station.RemoveUserFromStationInput;
@@ -167,8 +168,8 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     private IStationService stationService;
     @DubboReference
     private ISettingRpcService settingRpcService;
-    @Resource
-    private RabbitMQUtils rabbitMQUtils;
+    @Autowired(required = false)
+    private MessageSender sender;
     //随机密码长度，可配置读取
     @Value("${app.setting.passwdLen}")
     private int passwdLen;
@@ -828,7 +829,11 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
         //userFaceRpcService.removeFace(id);
         //删除门禁权限
         CancelAuthDto cancelAuthDto = new CancelAuthDto(TenantContextHolder.getTenantId(), Collections.singletonList(id));
-        rabbitMQUtils.publishMsgAsync(RabbitConstant.CANCEL_USER_AUTH_FANOUT_EXCHANGE_V1, "", cancelAuthDto);
+        MqMessage<CancelAuthDto> msg = new MqMessage<>();
+        msg.setTopic(MqTopicConstant.CANCEL_USER_AUTH_FANOUT_EXCHANGE_V1);
+        msg.setPayload(cancelAuthDto);
+        msg.setBizKey(id.toString());
+        sender.sendAsync(msg);
     }
 
     @Override
@@ -894,7 +899,10 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
                 //userFaceRpcService.removeFace(id);
             }
             CancelAuthDto cancelAuthDto = new CancelAuthDto(TenantContextHolder.getTenantId(), userIds);
-            rabbitMQUtils.publishMsgAsync(RabbitConstant.CANCEL_USER_AUTH_FANOUT_EXCHANGE_V1, "", cancelAuthDto);
+            MqMessage<CancelAuthDto> message = new MqMessage<>();
+            message.setTopic(MqTopicConstant.CANCEL_USER_AUTH_FANOUT_EXCHANGE_V1);
+            message.setPayload(cancelAuthDto);
+            sender.sendAsync(message);
         }
     }
 

@@ -1,20 +1,20 @@
 package com.dusk.module.auth.push;
 
+import com.dusk.common.mqs.core.MessageSender;
+import com.dusk.common.mqs.core.MqMessage;
 import com.dusk.common.mqs.enums.PushDeviceType;
 import com.dusk.common.mqs.enums.PushType;
 import com.dusk.common.mqs.pusher.Navigation;
 import com.dusk.common.mqs.pusher.NotificationOption;
 import com.dusk.common.mqs.pusher.PushMessage;
 import com.dusk.common.mqs.pusher.PushSMS;
-import com.dusk.common.mqs.rabbitmq.RabbitMQEnableCondition;
-import com.dusk.common.mqs.utils.RabbitMQUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.Queue;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -24,13 +24,12 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-@Conditional(RabbitMQEnableCondition.class)
 public class NotificationPushManager implements INotificationPushManager {
     //#region 常量
     private final static String MOBILE_PUSH_QUEUE_NAME = "push.aliyun";
     private final static String SMS_PUSH_QUEUE_NAME = "sms.aliyun";
-    @Resource
-    private RabbitMQUtils rabbitMQUtils;
+    @Autowired(required = false)
+    private MessageSender sender;
     @Resource
     private AmqpAdmin amqpAdmin;
     /**
@@ -73,15 +72,15 @@ public class NotificationPushManager implements INotificationPushManager {
             pushMessage.setTitle(pushMessage.getTitle().substring(0, 15));
         }
         Payload payload = new Payload(pushType, pushMessage, option, navigation);
+        MqMessage<Payload> message = new MqMessage<>();
+        message.setTopic(MOBILE_PUSH_QUEUE_NAME);
         if (pushMessage.getDeviceType().equals(PushDeviceType.ALL) || pushMessage.getDeviceType().equals(PushDeviceType.ANDROID)) {
             payload.setAppKey(androidAppKey);
-            rabbitMQUtils.publishMsg(MOBILE_PUSH_QUEUE_NAME, payload);
-        }
-        if (pushMessage.getDeviceType().equals(PushDeviceType.ALL) || pushMessage.getDeviceType().equals(PushDeviceType.iOS)) {
+        } else {
             payload.setAppKey(iosAppKey);
-            rabbitMQUtils.publishMsg(MOBILE_PUSH_QUEUE_NAME, payload);
         }
-
+        message.setPayload(payload);
+        sender.sendAsync(message);
     }
 
     @Async
@@ -100,7 +99,11 @@ public class NotificationPushManager implements INotificationPushManager {
      */
     @Override
     public void smsPush(PushSMS input) {
-        rabbitMQUtils.publishMsg(SMS_PUSH_QUEUE_NAME, input);
+        MqMessage<PushSMS> msg = new MqMessage<>();
+        msg.setTopic(SMS_PUSH_QUEUE_NAME);
+        msg.setPayload(input);
+        msg.setBizKey(input.getPhoneNumbers());
+        sender.sendAsync(msg);
     }
 
     @Async
