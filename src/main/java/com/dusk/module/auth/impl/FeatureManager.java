@@ -8,6 +8,8 @@ import com.dusk.module.auth.service.IFeatureManager;
 import com.dusk.module.auth.service.IFeaturePusher;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -48,7 +50,16 @@ public class FeatureManager implements IFeatureManager {
             value.setFeatures(featureDefinitionContext);
         }
         mergeFeature(featureDefinitionContext);
-        //推送给auth服务
+    }
+
+    /**
+     * 应用完全启动后再推送特性列表。
+     * IFeatureRpcService 的 provider（FeatureRpcServiceImpl）与本应用同属一个进程（自调用），
+     * 若在 @PostConstruct 阶段（此时 Dubbo 服务尚未导出并注册到注册中心）发起调用，
+     * 会报 “No provider available from registry ... invokers: 0”，故延后到 ApplicationReadyEvent 触发。
+     */
+    @EventListener(ApplicationReadyEvent.class)
+    public void pushFeatureInfo() {
         featurePusher.provideFeatureInfo(featureDefinitionContext);
     }
 

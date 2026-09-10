@@ -14,14 +14,20 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
+ * 将本模块收集到的特性定义通过 IFeatureRpcService 推送到特性缓存。
+ * <p>
+ * 注意：IFeatureRpcService 的 provider（FeatureRpcServiceImpl）与本类同属一个应用，属于 Dubbo 自调用。
+ * 启动早期（provider 尚未导出/注册到注册中心）发起调用会报
+ * “No provider available from registry ... invokers: 0”，因此触发时机放在 ApplicationReadyEvent（见 FeatureManager）
+ *
  * @author kefuming
  * @date 2021-07-26 10:16
  */
 @Component
 @Slf4j
 public class FeaturePusher implements IFeaturePusher {
-    @DubboReference
-    IFeatureRpcService featureRpcService;
+    @DubboReference(check = false)
+    private IFeatureRpcService featureRpcService;
     @Value("${spring.application.name}")
     private String applicationName;
 
