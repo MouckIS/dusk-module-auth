@@ -68,14 +68,15 @@ public class NotificationPushManager implements INotificationPushManager {
             pushMessage.setTitle(pushMessage.getTitle().substring(0, 15));
         }
         Payload payload = new Payload(pushType, pushMessage, option, navigation);
-        MqMessage<Payload> message = new MqMessage<>();
-        message.setTopic(MOBILE_PUSH_QUEUE_NAME);
         if (pushMessage.getDeviceType().equals(PushDeviceType.ALL) || pushMessage.getDeviceType().equals(PushDeviceType.ANDROID)) {
             payload.setAppKey(androidAppKey);
         } else {
             payload.setAppKey(iosAppKey);
         }
-        message.setPayload(payload);
+        MqMessage<Payload> message = MqMessage.<Payload>builder()
+                .topic(MOBILE_PUSH_QUEUE_NAME)
+                .payload(payload)
+                .build();
         sender.sendAsync(message);
     }
 
@@ -95,10 +96,11 @@ public class NotificationPushManager implements INotificationPushManager {
      */
     @Override
     public void smsPush(PushSMS input) {
-        MqMessage<PushSMS> msg = new MqMessage<>();
-        msg.setTopic(SMS_PUSH_QUEUE_NAME);
-        msg.setPayload(input);
-        msg.setBizKey(input.getPhoneNumbers());
+        MqMessage<PushSMS> msg = MqMessage.<PushSMS>builder()
+                .topic(SMS_PUSH_QUEUE_NAME)
+                .payload(input)
+                .bizKey(input.getPhoneNumbers())
+                .build();
         sender.sendAsync(msg);
     }
 

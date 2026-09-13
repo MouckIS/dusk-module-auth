@@ -18,6 +18,6 @@ public class NotificationAuthProvider extends AuthorizationProvider {
     @Override
     public void setPermissions(IPermissionDefinitionContext context) {
         Permission root = context.getPermissionOrNull(AdministrationAuthProvider.PAGES_ADMINISTRATION);
-        root.createChildPermission(PAGES_NOTIFICATION, "消息中心", MultiTenancySides.TENANT);
+        root.createChildPermission(PAGES_NOTIFICATION, "消息中心", MultiTenancySides.Tenant);
     }
 }

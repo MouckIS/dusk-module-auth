@@ -22,10 +22,10 @@ public class EditionAuthProvider extends AuthorizationProvider {
     @Override
     public void setPermissions(IPermissionDefinitionContext context) {
         Permission administration = context.getPermissionOrNull(AdministrationAuthProvider.PAGES_ADMINISTRATION);
-        var editions = administration.createChildPermission(PAGES_EDITIONS, "版本", MultiTenancySides.HOST);
-        editions.createChildPermission(PAGES_EDITIONS_EDIT, "编辑版本", MultiTenancySides.HOST);
-        editions.createChildPermission(PAGES_EDITIONS_DELETE, "删除版本", MultiTenancySides.HOST);
-        editions.createChildPermission(PAGES_EDITIONS_FEATURE, "编辑特性", MultiTenancySides.HOST);
-        editions.createChildPermission(PAGES_EDITIONS_PERMISSION, "编辑权限", MultiTenancySides.HOST);
+        var editions = administration.createChildPermission(PAGES_EDITIONS, "版本", MultiTenancySides.Host);
+        editions.createChildPermission(PAGES_EDITIONS_EDIT, "编辑版本", MultiTenancySides.Host);
+        editions.createChildPermission(PAGES_EDITIONS_DELETE, "删除版本", MultiTenancySides.Host);
+        editions.createChildPermission(PAGES_EDITIONS_FEATURE, "编辑特性", MultiTenancySides.Host);
+        editions.createChildPermission(PAGES_EDITIONS_PERMISSION, "编辑权限", MultiTenancySides.Host);
     }
 }

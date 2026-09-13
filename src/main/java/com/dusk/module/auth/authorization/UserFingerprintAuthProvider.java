@@ -22,10 +22,10 @@ public class UserFingerprintAuthProvider extends AuthorizationProvider {
 
     @Override
     public void setPermissions(IPermissionDefinitionContext context) {
-        Permission fingerprint = context.createPermission(PAGES_FINGERPRINT, "用户指纹管理", MultiTenancySides.TENANT);
-        fingerprint.createChildPermission(PAGES_FINGERPRINT_SAVE, "新增/编辑他人指纹", MultiTenancySides.TENANT);
-        fingerprint.createChildPermission(PAGES_FINGERPRINT_DELETE, "删除他人指纹", MultiTenancySides.TENANT);
-        fingerprint.createChildPermission(PAGES_FINGERPRINT_SAVE_PRIVATE, "新增/编辑个人指纹", MultiTenancySides.TENANT);
-        fingerprint.createChildPermission(PAGES_FINGERPRINT_DELETE_PRIVATE, "删除个人指纹", MultiTenancySides.TENANT);
+        Permission fingerprint = context.createPermission(PAGES_FINGERPRINT, "用户指纹管理", MultiTenancySides.Tenant);
+        fingerprint.createChildPermission(PAGES_FINGERPRINT_SAVE, "新增/编辑他人指纹", MultiTenancySides.Tenant);
+        fingerprint.createChildPermission(PAGES_FINGERPRINT_DELETE, "删除他人指纹", MultiTenancySides.Tenant);
+        fingerprint.createChildPermission(PAGES_FINGERPRINT_SAVE_PRIVATE, "新增/编辑个人指纹", MultiTenancySides.Tenant);
+        fingerprint.createChildPermission(PAGES_FINGERPRINT_DELETE_PRIVATE, "删除个人指纹", MultiTenancySides.Tenant);
     }
 }

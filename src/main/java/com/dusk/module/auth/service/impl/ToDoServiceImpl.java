@@ -146,13 +146,13 @@ public class ToDoServiceImpl extends BaseService<Todo, IToDoRepository> implemen
         }
         QTodoPermission todoPermission = QTodoPermission.todoPermission;
         User currentUser = userManage.getCurrentUser();
-        BooleanExpression permissionExpression = QTodo.todo.targetType.eq(ToDoTargetType.USER_ID).and(todoPermission.permission.eq(currentUser.getId().toString()));
+        BooleanExpression permissionExpression = QTodo.todo.targetType.eq(ToDoTargetType.UserId).and(todoPermission.permission.eq(currentUser.getId().toString()));
         List<String> roles = currentUser.getUserRoles().stream().map(Role::getRoleName).collect(Collectors.toList());
         if (!roles.isEmpty()) {
-            permissionExpression = permissionExpression.or(QTodo.todo.targetType.eq(ToDoTargetType.ROLE).and(todoPermission.permission.in(roles)));
+            permissionExpression = permissionExpression.or(QTodo.todo.targetType.eq(ToDoTargetType.Role).and(todoPermission.permission.in(roles)));
         }
 
-        BooleanExpression temp = QTodo.todo.targetType.eq(ToDoTargetType.PERMISSION);
+        BooleanExpression temp = QTodo.todo.targetType.eq(ToDoTargetType.Permission);
         if (!currentUser.isAdmin()) {
             List<String> currentUserPermissions = userManage.getCurrentUserPermissions();
             if (!currentUserPermissions.isEmpty()) {

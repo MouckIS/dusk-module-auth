@@ -59,7 +59,7 @@ public class OrganizationUnitController extends CruxBaseController {
     @Operation(summary = "获取本单位所有组织机构")
     public ListResultDto<OrganizationStationUnitDto> getOrganizationUnits() {
         List<OrganizationUnit> organizationUnitList = organizationUnitService.findAll(
-                Specifications.where(e -> e.eq(OrganizationUnit.Fields.type, EUnitType.INNER)),
+                Specifications.where(e -> e.eq(OrganizationUnit.Fields.type, EUnitType.Inner)),
                 Sort.by(TreeEntity.Fields.sortIndex, TreeEntity.Fields.displayName));
         Map<Long, Long> map = organizationManagerRepository.findAll().stream()
                 .collect(Collectors.toMap(OrganizationManager::getOrgId, OrganizationManager::getUserId));

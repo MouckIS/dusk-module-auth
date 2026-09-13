@@ -108,7 +108,8 @@ public class OkHttpTask {
 
     private RequestBody getRequestBody(OkHttpTaskParam param) {
         if (!StringUtils.isEmpty(param.getBody())) {
-            return RequestBody.create(JSON, param.getBody());
+            // OkHttp 5.x：create 参数顺序为 (content, MediaType)，与 4.x 的 (MediaType, content) 相反
+            return RequestBody.create(param.getBody(), JSON);
         } else {
             FormBody.Builder builder = new FormBody.Builder();
             if (param.getQuery() != null) {

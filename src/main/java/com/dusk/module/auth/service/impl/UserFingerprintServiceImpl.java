@@ -160,7 +160,7 @@ public class UserFingerprintServiceImpl extends BaseService<UserFingerprint, IUs
                 if (!userFingerprintList.isEmpty()) {
                     userSeq = userFingerprintList.getFirst().getUserSeq();
                 } else {
-                    userSeq = Integer.parseInt(serialNoRpcService.getSerialNo("userSeq", EnumResetType.NEVER,
+                    userSeq = Integer.parseInt(serialNoRpcService.getSerialNo("userSeq", EnumResetType.Never,
                             null, 5));
                 }
 

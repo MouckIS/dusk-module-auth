@@ -5,8 +5,6 @@ import com.dusk.common.core.auth.permission.UrlPermission;
 import com.dusk.common.core.constant.AuthConstant;
 import com.dusk.module.auth.common.permission.IAuthPermissionManager;
 import jakarta.annotation.Resource;
-import org.springframework.security.access.ConfigAttribute;
-import org.springframework.security.access.SecurityConfig;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 
@@ -25,8 +23,8 @@ public class DefaultInvocationSecurityMetadataSource {
     @Resource
     private IAuthPermissionManager authPermissionManager;
 
-    public Collection<ConfigAttribute> getAttributes(String applicationName, String url) {
-        Collection<ConfigAttribute> configAttributes = new ArrayList<>();
+    public Collection<String> getAttributes(String applicationName, String url) {
+        List<String> configAttributes = new ArrayList<>();
 
         Map<String, List<UrlPermission>> applicationPermissions = authPermissionManager.getApplicationPermissions(applicationName);
         if (applicationPermissions != null) {
@@ -47,16 +45,16 @@ public class DefaultInvocationSecurityMetadataSource {
             if (permissions != null) {
                 permissions.forEach(permission -> {
                     for (RoleInfo role : permission.getRoles()) {
-                        configAttributes.add(new SecurityConfig(AuthConstant.TYPE_ROLE + role.getId()));
+                        configAttributes.add(AuthConstant.TYPE_ROLE + role.getId());
                     }
                     if (permission.getTenants() != null) {
                         permission.getTenants().forEach(p -> {
                             //添加租户admin标识
-                            configAttributes.add(new SecurityConfig(AuthConstant.ROLE_TENANT_ADMIN + p));
+                            configAttributes.add(AuthConstant.ROLE_TENANT_ADMIN + p);
                         });
                     }
                     // 宿主admin 可以访问任意接口
-                    configAttributes.add(new SecurityConfig(AuthConstant.ROLE_HOST_ADMIN));
+                    configAttributes.add(AuthConstant.ROLE_HOST_ADMIN);
                 });
             }
         }

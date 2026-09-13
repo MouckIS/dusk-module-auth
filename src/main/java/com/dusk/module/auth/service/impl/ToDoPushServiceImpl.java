@@ -98,13 +98,13 @@ public class ToDoPushServiceImpl implements ToDoPushService {
         List<Long> userIds = new ArrayList<>();
         List<TodoPermission> todoPermissions = todo.getTodoPermissions();
         switch (targetType) {
-            case USER_ID:
+            case UserId:
                 todoPermissions.forEach(p -> userIds.add(Long.valueOf(p.getPermission())));
                 break;
-            case ROLE:
+            case Role:
                 userIds.addAll(userManage.getUserIdsByRoleName(todoPermissions.stream().map(TodoPermission::getPermission).collect(Collectors.toList())));
                 break;
-            case PERMISSION:
+            case Permission:
                 String[] permissions = todoPermissions.stream().map(TodoPermission::getPermission).toArray(String[]::new);
                 userIds.addAll(userRpcService.getUserIdsByPermissionsOr(permissions));
                 break;

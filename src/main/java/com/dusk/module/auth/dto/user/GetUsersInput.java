@@ -30,7 +30,7 @@ public class GetUsersInput extends PagedAndSortedInputDto {
     @Schema(description = "只显示锁定用户")
     private boolean onlyLockedUsers;
     @Schema(description = "账号类型")
-    private EUnitType userType = EUnitType.INNER;
+    private EUnitType userType = EUnitType.Inner;
     @Schema(description = "显示离职账号")
     private boolean displayDimissionUsers;
 

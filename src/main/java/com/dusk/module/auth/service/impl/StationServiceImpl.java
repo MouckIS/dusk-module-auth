@@ -143,7 +143,7 @@ public class StationServiceImpl extends TreeService<Station, IStationRepository>
      */
     @Override
     protected String[] getSerialNos(int count) {
-        String[] serialNos = serialNoService.getSerialNos(getEntityClass().getName(), EnumResetType.NEVER, "", 12, count);
+        String[] serialNos = serialNoService.getSerialNos(getEntityClass().getName(), EnumResetType.Never, "", 12, count);
         String[] result = new String[count];
         for (int i = 0; i < serialNos.length; i++) {
             result[i] = Integer.parseInt(serialNos[i]) + "";

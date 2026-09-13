@@ -18,7 +18,7 @@ public class SerialNoAuthProvider extends AuthorizationProvider {
     @Override
     public void setPermissions(IPermissionDefinitionContext context) {
         Permission administration = context.getPermissionOrNull(AdministrationAuthProvider.PAGES_ADMINISTRATION);
-        Permission parent = administration.createChildPermission(PAGES_SERIAL_NO, "序列号管理", MultiTenancySides.ALL);
-        parent.createChildPermission(PAGES_SERIAL_NO_EDIT, "编辑", MultiTenancySides.ALL);
+        Permission parent = administration.createChildPermission(PAGES_SERIAL_NO, "序列号管理", MultiTenancySides.All);
+        parent.createChildPermission(PAGES_SERIAL_NO_EDIT, "编辑", MultiTenancySides.All);
     }
 }

@@ -19,8 +19,8 @@ public class FaceAuthProvider extends AuthorizationProvider {
     @Override
     public void setPermissions(IPermissionDefinitionContext context) {
         Permission administration = context.getPermissionOrNull(AdministrationAuthProvider.PAGES_ADMINISTRATION);
-        var users = administration.createChildPermission(PAGES_ADMINISTRATION_FACES, "人脸", MultiTenancySides.ALL);
-        users.createChildPermission(PAGES_ADMINISTRATION_FACES_ADD, "添加人脸", MultiTenancySides.ALL);
-        users.createChildPermission(PAGES_ADMINISTRATION_FACES_ADD_SELF, "添加个人人脸", MultiTenancySides.ALL);
+        var users = administration.createChildPermission(PAGES_ADMINISTRATION_FACES, "人脸", MultiTenancySides.All);
+        users.createChildPermission(PAGES_ADMINISTRATION_FACES_ADD, "添加人脸", MultiTenancySides.All);
+        users.createChildPermission(PAGES_ADMINISTRATION_FACES_ADD_SELF, "添加个人人脸", MultiTenancySides.All);
     }
 }

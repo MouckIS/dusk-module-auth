@@ -265,7 +265,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
                 e.eq(User.Fields.userType, input.getUserType());
             }
             if (!input.isDisplayDimissionUsers()) {
-                e.eq(User.Fields.userStatus, UserStatus.ON_JOB);
+                e.eq(User.Fields.userStatus, UserStatus.OnJob);
             }
             e.ge(input.isOnlyLockedUsers(), User.Fields.lockoutEndDateUtc, LocalDateTime.now(ZoneId.systemDefault()));
             e.getQuery().distinct(true);
@@ -347,7 +347,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     @Override
     public List<User> getAllInnerUsers() {
         QUser qUser = QUser.user;
-        return queryFactory.selectFrom(qUser).where(qUser.userType.eq(EUnitType.INNER)).fetch();
+        return queryFactory.selectFrom(qUser).where(qUser.userType.eq(EUnitType.Inner)).fetch();
     }
 
     @Override
@@ -358,7 +358,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     @Override
     public void getUsersToExcel(HttpServletResponse response) {
         String fileName = "userlist.xlsx";
-        List<User> userList = userRepository.findAll(Specifications.where(e -> e.ne(User.Fields.userType, EUnitType.VISITOR)), Sort.by(User.Fields.surName));
+        List<User> userList = userRepository.findAll(Specifications.where(e -> e.ne(User.Fields.userType, EUnitType.Visitor)), Sort.by(User.Fields.surName));
         Map<Long, List<String>> orgNamePathMap = getAllUserOrgMap();
 
         //先去掉Role里面关联字段，以免序列化时出错
@@ -577,7 +577,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     public void createOrUpdateUserExistByUserName(CreateOrUpdateUserInput createOrUpdateUserInput) {
         Long userId = createOrUpdateUserInput.getUser().getId();
         if (userId == null) {
-            createUser(createOrUpdateUserInput, EUnitType.INNER);
+            createUser(createOrUpdateUserInput, EUnitType.Inner);
         } else {
             //第二个参数为null时默认根据id判断唯一
             updateUser(createOrUpdateUserInput, "userName", "password");
@@ -589,7 +589,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     public void createOrUpdateUserExistByUserName(CreateOrUpdateUserInfoInput input) {
         Long userId = input.getUser().getId();
         if (userId == null) {
-            userId = createUser(input, EUnitType.INNER);
+            userId = createUser(input, EUnitType.Inner);
         } else {
             //第二个参数为null时默认根据id判断唯一
             updateUser(input, "userName", "password");
@@ -606,8 +606,8 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     public Long createExternalUser(CreateExternalUserInput input) {
         Long userId;
         User user = mapper.CreateExternalUserInputToEntity(input);
-        user.setUserType(EUnitType.EXTERNAL);
-        user.setUserStatus(UserStatus.ON_JOB);
+        user.setUserType(EUnitType.External);
+        user.setUserStatus(UserStatus.OnJob);
 
         Long tenantId = TenantContextHolder.getTenantId();
         if (tenantId != null) {
@@ -784,7 +784,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
         }
         User user = mapper.editDtoToEntity(createOrUpdateUserInput.getUser());
         user.setUserType(type);
-        user.setUserStatus(UserStatus.ON_JOB);
+        user.setUserStatus(UserStatus.OnJob);
         //仅在创建用户设置密码
         if (createOrUpdateUserInput.isSetRandomPassword()) {
             String randomPwd = generatePassword(passwdLen);
@@ -829,10 +829,11 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
         //userFaceRpcService.removeFace(id);
         //删除门禁权限
         CancelAuthDto cancelAuthDto = new CancelAuthDto(TenantContextHolder.getTenantId(), Collections.singletonList(id));
-        MqMessage<CancelAuthDto> msg = new MqMessage<>();
-        msg.setTopic(MqTopicConstant.CANCEL_USER_AUTH_FANOUT_EXCHANGE_V1);
-        msg.setPayload(cancelAuthDto);
-        msg.setBizKey(id.toString());
+        MqMessage<CancelAuthDto> msg = MqMessage.<CancelAuthDto>builder()
+                .topic(MqTopicConstant.CANCEL_USER_AUTH_FANOUT_EXCHANGE_V1)
+                .payload(cancelAuthDto)
+                .bizKey(id.toString())
+                .build();
         sender.sendAsync(msg);
     }
 
@@ -893,15 +894,16 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
         List<User> userList = findAllById(userIds);
         userList.forEach(user -> user.setUserStatus(input.getStatus()));
         saveAll(userList);
-        if (input.getStatus().equals(UserStatus.DIMISSION)) {
+        if (input.getStatus().equals(UserStatus.Dimission)) {
             for (Long id : userIds) {
                 //删除人脸
                 //userFaceRpcService.removeFace(id);
             }
             CancelAuthDto cancelAuthDto = new CancelAuthDto(TenantContextHolder.getTenantId(), userIds);
-            MqMessage<CancelAuthDto> message = new MqMessage<>();
-            message.setTopic(MqTopicConstant.CANCEL_USER_AUTH_FANOUT_EXCHANGE_V1);
-            message.setPayload(cancelAuthDto);
+            MqMessage<CancelAuthDto> message = MqMessage.<CancelAuthDto>builder()
+                    .topic(MqTopicConstant.CANCEL_USER_AUTH_FANOUT_EXCHANGE_V1)
+                    .payload(cancelAuthDto)
+                    .build();
             sender.sendAsync(message);
         }
     }
@@ -971,7 +973,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
         //            }
         //        }
         // 检查员工是否离职
-        if (UserStatus.DIMISSION.equals(user.getUserStatus())) {
+        if (UserStatus.Dimission.equals(user.getUserStatus())) {
             UserLoginException loginException = new UserLoginException(ERROR_USER_DIMISSION);
             loginException.setCode(CODE_USER_DIMISSION);
             throw loginException;
@@ -1236,7 +1238,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
             checkMobilePhone(phoneNo);
         } else {
             String value = settingRpcService.getValue(PERSONNEL_CONTROL_CONFIRM_PHONE);
-            if (EUnitType.EXTERNAL.equals(type) && Boolean.TRUE.toString().equals(value)) {
+            if (EUnitType.External.equals(type) && Boolean.TRUE.toString().equals(value)) {
                 throw new BusinessException("手机号码不能为空");
             }
         }
@@ -1251,7 +1253,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
             checkIdCard(idCard);
         } else {
             String value = settingRpcService.getValue(PERSONNEL_CONTROL_CONFIRM_ID_CARD);
-            if (EUnitType.EXTERNAL.equals(type) && Boolean.TRUE.toString().equals(value)) {
+            if (EUnitType.External.equals(type) && Boolean.TRUE.toString().equals(value)) {
                 throw new BusinessException("身份证号码不能为空");
             }
         }
