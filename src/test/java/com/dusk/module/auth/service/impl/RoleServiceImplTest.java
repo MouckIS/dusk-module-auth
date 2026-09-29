@@ -4,6 +4,7 @@ import com.dusk.common.core.auth.permission.MultiTenancySides;
 import com.dusk.common.core.auth.permission.Permission;
 import com.dusk.common.core.dto.EntityDto;
 import com.dusk.common.core.dto.PagedResultDto;
+import com.dusk.common.core.dto.PagedAndSortedInputDto;
 import com.dusk.common.core.enums.EUnitType;
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.service.impl.BaseService;
@@ -643,7 +644,7 @@ class RoleServiceImplTest {
         Page<Role> page = new PageImpl<>(List.of(role(1L, "R", "N")), PageRequest.of(0, 10), 1);
         when(repository.findAll(any(Pageable.class))).thenReturn(page);
 
-        assertThat(service.getRoles(new com.dusk.common.core.dto.PagedAndSortedInputDto()).getItems())
+        assertThat(service.getRoles(new PagedAndSortedInputDto()).getItems())
                 .extracting(RoleListDto::getRoleCode)
                 .containsExactly("R");
     }
@@ -658,7 +659,7 @@ class RoleServiceImplTest {
         when(authPermissionManager.getDefinitionPermissionTree(false))
                 .thenReturn(List.of(permission("A"), permission("C")));
 
-        var result = service.getRolesForSync(new com.dusk.common.core.dto.PagedAndSortedInputDto());
+        var result = service.getRolesForSync(new PagedAndSortedInputDto());
 
         assertThat(result.getItems()).hasSize(1);
         assertThat(result.getItems().getFirst().getPermissionList()).hasSize(2);
@@ -675,7 +676,7 @@ class RoleServiceImplTest {
         when(tenantPermissionService.getTenantPermissions(TENANT_ID))
                 .thenReturn(List.of(granted("A", "A-display", null)));
 
-        var result = service.getRolesForSync(new com.dusk.common.core.dto.PagedAndSortedInputDto());
+        var result = service.getRolesForSync(new PagedAndSortedInputDto());
 
         assertThat(result.getItems().getFirst().getPermissionList()).hasSize(1);
     }

@@ -13,7 +13,6 @@ import com.dusk.common.mqs.core.MessageSender;
 import com.dusk.common.rpc.auth.dto.ChangePwdInput;
 import com.dusk.common.rpc.auth.dto.CreateOrUpdateUserInput;
 import com.dusk.common.rpc.auth.dto.UserEditDto;
-import com.dusk.common.rpc.auth.dto.UserFullListDto;
 import com.dusk.common.rpc.auth.dto.orga.GetOrganizationUnitUsersInput;
 import com.dusk.common.rpc.auth.dto.orga.OrganizationUnitUserListDto;
 import com.dusk.module.auth.common.config.AppAuthConfig;

@@ -1,7 +1,5 @@
 package com.dusk.module.auth.service.impl;
 
-import com.dusk.common.core.dto.EntityDto;
-import com.dusk.common.core.enums.EUnitType;
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.rpc.auth.dto.station.StationDto;
 import com.dusk.common.rpc.auth.enums.EnumResetType;
@@ -48,7 +46,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
