@@ -1,4 +1,6 @@
 /target/
+/dusk-module-auth/target
+/dusk-module-auth-shared/target
 !.mvn/wrapper/maven-wrapper.jar
 
 ### STS ###

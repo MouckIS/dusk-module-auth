@@ -33,7 +33,7 @@ dusk-module-parent/       父 POM
 dusk-dependencies/        BOM（外部依赖版本管理）
 dusk-common/              core / rpc / doc / mqs 共享构件（GitHub Packages 分发）
 dusk-module-auth/         ← 本仓库：认证/用户/权限/租户
-dusk-module-ddm/          特性值、系统设置、订阅、动态菜单的最终存储
+dusk-module-metadata/          特性值、系统设置、订阅、动态菜单的最终存储
 dusk-module-gateway/      统一入口，鉴权通过 Dubbo RPC 调用本模块
 dusk-module-workflow/     工作流引擎
 dusk-module-minio/        对象存储
@@ -49,7 +49,7 @@ dusk-web/                 Vue3 前端（pnpm monorepo）
 ### 前置条件（必须）
 
 - **JDK 21 + Maven 3.9+**（无 `mvnw` wrapper）。
-- **GitHub Packages PAT**：内部依赖（`dusk-module-parent`、`dusk-common-*`、`dusk-module-ddm-shared`）从 GitHub Packages 解析，需在 `~/.m2/settings.xml` 配置 `read:packages` 权限的 PAT，server id：`github-dusk-dependencies`、`github-dusk-module-parent`、`github-dusk-common`、`github-dusk-module-ddm`。模板见 `.github/workflows/ci.yml`。
+- **GitHub Packages PAT**：内部依赖（`dusk-module-parent`、`dusk-common-*`、`dusk-module-metadata-shared`）从 GitHub Packages 解析，需在 `~/.m2/settings.xml` 配置 `read:packages` 权限的 PAT，server id：`github-dusk-dependencies`、`github-dusk-module-parent`、`github-dusk-common`、`github-dusk-module-metadata`。模板见 `.github/workflows/ci.yml`。
 - **无 Maven Central 仓库**：`pom.xml` 未配置 Central 的 `<repositories>`，外部依赖版本统一由 parent 引入的 `dusk-dependencies` BOM 管理，不要自行添加中央仓库依赖版本。
 - **运行时依赖**：Nacos（配置+注册中心，配置导入 `optional:nacos:dusk-module-auth.yaml`）、PostgreSQL（Druid 池）、Redis（权限/特性/设置缓存）。RabbitMQ / RocketMQ / EMQX 可选（`SPRING_RABBITMQ_ISENABLED` 控制）。
 
@@ -178,14 +178,14 @@ src/main/java/com/dusk/module/auth/
 
 ## 八、数据库与 Flyway
 
-- 迁移脚本 `src/main/resources/db/migration/`：**V1~V18**（18 个版本脚本）+ **R__ 约 35 个可重复脚本**，历史表 `flyway_schema_history_auth`（pom 中 `flyway.table` 指定）。
+- 迁移脚本 `dusk-module-auth/src/main/resources/db/migration/`：**V1~V18**（18 个版本脚本）+ **R__ 约 35 个可重复脚本**，历史表 `flyway_schema_history_auth`（pom 中 `flyway.table` 指定）。
 - dev 配置关闭 Flyway；schema 变更必须新增 `V19__...sql`（或可重复 `R__`），不要改已执行的历史脚本。
 - 关键表：`sys_user`、`sys_role`、`sys_tenant`、`sys_station`、`sys_organization_unit`、`grant_permission`、`tenant_permission`、`sys_feature_value`、`sys_setting`、`audit_log`、`sys_user_login_log`、`sys_serial_no`、`sys_user_fingerprint`、`sys_user_wx_relation`、`sys_todo*`、`sys_dashboard*` 等。
 - 无 Menu/Permission 实体表：菜单/权限是常量树 + 授权关系表，动态菜单数据在 ddm 模块。
 
 ## 九、测试现状（重要，别被文档误导）
 
-- **当前只有一个测试类**：`src/test/java/.../CruxModuleAuthApplicationTests.java`（`@SpringBootTest`，需要真实 DB/Redis/Nacos）。
+- **当前只有一个测试类**：`dusk-module-auth/src/test/java/.../CruxModuleAuthApplicationTests.java`（`@SpringBootTest`，需要真实 DB/Redis/Nacos）。
 - README/CODEBUDDY 提到的 68 用例套件（`BaseUnitTest`、`TestDataBuilder`、`CaptchaServiceImplTest` 等）**已被删除**（commit `3984c89`），文档保留仅作设计参考，不要假设它们存在。
 - `pom.xml` 有 **JaCoCo 硬性门槛**：`com.dusk.module.auth.service.impl` 与 `common.util` 分支覆盖率 ≥ 60%、行 ≥ 70%，`mvn test` 时未达标会**构建失败**——在这两个包改代码必须补测试。
 - ⚠️ `CruxModuleAuthApplicationTests#resetUserPassword()` 会**改写真实用户密码**，绝不要对共享/测试环境以外的数据运行。
@@ -201,7 +201,7 @@ src/main/java/com/dusk/module/auth/
 7. **缓存在 Redis，有内存兜底**：改权限/特性/设置相关逻辑时，两个实现都要测。
 8. **Secret 不要提交**：微信 appid/secret、SM4 密钥、DB 密码等一律走环境变量/Nacos。
 9. **RPC 变更影响面大**：改 `*RpcServiceImpl` 前确认网关（`dusk-module-gateway`）与 ddm 等消费方兼容。
-10. **行政区划数据**在 `src/main/resources/regions/*.json`，新增地区要同步数据而非硬编码。
+10. **行政区划数据**在 `dusk-module-auth/src/main/resources/regions/*.json`，新增地区要同步数据而非硬编码。
 
 ## 十一、编码规范
 

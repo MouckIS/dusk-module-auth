@@ -54,7 +54,7 @@
                                     │ Dubbo RPC (鉴权/用户/角色/特性...)
         ┌───────────────────────────┼──────────────────────────────┐
         ▼                           ▼                              ▼
- dusk-module-auth            dusk-module-ddm                 dusk-module-workflow
+ dusk-module-auth            dusk-module-metadata                 dusk-module-workflow
  认证/用户/权限/租户          特性/设置/订阅/动态菜单              工作流引擎
         │                           │                              │
         └──────────┬────────────────┴──────────────┬───────────────┘
@@ -63,7 +63,7 @@
 ```
 
 - **dusk-module-auth**（本模块）：登录认证、权限定义与校验、用户/组织/角色/租户/订阅等身份域管理
-- **dusk-module-ddm**：功能特性值、系统设置、订阅版本等运行时配置的最终存储
+- **dusk-module-metadata**：功能特性值、系统设置、订阅版本等运行时配置的最终存储
 - **dusk-common**：`core`（JPA/安全/JWT/多租户基础设施）、`rpc`（跨模块 Dubbo 接口定义）、`doc`、`mqs`
 - 模块间通过 Dubbo（Nacos 注册中心）通信，RPC 接口统一在 `dusk-common-rpc` 中定义
 
@@ -106,7 +106,7 @@ controller ──> service / service.impl ──> repository (Spring Data JPA) �
 | Nacos | 注册中心 + 配置中心（必须） |
 | RocketMQ / EMQX | 可选，消息推送与 MQTT |
 
-内部依赖（`dusk-module-parent`、`dusk-common-*`、`dusk-module-ddm-shared`）托管于 GitHub Packages 私有仓库，构建前需在 `~/.m2/settings.xml` 配置具有 `read:packages` 权限的 GitHub PAT（server id：`github-dusk-dependencies`、`github-dusk-module-parent`、`github-dusk-common`、`github-dusk-module-ddm`）。模板参考 `.github/workflows/ci.yml`。
+内部依赖（`dusk-module-parent`、`dusk-common-*`、`dusk-module-metadata-shared`）托管于 GitHub Packages 私有仓库，构建前需在 `~/.m2/settings.xml` 配置具有 `read:packages` 权限的 GitHub PAT（server id：`github-dusk-dependencies`、`github-dusk-module-parent`、`github-dusk-common`、`github-dusk-module-metadata`）。模板参考 `.github/workflows/ci.yml`。
 
 一键启动中间件：
 
@@ -116,7 +116,7 @@ cd dusk/docker && docker compose up -d   # Postgres/Redis/Nacos/RocketMQ/EMQX/Mi
 
 ### 2. 配置文件修改
 
-主要配置位于 `src/main/resources/application-{dev,sit,prod}.yml`，通过环境变量注入敏感信息（推荐用环境变量覆盖，勿提交明文密钥）：
+主要配置位于 `dusk-module-auth/src/main/resources/application-{dev,sit,prod}.yml`，通过环境变量注入敏感信息（推荐用环境变量覆盖，勿提交明文密钥）：
 
 | 参数 | 环境变量 | 说明 |
 | ---- | ---- | ---- |
@@ -129,7 +129,7 @@ cd dusk/docker && docker compose up -d   # Postgres/Redis/Nacos/RocketMQ/EMQX/Mi
 | `app.login.encrypt-key` | — | 登录密码 SM4 解密密钥（16 进制） |
 | `app.security.ignores` | — | 匿名访问路径白名单 |
 
-> dev 配置中 `flyway.enabled: false`；迁移脚本位于 `src/main/resources/db/migration`，历史表 `flyway_schema_history_auth`。
+> dev 配置中 `flyway.enabled: false`；迁移脚本位于 `dusk-module-auth/src/main/resources/db/migration`，历史表 `flyway_schema_history_auth`。
 
 ### 3. 启动运行
 
