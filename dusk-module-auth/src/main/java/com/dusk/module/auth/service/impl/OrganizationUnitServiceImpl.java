@@ -22,7 +22,7 @@ import com.dusk.common.core.utils.MapperUtil;
 import com.dusk.module.auth.dto.orga.GetOrganizationUnitUsersInput;
 import com.dusk.module.auth.dto.orga.OrganizationUnitDto;
 import com.dusk.module.auth.dto.orga.OrganizationUnitUserListDto;
-import com.dusk.module.auth.enums.EnumResetType;
+import com.dusk.module.metadata.enums.EnumResetType;
 import com.dusk.module.auth.service.IOrganizationUnitRpcService;
 import com.dusk.module.auth.service.TreeService;
 import com.dusk.module.auth.dto.orga.*;
@@ -34,11 +34,12 @@ import com.dusk.module.auth.repository.IOrganizationManagerRepository;
 import com.dusk.module.auth.repository.IOrganizationUnitRepository;
 import com.dusk.module.auth.repository.IUserRepository;
 import com.dusk.module.auth.service.IOrganizationUnitService;
-import com.dusk.module.auth.service.ISerialNoService;
+import com.dusk.module.metadata.service.ISerialNoRpcService;
 import com.querydsl.core.types.QBean;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.annotation.Resource;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
@@ -63,11 +64,11 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
     @Resource
     private JPAQueryFactory queryFactory;
     @Resource
-    private ISerialNoService serialNoService;
-    @Resource
     private IUserRepository userRepository;
     @Resource
     private IOrganizationManagerRepository organizationManagerRepository;
+    @DubboReference
+    private ISerialNoRpcService serialNoRpcService;
 
     @Override
     public ListResultDto<OrganizationStationUnitDto> getExternalOrganizationUnits() {
@@ -629,14 +630,14 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
     }
 
     /**
-     * 覆盖调treeService中的getSerialNos， 不需要通过rpc调用
+     * 覆盖调treeService中的getSerialNos
      *
      * @param count
      * @return
      */
     @Override
     protected String[] getSerialNos(int count) {
-        String[] serialNos = serialNoService.getSerialNos(getEntityClass().getName(), EnumResetType.Never, "", 12, count);
+        String[] serialNos = serialNoRpcService.getSerialNos(getEntityClass().getName(), EnumResetType.Never, "", 12, count);
         String[] result = new String[count];
         for (int i = 0; i < serialNos.length; i++) {
             result[i] = Integer.parseInt(serialNos[i]) + "";

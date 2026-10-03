@@ -7,7 +7,7 @@ import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.jpa.Specifications;
 import com.dusk.common.core.utils.MapperUtil;
 import com.dusk.module.auth.dto.station.StationDto;
-import com.dusk.module.auth.enums.EnumResetType;
+import com.dusk.module.metadata.enums.EnumResetType;
 import com.dusk.module.auth.service.TreeService;
 import com.dusk.module.auth.common.datafilter.IDataFilterDefinitionContext;
 import com.dusk.module.auth.dto.station.*;
@@ -16,9 +16,10 @@ import com.dusk.module.auth.entity.User;
 import com.dusk.module.auth.mapper.StationMapper;
 import com.dusk.module.auth.repository.IStationRepository;
 import com.dusk.module.auth.repository.IUserRepository;
-import com.dusk.module.auth.service.ISerialNoService;
 import com.dusk.module.auth.service.IStationService;
+import com.dusk.module.metadata.service.ISerialNoRpcService;
 import jakarta.annotation.Resource;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -38,8 +39,8 @@ public class StationServiceImpl extends TreeService<Station, IStationRepository>
     private IUserRepository userRepository;
     @Resource
     private IDataFilterDefinitionContext dataFilterDefinitionContext;
-    @Resource
-    private ISerialNoService serialNoService;
+    @DubboReference
+    private ISerialNoRpcService serialNoRpcService;
 
     @Override
     public Station createOrUpdate(CreateOrUpdateStationInput input) {
@@ -143,7 +144,7 @@ public class StationServiceImpl extends TreeService<Station, IStationRepository>
      */
     @Override
     protected String[] getSerialNos(int count) {
-        String[] serialNos = serialNoService.getSerialNos(getEntityClass().getName(), EnumResetType.Never, "", 12, count);
+        String[] serialNos = serialNoRpcService.getSerialNos(getEntityClass().getName(), EnumResetType.Never, "", 12, count);
         String[] result = new String[count];
         for (int i = 0; i < serialNos.length; i++) {
             result[i] = Integer.parseInt(serialNos[i]) + "";

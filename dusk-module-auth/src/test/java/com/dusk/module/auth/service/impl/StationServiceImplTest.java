@@ -1,14 +1,13 @@
 package com.dusk.module.auth.service.impl;
 
 import com.dusk.common.core.exception.BusinessException;
-import com.dusk.module.auth.dto.station.StationDto;
-import com.dusk.module.auth.enums.EnumResetType;
 import com.dusk.module.auth.common.datafilter.IDataFilterDefinitionContext;
 import com.dusk.module.auth.dto.station.AddUsersToStationInput;
 import com.dusk.module.auth.dto.station.CreateOrUpdateStationInput;
 import com.dusk.module.auth.dto.station.GetNotAssignedStationUsersInput;
 import com.dusk.module.auth.dto.station.GetStationUsersInput;
 import com.dusk.module.auth.dto.station.RemoveUserFromStationInput;
+import com.dusk.module.auth.dto.station.StationDto;
 import com.dusk.module.auth.dto.station.StationUserDto;
 import com.dusk.module.auth.dto.station.StationUserListDto;
 import com.dusk.module.auth.dto.station.StationsOfLoginUserDto;
@@ -16,7 +15,8 @@ import com.dusk.module.auth.entity.Station;
 import com.dusk.module.auth.entity.User;
 import com.dusk.module.auth.repository.IStationRepository;
 import com.dusk.module.auth.repository.IUserRepository;
-import com.dusk.module.auth.service.ISerialNoService;
+import com.dusk.module.metadata.enums.EnumResetType;
+import com.dusk.module.metadata.service.ISerialNoRpcService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -45,7 +45,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -64,7 +63,7 @@ class StationServiceImplTest {
     @Mock
     private IDataFilterDefinitionContext dataFilterDefinitionContext;
     @Mock
-    private ISerialNoService serialNoService;
+    private ISerialNoRpcService serialNoService;
 
     private StationServiceImpl service;
 

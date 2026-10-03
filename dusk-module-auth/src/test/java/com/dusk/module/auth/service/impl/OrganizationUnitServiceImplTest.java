@@ -12,7 +12,7 @@ import com.dusk.common.core.exception.BusinessException;
 import com.dusk.module.auth.dto.orga.GetOrganizationUnitUsersInput;
 import com.dusk.module.auth.dto.orga.OrganizationUnitDto;
 import com.dusk.module.auth.dto.orga.OrganizationUnitUserListDto;
-import com.dusk.module.auth.enums.EnumResetType;
+import com.dusk.module.metadata.enums.EnumResetType;
 import com.dusk.module.auth.dto.orga.CreateOrganizationUnitInput;
 import com.dusk.module.auth.dto.orga.GetOrganizationUnitUsersExtInput;
 import com.dusk.module.auth.dto.orga.GetOrganizationUnitUsersForSelectInput;
@@ -29,7 +29,7 @@ import com.dusk.module.auth.entity.User;
 import com.dusk.module.auth.repository.IOrganizationManagerRepository;
 import com.dusk.module.auth.repository.IOrganizationUnitRepository;
 import com.dusk.module.auth.repository.IUserRepository;
-import com.dusk.module.auth.service.ISerialNoService;
+import com.dusk.module.metadata.service.ISerialNoRpcService;
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Predicate;
@@ -97,7 +97,7 @@ class OrganizationUnitServiceImplTest {
     @Mock
     private JPAQueryFactory queryFactory;
     @Mock
-    private ISerialNoService serialNoService;
+    private ISerialNoRpcService serialNoService;
     @Mock
     private IUserRepository userRepository;
     @Mock
