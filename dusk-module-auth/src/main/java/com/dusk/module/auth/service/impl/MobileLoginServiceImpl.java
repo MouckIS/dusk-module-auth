@@ -18,12 +18,12 @@ import com.dusk.module.auth.entity.QUser;
 import com.dusk.module.auth.entity.User;
 import com.dusk.module.auth.feature.UserFeatureProvider;
 import com.dusk.module.auth.mapper.UserMapper;
-import com.dusk.module.auth.push.INotificationPushManager;
 import com.dusk.module.auth.repository.IUserRepository;
 import com.dusk.module.auth.service.ICaptchaService;
 import com.dusk.module.auth.service.IFeatureService;
 import com.dusk.module.auth.service.IMobileLoginService;
 import com.dusk.module.auth.service.IUserService;
+import com.dusk.module.notification.service.IAuthPushRpcService;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,6 +31,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -59,8 +60,6 @@ public class MobileLoginServiceImpl implements IMobileLoginService {
     private JPAQueryFactory queryFactory;
     @Resource
     private SmsPushConfig smsPushConfig;
-    @Autowired(required = false)
-    private INotificationPushManager pushManager;
     @Resource
     private IFeatureService featureService;
     @Resource
@@ -69,11 +68,13 @@ public class MobileLoginServiceImpl implements IMobileLoginService {
     private IUserService userService;
     @Resource
     private ICaptchaService captchaService;
+    @DubboReference
+    private IAuthPushRpcService pushRpcService;
 
     @Override
     @DisableTenantFilter
     public void captcha(SendCaptchaInput input, HttpServletRequest request) {
-        if (pushManager == null) {
+        if (pushRpcService == null) {
             throw new BusinessException("消息推送服务未启用");
         }
 
@@ -173,6 +174,6 @@ public class MobileLoginServiceImpl implements IMobileLoginService {
         param.setProduct(captcha);
         params[0] = param;
         sms.setTemplateParams(params);
-        pushManager.smsPushAsync(sms);
+        pushRpcService.smsPushAsync(sms);
     }
 }

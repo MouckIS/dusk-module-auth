@@ -7,8 +7,8 @@ import com.dusk.common.mqs.pusher.PushMessage;
 import com.dusk.common.mqs.pusher.PushSMS;
 import com.dusk.module.auth.dto.ToDoDto;
 import com.dusk.module.auth.push.IPushManager;
-import com.dusk.module.auth.service.IAuthPushRpcService;
 import com.dusk.module.auth.service.ITodoRpcService;
+import com.dusk.module.notification.service.IAuthPushRpcService;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.stereotype.Component;
 

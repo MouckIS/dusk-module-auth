@@ -49,13 +49,14 @@ import com.dusk.module.auth.feature.UserFeatureProvider;
 import com.dusk.module.auth.mapper.OrganizationMapper;
 import com.dusk.module.auth.mapper.RoleMapper;
 import com.dusk.module.auth.mapper.UserMapper;
-import com.dusk.module.auth.push.INotificationPushManager;
 import com.dusk.module.auth.repository.IGrantPermissionRepository;
 import com.dusk.module.auth.repository.IOrganizationManagerRepository;
 import com.dusk.module.auth.repository.ITenantRepository;
 import com.dusk.module.auth.repository.IUserRepository;
 import com.dusk.module.auth.service.*;
 import com.dusk.module.ddm.service.ISettingRpcService;
+import com.dusk.module.notification.service.IAuthPushRpcService;
+import com.dusk.module.notification.service.IEmailRpcService;
 import com.hankcs.hanlp.HanLP;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -155,10 +156,10 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     private AppAuthConfig appAuthConfig;
     @Resource
     private SmsPushConfig smsPushConfig;
-    @Autowired(required = false)
-    private INotificationPushManager pushManager;
-    @Resource
-    private IEmailService emailService;
+    @DubboReference
+    private IAuthPushRpcService pushRpcService;
+    @DubboReference
+    private IEmailRpcService emailRpcService;
     @Resource
     private TokenAuthManager tokenAuthManager;
     @Resource
@@ -793,7 +794,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
             try {
                 String title = "账号注册通知";
                 String content = "您的随机密码是：" + randomPwd + ",请及时修改!";
-                emailService.sendEmail(title, content, user.getEmailAddress());
+                emailRpcService.sendEmail(title, content, user.getEmailAddress());
             } catch (Exception e) {
                 throw new BusinessException(ERROR_MAIL_SEND_FAIL);
             }
@@ -1024,9 +1025,6 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
 
     @Override
     public void getForgetPwdCaptchaByMobile(String userName, String mobile) {
-        if (pushManager == null) {
-            throw new BusinessException("消息推送服务未启用");
-        }
         if (TenantContextHolder.getTenantId() != null) {
             String futureForgetPwd = featureChecker.getValue(LoginFeatureProvider.APP_LOGIN_FORGET_PWD);
             if (!(StringUtils.equals("mobile", futureForgetPwd) || StringUtils.equals("mobileOrEmail",
@@ -1179,7 +1177,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
             subject = tenant.getName() + "【密码找回】";
         }
         try {
-            emailService.sendEmail(subject, content, email);
+            emailRpcService.sendEmail(subject, content, email);
         } catch (Exception e) {
             if (e instanceof BusinessException) {
                 throw e;
@@ -1215,7 +1213,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
         param.setProduct(captcha);
         params[0] = param;
         sms.setTemplateParams(params);
-        pushManager.smsPushAsync(sms);
+        pushRpcService.smsPushAsync(sms);
     }
 
     private void checkMobilePhone(String phoneNo) {
@@ -1372,7 +1370,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
             }
             try {
                 String title = "账号激活通知";
-                emailService.sendEmail(title, url, user.getEmailAddress());
+                emailRpcService.sendEmail(title, url, user.getEmailAddress());
             } catch (Exception e) {
                 throw new BusinessException(ERROR_MAIL_SEND_FAIL);
             }

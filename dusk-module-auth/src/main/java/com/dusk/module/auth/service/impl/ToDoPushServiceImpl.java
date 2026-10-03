@@ -15,10 +15,11 @@ import com.dusk.module.auth.entity.TodoPermission;
 import com.dusk.module.auth.enums.ToDoMQTTTypeEnum;
 import com.dusk.module.auth.manage.IUserManage;
 import com.dusk.module.auth.mapper.TodoMapper;
-import com.dusk.module.auth.push.INotificationPushManager;
 import com.dusk.module.auth.service.ToDoPushService;
+import com.dusk.module.notification.service.IAuthPushRpcService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -46,8 +47,8 @@ public class ToDoPushServiceImpl implements ToDoPushService {
     private IUserManage userManage;
     @Resource
     private IUserRpcService userRpcService;
-    @Autowired(required = false)
-    private INotificationPushManager pushManager;
+    @DubboReference
+    private IAuthPushRpcService pushRpcService;
 
     @Override
     @Async
@@ -77,8 +78,8 @@ public class ToDoPushServiceImpl implements ToDoPushService {
             }
             NotificationOption option = new NotificationOption();
             option.setNoticationLevel(dto.getNoticationLevel());
-            if (pushManager != null) {
-                pushManager.mobilePush(pushMessage, option, dto.getPushType(), dto.getNavigation());
+            if (pushRpcService != null) {
+                pushRpcService.pushAppMsg(pushMessage, option, dto.getPushType(), dto.getNavigation());
             } else {
                 log.error("尚未启用rabbitmq，无法推送消息");
             }
