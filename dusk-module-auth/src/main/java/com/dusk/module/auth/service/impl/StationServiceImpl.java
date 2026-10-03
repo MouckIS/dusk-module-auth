@@ -8,7 +8,7 @@ import com.dusk.common.core.jpa.Specifications;
 import com.dusk.common.core.utils.MapperUtil;
 import com.dusk.module.auth.dto.station.StationDto;
 import com.dusk.module.metadata.enums.EnumResetType;
-import com.dusk.module.auth.service.TreeService;
+import com.dusk.common.core.service.impl.TreeService;
 import com.dusk.module.auth.common.datafilter.IDataFilterDefinitionContext;
 import com.dusk.module.auth.dto.station.*;
 import com.dusk.module.auth.entity.Station;

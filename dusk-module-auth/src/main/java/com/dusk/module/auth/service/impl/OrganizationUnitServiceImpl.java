@@ -24,7 +24,7 @@ import com.dusk.module.auth.dto.orga.OrganizationUnitDto;
 import com.dusk.module.auth.dto.orga.OrganizationUnitUserListDto;
 import com.dusk.module.metadata.enums.EnumResetType;
 import com.dusk.module.auth.service.IOrganizationUnitRpcService;
-import com.dusk.module.auth.service.TreeService;
+import com.dusk.common.core.service.impl.TreeService;
 import com.dusk.module.auth.dto.orga.*;
 import com.dusk.module.auth.dto.station.StationsOfLoginUserDto;
 import com.dusk.module.auth.entity.*;
