@@ -3,8 +3,8 @@ package com.dusk.module.auth.feature;
 import com.dusk.module.auth.dto.TenantFeature;
 import com.dusk.module.auth.impl.FeatureProvider;
 import com.dusk.module.auth.service.IFeatureDefinitionContext;
-import com.dusk.module.ddm.dto.ui.CheckBox;
-import com.dusk.module.ddm.dto.ui.SingerLineString;
+import com.dusk.module.metadata.dto.ui.CheckBox;
+import com.dusk.module.metadata.dto.ui.SingerLineString;
 import org.springframework.stereotype.Component;
 
 /**

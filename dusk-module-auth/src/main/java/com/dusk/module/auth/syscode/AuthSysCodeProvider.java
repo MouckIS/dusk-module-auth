@@ -1,7 +1,7 @@
 package com.dusk.module.auth.syscode;
 
-import com.dusk.module.ddm.context.ISysCodeDefinitionContext;
-import com.dusk.module.ddm.provider.SysCodeProvider;
+import com.dusk.module.metadata.context.ISysCodeDefinitionContext;
+import com.dusk.module.metadata.provider.SysCodeProvider;
 import org.springframework.stereotype.Component;
 
 /**

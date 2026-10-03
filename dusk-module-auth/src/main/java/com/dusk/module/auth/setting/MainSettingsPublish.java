@@ -1,7 +1,7 @@
 package com.dusk.module.auth.setting;
 
-import com.dusk.module.ddm.service.ISettingDefinitionManager;
-import com.dusk.module.ddm.service.ISettingsPublish;
+import com.dusk.module.metadata.service.ISettingDefinitionManager;
+import com.dusk.module.metadata.service.ISettingsPublish;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

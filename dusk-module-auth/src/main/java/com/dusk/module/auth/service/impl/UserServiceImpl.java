@@ -54,7 +54,7 @@ import com.dusk.module.auth.repository.IOrganizationManagerRepository;
 import com.dusk.module.auth.repository.ITenantRepository;
 import com.dusk.module.auth.repository.IUserRepository;
 import com.dusk.module.auth.service.*;
-import com.dusk.module.ddm.service.ISettingRpcService;
+import com.dusk.module.metadata.service.ISettingRpcService;
 import com.dusk.module.notification.service.IAuthPushRpcService;
 import com.dusk.module.notification.service.IEmailRpcService;
 import com.hankcs.hanlp.HanLP;

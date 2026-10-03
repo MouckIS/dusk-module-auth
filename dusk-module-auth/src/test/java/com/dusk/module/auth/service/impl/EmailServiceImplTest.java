@@ -4,7 +4,7 @@ import cn.hutool.extra.mail.MailAccount;
 import com.dusk.module.auth.dto.setting.EmailShareLinkHostUrlOutput;
 import com.dusk.module.auth.setting.provider.EmailSettingProvider;
 import com.dusk.module.auth.setting.provider.HostSettingProvider;
-import com.dusk.module.ddm.service.ISettingRpcService;
+import com.dusk.module.metadata.service.ISettingRpcService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

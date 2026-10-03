@@ -3,7 +3,7 @@ package com.dusk.module.auth.feature;
 
 import com.dusk.module.auth.impl.FeatureProvider;
 import com.dusk.module.auth.service.IFeatureDefinitionContext;
-import com.dusk.module.ddm.dto.ui.CheckBox;
+import com.dusk.module.metadata.dto.ui.CheckBox;
 import org.springframework.stereotype.Component;
 
 /**

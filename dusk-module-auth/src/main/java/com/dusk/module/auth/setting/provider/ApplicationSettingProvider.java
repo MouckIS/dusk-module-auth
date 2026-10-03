@@ -1,8 +1,8 @@
 package com.dusk.module.auth.setting.provider;
 
-import com.dusk.module.ddm.dto.SettingDefinition;
-import com.dusk.module.ddm.enums.SettingScopes;
-import com.dusk.module.ddm.provider.SettingProvider;
+import com.dusk.module.metadata.dto.SettingDefinition;
+import com.dusk.module.metadata.enums.SettingScopes;
+import com.dusk.module.metadata.provider.SettingProvider;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

@@ -2,7 +2,7 @@ package com.dusk.module.auth.service;
 
 import com.dusk.module.auth.dto.setting.SettingDto;
 import com.dusk.module.auth.dto.setting.UpdateSettingInput;
-import com.dusk.module.ddm.service.ISettingRpcService;
+import com.dusk.module.metadata.service.ISettingRpcService;
 
 import java.util.List;
 import java.util.Map;

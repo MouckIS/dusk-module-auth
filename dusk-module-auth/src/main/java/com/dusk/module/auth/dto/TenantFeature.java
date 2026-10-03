@@ -1,6 +1,6 @@
 package com.dusk.module.auth.dto;
 
-import com.dusk.module.ddm.dto.ui.InputType;
+import com.dusk.module.metadata.dto.ui.InputType;
 import lombok.Getter;
 import lombok.Setter;
 

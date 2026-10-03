@@ -2,7 +2,7 @@ package com.dusk.module.auth.impl;
 
 import com.dusk.module.auth.dto.TenantFeature;
 import com.dusk.module.auth.service.IFeatureDefinitionContext;
-import com.dusk.module.ddm.dto.ui.InputType;
+import com.dusk.module.metadata.dto.ui.InputType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;

@@ -3,7 +3,7 @@ package com.dusk.module.auth.mapper;
 import com.dusk.module.auth.dto.setting.SettingDto;
 import com.dusk.module.auth.entity.Setting;
 import com.dusk.module.auth.setting.SettingInfo;
-import com.dusk.module.ddm.dto.SettingDefinition;
+import com.dusk.module.metadata.dto.SettingDefinition;
 import org.mapstruct.Mapper;
 
 @Mapper

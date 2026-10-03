@@ -1,7 +1,7 @@
 package com.dusk.module.auth.setting;
 
 
-import com.dusk.module.ddm.provider.ISettingClientVisibilityProvider;
+import com.dusk.module.metadata.provider.ISettingClientVisibilityProvider;
 
 /**
  * @author kefuming

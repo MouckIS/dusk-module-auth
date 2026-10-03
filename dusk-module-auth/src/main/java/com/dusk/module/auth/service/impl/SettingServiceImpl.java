@@ -13,11 +13,11 @@ import com.dusk.module.auth.repository.ISettingRepository;
 import com.dusk.module.auth.service.ISettingService;
 import com.dusk.module.auth.setting.ISettingManager;
 import com.dusk.module.auth.setting.ISettingsCache;
-import com.dusk.module.ddm.dto.SettingDefinition;
-import com.dusk.module.ddm.dto.ui.FileInput;
-import com.dusk.module.ddm.dto.ui.InputType;
-import com.dusk.module.ddm.enums.SettingAccessLevel;
-import com.dusk.module.ddm.service.ISettingRpcService;
+import com.dusk.module.metadata.dto.SettingDefinition;
+import com.dusk.module.metadata.dto.ui.FileInput;
+import com.dusk.module.metadata.dto.ui.InputType;
+import com.dusk.module.metadata.enums.SettingAccessLevel;
+import com.dusk.module.metadata.service.ISettingRpcService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author kefuming

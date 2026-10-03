@@ -52,7 +52,7 @@ import com.dusk.module.auth.service.IFeatureChecker;
 import com.dusk.module.auth.service.IOrganizationUnitService;
 import com.dusk.module.auth.service.IRoleService;
 import com.dusk.module.auth.service.IStationService;
-import com.dusk.module.ddm.service.ISettingRpcService;
+import com.dusk.module.metadata.service.ISettingRpcService;
 import com.dusk.common.core.utils.SecurityUtils;
 import com.dusk.common.mqs.pusher.SmsPushConfig;
 import com.querydsl.core.types.EntityPath;

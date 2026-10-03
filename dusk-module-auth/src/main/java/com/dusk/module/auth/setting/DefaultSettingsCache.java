@@ -1,7 +1,7 @@
 package com.dusk.module.auth.setting;
 
-import com.dusk.module.ddm.dto.SettingDefinition;
-import com.dusk.module.ddm.enums.SettingScopes;
+import com.dusk.module.metadata.dto.SettingDefinition;
+import com.dusk.module.metadata.enums.SettingScopes;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;

@@ -2,9 +2,9 @@ package com.dusk.module.auth.feature;
 
 import com.dusk.module.auth.impl.FeatureProvider;
 import com.dusk.module.auth.service.IFeatureDefinitionContext;
-import com.dusk.module.ddm.dto.ui.CheckBox;
-import com.dusk.module.ddm.dto.ui.ComboBox;
-import com.dusk.module.ddm.dto.ui.Item;
+import com.dusk.module.metadata.dto.ui.CheckBox;
+import com.dusk.module.metadata.dto.ui.ComboBox;
+import com.dusk.module.metadata.dto.ui.Item;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

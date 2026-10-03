@@ -2,7 +2,7 @@ package com.dusk.module.auth.service;
 
 
 import com.dusk.module.auth.dto.TenantFeature;
-import com.dusk.module.ddm.dto.ui.InputType;
+import com.dusk.module.metadata.dto.ui.InputType;
 
 import java.io.Serializable;
 import java.util.List;

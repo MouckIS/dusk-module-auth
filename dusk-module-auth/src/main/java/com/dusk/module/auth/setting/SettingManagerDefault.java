@@ -11,7 +11,7 @@ import com.dusk.module.auth.mapper.SettingMapper;
 import com.dusk.module.auth.repository.ISettingRepository;
 import com.dusk.module.auth.service.ITenantService;
 import com.dusk.module.auth.setting.config.MultiTenancyConfig;
-import com.dusk.module.ddm.enums.SettingScopes;
+import com.dusk.module.metadata.enums.SettingScopes;
 import jakarta.annotation.Resource;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
