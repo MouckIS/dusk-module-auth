@@ -20,7 +20,7 @@ import java.util.Map;
 @Slf4j
 public class DefaultAuthProvider implements IAuthProvider {
     @DubboReference(timeout = 5000, retries = 0)
-    IAuthRpcService authService;
+    public IAuthRpcService authService;
 
     /**
      * 简单支持异步重试，如要优雅可以引入guava里的retry包
