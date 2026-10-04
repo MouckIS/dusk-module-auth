@@ -1,39 +1,26 @@
 package com.dusk.module.auth.service.impl;
 
+import com.dusk.common.core.auth.authentication.LoginUserIdContextHolder;
 import com.dusk.common.core.dto.EntityDto;
 import com.dusk.common.core.enums.EUnitType;
-import com.dusk.common.core.auth.authentication.LoginUserIdContextHolder;
 import com.dusk.common.core.enums.UserStatus;
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.exception.UserLoginException;
 import com.dusk.common.core.model.UserContext;
 import com.dusk.common.core.redis.RedisUtil;
 import com.dusk.common.core.tenant.TenantContextHolder;
+import com.dusk.common.core.utils.SecurityUtils;
 import com.dusk.common.mqs.core.MessageSender;
+import com.dusk.common.mqs.pusher.SmsPushConfig;
+import com.dusk.module.auth.common.config.AppAuthConfig;
+import com.dusk.module.auth.common.manage.TokenAuthManager;
+import com.dusk.module.auth.common.util.LoginUtils;
 import com.dusk.module.auth.dto.ChangePwdInput;
 import com.dusk.module.auth.dto.CreateOrUpdateUserInput;
 import com.dusk.module.auth.dto.UserEditDto;
 import com.dusk.module.auth.dto.orga.GetOrganizationUnitUsersInput;
 import com.dusk.module.auth.dto.orga.OrganizationUnitUserListDto;
-import com.dusk.module.auth.common.config.AppAuthConfig;
-import com.dusk.module.auth.common.manage.TokenAuthManager;
-import com.dusk.module.auth.dto.user.ChangePasswordInput;
-import com.dusk.module.auth.dto.user.ChangeStatusInput;
-import com.dusk.module.auth.dto.user.CreateExternalUserInput;
-import com.dusk.module.auth.dto.user.CreateOrUpdateUserInfoInput;
-import com.dusk.module.auth.dto.user.ExternalUserSettingDto;
-import com.dusk.module.auth.dto.user.GetOrgaUsersInput;
-import com.dusk.module.auth.dto.user.GetUserForEditOutput;
-import com.dusk.module.auth.dto.user.GetUserInfoOutput;
-import com.dusk.module.auth.dto.user.GetUsersByRoleCodesInput;
-import com.dusk.module.auth.dto.user.GetUsersByRoleNameInput;
-import com.dusk.module.auth.dto.user.GetUsersForLoginInput;
-import com.dusk.module.auth.dto.user.GetUsersInput;
-import com.dusk.module.auth.dto.user.PersonalInfoInput;
-import com.dusk.module.auth.dto.user.SetDefaultStationInput;
-import com.dusk.module.auth.dto.user.UpdateUserInfo;
-import com.dusk.module.auth.dto.user.UserInfoDto;
-import com.dusk.module.auth.common.util.LoginUtils;
+import com.dusk.module.auth.dto.user.*;
 import com.dusk.module.auth.entity.OrganizationManager;
 import com.dusk.module.auth.entity.OrganizationUnit;
 import com.dusk.module.auth.entity.Role;
@@ -42,19 +29,17 @@ import com.dusk.module.auth.entity.Tenant;
 import com.dusk.module.auth.entity.User;
 import com.dusk.module.auth.enums.ELevel;
 import com.dusk.module.auth.feature.UserFeatureProvider;
-import com.dusk.module.auth.push.INotificationPushManager;
 import com.dusk.module.auth.repository.IGrantPermissionRepository;
 import com.dusk.module.auth.repository.IOrganizationManagerRepository;
 import com.dusk.module.auth.repository.ITenantRepository;
 import com.dusk.module.auth.repository.IUserRepository;
-import com.dusk.module.auth.service.IEmailService;
 import com.dusk.module.auth.service.IFeatureChecker;
 import com.dusk.module.auth.service.IOrganizationUnitService;
 import com.dusk.module.auth.service.IRoleService;
 import com.dusk.module.auth.service.IStationService;
 import com.dusk.module.metadata.service.ISettingRpcService;
-import com.dusk.common.core.utils.SecurityUtils;
-import com.dusk.common.mqs.pusher.SmsPushConfig;
+import com.dusk.module.notification.service.IEmailRpcService;
+import com.dusk.module.notification.service.INotificationPushRpcServicve;
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Predicate;
@@ -92,14 +77,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * {@link UserServiceImpl} 单元测试。
@@ -140,9 +118,9 @@ class UserServiceImplTest {
     @Mock
     private SmsPushConfig smsPushConfig;
     @Mock
-    private INotificationPushManager pushManager;
+    private INotificationPushRpcServicve pushManager;
     @Mock
-    private IEmailService emailService;
+    private IEmailRpcService emailService;
     @Mock
     private TokenAuthManager tokenAuthManager;
     @Mock

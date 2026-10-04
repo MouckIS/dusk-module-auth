@@ -8,7 +8,7 @@ import com.dusk.module.auth.entity.Todo;
 import com.dusk.module.auth.entity.TodoPermission;
 import com.dusk.module.auth.enums.ToDoMQTTTypeEnum;
 import com.dusk.module.auth.manage.IUserManage;
-import com.dusk.module.auth.push.INotificationPushManager;
+import com.dusk.module.notification.service.INotificationPushRpcServicve;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,7 +43,7 @@ class ToDoPushServiceImplTest {
     @Mock
     private IUserRpcService userRpcService;
     @Mock
-    private INotificationPushManager pushManager;
+    private INotificationPushRpcServicve pushManager;
 
     private ToDoPushServiceImpl service;
 

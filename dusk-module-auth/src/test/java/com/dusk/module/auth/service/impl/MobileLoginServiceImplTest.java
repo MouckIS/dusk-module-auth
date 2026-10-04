@@ -11,11 +11,11 @@ import com.dusk.module.auth.dto.mobilelogin.MobileUserDto;
 import com.dusk.module.auth.dto.mobilelogin.SendCaptchaInput;
 import com.dusk.module.auth.entity.User;
 import com.dusk.module.auth.feature.UserFeatureProvider;
-import com.dusk.module.auth.push.INotificationPushManager;
 import com.dusk.module.auth.repository.IUserRepository;
 import com.dusk.module.auth.service.ICaptchaService;
 import com.dusk.module.auth.service.IFeatureService;
 import com.dusk.module.auth.service.IUserService;
+import com.dusk.module.notification.service.INotificationPushRpcServicve;
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Predicate;
@@ -64,7 +64,7 @@ class MobileLoginServiceImplTest {
     @Mock
     private SmsPushConfig smsPushConfig;
     @Mock
-    private INotificationPushManager pushManager;
+    private INotificationPushRpcServicve pushManager;
     @Mock
     private IFeatureService featureService;
     @Mock
