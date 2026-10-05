@@ -54,9 +54,9 @@ public interface IUserRepository extends IBaseRepository<User> {
 
     void deleteByIdIn(List<Long> ids);
 
-    @Query("select distinct a.id from User a inner join a.userRoles b inner join b.permissions c where c.name in (:permissions) and a.userType in (:userTypes) and (a.userStatus = 'ON_JOB')")
+    @Query("select distinct a.id from User a inner join a.userRoles b inner join b.permissions c where c.name in (:permissions) and a.userType in (:userTypes) and (a.userStatus = 'OnJob')")
     List<Long> getUserIdsByPermissions(@Param("permissions") String[] permissions, @Param("userTypes") List<EUnitType> userTypes);
 
-    @Query("select new com.dusk.module.auth.dto.user.UserIdAndPermissionDto(a.id,c.name) from User a inner join a.userRoles b inner join b.permissions c where c.name in (:permissions) and a.userType in (:userTypes) and (a.userStatus = 'ON_JOB')")
+    @Query("select new com.dusk.module.auth.dto.user.UserIdAndPermissionDto(a.id,c.name) from User a inner join a.userRoles b inner join b.permissions c where c.name in (:permissions) and a.userType in (:userTypes) and (a.userStatus = 'OnJob')")
     List<UserIdAndPermissionDto> getUserIdsByPermissionsAnd(@Param("permissions") String[] permissions, @Param("userTypes") List<EUnitType> userTypes);
 }

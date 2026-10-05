@@ -29,13 +29,13 @@ public interface IOrganizationUnitRepository extends IBaseRepository<Organizatio
      * @param pageable
      * @return
      */
-    @Query("select new com.dusk.common.rpc.auth.dto.orga.OrganizationUnitUserListDto(" +
+    @Query("select new com.dusk.module.auth.dto.orga.OrganizationUnitUserListDto(" +
             "u.id, u.name, u.userName, u.emailAddress, orga.id, orga.displayName) " +
             "from OrganizationUnit orga inner join orga.users u " +
             "where (-1L in (:queryOrgaIds) or orga.id in (:queryOrgaIds)) " +
             "and (:filter is null or :filter = '' or u.name like %:filter% or u.userName like %:filter%)" +
             "and (:type is null or orga.type = :type)" +
-            "and (u.userStatus = 'ON_JOB')")
+            "and (u.userStatus = 'OnJob')")
     Page<OrganizationUnitUserListDto> getOrganizationUnitUsers(@Param("queryOrgaIds") Set<Long> queryOrgaIds, @Param("filter") String filter, Pageable pageable, @Param("type") EUnitType type);
 
     @Query("select new com.dusk.module.auth.dto.orga.OrganizationUnitUserInfoListDto(" +
@@ -44,7 +44,7 @@ public interface IOrganizationUnitRepository extends IBaseRepository<Organizatio
             "where (-1L in (:queryOrgaIds) or orga.id in (:queryOrgaIds)) " +
             "and (:filter is null or :filter = '' or u.name like %:filter% or u.userName like %:filter%)" +
             "and (:type is null or orga.type = :type)" +
-            "and (u.userStatus = 'ON_JOB')")
+            "and (u.userStatus = 'OnJob')")
     Page<OrganizationUnitUserInfoListDto> getOrganizationUnitUsersInfo(@Param("queryOrgaIds") Set<Long> queryOrgaIds, @Param("filter") String filter, Pageable pageable, @Param("type") EUnitType type);
 
     @Query("select distinct new com.dusk.module.auth.dto.orga.OrganizationUnitUserForSelectDto(u.id,u.name,u.userName) from User u where u.id not in (select u2.id from OrganizationUnit orga inner join orga.users u2 where orga.id = :orgId) and (:filter is null or :filter = '' or u.name like %:filter% or u.userName like %:filter%) and u.userType = 'INNER' and u.organizationUnit is empty")
@@ -72,7 +72,7 @@ public interface IOrganizationUnitRepository extends IBaseRepository<Organizatio
             "where (-1L in (:queryOrgaIds) or orga.id in (:queryOrgaIds)) " +
             "and (:filter is null or :filter = '' or u.name like %:filter% or u.userName like %:filter%)" +
             "and (:unitType is null or orga.type = :unitType)" +
-            "and (u.userStatus = 'ON_JOB')")
+            "and (u.userStatus = 'OnJob')")
     Page<User> findUsers(@Param("queryOrgaIds") Set<Long> queryOrgaIds, @Param("filter") String filter, @Param("unitType") EUnitType unitType, Pageable pageable);
 
     /**
@@ -86,7 +86,7 @@ public interface IOrganizationUnitRepository extends IBaseRepository<Organizatio
             "where ((:queryOrgaIds) is null or orga.id in (:queryOrgaIds)) " +
             "and (:name is null or :name = '' or u.name like %:name% )" +
             "and (:type is null or orga.type = :type)" +
-            "and (u.userStatus = 'ON_JOB')")
+            "and (u.userStatus = 'OnJob')")
     List<Long> getUserIds(@Param("queryOrgaIds") Set<Long> queryOrgaIds, @Param("name") String name, @Param("type") EUnitType type);
 
     @Query("select org from OrganizationUnit org inner join org.users u on u.id = :userId")
@@ -101,7 +101,7 @@ public interface IOrganizationUnitRepository extends IBaseRepository<Organizatio
     List<OrganizationUnit> getOrganizationUnitsByType(@Param("type") EUnitType type);
 
     @Query("select distinct u from OrganizationUnit orga inner join orga.users u " +
-            "where orga.id = :orgId and u.userStatus = 'ON_JOB' order by u.userName asc")
+            "where orga.id = :orgId and u.userStatus = 'OnJob' order by u.userName asc")
     List<User> findUsersByOrgId(@Param("orgId") Long orgId);
 
 }

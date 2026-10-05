@@ -1,6 +1,6 @@
 package com.dusk.module.auth.service.impl;
 
-import com.dusk.module.auth.impl.DefaultAuthProvider;
+import com.dusk.module.auth.adapter.DefaultAuthProvider;
 import com.dusk.module.auth.service.IAuthRpcService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
