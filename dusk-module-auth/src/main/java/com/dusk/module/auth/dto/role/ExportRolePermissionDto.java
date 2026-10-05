@@ -1,0 +1,43 @@
+package com.dusk.module.auth.dto.role;
+
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @author kefuming
+ * @date 2021-08-06 9:02
+ */
+@Getter
+@Setter
+@ExcelIgnoreUnannotated
+public class ExportRolePermissionDto extends RolePermissionDto {
+    @JsonIgnore
+    //@Mapping("this")
+    private String grantedStr;
+    @JsonIgnore
+    // 角色Excel导入导出的时候用
+    //@Mapping("this")
+    private List<ExportRolePermissionDto> children = new ArrayList<>();
+
+
+    public ExportRolePermissionDto(RolePermissionDto rolePermissionDto) {
+        setGranted(rolePermissionDto.isGranted());
+        setName(rolePermissionDto.getName());
+        setParentName(rolePermissionDto.getParentName());
+        setDisplayName(rolePermissionDto.getDisplayName());
+    }
+
+
+    public String getGrantedStr() {
+        return isGranted() ? "是" : "";
+    }
+
+    public void appendChild(ExportRolePermissionDto dto) {
+        children.add(dto);
+    }
+}

@@ -1,0 +1,184 @@
+package com.dusk.module.auth.service.impl;
+
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
+import com.dusk.common.core.auth.permission.Permission;
+import com.dusk.common.core.auth.permission.UrlPermission;
+import com.dusk.common.core.dto.NameValueDefaultByDto;
+import com.dusk.common.core.dto.NameValueDto;
+import com.dusk.common.core.exception.UserContextException;
+import com.dusk.common.core.jwt.JwtTokenFactory;
+import com.dusk.common.core.jwt.extractor.JwtHeaderTokenExtractor;
+import com.dusk.common.core.model.UserContext;
+import com.dusk.common.core.tenant.TenantContextHolder;
+import com.dusk.common.core.utils.SecurityUtils;
+import com.dusk.common.core.utils.UserContextUtils;
+import com.dusk.module.auth.service.IAuthRpcService;
+import com.dusk.module.auth.common.datafilter.IDataFilterDefinitionContext;
+import com.dusk.module.auth.common.manage.DefaultAccessDecisionManager;
+import com.dusk.module.auth.common.manage.TokenAuthManager;
+import com.dusk.module.auth.common.metadata.DefaultInvocationSecurityMetadataSource;
+import com.dusk.module.auth.common.provider.CustomAuthProvider;
+import com.dusk.module.auth.common.skiprequest.SkipPathRequestMatcher;
+import com.dusk.module.auth.dto.station.StationsOfLoginUserDto;
+import com.dusk.module.auth.feature.CenterControlFeatureProvider;
+import com.dusk.module.auth.service.IFeatureChecker;
+import com.dusk.module.auth.service.IStationService;
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboService;
+import org.apache.dubbo.rpc.RpcContext;
+import org.springframework.util.StringUtils;
+
+import java.util.*;
+
+/**
+ * @author kefuming
+ * @date 2020-05-22 14:01
+ */
+@Slf4j
+@DubboService
+public class AuthRpcServiceImpl implements IAuthRpcService {
+    @Resource
+    JwtTokenFactory jwtTokenFactory;
+    @Resource
+    JwtHeaderTokenExtractor jwtHeaderTokenExtractor;
+    @Resource
+    UserContextUtils userContextUtils;
+    @Resource
+    DefaultAccessDecisionManager accessDecisionManager;
+    @Resource
+    DefaultInvocationSecurityMetadataSource metadataSource;
+    @Resource
+    CustomAuthProvider customAuthProvider;
+    @Resource
+    SkipPathRequestMatcher skipPathRequestMatcher;
+    @Resource
+    IDataFilterDefinitionContext dataFilterDefinitionContext;
+    @Resource
+    TokenAuthManager tokenAuthManager;
+    @Resource
+    SecurityUtils securityUtils;
+    @Resource
+    IStationService stationService;
+    @Resource
+    IFeatureChecker featureChecker;
+
+    @Override
+    public boolean auth(String authorization, String applicationName, String url) {
+        if (ignoreAuthentication(applicationName, url)) {
+            return true;
+        } else {
+            return hasPermission(authorization, applicationName, url);
+        }
+
+    }
+
+    @Override
+    public void provideAuthInfo(String applicationName, List<String> allowAnonymousPath, Map<String, Permission> definitionPermissions, Map<String, List<UrlPermission>> urlPermissions) {
+        customAuthProvider.provideAuthInfo(applicationName, allowAnonymousPath, definitionPermissions, urlPermissions);
+    }
+
+    @Override
+    public UserContext getUserContext() {
+        String authorization = RpcContext.getContext().getAttachment("authorization");
+        UserContext userContext = null;
+        if (!StringUtils.isEmpty(authorization)) {
+            try {
+                userContext = jwtTokenFactory.parseJwtToken(jwtHeaderTokenExtractor.extract(authorization));
+            } catch (Exception ex) {
+                log.info(ex.getMessage());
+            }
+        }
+        return userContext;
+    }
+
+    @Override
+    public String getLinkedOrgIds(String orgId, String authentication) {
+        if (StrUtil.isNotEmpty(authentication)) {
+            UserContext userContext = userContextUtils.getUserContext(authentication);
+            if (userContext != null) {
+                try {
+                    TenantContextHolder.setTenantId(userContext.getTenantId());
+                    if (featureChecker.isEnabled(CenterControlFeatureProvider.STATION_DOWNWARD)) {
+                        return orgId;
+                    }
+                    //如果当前用户登陆了，则获取关联的默认厂站
+                    if (StrUtil.isEmpty(orgId)) {
+                        //这里走分支，如果由特性 则获取所有厂站，没有则获取默认第一个厂站
+                        List<StationsOfLoginUserDto> stations = stationService.getStationsForFrontByUserId(userContext.getId());
+                        if (featureChecker.isEnabled(CenterControlFeatureProvider.STATION_CENTER_CONTROL)) {
+                            List<Long> allOrg = new ArrayList<>();
+                            List<Long> collect = stations.stream().map(NameValueDto::getValue).toList();
+                            collect.forEach(p -> {
+                                List<Long> linkOrgs = dataFilterDefinitionContext.getDataFilterDefinition().get(p.toString());
+                                linkOrgs.forEach(q -> {
+                                    if (!allOrg.contains(q)) {
+                                        allOrg.add(q);
+                                    }
+                                });
+                            });
+                            if (!allOrg.isEmpty()) {
+                                return CollectionUtil.join(allOrg, ",");
+                            }
+                            return null;
+                        } else {
+                            //非集控模式走默认代码
+                            Optional<StationsOfLoginUserDto> defaultStation = stations.stream().filter(NameValueDefaultByDto::isDefaultBy).findFirst();
+                            if (defaultStation.isPresent()) {
+                                orgId = defaultStation.get().getValue().toString();
+                            } else {
+                                if (!stations.isEmpty()) {
+                                    orgId = stations.getFirst().getValue().toString();
+                                }
+                            }
+                        }
+                    }
+
+                } finally {
+                    TenantContextHolder.clear();
+                }
+            }
+        }
+        if (!StringUtils.isEmpty(orgId)) {
+            List<Long> ids = dataFilterDefinitionContext.getDataFilterDefinition().get(orgId);
+            if (ids != null && !ids.isEmpty()) {
+                Long[] orgIdArr = new Long[ids.size()];
+                ids.toArray(orgIdArr);
+                return ArrayUtil.join(orgIdArr, ",");
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public String changeRealToken(String tokenId) {
+        return tokenAuthManager.getToken(tokenId);
+    }
+
+
+    //region private method
+
+    /**
+     * 是否跳过权限验证
+     *
+     * @param url
+     * @return
+     */
+    private boolean ignoreAuthentication(String applicationName, String url) {
+        return skipPathRequestMatcher.matches(applicationName, url);
+    }
+
+    private boolean hasPermission(String authorization, String applicationName, String url) {
+        UserContext userContext = tokenAuthManager.checkTokenValid(authorization);
+        if (userContext == null) {
+            throw new UserContextException("尚未登陆");
+        }
+        Collection<String> attributes = metadataSource.getAttributes(applicationName, url);
+        return accessDecisionManager.decide(userContext, attributes);
+    }
+
+    //endregion
+}
