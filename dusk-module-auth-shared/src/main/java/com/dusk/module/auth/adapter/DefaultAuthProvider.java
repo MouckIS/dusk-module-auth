@@ -1,4 +1,4 @@
-package com.dusk.module.auth.impl;
+package com.dusk.module.auth.adapter;
 
 import com.dusk.common.core.auth.IAuthProvider;
 import com.dusk.common.core.auth.permission.Permission;
