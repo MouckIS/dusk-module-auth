@@ -4,6 +4,7 @@ import com.dusk.common.core.exception.BusinessException;
 
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,6 +44,11 @@ public enum ReleaseStatus {
             ACTIVE, EnumSet.of(RETIRED),
             RETIRED, EnumSet.of(ACTIVE)
     );
+
+    /**
+     * 可能承接流量的状态集合，见 {@link #mayServeTraffic()}。
+     */
+    private static final List<ReleaseStatus> TRAFFIC_CAPABLE = List.of(REGISTERED, ACTIVE);
 
     private final String displayName;
     private final String description;
@@ -94,8 +100,38 @@ public enum ReleaseStatus {
      * 该 Release 是否正在支撑其 Resource 的生效性。
      *
      * <p>只有 {@link #ACTIVE} 会阻止其独有 Permission 被判定为 ORPHANED。</p>
+     *
+     * <p><b>注意</b>：本方法与 {@link #mayServeTraffic()} 的口径不同，差别见后者的说明；
+     * 注册链路（资源落库、运行读模型投影、权限生效性判定）统一使用
+     * {@link #mayServeTraffic()}，本方法保留以示 4.8 的原始表述。</p>
      */
     public boolean keepsPermissionsAlive() {
         return this == ACTIVE;
+    }
+
+    /**
+     * 该 Release 是否<b>可能承接流量</b>，因而其 Resource 必须进入运行映射（5.7）并参与权限生效性判定（4.8）。
+     *
+     * <p>取 {@link #REGISTERED} 与 {@link #ACTIVE}、排除 {@link #RETIRED}，理由是 4.6/4.7 的既定前提
+     * <b>尚未落地</b>：现状各服务未向 Nacos 发布 {@code version} metadata，Auth 也没有实例同步任务，
+     * 因此 {@code Instance → Release} 的归属无从得知，Release 无法按 4.7 由「存在运行实例」推进到 ACTIVE。</p>
+     *
+     * <p>而 3.12 明确 readiness 以「Auth 注册确认」为准、不以缓存收敛为准——即<b>注册成功就意味着该版本即将接流量</b>。
+     * 若此处按 {@code ACTIVE} 单值过滤，新服务注册后其全部路由都不会进入运行读模型，
+     * 网关在 5.10 的「默认拒绝」下会把该服务的所有接口判为「未登记」而 403，方案 3.5 的「窗口归零」直接失效。
+     * 因此注册链路必须把 {@code REGISTERED} 一并视作「可能承接流量」。</p>
+     *
+     * <p>待 4.6 的 Nacos metadata 与实例同步落地后，可把本方法收紧为 {@code this == ACTIVE}——
+     * 注册链路的所有判定都集中在这一处，收紧不会有遗漏。</p>
+     */
+    public boolean mayServeTraffic() {
+        return this == REGISTERED || this == ACTIVE;
+    }
+
+    /**
+     * {@link #mayServeTraffic()} 对应的状态集合，供 SQL 查询与批量过滤直接使用（只读）。
+     */
+    public static List<ReleaseStatus> trafficCapableStatuses() {
+        return TRAFFIC_CAPABLE;
     }
 }

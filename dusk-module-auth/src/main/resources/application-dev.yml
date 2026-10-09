@@ -73,6 +73,10 @@ app:
     encrypt-key: 63727578e5a4a9e4b88be697a0e6958c
   security:
     ignores: [ "/error/**","/swagger-resources/**","/swagger-ui.html","/v3/api-docs","/webjars/**","/login" ]
+  registry:
+    # 本机联调时 SDK 通常不配置密钥，这里显式关闭强制校验以便注册端点可用。
+    # 注意：只要配置了 service-secret，仍会强制要求匹配；生产默认 true（见 application.yml）。
+    require-service-secret: false
 
 mqtt:
   is-enabled: true

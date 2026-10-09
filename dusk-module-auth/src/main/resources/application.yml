@@ -14,3 +14,22 @@ dubbo:
     # 元数据优化
     metadataType: remote
     register-mode: instance
+
+app:
+  registry:
+    # 权限注册内网端点（POST /internal/registry/snapshot）的服务间密钥。
+    # 必须与各业务服务的 app.permission.sdk.service-secret 配置为同一值（承载请求头 X-Service-Secret）。
+    # 留空 + require-service-secret=true（默认）时端点会拒绝所有注册请求，是刻意的 fail-closed 默认值：
+    # 该端点直接写权限事实（PostgreSQL），漏配密钥不能等同于对外开放。内网开发环境见 application-dev.yml。
+    service-secret: ${APP_REGISTRY_SERVICE_SECRET:}
+    # 服务间密钥请求头名，需与 SDK 的 app.permission.sdk.service-secret-header 一致。
+    service-secret-header: ${APP_REGISTRY_SERVICE_SECRET_HEADER:X-Service-Secret}
+    # 是否强制要求密钥；true 且未配置密钥时拒绝一切注册请求。
+    require-service-secret: ${APP_REGISTRY_REQUIRE_SERVICE_SECRET:true}
+    # 是否校验快照 resourceVersion 与内容一致（3.3 契约）。强烈建议保持 true。
+    strict-resource-version: ${APP_REGISTRY_STRICT_RESOURCE_VERSION:true}
+    read-model:
+      # 注册提交后是否投影 Redis 运行读模型 auth:resource:{serviceId}（5.7，供网关 L2 消费）。
+      enabled: ${APP_REGISTRY_READ_MODEL_ENABLED:true}
+      # L2 条目 TTL（5.4），给「投影失败 / 事件丢失」一个上界。
+      ttl: ${APP_REGISTRY_READ_MODEL_TTL:30m}
