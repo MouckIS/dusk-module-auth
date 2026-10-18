@@ -33,6 +33,8 @@ import com.dusk.module.auth.entity.*;
 import com.dusk.module.auth.excel.RolePermissionExportRowWriteHandler;
 import com.dusk.module.auth.mapper.RoleMapper;
 import com.dusk.module.auth.repository.IGrantPermissionRepository;
+import com.dusk.module.auth.authz.service.AuthzEventPublisher;
+import com.dusk.module.auth.authz.version.AuthzPermissionVersionService;
 import com.dusk.module.auth.repository.IRoleRepository;
 import com.dusk.module.auth.repository.IUserRepository;
 import com.dusk.module.auth.service.IOrganizationUnitService;
@@ -74,6 +76,16 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
     private ITenantPermissionService tenantPermissionService;
     @Resource
     private JPAQueryFactory queryFactory;
+    /**
+     * 权限变更事件发布入口（8.5）。事件在<b>本方法所在事务内</b>写入 Outbox，提交后投递。
+     */
+    @Resource
+    private AuthzEventPublisher authzEventPublisher;
+    /**
+     * 角色权限版本号分配（8.5，permissionVersion 的单调来源）。
+     */
+    @Resource
+    private AuthzPermissionVersionService authzPermissionVersionService;
 
     @Override
     public List<Role> getRoles() {
@@ -123,6 +135,8 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
         Role save = repository.save(entity);
         //刷新权限缓存
         authPermissionManager.refreshAll();
+        //推送 PERMISSION_CHANGED，令网关精确失效该角色的 rolePermCache 条目（8.5）
+        publishPermissionChanged(save);
         return save;
     }
 
@@ -147,6 +161,22 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
 
         //刷新权限缓存
         authPermissionManager.refreshAll();
+        //推送 PERMISSION_CHANGED：角色删除同样改变授权集合，网关必须失效对应缓存（8.5）
+        publishPermissionChanged(entity);
+    }
+
+    /**
+     * 为角色申请新的 {@code permissionVersion} 并推送 {@code PERMISSION_CHANGED}（8.5）。
+     *
+     * <p>刻意<b>不吞异常</b>：Outbox 写入与业务写入同事务，任一步失败整体回滚——这正是 Outbox
+     * 要保证的「不会出现事实变更而事件缺失」。若事件推送失败，权限变更也应一并失败以便重试。</p>
+     */
+    private void publishPermissionChanged(Role role) {
+        if (role == null || role.getId() == null) {
+            return;
+        }
+        long version = authzPermissionVersionService.nextVersion(role.getTenantId(), role.getId());
+        authzEventPublisher.permissionChanged(role.getTenantId(), role.getId(), version);
     }
 
     @Override
@@ -232,6 +262,8 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
         save(role);
         //刷新权限缓存
         authPermissionManager.refreshAll();
+        //推送 PERMISSION_CHANGED（8.5）
+        publishPermissionChanged(role);
     }
 
     @Override

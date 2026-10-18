@@ -24,6 +24,7 @@ import com.dusk.module.auth.registry.repository.IPermissionDefinitionRepository;
 import com.dusk.module.auth.registry.repository.IServiceDefinitionRepository;
 import com.dusk.module.auth.registry.repository.IServiceReleaseRepository;
 import com.dusk.module.auth.repository.IGrantPermissionRepository;
+import com.dusk.module.auth.authz.service.AuthzEventPublisher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,6 +65,7 @@ public class ResourceRegistryServiceImpl implements IResourceRegistryService {
     private final IGrantPermissionRepository grantPermissionRepository;
     private final RegistryProperties properties;
     private final ResourceReadModelProjector readModelProjector;
+    private final AuthzEventPublisher authzEventPublisher;
 
     /**
      * 纯函数协作者：无状态、不依赖 Spring 上下文，直接构造即可（与模块内 MapStruct Mapper 的处理方式一致）。
@@ -77,7 +79,8 @@ public class ResourceRegistryServiceImpl implements IResourceRegistryService {
                                        IPermissionDefinitionRepository permissionRepository,
                                        IGrantPermissionRepository grantPermissionRepository,
                                        RegistryProperties properties,
-                                       ResourceReadModelProjector readModelProjector) {
+                                       ResourceReadModelProjector readModelProjector,
+                                       AuthzEventPublisher authzEventPublisher) {
         this.serviceRepository = serviceRepository;
         this.releaseRepository = releaseRepository;
         this.resourceRepository = resourceRepository;
@@ -85,6 +88,7 @@ public class ResourceRegistryServiceImpl implements IResourceRegistryService {
         this.grantPermissionRepository = grantPermissionRepository;
         this.properties = properties;
         this.readModelProjector = readModelProjector;
+        this.authzEventPublisher = authzEventPublisher;
     }
 
     @Override
@@ -121,7 +125,7 @@ public class ResourceRegistryServiceImpl implements IResourceRegistryService {
         release.setResourceVersion(snapshot.resourceVersion());
         releaseRepository.save(release);
 
-        scheduleReadModelProjection(serviceId);
+        scheduleRegistrationSideEffects(serviceId, snapshot.resourceVersion(), snapshot.serviceVersion());
 
         log.info("快照注册完成：serviceId={}, serviceVersion={}, resourceVersion={}，"
                         + "新增 {}、更新 {}、废弃 {}、换绑挂起 {}，权限生效 {}、孤立 {}",
@@ -370,6 +374,26 @@ public class ResourceRegistryServiceImpl implements IResourceRegistryService {
                 readModelProjector.project(serviceId);
             }
         });
+    }
+
+    /**
+     * 一次「真实变更」注册的提交后副作用（3.4 第 12 步 + 8.5）。
+     *
+     * <p>与 {@link #scheduleReadModelProjection(String)} 的区别：本方法只在 {@code resourceVersion}
+     * <b>确实变化</b>时调用（幂等命中的路径不投递事件——版本没变，网关侧的
+     * {@code invalidateIfVersionDiffers} 也不会失效，投递只会是无意义的噪声）。</p>
+     *
+     * <p>两件事：</p>
+     * <ol>
+     *   <li>事务提交后投影 {@code auth:resource:{serviceId}}（低延迟，先于下面注册的事件唤醒回调执行）；</li>
+     *   <li><b>在事务内</b>写入 Outbox 行（{@link AuthzEventPublisher#resourceChanged}），
+     *       由其在提交后唤醒发布器投递 {@code RESOURCE_CHANGED}。
+     *       写入必须在事务内，才能与业务写入同生共死（Outbox 的核心，见 8.5）。</li>
+     * </ol>
+     */
+    private void scheduleRegistrationSideEffects(String serviceId, String resourceVersion, String serviceVersion) {
+        scheduleReadModelProjection(serviceId);
+        authzEventPublisher.resourceChanged(serviceId, resourceVersion, serviceVersion);
     }
 
     /**

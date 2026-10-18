@@ -33,3 +33,38 @@ app:
       enabled: ${APP_REGISTRY_READ_MODEL_ENABLED:true}
       # L2 条目 TTL（5.4），给「投影失败 / 事件丢失」一个上界。
       ttl: ${APP_REGISTRY_READ_MODEL_TTL:30m}
+  # ---------------------------------------------------------------------------------------------------
+  # 权限事件推送（MQ），见《权限优化方案-整理版》第八章。
+  # 默认全关：app.authz.mq.enabled=false 时不写 Outbox、不投递、不装配消费者。
+  # 启用顺序（8.11）：① dusk.mq.rocketmq.enabled=true（需 broker 可达，否则 RocketMQMessageSender
+  # 启动失败会让本服务起不来）→ ② app.authz.mq.enabled=true → ③ 网关侧对应打开。
+  # ---------------------------------------------------------------------------------------------------
+  authz:
+    mq:
+      enabled: ${APP_AUTHZ_MQ_ENABLED:false}
+      domain: ${APP_AUTHZ_MQ_DOMAIN:authz}
+      # 以下三个主题名是跨仓契约，默认值不得随意更改（8.2）；名称须与网关
+      # app.authorization.mq.permission-changed-topic / resource-changed-topic 逐字一致。
+      resource-changed-topic: ${APP_AUTHZ_MQ_RESOURCE_CHANGED_TOPIC:RESOURCE_CHANGED}
+      permission-changed-topic: ${APP_AUTHZ_MQ_PERMISSION_CHANGED_TOPIC:PERMISSION_CHANGED}
+      snapshot-register-topic: ${APP_AUTHZ_MQ_SNAPSHOT_TOPIC:RESOURCE_SNAPSHOT_REGISTERED}
+      # 投递前先刷 Redis 读模型，保证网关收到失效事件时 L2 已是新值（3.8 第 1 点）。
+      refresh-read-model-before-publish: ${APP_AUTHZ_MQ_REFRESH_READ_MODEL:true}
+      outbox:
+        enabled: ${APP_AUTHZ_MQ_OUTBOX_ENABLED:true}
+        # 兜底轮询间隔（毫秒）；正常路径由事务提交后立即唤醒投递。
+        poll-interval-ms: ${APP_AUTHZ_MQ_OUTBOX_POLL_MS:1000}
+        batch-size: ${APP_AUTHZ_MQ_OUTBOX_BATCH_SIZE:200}
+        max-attempts: ${APP_AUTHZ_MQ_OUTBOX_MAX_ATTEMPTS:10}
+        initial-backoff-ms: ${APP_AUTHZ_MQ_OUTBOX_BACKOFF_MS:1000}
+        max-backoff-ms: ${APP_AUTHZ_MQ_OUTBOX_MAX_BACKOFF_MS:300000}
+
+# RocketMQ 通用层总闸（dusk-common-mqs 的 RocketMQEnableCondition）。
+# 权限事件链路要真正流动，必须同时打开本开关与 app.authz.mq.enabled（8.9 / 8.11）。
+# 默认关闭：未配置 broker 的环境不应因为缺配置而启动失败；打开后 RocketMQMessageSender
+# 会在启动期连接 NameServer，连不上会导致本服务启动失败。
+dusk:
+  mq:
+    rocketmq:
+      enabled: ${DUSK_MQ_ROCKETMQ_ENABLED:false}
+      name-server: ${DUSK_MQ_ROCKETMQ_NAME_SERVER:localhost:9876}

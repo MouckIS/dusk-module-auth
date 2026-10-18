@@ -70,14 +70,16 @@ public class InternalResourceRegistryController {
     public ResponseEntity<Object> registerSnapshot(@RequestBody(required = false) ResourceSnapshot snapshot,
                                                    @RequestHeader HttpHeaders headers) {
         String presentedSecret = headers.getFirst(registryProperties.getServiceSecretHeader());
-        //if (!serviceSecretVerifier.isAuthorized(presentedSecret)) {
-        //    // 401 属于 4xx：密钥错误是确定性拒绝，重试没有意义。
-        //    log.error("注册快照被拒绝：服务间密钥校验未通过（请求头 {} 缺失或不匹配）", registryProperties.getServiceSecretHeader());
-        //    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorBody(
-        //            "UNAUTHORIZED",
-        //            "服务间密钥校验未通过，请确认请求头 " + registryProperties.getServiceSecretHeader()
-        //                    + " 与 Auth 侧 app.registry.service-secret 配置一致"));
-        //}
+        if (!serviceSecretVerifier.isAuthorized(presentedSecret)) {
+            // 401 属于 4xx：密钥错误是确定性拒绝，重试没有意义。
+            // 本地联调无需关闭本校验：把 app.registry.require-service-secret 设为 false（dev 已配置）
+            // 或两侧配置同一密钥即可；直接注释掉校验会让「写权限事实」的端点对外无鉴权。
+            log.error("注册快照被拒绝：服务间密钥校验未通过（请求头 {} 缺失或不匹配）", registryProperties.getServiceSecretHeader());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorBody(
+                    "UNAUTHORIZED",
+                    "服务间密钥校验未通过，请确认请求头 " + registryProperties.getServiceSecretHeader()
+                            + " 与 Auth 侧 app.registry.service-secret 配置一致"));
+        }
         if (snapshot == null) {
             return ResponseEntity.badRequest().body(new ErrorBody("INVALID_SNAPSHOT", "请求体不能为空"));
         }
