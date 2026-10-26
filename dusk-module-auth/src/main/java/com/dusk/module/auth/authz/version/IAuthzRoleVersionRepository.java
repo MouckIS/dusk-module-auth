@@ -13,12 +13,13 @@ import java.util.Optional;
  */
 public interface IAuthzRoleVersionRepository extends IBaseRepository<AuthzRoleVersion> {
 
-    Optional<AuthzRoleVersion> findByRoleId(Long roleId);
+    Optional<AuthzRoleVersion> findByTenantScopeAndRoleId(String tenantScope, Long roleId);
 
     /**
-     * 加行级悲观锁读取，保证同一角色并发的权限变更串行化，版本号不会重复或倒退。
+     * 加行级悲观锁读取，保证同一作用域内角色并发的权限变更串行化，版本号不会重复或倒退。
      */
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select v from AuthzRoleVersion v where v.roleId = :roleId")
-    Optional<AuthzRoleVersion> findWithLockByRoleId(@Param("roleId") Long roleId);
+    @Query("select v from AuthzRoleVersion v where v.tenantScope = :tenantScope and v.roleId = :roleId")
+    Optional<AuthzRoleVersion> findWithLockByScopeAndRoleId(@Param("tenantScope") String tenantScope,
+                                                            @Param("roleId") Long roleId);
 }

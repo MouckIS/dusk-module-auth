@@ -28,16 +28,16 @@ import com.dusk.common.mqs.core.MqMessage;
 import com.dusk.common.mqs.pusher.PushSMS;
 import com.dusk.common.mqs.pusher.SmsPushConfig;
 import com.dusk.common.mqs.pusher.SmsTemplateParam;
+import com.dusk.module.auth.common.config.AppAuthConfig;
+import com.dusk.module.auth.common.manage.TokenAuthManager;
+import com.dusk.module.auth.common.topic.MqTopicConstant;
+import com.dusk.module.auth.common.util.LoginUtils;
 import com.dusk.module.auth.dto.ChangePwdInput;
 import com.dusk.module.auth.dto.CreateOrUpdateUserInput;
 import com.dusk.module.auth.dto.UserEditDto;
 import com.dusk.module.auth.dto.UserFullListDto;
 import com.dusk.module.auth.dto.orga.GetOrganizationUnitUsersInput;
 import com.dusk.module.auth.dto.orga.OrganizationUnitUserListDto;
-import com.dusk.module.auth.common.config.AppAuthConfig;
-import com.dusk.module.auth.common.manage.TokenAuthManager;
-import com.dusk.module.auth.common.topic.MqTopicConstant;
-import com.dusk.module.auth.common.util.LoginUtils;
 import com.dusk.module.auth.dto.station.AddUsersToStationInput;
 import com.dusk.module.auth.dto.station.RemoveUserFromStationInput;
 import com.dusk.module.auth.dto.station.StationsOfLoginUserDto;
@@ -172,6 +172,13 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     private ISettingRpcService settingRpcService;
     @Autowired(required = false)
     private MessageSender sender;
+    /**
+     * 账号/角色变更必须推进 {@code subjectVersion} 并发出 {@code SUBJECT_CHANGED}（5.3）。
+     */
+    @Resource
+    private com.dusk.module.auth.authz.version.AuthzSubjectVersionService authzSubjectVersionService;
+    @Resource
+    private com.dusk.module.auth.authz.service.AuthzEventPublisher authzEventPublisher;
     //随机密码长度，可配置读取
     @Value("${app.setting.passwdLen}")
     private int passwdLen;
@@ -818,6 +825,8 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     public void deleteUser(EntityDto entityDto) {
         Long id = entityDto.getId();
         User user = userRepository.findById(id).orElseThrow(() -> new BusinessException(ERROR_USER_NOT_FIND));
+        // 删除前先推进代际并广播，让旧 JWT 立即失效；事件投影会写入 enabled=false。
+        publishSubjectChanged(user, false);
         userRepository.delete(user);
         //if (DubboCustomUtils.isValidRpcService(IUserFaceRpcService.class.getName())) {
         //    userFaceRpcService.removeUser(id);
@@ -845,6 +854,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
         }
         Long loginId = LoginUserIdContextHolder.getUserId();
         List<Long> ids = entityDtos.stream().map(EntityDto::getId).filter(id -> !loginId.equals(id)).collect(Collectors.toList());
+        findAllById(ids).forEach(user -> publishSubjectChanged(user, false));
         userRepository.deleteByIdIn(ids);
         organizationManagerRepository.deleteByUserIdIn(ids);
     }
@@ -895,6 +905,8 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
         List<User> userList = findAllById(userIds);
         userList.forEach(user -> user.setUserStatus(input.getStatus()));
         saveAll(userList);
+        // 账号状态变化必须让旧 JWT 失效（5.3）
+        userList.forEach(this::publishSubjectChanged);
         if (input.getStatus().equals(UserStatus.Dimission)) {
             for (Long id : userIds) {
                 //删除人脸
@@ -940,6 +952,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
         User user = getUserById(userId);
         user.setActive(true);
         userRepository.save(user);
+        publishSubjectChanged(user);
     }
 
     @Override
@@ -1156,6 +1169,8 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
         findById(userId).ifPresent(user -> {
             user.setUserRoles(roles);
             save(user);
+            // 用户角色变更必须推进 subjectVersion（5.3）
+            publishSubjectChanged(user);
         });
 
     }
@@ -1167,6 +1182,29 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     }
 
     //region private method
+
+    /**
+     * 推进用户代际并广播 {@code SUBJECT_CHANGED}，见 5.3。
+     *
+     * <p>UserRole 变更、禁用/启用、强制下线都必须调用本方法；否则旧 JWT 的角色快照会继续被使用。</p>
+     */
+    private void publishSubjectChanged(User user) {
+        if (user == null || user.getId() == null) {
+            return;
+        }
+        boolean enabled = user.isActive()
+                && (user.getUserStatus() == null || user.getUserStatus() == UserStatus.OnJob);
+        publishSubjectChanged(user, enabled);
+    }
+
+    private void publishSubjectChanged(User user, boolean enabled) {
+        if (user == null || user.getId() == null) {
+            return;
+        }
+        String scope = com.dusk.common.core.auth.registry.AuthzScope.of(user.getTenantId());
+        long version = authzSubjectVersionService.nextVersion(scope, user.getId());
+        authzEventPublisher.subjectChanged(scope, user.getId(), version, enabled);
+    }
 
     private void sendCaptchaByEmail(String email, String captcha) {
         String content = "您本次密码找回操作验证码为:" + captcha + ",该验证码" + RESET_PWD_CAPTCHA_TIME + "分钟内有效，请勿泄露给他人。";
@@ -1359,6 +1397,9 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
         //更新组织机构与用户关联关系
         updateOrganizationRelation(user, createOrUpdateUserInput.getOrganizationUnits());
         userRepository.save(user);
+        if (roleList != null) {
+            publishSubjectChanged(user);
+        }
         if (createOrUpdateUserInput.isSendActivationEmail()) {
             // 2020/5/18 发送邮件激活。
             String url = activeAddr + "?userId=" + user.getId();

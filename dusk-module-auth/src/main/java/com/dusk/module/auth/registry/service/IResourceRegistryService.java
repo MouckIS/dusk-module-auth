@@ -1,6 +1,7 @@
 package com.dusk.module.auth.registry.service;
 
 import com.dusk.common.core.auth.registry.ResourceSnapshot;
+import com.dusk.common.rpc.authz.ResourceRegistrationResult;
 import com.dusk.module.auth.registry.dto.RegistryRegistrationResponse;
 
 /**
@@ -22,4 +23,13 @@ public interface IResourceRegistryService {
      * @return 本次注册的结果与变更清单
      */
     RegistryRegistrationResponse register(ResourceSnapshot snapshot);
+
+    /**
+     * Dubbo 同步注册入口，返回稳定的结果码供 SDK 做 readiness 门禁（4.3）。
+     *
+     * <p>与 {@link #register(ResourceSnapshot)} 共用同一事务实现，区别只在于返回值形态：
+     * 本方法不抛领域异常，而是把确定性失败映射为 {@code INVALID_SNAPSHOT} /
+     * {@code UNKNOWN_PERMISSION}，避免 Dubbo 调用方只能看到异常类型。</p>
+     */
+    ResourceRegistrationResult registerSnapshot(ResourceSnapshot snapshot);
 }

@@ -1,5 +1,6 @@
 package com.dusk.module.auth.authz.version;
 
+import com.dusk.common.core.auth.registry.AuthzScope;
 import com.dusk.common.core.entity.CreationEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,7 +25,8 @@ import lombok.experimental.FieldNameConstants;
  */
 @Entity
 @Table(name = "sys_authz_role_version",
-        uniqueConstraints = @UniqueConstraint(name = "uk_authz_role_version_role_id", columnNames = "role_id"))
+        uniqueConstraints = @UniqueConstraint(name = "uk_authz_role_version_scope_role",
+                columnNames = {"tenant_scope", "role_id"}))
 @Getter
 @Setter
 @FieldNameConstants
@@ -33,13 +35,19 @@ public class AuthzRoleVersion extends CreationEntity {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 角色 ID。宿主/租户角色共用一张表，故不按租户唯一。
+     * 授权作用域：{@code HOST} 或 {@code TENANT:<id>}（红线⑧：禁止用 null 表示 Host）。
+     */
+    @Column(name = "tenant_scope", nullable = false, length = 64)
+    private String tenantScope = AuthzScope.HOST;
+
+    /**
+     * 角色 ID。
      */
     @Column(name = "role_id", nullable = false)
     private Long roleId;
 
     /**
-     * 角色所属租户，冗余保存仅用于排障（失效判定以 roleId 为准）。
+     * 角色所属租户，冗余保存仅用于排障；{@code null} 表示 Host。
      */
     @Column(name = "tenant_id")
     private Long tenantId;

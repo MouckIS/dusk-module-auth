@@ -33,6 +33,11 @@ public interface IRoleRepository extends IBaseRepository<Role> {
 
     List<Role> findAllByIdIn(List<Long> ids);
 
+    /**
+     * 套餐/租户权限变更时按租户批量失效角色权限（3.3）。
+     */
+    List<Role> findByTenantId(Long tenantId);
+
 }
 
 

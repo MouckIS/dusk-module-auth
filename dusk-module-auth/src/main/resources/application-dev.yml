@@ -59,7 +59,7 @@ dubbo:
   registry:
     address: nacos://${spring.cloud.nacos.discovery.server-addr}?namespace=${spring.cloud.nacos.discovery.namespace}
   scan:
-    base-packages: com.dusk.module.auth.service
+    base-packages: com.dusk.module.auth
   consumer:
     check: false
   provider:

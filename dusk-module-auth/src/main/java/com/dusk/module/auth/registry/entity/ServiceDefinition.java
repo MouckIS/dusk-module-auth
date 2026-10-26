@@ -45,4 +45,22 @@ public class ServiceDefinition extends CreationEntity {
      */
     @Column(name = "default_release_version", length = 64)
     private String defaultReleaseVersion;
+
+    /**
+     * 服务级资源读模型修订号，见《权限优化方案-整理版》3.2。
+     *
+     * <p>单调递增，只在「影响该服务有效资源并集的变更」发生时推进：
+     * Release 注册、换绑审批、Release 状态变化等。Redis 投影与 MQ 事件都按它排序，
+     * 保证旧快照、旧事件不会覆盖新读模型。{@code resourceVersion} 是内容哈希，不参与排序（红线⑨）。</p>
+     */
+    @Column(name = "resource_revision", nullable = false)
+    private long resourceRevision;
+
+    /**
+     * 推进修订号并返回新值。
+     */
+    public long nextResourceRevision() {
+        resourceRevision = resourceRevision + 1;
+        return resourceRevision;
+    }
 }

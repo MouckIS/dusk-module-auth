@@ -2,11 +2,7 @@ package com.dusk.module.auth.registry.enums;
 
 import com.dusk.common.core.exception.BusinessException;
 
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 服务发布版本（Release）生命周期状态，见《权限优化方案-整理版》4.5 / 4.7。
@@ -28,6 +24,21 @@ public enum ReleaseStatus {
     ACTIVE("生效中", "存在运行实例，或被部署系统标记为当前有效版本"),
 
     /**
+     * 等待换绑审批：候选 Release 已落库，但同路径的权限换绑尚未获批。
+     *
+     * <p>该状态<b>不参与运行映射</b>（4.7 的发布门禁）：新实例不得接流量，
+     * 避免「网关按旧绑定、业务服务按新注解」的双层判定矛盾。</p>
+     */
+    PENDING_APPROVAL("待换绑审批", "候选 Release 已落库，同路径权限换绑尚未获批，不参与运行映射"),
+
+    /**
+     * 被阻塞：审批通过但仍有 ACTIVE Release 冲突，或换绑被拒绝。
+     *
+     * <p>同样不参与运行映射；需要按发布方案摘除旧 Release 或改用版本化路径后重试。</p>
+     */
+    BLOCKED("已阻塞", "候选 Release 存在 ACTIVE 冲突或被拒绝，不参与运行映射"),
+
+    /**
      * 已退役：持续 5 分钟无运行实例（4.7 防抖通过）。其独有 Permission 可进入 ORPHANED。
      */
     RETIRED("已退役", "持续无运行实例，其独有 Resource 不再支撑任何 Permission");
@@ -40,8 +51,10 @@ public enum ReleaseStatus {
      * 若不允许该迁移，它会永久停留在 REGISTERED，导致其 Resource 永远无法退役。</p>
      */
     private static final Map<ReleaseStatus, Set<ReleaseStatus>> ALLOWED_TRANSITIONS = Map.of(
-            REGISTERED, EnumSet.of(ACTIVE, RETIRED),
+            REGISTERED, EnumSet.of(ACTIVE, RETIRED, PENDING_APPROVAL, BLOCKED),
             ACTIVE, EnumSet.of(RETIRED),
+            PENDING_APPROVAL, EnumSet.of(REGISTERED, ACTIVE, BLOCKED, RETIRED),
+            BLOCKED, EnumSet.of(REGISTERED, RETIRED),
             RETIRED, EnumSet.of(ACTIVE)
     );
 

@@ -28,13 +28,8 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyCollection;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * {@link ResourceReadModelProjector} 单元测试。
@@ -86,12 +81,15 @@ class ResourceReadModelProjectorTest {
                         resource(release, "GET", "/users", "system:user:query"),
                         resource(release, "POST", "/login", "ANONYMOUS")));
         when(redisTemplateProvider.getIfAvailable()).thenReturn(redisTemplate);
-        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(redisTemplate.execute(any(org.springframework.data.redis.core.script.RedisScript.class),
+                any(java.util.List.class), any(), any(), any(), any())).thenReturn(1L);
 
         projector.project(SERVICE_ID);
 
         org.mockito.ArgumentCaptor<String> json = org.mockito.ArgumentCaptor.forClass(String.class);
-        verify(valueOperations).set(eq("auth:resource:" + SERVICE_ID), json.capture(), eq(Duration.ofMinutes(30)));
+        verify(redisTemplate).execute(any(org.springframework.data.redis.core.script.RedisScript.class),
+                eq(java.util.List.of("auth:resource:" + SERVICE_ID)),
+                eq(ResourceReadModelProjector.RESOURCE_REVISION_FIELD), eq("0"), json.capture(), any());
 
         JsonNode root = objectMapper.readTree(json.getValue());
         assertThat(root.get("resourceVersion").asString()).isEqualTo("rv-1");
@@ -142,23 +140,26 @@ class ResourceReadModelProjectorTest {
         when(releaseRepository.findByService_ServiceId(SERVICE_ID)).thenReturn(List.of(release));
         when(resourceRepository.findByRelease_IdInAndStatusIn(anyCollection(), anyCollection())).thenReturn(List.of());
         when(redisTemplateProvider.getIfAvailable()).thenReturn(redisTemplate);
-        when(redisTemplate.opsForValue()).thenThrow(new IllegalStateException("Redis 连接不可用"));
+        when(redisTemplate.execute(any(org.springframework.data.redis.core.script.RedisScript.class),
+                any(java.util.List.class), any(), any(), any(), any()))
+                .thenThrow(new IllegalStateException("Redis 连接不可用"));
 
         assertThatCode(() -> projector.project(SERVICE_ID)).doesNotThrowAnyException();
     }
 
     @Test
-    @DisplayName("无可能承接流量的 Release 时不写入（全部已退役）")
-    void shouldSkipWhenNoTrafficCapableRelease() {
+    @DisplayName("无可能承接流量的 Release 时删除旧读模型（避免陈旧路由继续生效）")
+    void shouldDeleteWhenNoTrafficCapableRelease() {
         ServiceDefinition service = new ServiceDefinition();
         service.setServiceId(SERVICE_ID);
         when(serviceRepository.findByServiceId(SERVICE_ID)).thenReturn(Optional.of(service));
         when(releaseRepository.findByService_ServiceId(SERVICE_ID)).thenReturn(List.of(
                 release(10L, "1.0.0", "rv-1", ReleaseStatus.RETIRED)));
+        when(redisTemplateProvider.getIfAvailable()).thenReturn(redisTemplate);
 
         projector.project(SERVICE_ID);
 
-        verify(redisTemplateProvider, never()).getIfAvailable();
+        verify(redisTemplate).delete("auth:resource:" + SERVICE_ID);
     }
 
     private static ServiceRelease release(Long id, String version, String resourceVersion, ReleaseStatus status) {

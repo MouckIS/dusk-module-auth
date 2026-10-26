@@ -1,9 +1,12 @@
 package com.dusk.module.auth.authz.service;
 
+import com.dusk.common.core.auth.registry.AuthzScope;
 import com.dusk.module.auth.authz.config.AuthzMqProperties;
 import com.dusk.module.auth.authz.event.PermissionChangedEvent;
 import com.dusk.module.auth.authz.event.ResourceChangedEvent;
+import com.dusk.module.auth.authz.event.SubjectChangedEvent;
 import com.dusk.module.auth.authz.outbox.AuthzOutboxEvent;
+import com.dusk.module.auth.authz.outbox.AuthzOutboxProjectionStatus;
 import com.dusk.module.auth.authz.outbox.AuthzOutboxPublisher;
 import com.dusk.module.auth.authz.outbox.IAuthzOutboxEventRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -54,32 +57,66 @@ public class AuthzEventPublisher {
      * @param releaseVersion  产出该版本的 Release 版本号
      */
     public void resourceChanged(String serviceId, String resourceVersion, String releaseVersion) {
+        resourceChanged(serviceId, resourceVersion, releaseVersion, 0L);
+    }
+
+    /**
+     * 发布「资源定义变更」事件（→ Gateway，失效 routePermCache）。
+     *
+     * @param serviceId        服务标识
+     * @param resourceVersion  变更后的内容哈希
+     * @param releaseVersion   产出该版本的 Release 版本号
+     * @param resourceRevision 变更后的服务级修订号（单调递增）
+     */
+    public void resourceChanged(String serviceId, String resourceVersion, String releaseVersion,
+                                long resourceRevision) {
         if (serviceId == null || serviceId.isBlank() || resourceVersion == null || resourceVersion.isBlank()) {
             log.debug("跳过 RESOURCE_CHANGED：serviceId 或 resourceVersion 为空（serviceId={}, resourceVersion={}）",
                     serviceId, resourceVersion);
             return;
         }
-        ResourceChangedEvent event = ResourceChangedEvent.of(serviceId, resourceVersion, releaseVersion);
-        append(properties.getResourceChangedTopic(), event.bizKey(), event.refKey(), event);
+        ResourceChangedEvent event = ResourceChangedEvent.of(serviceId, resourceVersion, releaseVersion, resourceRevision);
+        append(properties.getResourceChangedTopic(), event.bizKey(), event.refKey(), event, resourceRevision);
     }
 
     /**
      * 发布「角色权限变更」事件（→ Gateway，失效 rolePermCache）。
      *
-     * @param tenantId          租户 ID
+     * @param tenantId          租户 ID，Host 为 {@code null}
      * @param roleId            角色 ID
      * @param permissionVersion 递增后的新版本号
      */
     public void permissionChanged(Long tenantId, Long roleId, long permissionVersion) {
-        if (tenantId == null || roleId == null) {
-            log.debug("跳过 PERMISSION_CHANGED：tenantId 或 roleId 为空（tenantId={}, roleId={}）", tenantId, roleId);
-            return;
-        }
-        PermissionChangedEvent event = PermissionChangedEvent.of(tenantId, roleId, permissionVersion);
-        append(properties.getPermissionChangedTopic(), event.bizKey(), event.refKey(), event);
+        permissionChanged(AuthzScope.of(tenantId), tenantId, roleId, permissionVersion);
     }
 
-    private void append(String eventType, String bizKey, String refKey, Object payload) {
+    /**
+     * 发布「角色权限变更」事件（带显式作用域，避免 Host 被 null 过滤）。
+     */
+    public void permissionChanged(String tenantScope, Long tenantId, Long roleId, long permissionVersion) {
+        if (tenantScope == null || tenantScope.isBlank() || roleId == null) {
+            log.debug("跳过 PERMISSION_CHANGED：tenantScope 或 roleId 为空（tenantScope={}, roleId={}）",
+                    tenantScope, roleId);
+            return;
+        }
+        PermissionChangedEvent event = PermissionChangedEvent.of(tenantScope, tenantId, roleId, permissionVersion);
+        append(properties.getPermissionChangedTopic(), event.bizKey(), event.refKey(), event, permissionVersion);
+    }
+
+    /**
+     * 发布「账号状态/用户代际变更」事件（→ Gateway，失效 subjectCache）。
+     */
+    public void subjectChanged(String tenantScope, Long userId, long subjectVersion, boolean enabled) {
+        if (tenantScope == null || tenantScope.isBlank() || userId == null) {
+            log.debug("跳过 SUBJECT_CHANGED：tenantScope 或 userId 为空（tenantScope={}, userId={}）",
+                    tenantScope, userId);
+            return;
+        }
+        SubjectChangedEvent event = SubjectChangedEvent.of(tenantScope, userId, subjectVersion, enabled);
+        append(properties.getSubjectChangedTopic(), event.bizKey(), event.refKey(), event, subjectVersion);
+    }
+
+    private void append(String eventType, String bizKey, String refKey, Object payload, long revision) {
         if (!properties.isEnabled() || !properties.getOutbox().isEnabled()) {
             log.debug("事件推送未启用，跳过 Outbox 写入: eventType={}, bizKey={}", eventType, bizKey);
             return;
@@ -97,6 +134,8 @@ public class AuthzEventPublisher {
         row.setBizKey(bizKey);
         row.setRefKey(refKey);
         row.setPayload(json);
+        row.setRevision(revision);
+        row.setProjectionStatus(AuthzOutboxProjectionStatus.PENDING);
         repository.save(row);
         log.debug("Outbox 事件已写入: id={}, eventType={}, bizKey={}", row.getId(), eventType, bizKey);
 

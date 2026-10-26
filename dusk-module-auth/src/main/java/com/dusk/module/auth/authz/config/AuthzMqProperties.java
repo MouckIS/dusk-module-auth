@@ -5,6 +5,8 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
+
 /**
  * 权限事件推送（MQ）配置，前缀 {@code app.authz.mq}。见《权限优化方案-整理版》8.5 / 8.9。
  *
@@ -50,6 +52,11 @@ public class AuthzMqProperties {
     private String permissionChangedTopic = "PERMISSION_CHANGED";
 
     /**
+     * 账号状态/用户代际变更事件主题（Auth → Gateway）。
+     */
+    private String subjectChangedTopic = "SUBJECT_CHANGED";
+
+    /**
      * 资源快照增量注册主题（SDK → Auth）。
      */
     private String snapshotRegisterTopic = "RESOURCE_SNAPSHOT_REGISTERED";
@@ -62,6 +69,16 @@ public class AuthzMqProperties {
      * 从而避免「失效 → 回源」读到旧快照。</p>
      */
     private boolean refreshReadModelBeforePublish = true;
+
+    /**
+     * 角色权限读模型的 L2 TTL，见 5.2。默认 30 分钟。
+     */
+    private Duration readModelTtl = Duration.ofMinutes(30);
+
+    /**
+     * 账号状态读模型的 L2 TTL，见 6.1（应明显短于普通路由缓存，默认 1 分钟）。
+     */
+    private Duration subjectReadModelTtl = Duration.ofMinutes(1);
 
     private Outbox outbox = new Outbox();
 
@@ -102,5 +119,10 @@ public class AuthzMqProperties {
          * 退避上限（毫秒）。
          */
         private long maxBackoffMs = 300000L;
+
+        /**
+         * 数据库租约时长（秒）。Worker 崩溃后租约到期即可被其他实例重新领取（6.3）。
+         */
+        private long leaseSeconds = 30L;
     }
 }

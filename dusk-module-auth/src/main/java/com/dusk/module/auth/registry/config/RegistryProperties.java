@@ -49,6 +49,17 @@ public class RegistryProperties {
     private boolean strictResourceVersion = true;
 
     /**
+     * 是否拒绝权限目录中不存在的权限码（3.1「Permission 来源必须唯一」）。
+     *
+     * <p>开启后，SDK 只能引用已存在于 {@code *AuthProvider} 权限树中的权限码；
+     * 未登记的权限码会让整个快照被拒绝（{@code UNKNOWN_PERMISSION}）。</p>
+     *
+     * <p><b>默认关闭</b>：现有接入方尚未全部通过权限树登记权限点，贸然开启会让这些服务
+     * 在启动期注册失败。生产环境在完成权限树盘点（迁移阶段 1）后应显式设为 true。</p>
+     */
+    private boolean strictPermissionCatalogue = false;
+
+    /**
      * Redis 运行读模型（3.4 第 12 步 / 5.7）。
      */
     private ReadModel readModel = new ReadModel();

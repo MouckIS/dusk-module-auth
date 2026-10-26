@@ -18,14 +18,13 @@ import com.dusk.common.core.service.impl.BaseService;
 import com.dusk.common.core.tenant.TenantContextHolder;
 import com.dusk.common.core.utils.MapperUtil;
 import com.dusk.common.core.utils.UtBeanUtils;
+import com.dusk.module.auth.authz.service.AuthzEventPublisher;
+import com.dusk.module.auth.authz.version.AuthzPermissionVersionService;
+import com.dusk.module.auth.common.permission.IAuthPermissionManager;
 import com.dusk.module.auth.dto.BindRoleToUserInput;
 import com.dusk.module.auth.dto.RoleSimpleDto;
-import com.dusk.module.auth.dto.orga.OrganizationUnitUserListDto;
-import com.dusk.module.auth.dto.role.RoleListDto;
-import com.dusk.module.auth.dto.role.RolePermissionDto;
-import com.dusk.module.auth.service.IRoleRpcService;
-import com.dusk.module.auth.common.permission.IAuthPermissionManager;
 import com.dusk.module.auth.dto.orga.BindRoleToOrgInput;
+import com.dusk.module.auth.dto.orga.OrganizationUnitUserListDto;
 import com.dusk.module.auth.dto.role.*;
 import com.dusk.module.auth.dto.user.GetUserByRoleDto;
 import com.dusk.module.auth.dto.user.UnbindRoleForUserDto;
@@ -33,11 +32,10 @@ import com.dusk.module.auth.entity.*;
 import com.dusk.module.auth.excel.RolePermissionExportRowWriteHandler;
 import com.dusk.module.auth.mapper.RoleMapper;
 import com.dusk.module.auth.repository.IGrantPermissionRepository;
-import com.dusk.module.auth.authz.service.AuthzEventPublisher;
-import com.dusk.module.auth.authz.version.AuthzPermissionVersionService;
 import com.dusk.module.auth.repository.IRoleRepository;
 import com.dusk.module.auth.repository.IUserRepository;
 import com.dusk.module.auth.service.IOrganizationUnitService;
+import com.dusk.module.auth.service.IRoleRpcService;
 import com.dusk.module.auth.service.IRoleService;
 import com.dusk.module.auth.service.ITenantPermissionService;
 import com.querydsl.core.types.QBean;
@@ -86,6 +84,13 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
      */
     @Resource
     private AuthzPermissionVersionService authzPermissionVersionService;
+    /**
+     * 用户角色变化必须推进 {@code subjectVersion}（5.3）。
+     */
+    @Resource
+    private com.dusk.module.auth.authz.version.AuthzSubjectVersionService authzSubjectVersionService;
+    @Resource
+    private com.dusk.module.auth.authz.service.AuthzEventPublisher authzSubjectEventPublisher;
 
     @Override
     public List<Role> getRoles() {
@@ -358,6 +363,7 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
         userList = userList.stream().filter((e) -> role.getUserRoles().stream().noneMatch(u -> u.getId().equals(e.getId()))).toList();
         role.getUserRoles().addAll(userList);
         save(role);
+        bumpSubjects(userList);
     }
 
     @Override
@@ -414,6 +420,21 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
         }
 
         save(role);
+        bumpSubjects(userRepository.findAllById(roleForUserDto.getUserIds()));
+    }
+
+    /**
+     * 用户角色变化后推进每个受影响用户的 {@code subjectVersion} 并广播失效事件（5.3）。
+     */
+    private void bumpSubjects(List<User> users) {
+        for (User user : users) {
+            if (user == null || user.getId() == null) {
+                continue;
+            }
+            String scope = com.dusk.common.core.auth.registry.AuthzScope.of(user.getTenantId());
+            long version = authzSubjectVersionService.nextVersion(scope, user.getId());
+            authzSubjectEventPublisher.subjectChanged(scope, user.getId(), version, user.isActive());
+        }
     }
 
     @Override

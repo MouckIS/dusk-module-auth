@@ -1,11 +1,7 @@
 package com.dusk.module.auth.authz.outbox;
 
 import com.dusk.common.core.entity.CreationEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
@@ -60,6 +56,31 @@ public class AuthzOutboxEvent extends CreationEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 16)
     private AuthzOutboxStatus status = AuthzOutboxStatus.PENDING;
+
+    /**
+     * 事件对应的单调版本号（resourceRevision / permissionVersion / subjectVersion）。
+     */
+    @Column(name = "revision", nullable = false)
+    private long revision;
+
+    /**
+     * 投影状态：与发送状态分开记录，投影失败时禁止发送（6.2）。
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "projection_status", nullable = false, length = 16)
+    private AuthzOutboxProjectionStatus projectionStatus = AuthzOutboxProjectionStatus.PENDING;
+
+    @Column(name = "projected_at")
+    private LocalDateTime projectedAt;
+
+    /**
+     * 数据库租约持有者，保证多实例只有一个 Worker 处理同一行（6.3）。
+     */
+    @Column(name = "lease_owner", length = 128)
+    private String leaseOwner;
+
+    @Column(name = "lease_until")
+    private LocalDateTime leaseUntil;
 
     /**
      * 已尝试投递次数。

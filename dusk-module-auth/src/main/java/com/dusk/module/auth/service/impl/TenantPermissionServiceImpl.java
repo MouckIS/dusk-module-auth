@@ -3,10 +3,10 @@ package com.dusk.module.auth.service.impl;
 import com.dusk.common.core.auth.permission.Permission;
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.service.impl.BaseService;
-import com.dusk.module.auth.dto.role.RolePermissionDto;
 import com.dusk.module.auth.common.config.AppAuthConfig;
 import com.dusk.module.auth.common.permission.IAuthPermissionManager;
 import com.dusk.module.auth.dto.permission.EditionPermissionInputDto;
+import com.dusk.module.auth.dto.role.RolePermissionDto;
 import com.dusk.module.auth.entity.QTenant;
 import com.dusk.module.auth.entity.QTenantPermission;
 import com.dusk.module.auth.entity.Tenant;
@@ -45,6 +45,8 @@ public class TenantPermissionServiceImpl extends BaseService<TenantPermission, I
     private ITenantRepository tenantRepository;
     @Resource
     private AppAuthConfig appAuthConfig;
+    @Resource
+    private com.dusk.module.auth.authz.version.TenantPermissionInvalidationService tenantPermissionInvalidationService;
 
     @Override
     public List<RolePermissionDto> getEditionPermissions(Long editionId) {
@@ -77,6 +79,8 @@ public class TenantPermissionServiceImpl extends BaseService<TenantPermission, I
 
         //要刷新权限缓存
         authPermissionManager.refreshAll();
+        // 套餐权限是所有租户内角色权限的上界，变更后必须精确失效受影响角色（3.3）
+        tenantPermissionInvalidationService.invalidateEdition(input.getId());
     }
 
     @Override

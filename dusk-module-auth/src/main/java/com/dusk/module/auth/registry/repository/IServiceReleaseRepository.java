@@ -14,9 +14,20 @@ import java.util.Optional;
 public interface IServiceReleaseRepository extends IBaseRepository<ServiceRelease> {
 
     /**
-     * 按服务标识 + 发布版本定位 Release，注册与 Diff 的入口查询。
+     * 按服务标识 + 发布版本定位 Release。保留用于兼容旧数据与迁移期查询。
      */
     Optional<ServiceRelease> findByService_ServiceIdAndServiceVersion(String serviceId, String serviceVersion);
+
+    /**
+     * 按不可变身份 {@code (serviceId, serviceVersion, resourceVersion)} 定位 Release，见 4.2。
+     */
+    Optional<ServiceRelease> findByService_ServiceIdAndServiceVersionAndResourceVersion(
+            String serviceId, String serviceVersion, String resourceVersion);
+
+    /**
+     * 某服务下指定状态的 Release。
+     */
+    List<ServiceRelease> findByService_ServiceIdAndStatusIn(String serviceId, Collection<ReleaseStatus> statuses);
 
     /**
      * 某服务下的全部 Release。

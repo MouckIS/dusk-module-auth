@@ -1,30 +1,26 @@
 package com.dusk.module.auth.registry.service;
 
+import com.dusk.common.core.auth.permission.Permission;
 import com.dusk.common.core.auth.registry.ResourceSnapshot;
 import com.dusk.common.core.auth.registry.ResourceVersionCalculator;
+import com.dusk.common.core.auth.registry.SnapshotResource;
 import com.dusk.common.core.exception.BusinessException;
+import com.dusk.common.rpc.authz.ResourceRegistrationResult;
+import com.dusk.module.auth.authz.service.AuthzEventPublisher;
+import com.dusk.module.auth.common.permission.IAuthPermissionManager;
 import com.dusk.module.auth.registry.config.RegistryProperties;
 import com.dusk.module.auth.registry.diff.PermissionRoleLookup;
 import com.dusk.module.auth.registry.diff.ResourceBinding;
+import com.dusk.module.auth.registry.diff.ResourceDiffEntry;
 import com.dusk.module.auth.registry.diff.ResourceKey;
 import com.dusk.module.auth.registry.dto.RegistryRegistrationResponse;
-import com.dusk.module.auth.registry.entity.ApiResource;
-import com.dusk.module.auth.registry.entity.PermissionDefinition;
-import com.dusk.module.auth.registry.entity.ServiceDefinition;
-import com.dusk.module.auth.registry.entity.ServiceRelease;
-import com.dusk.module.auth.registry.enums.PermissionStatus;
-import com.dusk.module.auth.registry.enums.ReleaseStatus;
-import com.dusk.module.auth.registry.enums.ResourceDiffType;
-import com.dusk.module.auth.registry.enums.ResourceStatus;
+import com.dusk.module.auth.registry.entity.*;
+import com.dusk.module.auth.registry.enums.*;
 import com.dusk.module.auth.registry.lifecycle.PermissionEvaluationInput;
 import com.dusk.module.auth.registry.lifecycle.PermissionLifecycleEvaluator;
 import com.dusk.module.auth.registry.lifecycle.PermissionTransition;
-import com.dusk.module.auth.registry.repository.IApiResourceRepository;
-import com.dusk.module.auth.registry.repository.IPermissionDefinitionRepository;
-import com.dusk.module.auth.registry.repository.IServiceDefinitionRepository;
-import com.dusk.module.auth.registry.repository.IServiceReleaseRepository;
+import com.dusk.module.auth.registry.repository.*;
 import com.dusk.module.auth.repository.IGrantPermissionRepository;
-import com.dusk.module.auth.authz.service.AuthzEventPublisher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,43 +28,50 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
- * 资源快照注册实现，见《权限优化方案-整理版》3.4「Auth 事务内处理明细」。
+ * 资源快照注册实现，见《权限优化方案-整理版》3.4 / 4.2 / 4.7。
  *
- * <p>事务内的顺序与文档一致：解析 Service/Release → 比较 resourceVersion → Diff → 资源落库 →
- * 权限创建与状态更新 → 提交；Redis 投影放在提交之后（3.8：Redis 是投影，不能先于 PG 事实落地）。</p>
- *
- * <p><b>关键取舍（都写在对应方法上）</b>：</p>
- * <ul>
- *   <li>幂等命中（版本未变）时仍然刷新读模型——Pod 重启会走这条路径，正好能自愈缓存；</li>
- *   <li>「新 Release 的代表集」是快照本身而非 Diff 结果，见 {@link RegistryApplyPlanner}；</li>
- *   <li>权限生效性判定同时计入换绑候选（4.9），方向保守，不会回收仍在被声明的权限。</li>
- * </ul>
+ * <p>本实现落实三条关键约束：</p>
+ * <ol>
+ *   <li><b>Release 不可变</b>：身份为 {@code (serviceId, serviceVersion, resourceVersion)}，
+ *       快照内容变化即新 Release，迟到的旧请求不会改写已注册 Release；</li>
+ *   <li><b>resourceRevision 单调</b>：任何影响有效资源并集的变更都推进服务级修订号，
+ *       由 Outbox 事件与 Redis 投影按它排序；{@code resourceVersion} 只做幂等；</li>
+ *   <li><b>换绑是发布门禁</b>：存在换绑时候选 Release 进入 {@link ReleaseStatus#PENDING_APPROVAL}，
+ *       不参与运行映射，注册返回 {@code REBIND_APPROVAL_REQUIRED}。</li>
+ * </ol>
  */
 @Service
 @Slf4j
 public class ResourceRegistryServiceImpl implements IResourceRegistryService {
+
+    /**
+     * 参与运行映射的资源状态：换绑未确认期间候选 Release 不参与，因此这里不再包含
+     * {@code PENDING_REBIND}/{@code REBIND_REJECTED}（4.7 已将换绑改为发布门禁）。
+     */
+    private static final List<ResourceStatus> EFFECTIVE_RESOURCE_STATUSES =
+            List.of(ResourceStatus.ACTIVE);
+
+    /**
+     * 可能承接流量的 Release 状态。
+     */
+    private static final List<ReleaseStatus> TRAFFIC_STATUSES = ReleaseStatus.trafficCapableStatuses();
 
     private final IServiceDefinitionRepository serviceRepository;
     private final IServiceReleaseRepository releaseRepository;
     private final IApiResourceRepository resourceRepository;
     private final IPermissionDefinitionRepository permissionRepository;
     private final IGrantPermissionRepository grantPermissionRepository;
+    private final IRebindRequestRepository rebindRequestRepository;
     private final RegistryProperties properties;
     private final ResourceReadModelProjector readModelProjector;
     private final AuthzEventPublisher authzEventPublisher;
+    private final IAuthPermissionManager authPermissionManager;
 
     /**
-     * 纯函数协作者：无状态、不依赖 Spring 上下文，直接构造即可（与模块内 MapStruct Mapper 的处理方式一致）。
+     * 纯函数协作者：无状态、不依赖 Spring 上下文。
      */
     private final RegistryApplyPlanner planner = new RegistryApplyPlanner();
     private final PermissionLifecycleEvaluator permissionEvaluator = new PermissionLifecycleEvaluator();
@@ -78,87 +81,134 @@ public class ResourceRegistryServiceImpl implements IResourceRegistryService {
                                        IApiResourceRepository resourceRepository,
                                        IPermissionDefinitionRepository permissionRepository,
                                        IGrantPermissionRepository grantPermissionRepository,
+                                       IRebindRequestRepository rebindRequestRepository,
                                        RegistryProperties properties,
                                        ResourceReadModelProjector readModelProjector,
-                                       AuthzEventPublisher authzEventPublisher) {
+                                       AuthzEventPublisher authzEventPublisher,
+                                       IAuthPermissionManager authPermissionManager) {
         this.serviceRepository = serviceRepository;
         this.releaseRepository = releaseRepository;
         this.resourceRepository = resourceRepository;
         this.permissionRepository = permissionRepository;
         this.grantPermissionRepository = grantPermissionRepository;
+        this.rebindRequestRepository = rebindRequestRepository;
         this.properties = properties;
         this.readModelProjector = readModelProjector;
         this.authzEventPublisher = authzEventPublisher;
+        this.authPermissionManager = authPermissionManager;
+    }
+
+    private static void addPermission(Set<String> codes, Permission permission) {
+        if (permission == null) {
+            return;
+        }
+        if (permission.getName() != null) {
+            codes.add(permission.getName());
+        }
+        if (permission.getChildren() != null) {
+            permission.getChildren().forEach(child -> addPermission(codes, child));
+        }
     }
 
     @Override
     @Transactional
     public RegistryRegistrationResponse register(ResourceSnapshot snapshot) {
+        return execute(snapshot).response();
+    }
+
+    @Override
+    @Transactional
+    public ResourceRegistrationResult registerSnapshot(ResourceSnapshot snapshot) {
+        try {
+            return execute(snapshot).result();
+        } catch (UnknownPermissionException e) {
+            log.error("快照注册被拒绝：{}", e.getMessage());
+            return ResourceRegistrationResult.unknownPermission(e.getMessage());
+        } catch (BusinessException e) {
+            log.error("快照注册被拒绝：{}", e.getMessage());
+            return ResourceRegistrationResult.invalid(e.getMessage());
+        }
+    }
+
+    /**
+     * 事务内执行注册，同时产出「给 SDK 的稳定结果」与「给运维的详细报告」。
+     */
+    private RegistrationExecution execute(ResourceSnapshot snapshot) {
         validateResourceVersion(snapshot);
+        validatePermissionCatalogue(snapshot);
         LocalDateTime now = LocalDateTime.now();
         String serviceId = snapshot.serviceId();
 
-        ServiceDefinition service = resolveService(serviceId);
-        ServiceRelease release = resolveRelease(service, snapshot.serviceVersion());
-        List<ApiResource> existingRows = resourceRepository.findByRelease_Id(release.getId());
+        ServiceDefinition service = resolveServiceForUpdate(serviceId);
+        List<ServiceRelease> sameVersionTraffic = trafficReleasesOfVersion(serviceId, snapshot.serviceVersion(), null);
 
-        if (snapshot.resourceVersion().equals(release.getResourceVersion())) {
-            // 幂等命中：不写库，但仍然投影一次读模型——Pod 重启会重复上报同一个版本，
-            // 这条路径正好可以用来修复「投影曾经失败 / L2 TTL 到期」导致的缓存缺失。
-            scheduleReadModelProjection(serviceId);
-            log.info("快照注册幂等命中，未做写库：serviceId={}, serviceVersion={}, resourceVersion={}, 资源数={}",
-                    serviceId, snapshot.serviceVersion(), snapshot.resourceVersion(), snapshot.totalResources());
-            return RegistryRegistrationResponse.unchanged(serviceId, snapshot.serviceVersion(),
-                    snapshot.resourceVersion(), release.getStatus().name(), snapshot.totalResources());
+        Optional<ServiceRelease> identicalRelease = releaseRepository
+                .findByService_ServiceIdAndServiceVersionAndResourceVersion(
+                        serviceId, snapshot.serviceVersion(), snapshot.resourceVersion());
+        if (identicalRelease.isPresent()) {
+            return handleIdentical(service, identicalRelease.get(), snapshot);
         }
 
-        List<RegisteredResource> existingResources = toRegisteredResources(existingRows, serviceId);
-        List<ResourceBinding> baseBindings = release.getResourceVersion() == null
-                ? predecessorBindings(service, release)
-                : existingResources.stream().map(RegisteredResource::binding).toList();
-
+        ServiceRelease release = createRelease(service, snapshot);
+        List<RegisteredResource> existingResources = List.of();
+        List<ResourceBinding> baseBindings = predecessorBindings(service, release);
         RegistryApplyPlan plan = planner.plan(existingResources, baseBindings, snapshot, roleLookup());
 
-        applyMutations(release, existingRows, plan, now);
-        PermissionReconciliation reconciliation = reconcilePermissions(plan.touchedPermissions(), serviceId, now);
+        applyMutations(release, existingResources, plan, now);
 
-        release.setResourceVersion(snapshot.resourceVersion());
-        releaseRepository.save(release);
-
-        scheduleRegistrationSideEffects(serviceId, snapshot.resourceVersion(), snapshot.serviceVersion());
-
-        log.info("快照注册完成：serviceId={}, serviceVersion={}, resourceVersion={}，"
-                        + "新增 {}、更新 {}、废弃 {}、换绑挂起 {}，权限生效 {}、孤立 {}",
-                serviceId, snapshot.serviceVersion(), snapshot.resourceVersion(),
-                plan.ofType(ResourceDiffType.ADD).size(), plan.ofType(ResourceDiffType.UPDATE).size(),
-                plan.ofType(ResourceDiffType.REMOVE).size(), plan.ofType(ResourceDiffType.REBIND).size(),
-                reconciliation.activated().size(), reconciliation.orphaned().size());
         if (!plan.diff().rebinds().isEmpty()) {
-            // 4.9：换绑必须人工确认，这里只把待办「点名」，具体影响面已在 diff 中解析。
-            log.warn("快照注册发现权限换绑，已挂起等待管理员确认（运行时仍按旧绑定执行）：serviceId={}, 换绑项={}",
-                    serviceId, texts(plan, ResourceDiffType.REBIND));
+            List<RebindRequest> pending = recordRebindRequests(service, release, plan, now);
+            release.setStatus(ReleaseStatus.PENDING_APPROVAL);
+            releaseRepository.save(release);
+            // 候选 Release 不参与有效并集，因此不推进 revision；但仍重算权限状态，
+            // 让旧绑定保持 ACTIVE、候选绑定处于 ORPHANED（如果它尚未被任何有效资源引用）。
+            PermissionReconciliation reconciliation = reconcilePermissions(plan.touchedPermissions(), serviceId, now);
+
+            log.warn("快照注册发现权限换绑，候选 Release 已挂起等待审批（新实例不得接流量）："
+                            + "serviceId={}, serviceVersion={}, resourceVersion={}, 待办={}",
+                    serviceId, snapshot.serviceVersion(), snapshot.resourceVersion(),
+                    pending.stream().map(RebindRequest::getId).toList());
+            return new RegistrationExecution(
+                    response(snapshot, false, release, plan, reconciliation, pending),
+                    ResourceRegistrationResult.rebindRequired(String.valueOf(release.getId()),
+                            service.getResourceRevision(), String.valueOf(pending.getFirst().getId())));
         }
 
-        return new RegistryRegistrationResponse(
-                serviceId,
-                snapshot.serviceVersion(),
-                snapshot.resourceVersion(),
-                false,
-                release.getStatus().name(),
-                snapshot.totalResources(),
-                texts(plan, ResourceDiffType.ADD),
-                texts(plan, ResourceDiffType.UPDATE),
-                texts(plan, ResourceDiffType.REMOVE),
-                texts(plan, ResourceDiffType.REBIND),
-                reconciliation.activated(),
-                reconciliation.orphaned());
+        Optional<String> conflict = findActiveConflict(serviceId, release, plan, sameVersionTraffic);
+        if (conflict.isPresent()) {
+            release.setStatus(ReleaseStatus.BLOCKED);
+            releaseRepository.save(release);
+            log.error("快照注册被阻塞：候选 Release 与运行中的 Release 存在同路径不同权限，"
+                    + "必须摘除旧 Release 流量或使用版本化路径：serviceId={}, conflict={}", serviceId, conflict.get());
+            return new RegistrationExecution(
+                    response(snapshot, false, release, plan, new PermissionReconciliation(List.of(), List.of()), List.of()),
+                    ResourceRegistrationResult.activeConflict(String.valueOf(release.getId()),
+                            service.getResourceRevision()));
+        }
+
+        retireSameVersionReleases(sameVersionTraffic, release, now);
+        PermissionReconciliation reconciliation = reconcilePermissions(plan.touchedPermissions(), serviceId, now);
+        release.setStatus(ReleaseStatus.REGISTERED);
+        releaseRepository.save(release);
+        service.nextResourceRevision();
+        serviceRepository.save(service);
+        scheduleRegistrationSideEffects(serviceId, snapshot.resourceVersion(), snapshot.serviceVersion(),
+                service.getResourceRevision());
+
+        log.info("快照注册完成：serviceId={}, serviceVersion={}, resourceVersion={}, revision={}，"
+                        + "新增 {}、更新 {}、废弃 {}，权限生效 {}、孤立 {}",
+                serviceId, snapshot.serviceVersion(), snapshot.resourceVersion(), service.getResourceRevision(),
+                plan.ofType(ResourceDiffType.ADD).size(), plan.ofType(ResourceDiffType.UPDATE).size(),
+                plan.ofType(ResourceDiffType.REMOVE).size(),
+                reconciliation.activated().size(), reconciliation.orphaned().size());
+
+        return new RegistrationExecution(
+                response(snapshot, false, release, plan, reconciliation, List.of()),
+                ResourceRegistrationResult.accepted(String.valueOf(release.getId()), service.getResourceRevision()));
     }
 
     /**
      * 3.3 契约校验：快照声明的 {@code resourceVersion} 必须与其资源内容一致。
-     *
-     * <p>该版本号是 Diff 幂等的唯一依据，一旦「内容变了而版本没变」，本次注册会被整体跳过，
-     * 表现为新接口静默没有登记（5.10 下即 403）。拒绝注册比静默失配安全。</p>
      */
     private void validateResourceVersion(ResourceSnapshot snapshot) {
         if (!properties.isStrictResourceVersion() || snapshot.isResourceVersionConsistent()) {
@@ -171,46 +221,130 @@ public class ResourceRegistryServiceImpl implements IResourceRegistryService {
     }
 
     /**
-     * 解析或创建 Service（2.2：Service 只承载标识信息，不承载权限事实）。
+     * 相同 Release 身份：幂等成功，不重复推进 revision。
      */
-    private ServiceDefinition resolveService(String serviceId) {
-        Optional<ServiceDefinition> existing = serviceRepository.findByServiceId(serviceId);
+    private RegistrationExecution handleIdentical(ServiceDefinition service, ServiceRelease release,
+                                                  ResourceSnapshot snapshot) {
+        if (release.getStatus() == ReleaseStatus.PENDING_APPROVAL) {
+            List<RebindRequest> pending = rebindRequestRepository.findByCandidateReleaseIdAndStatusIn(
+                    release.getId(), List.of(RebindStatus.PENDING));
+            String pendingId = pending.isEmpty() ? null : String.valueOf(pending.getFirst().getId());
+            return new RegistrationExecution(
+                    RegistryRegistrationResponse.unchanged(snapshot.serviceId(), snapshot.serviceVersion(),
+                            snapshot.resourceVersion(), release.getStatus().name(), snapshot.totalResources()),
+                    ResourceRegistrationResult.rebindRequired(String.valueOf(release.getId()),
+                            service.getResourceRevision(), pendingId));
+        }
+        if (release.getStatus() == ReleaseStatus.BLOCKED) {
+            List<RebindRequest> rebinds = rebindRequestRepository.findByCandidateReleaseId(release.getId());
+            String lastId = rebinds.isEmpty() ? null : String.valueOf(rebinds.getLast().getId());
+            log.warn("候选 Release 仍处于 BLOCKED，拒绝就绪：serviceId={}, serviceVersion={}, resourceVersion={}",
+                    snapshot.serviceId(), snapshot.serviceVersion(), snapshot.resourceVersion());
+            return new RegistrationExecution(
+                    RegistryRegistrationResponse.unchanged(snapshot.serviceId(), snapshot.serviceVersion(),
+                            snapshot.resourceVersion(), release.getStatus().name(), snapshot.totalResources()),
+                    new ResourceRegistrationResult(ResourceRegistrationResult.ACTIVE_RELEASE_CONFLICT,
+                            String.valueOf(release.getId()), service.getResourceRevision(), lastId));
+        }
+
+        // 幂等命中仍然投影一次读模型：Pod 重启会重复上报同一个版本，这条路径可以自愈缓存。
+        scheduleReadModelProjection(snapshot.serviceId());
+        log.info("快照注册幂等命中，未做写库：serviceId={}, serviceVersion={}, resourceVersion={}, 资源数={}",
+                snapshot.serviceId(), snapshot.serviceVersion(), snapshot.resourceVersion(), snapshot.totalResources());
+        return new RegistrationExecution(
+                RegistryRegistrationResponse.unchanged(snapshot.serviceId(), snapshot.serviceVersion(),
+                        snapshot.resourceVersion(), release.getStatus().name(), snapshot.totalResources()),
+                ResourceRegistrationResult.unchanged(String.valueOf(release.getId()),
+                        service.getResourceRevision()));
+    }
+
+    /**
+     * 3.1：SDK 只能引用权限目录中已存在的权限码。
+     *
+     * <p>权限目录为空时不阻断（本地开发/权限树尚未接入），但输出 WARN，避免把「未配置」
+     * 伪装成「全部合法」。</p>
+     */
+    private void validatePermissionCatalogue(ResourceSnapshot snapshot) {
+        if (!properties.isStrictPermissionCatalogue()) {
+            return;
+        }
+        Set<String> known = knownPermissionCodes();
+        if (known.isEmpty()) {
+            log.warn("权限目录为空，跳过权限码校验（请确认各模块 *AuthProvider 已向 Auth 注册权限树）：serviceId={}",
+                    snapshot.serviceId());
+            return;
+        }
+        for (SnapshotResource resource : snapshot.resources()) {
+            if (ResourceBinding.ANONYMOUS_PERMISSION.equals(resource.permission())) {
+                continue;
+            }
+            if (!known.contains(resource.permission())) {
+                throw new UnknownPermissionException(resource.permission());
+            }
+        }
+    }
+
+    private Set<String> knownPermissionCodes() {
+        Set<String> codes = new HashSet<>();
+        try {
+            for (Permission permission : authPermissionManager.getDefinitionPermissionTree(false)) {
+                addPermission(codes, permission);
+            }
+            for (Permission permission : authPermissionManager.getDefinitionPermissionTree(true)) {
+                addPermission(codes, permission);
+            }
+        } catch (Exception e) {
+            log.warn("读取权限目录失败，本次跳过权限码校验", e);
+            return Set.of();
+        }
+        return codes;
+    }
+
+    /**
+     * 解析或创建 Service，并锁定服务行以串行化 revision 推进（3.2）。
+     */
+    private ServiceDefinition resolveServiceForUpdate(String serviceId) {
+        Optional<ServiceDefinition> existing = serviceRepository.findByServiceIdForUpdate(serviceId);
         if (existing.isPresent()) {
             return existing.get();
         }
         ServiceDefinition created = new ServiceDefinition();
         created.setServiceId(serviceId);
         log.info("权限注册：首次登记服务 serviceId={}", serviceId);
-        // 并发首次注册由 index_registry_service_service_id 唯一索引兜底：冲突会让本次请求 5xx，
-        // SDK 对 5xx 会重试，届时即可读到另一个实例刚提交的记录（SyncRegisterClient 的既有语义）。
-        return serviceRepository.save(created);
+        // 并发首次注册由 index_registry_service_service_id 唯一索引兜底；冲突让本次请求失败，
+        // SDK 的幂等重试会读到另一个实例刚提交的记录。
+        return serviceRepository.saveAndFlush(created);
     }
 
     /**
-     * 解析或创建 Release（4.5：Release 必须独立存在，否则无法表达滚动发布的多版本并存）。
-     *
-     * <p>新 Release 以 {@link ReleaseStatus#REGISTERED} 落地，由 4.7 的实例同步推进到 ACTIVE；
-     * 在实例同步落地前，运行映射通过 {@link ReleaseStatus#mayServeTraffic()} 把 REGISTERED 一并纳入。</p>
+     * 按不可变身份创建 Release（4.2）。内容变化即新 Release，绝不改写旧 Release。
      */
-    private ServiceRelease resolveRelease(ServiceDefinition service, String serviceVersion) {
-        Optional<ServiceRelease> existing =
-                releaseRepository.findByService_ServiceIdAndServiceVersion(service.getServiceId(), serviceVersion);
-        if (existing.isPresent()) {
-            return existing.get();
-        }
+    private ServiceRelease createRelease(ServiceDefinition service, ResourceSnapshot snapshot) {
         ServiceRelease created = new ServiceRelease();
         created.setService(service);
-        created.setServiceVersion(serviceVersion);
+        created.setServiceVersion(snapshot.serviceVersion());
+        created.setResourceVersion(snapshot.resourceVersion());
         created.setStatus(ReleaseStatus.REGISTERED);
-        log.info("权限注册：登记新的发布版本 serviceId={}, serviceVersion={}", service.getServiceId(), serviceVersion);
-        return releaseRepository.save(created);
+        log.info("权限注册：登记新的发布身份 serviceId={}, serviceVersion={}, resourceVersion={}",
+                service.getServiceId(), snapshot.serviceVersion(), snapshot.resourceVersion());
+        return releaseRepository.saveAndFlush(created);
     }
 
     /**
-     * 首次注册某个 Release 时的 Diff 基准 = 上一个 Release 的资源（4.1/4.5）。
+     * 同一 serviceVersion 下、可能承接流量的其他 Release。
+     */
+    private List<ServiceRelease> trafficReleasesOfVersion(String serviceId, String serviceVersion, Long excludeId) {
+        return releaseRepository.findByService_ServiceId(serviceId).stream()
+                .filter(release -> java.util.Objects.equals(release.getServiceVersion(), serviceVersion))
+                .filter(release -> excludeId == null || !excludeId.equals(release.getId()))
+                .filter(release -> release.getStatus() != null && release.getStatus().mayServeTraffic())
+                .toList();
+    }
+
+    /**
+     * Diff 基准 = 最近登记的、可能承接流量的 Release。
      *
-     * <p>该基准只用于「产出 REMOVE 候选与 REBIND 识别」：旧 Release 的独有资源在其退役前必须继续生效（4.5），
-     * 因此这些 REMOVE <b>不会</b>被施加到旧 Release 上（见 {@link RegistryApplyPlanner#plan}）。</p>
+     * <p>候选 Release 不参与基准，否则等待审批的候选会污染后续注册。</p>
      */
     private List<ResourceBinding> predecessorBindings(ServiceDefinition service, ServiceRelease current) {
         List<ServiceRelease> releases = releaseRepository.findByService_ServiceId(service.getServiceId());
@@ -219,6 +353,7 @@ public class ResourceRegistryServiceImpl implements IResourceRegistryService {
                 .thenComparing(ServiceRelease::getId, Comparator.nullsLast(Comparator.naturalOrder()));
         return releases.stream()
                 .filter(release -> !release.getId().equals(current.getId()))
+                .filter(release -> release.getStatus() != null && release.getStatus().mayServeTraffic())
                 .max(byRecency)
                 .map(predecessor -> toRegisteredResources(
                         resourceRepository.findByRelease_Id(predecessor.getId()), service.getServiceId())
@@ -227,17 +362,105 @@ public class ResourceRegistryServiceImpl implements IResourceRegistryService {
     }
 
     /**
-     * 施加资源变更（3.4 第 6~8 步）。
+     * 与运行中的 Release 比较同一 {@code (method, path)} 的绑定。
+     *
+     * <p>同路径不同权限不能同时进入有效并集（4.7）：这正是 REBIND 审批后仍需要等待旧 Release
+     * 摘流的原因。返回的字符串会写入日志和 {@code activationBlockedReason}。</p>
+     */
+    private Optional<String> findActiveConflict(String serviceId, ServiceRelease candidate,
+                                                RegistryApplyPlan plan,
+                                                List<ServiceRelease> sameVersionTraffic) {
+        List<Long> releaseIds = new ArrayList<>();
+        for (ServiceRelease release : releaseRepository.findByService_ServiceId(serviceId)) {
+            if (release.getId().equals(candidate.getId())) {
+                continue;
+            }
+            if (release.getStatus() != null && release.getStatus().mayServeTraffic()) {
+                releaseIds.add(release.getId());
+            }
+        }
+        if (releaseIds.isEmpty()) {
+            return Optional.empty();
+        }
+        Map<ResourceKey, String> activeBindings = new HashMap<>();
+        for (ApiResource resource : resourceRepository.findByRelease_IdInAndStatusIn(releaseIds,
+                EFFECTIVE_RESOURCE_STATUSES)) {
+            if (resource.getPermissionCode() == null || resource.getPermissionCode().isBlank()) {
+                continue;
+            }
+            activeBindings.put(ResourceKey.of(resource.getHttpMethod(), resource.getPath()), resource.getPermissionCode());
+        }
+        for (ResourceMutation mutation : plan.mutations()) {
+            String active = activeBindings.get(mutation.key());
+            if (active != null && !active.equals(mutation.permissionCode())) {
+                return Optional.of(mutation.key().asText() + " 运行中=" + active + "，候选=" + mutation.permissionCode());
+            }
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * 同一 serviceVersion 被新的 resourceVersion 取代时，旧 Release 必须退出有效并集。
+     *
+     * <p>同一个构建版本无法通过 Nacos metadata 区分两份不同的资源定义，保留旧 Release 会
+     * 形成「旧快照复活」；因此这里直接退役旧身份。跨 serviceVersion 的滚动发布不受影响。</p>
+     */
+    private void retireSameVersionReleases(List<ServiceRelease> releases, ServiceRelease current, LocalDateTime now) {
+        for (ServiceRelease old : releases) {
+            if (old.getId().equals(current.getId())) {
+                continue;
+            }
+            if (old.getStatus() != null && old.getStatus().mayServeTraffic()) {
+                old.setStatus(ReleaseStatus.RETIRED);
+                old.setRetiredAt(now);
+                releaseRepository.save(old);
+                log.info("同一发布版本被新快照取代，旧 Release 退役：releaseId={}, serviceId={}, serviceVersion={}, resourceVersion={}",
+                        old.getId(), old.getService().getServiceId(), old.getServiceVersion(), old.getResourceVersion());
+            }
+        }
+    }
+
+    /**
+     * 创建/复用换绑待办。同一候选 Release 的同一路径 + 新权限只建一条（4.7 第 5 点）。
+     */
+    private List<RebindRequest> recordRebindRequests(ServiceDefinition service, ServiceRelease release,
+                                                     RegistryApplyPlan plan, LocalDateTime now) {
+        List<RebindRequest> requests = new ArrayList<>();
+        for (ResourceDiffEntry entry : plan.diff().rebinds()) {
+            RebindRequest request = rebindRequestRepository
+                    .findByCandidateReleaseIdAndHttpMethodAndPathAndNewPermissionCode(
+                            release.getId(), entry.key().method(), entry.key().path(),
+                            entry.currentPermission() == null ? "" : entry.currentPermission())
+                    .orElseGet(() -> {
+                        RebindRequest created = new RebindRequest();
+                        created.setServiceId(service.getServiceId());
+                        created.setCandidateReleaseId(release.getId());
+                        created.setHttpMethod(entry.key().method());
+                        created.setPath(entry.key().path());
+                        created.setOldPermissionCode(entry.previousPermission());
+                        created.setNewPermissionCode(entry.currentPermission());
+                        created.setStatus(RebindStatus.PENDING);
+                        created.setRequestedAt(now);
+                        return created;
+                    });
+            request.setActivationBlockedReason("等待管理员审批");
+            requests.add(rebindRequestRepository.saveAndFlush(request));
+        }
+        return requests;
+    }
+
+    /**
+     * 施加资源变更（按快照物化 + 换绑保护）。
      */
     private void applyMutations(ServiceRelease release,
-                                List<ApiResource> existingRows,
+                                List<RegisteredResource> existingResources,
                                 RegistryApplyPlan plan,
                                 LocalDateTime now) {
         if (plan.mutations().isEmpty()) {
             return;
         }
         Map<ResourceKey, ApiResource> rowByKey = new HashMap<>();
-        for (ApiResource row : existingRows) {
+        for (ApiResource row : resourceRepository.findByRelease_Id(release.getId())) {
             if (row.getHttpMethod() == null || row.getPath() == null) {
                 log.error("资源落库跳过结构异常的历史数据：resourceId={}", row.getId());
                 continue;
@@ -258,7 +481,6 @@ public class ResourceRegistryServiceImpl implements IResourceRegistryService {
             } else {
                 ResourceStatus current = row.getStatus() == null ? ResourceStatus.ACTIVE : row.getStatus();
                 if (current != mutation.targetStatus()) {
-                    // 迁移合法性由枚举自己把关（非法迁移直接抛错），避免状态被静默改坏。
                     row.setStatus(current.transitionTo(mutation.targetStatus()));
                     row.setStatusChangedAt(now);
                 }
@@ -274,14 +496,7 @@ public class ResourceRegistryServiceImpl implements IResourceRegistryService {
     }
 
     /**
-     * 权限创建与状态重算（3.4 第 9~10 步 / 4.8）。
-     *
-     * <p>对本次注册触及的每个权限码：先确保存在（缺失则新建为 ACTIVE），再用
-     * {@link PermissionLifecycleEvaluator} 按「是否仍被可能承接流量的 Release 的有效资源引用」
-     * 推演目标状态。{@code DISABLED} 只进不出自动链路，管理员的人工决策不会被部署动作回滚（4.3）。</p>
-     *
-     * <p><b>关于首次创建</b>：{@code DISABLED/ORPHANED} 的权限若被重新引用，会由评估器按 4.11 自动回到 ACTIVE，
-     * 不需要重建权限，授权关系（RolePermission）也始终保留。</p>
+     * 权限创建与状态重算（4.8）。{@code DISABLED} 只进不出自动链路。
      */
     private PermissionReconciliation reconcilePermissions(Set<String> permissionCodes,
                                                          String serviceId,
@@ -319,27 +534,16 @@ public class ResourceRegistryServiceImpl implements IResourceRegistryService {
         created.setCode(code);
         created.setSourceServiceId(serviceId);
         created.setStatus(PermissionStatus.ACTIVE);
-        // displayName / multiTenancySides 留给权限树对账补齐（5.10 第 2 步的「权限码与权限树对账」）：
-        // 注册链路只保证「API 声明了哪些权限码」，不臆造展示名与租户侧。
         log.info("权限注册：登记新的权限点 code={}, sourceServiceId={}", code, serviceId);
         return permissionRepository.save(created);
     }
 
-    /**
-     * 权限是否仍被「可能承接流量的 Release」下的有效资源引用（4.8）。
-     *
-     * <p>引用来源包含生效绑定与换绑候选（见 {@code findPermissionReferences} 的说明）。</p>
-     */
     private boolean isReferencedByEffectiveResource(String permissionCode) {
-        List<ApiResource> references = resourceRepository.findPermissionReferences(
-                permissionCode, ReleaseStatus.trafficCapableStatuses());
+        List<ApiResource> references = resourceRepository.findPermissionReferences(permissionCode, TRAFFIC_STATUSES);
         return references.stream()
                 .anyMatch(reference -> reference.getStatus() != null && reference.getStatus().effectiveForRuntime());
     }
 
-    /**
-     * 换绑影响面查询（4.9）。失败只降级为「影响面未知」，不能让一次辅助查询拖垮注册。
-     */
     private PermissionRoleLookup roleLookup() {
         return permissionCode -> {
             try {
@@ -353,18 +557,11 @@ public class ResourceRegistryServiceImpl implements IResourceRegistryService {
         };
     }
 
-    /**
-     * 事务提交后再投影读模型（3.4 第 12 步）。
-     *
-     * <p>事务内投影会把可能回滚的中间状态写进 Redis；而注册本身不能因为缓存写失败而失败——
-     * PG 才是事实来源（红线⑧）。</p>
-     */
     private void scheduleReadModelProjection(String serviceId) {
         if (!properties.getReadModel().isEnabled()) {
             return;
         }
         if (!TransactionSynchronizationManager.isSynchronizationActive()) {
-            // 正常不会发生（入口方法是 @Transactional）；兜底为同步投影，宁可投影早一点也不要落后。
             readModelProjector.project(serviceId);
             return;
         }
@@ -376,32 +573,12 @@ public class ResourceRegistryServiceImpl implements IResourceRegistryService {
         });
     }
 
-    /**
-     * 一次「真实变更」注册的提交后副作用（3.4 第 12 步 + 8.5）。
-     *
-     * <p>与 {@link #scheduleReadModelProjection(String)} 的区别：本方法只在 {@code resourceVersion}
-     * <b>确实变化</b>时调用（幂等命中的路径不投递事件——版本没变，网关侧的
-     * {@code invalidateIfVersionDiffers} 也不会失效，投递只会是无意义的噪声）。</p>
-     *
-     * <p>两件事：</p>
-     * <ol>
-     *   <li>事务提交后投影 {@code auth:resource:{serviceId}}（低延迟，先于下面注册的事件唤醒回调执行）；</li>
-     *   <li><b>在事务内</b>写入 Outbox 行（{@link AuthzEventPublisher#resourceChanged}），
-     *       由其在提交后唤醒发布器投递 {@code RESOURCE_CHANGED}。
-     *       写入必须在事务内，才能与业务写入同生共死（Outbox 的核心，见 8.5）。</li>
-     * </ol>
-     */
-    private void scheduleRegistrationSideEffects(String serviceId, String resourceVersion, String serviceVersion) {
+    private void scheduleRegistrationSideEffects(String serviceId, String resourceVersion, String serviceVersion,
+                                                 long resourceRevision) {
         scheduleReadModelProjection(serviceId);
-        authzEventPublisher.resourceChanged(serviceId, resourceVersion, serviceVersion);
+        authzEventPublisher.resourceChanged(serviceId, resourceVersion, serviceVersion, resourceRevision);
     }
 
-    /**
-     * 历史数据 → 落库计划的输入视图（绑定 + 状态）。
-     *
-     * <p>权限码为空的资源会被剔除并报错：把它当成匿名（{@code ANONYMOUS}）会让一条受保护路由静默变成
-     * 「无需登录」，方向错误；剔除只是让这条异常数据不参与本次 Diff，需要人工核对。</p>
-     */
     private List<RegisteredResource> toRegisteredResources(List<ApiResource> rows, String serviceId) {
         List<RegisteredResource> resources = new ArrayList<>(rows.size());
         for (ApiResource row : rows) {
@@ -423,8 +600,32 @@ public class ResourceRegistryServiceImpl implements IResourceRegistryService {
         return resources;
     }
 
+    private RegistryRegistrationResponse response(ResourceSnapshot snapshot, boolean unchanged, ServiceRelease release,
+                                                  RegistryApplyPlan plan, PermissionReconciliation reconciliation,
+                                                  Collection<RebindRequest> pending) {
+        return new RegistryRegistrationResponse(
+                snapshot.serviceId(),
+                snapshot.serviceVersion(),
+                snapshot.resourceVersion(),
+                unchanged,
+                release.getStatus() == null ? null : release.getStatus().name(),
+                snapshot.totalResources(),
+                texts(plan, ResourceDiffType.ADD),
+                texts(plan, ResourceDiffType.UPDATE),
+                texts(plan, ResourceDiffType.REMOVE),
+                texts(plan, ResourceDiffType.REBIND),
+                reconciliation.activated(),
+                reconciliation.orphaned());
+    }
+
     private static List<String> texts(RegistryApplyPlan plan, ResourceDiffType type) {
         return plan.ofType(type).stream().map(ResourceMutation::asText).toList();
+    }
+
+    /**
+     * 本次注册的两种视图：SDK 只看 {@link ResourceRegistrationResult}，运维看详细报告。
+     */
+    private record RegistrationExecution(RegistryRegistrationResponse response, ResourceRegistrationResult result) {
     }
 
     /**

@@ -2,15 +2,7 @@ package com.dusk.module.auth.registry.entity;
 
 import com.dusk.common.core.entity.CreationEntity;
 import com.dusk.module.auth.registry.enums.ReleaseStatus;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
@@ -26,8 +18,8 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "sys_registry_release",
-        uniqueConstraints = @UniqueConstraint(name = "uk_registry_release_service_version",
-                columnNames = {"service_id", "service_version"}))
+        uniqueConstraints = @UniqueConstraint(name = "uk_registry_release_identity",
+                columnNames = {"service_id", "service_version", "resource_version"}))
 @Getter
 @Setter
 @FieldNameConstants
@@ -89,4 +81,10 @@ public class ServiceRelease extends CreationEntity {
      */
     @Column(name = "retired_at")
     private LocalDateTime retiredAt;
+
+    /**
+     * 候选 Release 无法激活的原因（换绑待审批 / ACTIVE 冲突 / 审批拒绝），仅用于排障。
+     */
+    @Column(name = "activation_blocked_reason", length = 1000)
+    private String activationBlockedReason;
 }

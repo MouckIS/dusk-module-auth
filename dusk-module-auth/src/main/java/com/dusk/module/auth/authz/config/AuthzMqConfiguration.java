@@ -10,10 +10,10 @@ import com.dusk.common.mqs.rocketmq.interceptor.MetricsInterceptor;
 import com.dusk.common.mqs.rocketmq.interceptor.TraceLoggingInterceptor;
 import com.dusk.common.mqs.rocketmq.producer.RocketMQMessageSender;
 import com.dusk.common.mqs.rocketmq.threadpool.MqDynamicThreadPoolManager;
-import com.dusk.module.auth.authz.event.ResourceSnapshotRegisteredConsumer;
 import com.dusk.module.auth.authz.outbox.AuthzOutboxPublisher;
 import com.dusk.module.auth.authz.outbox.IAuthzOutboxEventRepository;
-import com.dusk.module.auth.registry.service.IResourceRegistryService;
+import com.dusk.module.auth.authz.readmodel.RolePermissionReadModelProjector;
+import com.dusk.module.auth.authz.readmodel.SubjectReadModelProjector;
 import com.dusk.module.auth.registry.service.ResourceReadModelProjector;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -21,6 +21,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import tools.jackson.databind.ObjectMapper;
 
@@ -60,19 +61,7 @@ import tools.jackson.databind.ObjectMapper;
 public class AuthzMqConfiguration {
 
     /**
-     * 运行期快照增量注册的消费者（8.6）。注册到容器后由 {@link RocketMQConsumerRegistry}
-     * 在启动完成时自动捞取并订阅。
-     */
-    @Bean
-    @ConditionalOnMissingBean
-    public ResourceSnapshotRegisteredConsumer resourceSnapshotRegisteredConsumer(
-            IResourceRegistryService resourceRegistryService,
-            AuthzMqProperties properties) {
-        return new ResourceSnapshotRegisteredConsumer(resourceRegistryService, properties);
-    }
-
-    /**
-     * Outbox 发布器（8.5）。依赖 {@code ObjectProvider} 延迟取 {@code MessageSender}，
+     * Outbox 发布器（6.2 / 6.3）。依赖 {@code ObjectProvider} 延迟取 {@code MessageSender}，
      * 使「mqs 未启用 / broker 不可达」时本 bean 仍可创建，退化为「保留事件 + 限流告警」。
      */
     @Bean
@@ -80,9 +69,13 @@ public class AuthzMqConfiguration {
     public AuthzOutboxPublisher authzOutboxPublisher(IAuthzOutboxEventRepository repository,
                                                      AuthzMqProperties properties,
                                                      ObjectProvider<MessageSender> senderProvider,
-                                                     ObjectProvider<ResourceReadModelProjector> readModelProjectorProvider,
-                                                     ObjectMapper objectMapper) {
+                                                     ObjectProvider<ResourceReadModelProjector> resourceProjectorProvider,
+                                                     ObjectProvider<RolePermissionReadModelProjector> roleProjectorProvider,
+                                                     ObjectProvider<SubjectReadModelProjector> subjectProjectorProvider,
+                                                     ObjectMapper objectMapper,
+                                                     JdbcTemplate jdbcTemplate) {
         return new AuthzOutboxPublisher(repository, properties, senderProvider,
-                readModelProjectorProvider, objectMapper);
+                resourceProjectorProvider, roleProjectorProvider, subjectProjectorProvider,
+                objectMapper, jdbcTemplate);
     }
 }
