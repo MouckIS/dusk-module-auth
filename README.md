@@ -1,200 +1,141 @@
-# dusk-module-auth 认证授权服务
+# dusk-module-auth
 
-> DuskMS 平台的认证与授权微服务，为多租户 SaaS 系统提供统一的登录认证、权限控制、用户/组织/租户管理与订阅功能特性控制能力，解决"谁来、能看什么、能做什么"的核心访问控制问题。
+DuskMS 的 **认证与授权服务**：负责登录认证、JWT 签发与校验、用户/角色/租户/组织管理、权限树、功能特性开关、系统设置、待办与审计日志。
+
+- 聚合坐标：`dusk-module:dusk-module-auth-group:1.2.0`
+- 服务坐标：`com.dusk:dusk-module-auth:1.2.0`
+- 契约坐标：`com.dusk:dusk-module-auth-shared:1.2.0`
+- 端口：dev/sit `53201`
+
+## 核心能力
+
+| 领域        | 功能                                                                                                  |
+|-------------|-------------------------------------------------------------------------------------------------------|
+| 登录认证    | 账号密码（SM4 加密传输）、图形验证码、手机验证码、扫码登录、微信小程序/企业微信、i国网 SSO、SSO Token |
+| Token       | JWT 签发/校验、永久 Token、`/token-auth` 认证/登出/刷新                                               |
+| 权限        | 权限树常量（`Pages.*`）→ 权限缓存（Redis + 内存兜底）→ URL 权限映射 → 租户/组织数据权限               |
+| 用户        | 用户/外部用户 CRUD、Excel 导入导出、密码策略、锁定/解锁、指纹、微信绑定、默认厂站                     |
+| 组织        | 组织单位树、厂站管理、组织-角色绑定、组织管理员                                                       |
+| 租户        | 租户生命周期、订阅版本、功能特性开关、租户可用性校验                                                  |
+| 工作台/待办 | Dashboard、Todo、消息与推送                                                                           |
+| 审计        | 登录日志、审计日志（AOP 自动采集）、用户指纹日志                                                      |
+| 设置        | Host / Tenant 两级设置注册表、行政区划、序列号、系统码                                                |
 
 ## 技术栈
 
-![Java](https://img.shields.io/badge/Java-21-orange)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.12-brightgreen)
-![Apache Dubbo](https://img.shields.io/badge/Dubbo-3.2.8-blueviolet)
-![Maven](https://img.shields.io/badge/Maven-3.9+-yellow)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Druid%20Pool-336791)
-![Redis](https://img.shields.io/badge/Cache-Redis-red)
-![License](https://img.shields.io/badge/License-Apache%202.0-blue)
-[![CI](https://img.shields.io/badge/CI-GitHub%20Actions-blue)](.github/workflows/ci.yml)
+Java 25 · Spring Boot 4.0.8 · Spring Security · Spring Data JPA · QueryDSL · MapStruct · Dubbo 3.3.6 · Nacos ·
+PostgreSQL · Redis · Flyway · EasyExcel · HanLP · EasyCaptcha · BouncyCastle（国密）· 微信小程序 SDK · JJWT。
 
-| 维度 | 说明                                                                   |
-| ---- |------------------------------------------------------------------------|
-| 版本 | 1.1.0-SNAPSHOT                                                         |
-| 语言/框架 | Java 21 · Spring Boot 3.2 · Spring Security · Spring Data JPA          |
-| RPC | Apache Dubbo 3.2.8（Nacos 注册/配置中心）                              |
-| 数据存储 | PostgreSQL（Druid 连接池）· Redis 缓存 · Flyway 迁移                   |
-| 其他 | QueryDSL · MapStruct · Fesod · 微信小程序/企业微信 · springdoc-openapi |
+## 模块结构
 
-## 核心功能
-
-### 已实现
-
-- **登录认证**：账号密码登录（国密 SM4 加密）、图形验证码（失败次数触发）、手机验证码登录、扫码登录、微信小程序/企业微信登录、i国网（IGW）单点登录
-- **Token 体系**：JWT 签发与校验、永久 Token 签发（`foreverTokenSign`）、Token 认证管理
-- **权限体系**：基于 `AuthorizationProvider` 的权限树定义（`Pages.*`）、URL 级权限映射、多租户（租户侧/主机侧）权限过滤、组织/厂站数据权限过滤
-- **用户管理**：用户、外部用户、Excel 批量导入导出、人员打印、用户指纹、微信账号绑定、密码策略
-- **组织与岗位**：组织单位树、厂站（Station）管理及迁移、组织-角色绑定
-- **多租户与订阅**：租户生命周期管理、租户可用性校验、订阅版本（Edition）、功能特性（Feature）开关
-- **工作台与待办**：Dashboard 首页模块/主题/分类、Todo 待办、消息通知与多端推送
-- **审计与日志**：登录日志、审计日志（AOP 自动采集，`/login` 手动记录）、操作追踪
-- **系统设置**：主机/租户两级设置（邮件、LDAP、安全策略、外观、数据展示等）、行政区划数据、序列号（SerialNo）生成
-- **监控与集成**：`/actuator` 端点、OpenTelemetry 上报、RocketMQ/MQTT 消息
-
-### 规划中 (Todo)
-
-- [ ] User / Role / GrantPermission 等核心服务完整单元测试覆盖（目标全模块分支覆盖率 ≥ 80%，详见 `UNIT_TEST_GUIDE.md`）
-- [ ] 补充自定义 Dubbo 序列化安全白名单（当前 `serialize-check-status: DISABLE`，见 `application.yml`）
-- [ ] 集成测试套件（Testcontainers）与 CI 覆盖率门槛
-- [ ] 基于ABAC的数据维度控制
-
-## 架构与模块设计
-
-### 微服务划分（DuskMS 工作空间）
-
-```
-                    ┌─────────────────────────────────────────┐
-   Vue3 前端        │  dusk-module-gateway（统一入口/鉴权转发） │
-                    └───────────────┬─────────────────────────┘
-                                    │ Dubbo RPC (鉴权/用户/角色/特性...)
-        ┌───────────────────────────┼──────────────────────────────┐
-        ▼                           ▼                              ▼
- dusk-module-auth            dusk-module-metadata                 dusk-module-workflow
- 认证/用户/权限/租户          特性/设置/订阅/动态菜单              工作流引擎
-        │                           │                              │
-        └──────────┬────────────────┴──────────────┬───────────────┘
-                   ▼                               ▼
-          dusk-common (core/rpc/doc/mqs)      PostgreSQL · Redis · RocketMQ · EMQX · MinIO
+```text
+dusk-module-auth/
+├── dusk-module-auth/            可运行的认证服务
+│   └── src/main/java/com/dusk/module/auth/
+│       ├── controller/          REST 接口（约 27 个）
+│       ├── service/ + impl/     业务服务 + @DubboService 实现
+│       ├── repository/          Spring Data JPA
+│       ├── entity/              JPA 实体（用户/角色/租户/组织/厂站/待办/审计…）
+│       ├── mapper/              MapStruct（不是 MyBatis）
+│       ├── common/              Security 过滤器链、权限缓存、数据权限、工具
+│       ├── authorization/       权限树 Provider
+│       ├── feature/ + impl/     功能特性开关
+│       ├── setting/             设置注册表
+│       ├── syscode/             系统码定义
+│       ├── cache/               Redis + 内存兜底缓存
+│       ├── aspect/ audit 切面
+│       ├── excel/               导入导出监听器/导出器
+│       ├── igw/                 i国网 SSO
+│       └── utils/
+└── dusk-module-auth-shared/     跨模块 RPC 契约（70 个类：I*RpcService + DTO）
 ```
 
-- **dusk-module-auth**（本模块）：登录认证、权限定义与校验、用户/组织/角色/租户/订阅等身份域管理
-- **dusk-module-metadata**：功能特性值、系统设置、订阅版本等运行时配置的最终存储
-- **dusk-common**：`core`（JPA/安全/JWT/多租户基础设施）、`rpc`（跨模块 Dubbo 接口定义）、`doc`、`mqs`
-- 模块间通过 Dubbo（Nacos 注册中心）通信，RPC 接口统一在 `dusk-common-rpc` 中定义
+## 登录与鉴权链路
 
-### 模块内部分层
+```text
+POST /login（账号 + 密码 + 验证码）
+  → JWTAuthenticationFilter（common/filter/，不是 Controller）
+  → DefaultAuthenticationProvider 校验凭证
+  → 成功签发 JWT，记录登录/审计日志
 
-```
-controller ──> service / service.impl ──> repository (Spring Data JPA) ──> PostgreSQL
-                    │         │
-                    ├── mapper/（MapStruct DTO 转换，非 MyBatis）
-                    ├── manage/（@Transactional 跨实体操作，如 UserManage）
-                    ├── QueryDSL（JPAQueryFactory + Q* 类，复杂查询）
-                    ├── Redis 缓存（权限/特性/设置/指纹等，内存实现为降级兜底）
-                    ├── authorization/（AuthorizationProvider 权限树定义）
-                    ├── feature/ + impl/（特性定义与特性开关）
-                    └── setting/（设置注册表与 Redis 缓存）
+后续请求
+  → 网关 AccessGatewayFilter 调用 IAuthRpcService.auth(authorization, applicationName, url)
+  → TokenAuthManager 校验 Token
+  → DefaultInvocationSecurityMetadataSource 解析 URL 权限
+  → DefaultAccessDecisionManager 决策放行/拒绝
+  → 业务服务通过 UserContext / TenantContextHolder 获取上下文
 ```
 
-### 登录鉴权流程
+> 注意：`POST /login` 不在 Controller 中，排查登录问题请直接看 `common/filter/JWTAuthenticationFilter.java`。
 
-```
-1. 前端 POST /login（账号密码 + 验证码，密码 SM4 加密传输）
-2. JWTAuthenticationFilter：校验验证码 → DefaultAuthenticationProvider 校验凭证
-3. 成功后签发 JWT，随响应返回；同时记录登录/审计日志
-4. 后续请求携带 JWT：网关调用 AuthRpcService.auth(authorization, app, url)
-5. TokenAuthManager 校验 Token → MetadataSource 解析 URL 权限
-   → AccessDecisionManager 决策，放行或拒绝
-6. 登录态经 RpcContext/请求头传递，业务层通过 UserContext 获取当前用户
-```
+## 快速开始
 
-## 快速入门
+### 前置条件
 
-### 1. 环境准备 (Prerequisites)
+- JDK 25、Maven 3.9+
+- GitHub Packages PAT（`read:packages`）
+- PostgreSQL、Redis、Nacos
 
-| 依赖 | 版本/说明 |
-| ---- | ---- |
-| JDK | 21 |
-| Maven | 3.9+（无 mvnw wrapper） |
-| PostgreSQL | 数据库（Druid 连接池） |
-| Redis | 缓存（权限/特性/设置） |
-| Nacos | 注册中心 + 配置中心（必须） |
-| RocketMQ / EMQX | 可选，消息推送与 MQTT |
-
-内部依赖（`dusk-module-parent`、`dusk-common-*`、`dusk-module-metadata-shared`）托管于 GitHub Packages 私有仓库，构建前需在 `~/.m2/settings.xml` 配置具有 `read:packages` 权限的 GitHub PAT（server id：`github-dusk-dependencies`、`github-dusk-module-parent`、`github-dusk-common`、`github-dusk-module-metadata`）。模板参考 `.github/workflows/ci.yml`。
-
-一键启动中间件：
+### 构建与运行
 
 ```bash
-cd dusk/docker && docker compose up -d   # Postgres/Redis/Nacos/RocketMQ/EMQX/MinIO 及可观测组件
+export GH_PAT=<your-pat>
+
+# 构建（模块自带 settings.xml）
+mvn -B -ntp -U -s settings.xml -DskipTests clean package
+
+# 本地运行（默认 profile=sit，开发用 dev）
+mvn -s settings.xml spring-boot:run -Dspring-boot.run.profiles=dev
+
+# 测试（含 JaCoCo 覆盖率检查）
+mvn -s settings.xml test
 ```
 
-### 2. 配置文件修改
+### 关键配置
 
-主要配置位于 `dusk-module-auth/src/main/resources/application-{dev,sit,prod}.yml`，通过环境变量注入敏感信息（推荐用环境变量覆盖，勿提交明文密钥）：
+| 项           | 环境变量                                  | dev 默认值                             |
+|--------------|-------------------------------------------|----------------------------------------|
+| 端口         | `SERVER_PORT`                             | 53201                                  |
+| 数据源       | `SPRING_DATASOURCE_URL/USERNAME/PASSWORD` | `jdbc:postgresql://dusk.com:5432/dusk` |
+| Nacos        | `SPRING_CLOUD_NACOS_*`                    | `dusk.com:8848`，namespace `dev`       |
+| 匿名路径     | `app.security.ignores`                    | `/login`、`/error/**`、swagger         |
+| 登录密码密钥 | `app.login.encrypt-key`                   | SM4 16 进制密钥                        |
+| 微信测试模式 | `WX_TEST_ENABLED`                         | `true`                                 |
+| RabbitMQ     | `SPRING_RABBITMQ_ISENABLED`               | `false`                                |
 
-| 参数 | 环境变量 | 说明 |
-| ---- | ---- | ---- |
-| `spring.profiles.active` | `SPRING_PROFILES_ACTIVE` | 默认 `sit`，本地开发用 `dev` |
-| `spring.datasource.url` | `SPRING_DATASOURCE_URL` | PostgreSQL 连接串（dev 默认 `jdbc:postgresql://dusk.com:5432/dusk`） |
-| `spring.datasource.username/password` | `SPRING_DATASOURCE_USERNAME/PASSWORD` | 数据库账号密码 |
-| `server.port` | `SERVER_PORT` | 默认 `53201` |
-| `spring.cloud.nacos.server-addr` | `SPRING_APPLICATION_NAME` 等 | Nacos 地址（dev 默认 `dusk.com:8848`） |
-| `spring.config.import` | — | 从 Nacos 拉取 `dusk-module-auth.yaml` 覆盖配置 |
-| `app.login.encrypt-key` | — | 登录密码 SM4 解密密钥（16 进制） |
-| `app.security.ignores` | — | 匿名访问路径白名单 |
+> dev profile 下 `spring.flyway.enabled=false`，本地改表需手动执行 SQL 或临时开启 Flyway。
 
-> dev 配置中 `flyway.enabled: false`；迁移脚本位于 `dusk-module-auth/src/main/resources/db/migration`，历史表 `flyway_schema_history_auth`。
+## 数据库
 
-### 3. 启动运行
+- 迁移脚本：`dusk-module-auth/src/main/resources/db/migration/`（`V1`~`V18` 版本脚本 + `R__` 可重复脚本）。
+- 历史表：`flyway_schema_history_auth`。
+- 主要表：`sys_user`、`sys_role`、`sys_tenant`、`sys_organization_unit`、`sys_station`、`grant_permission`、
+  `tenant_permission`、`sys_feature_value`、`sys_setting`、`audit_log`、`sys_user_login_log`、`sys_serial_no`、
+  `sys_user_fingerprint`、`sys_todo*`、`sys_dashboard*`。
+- 菜单与权限为 **常量树 + 授权关系表**，没有独立的权限实体表；动态菜单数据在 metadata 服务。
 
-```bash
-# 克隆仓库
-git clone https://github.com/MouckIS/dusk-module-auth.git
-cd dusk-module-auth
+## 对外 RPC
 
-# 方式一：本模块单独构建（需已配置 GitHub Packages PAT）
-mvn -B -ntp -U -DskipTests clean package
+`dusk-module-auth-shared` 中的 `I*RpcService` 由本服务 `service/impl` 下的 `@DubboService` 实现，主要接口：
 
-# 方式二：从工作空间聚合构建（推荐，含父 POM 与公共依赖）
-mvn -f ../dusk/pom.xml clean install -DskipTests
+`IAuthRpcService`、`IUserRpcService`、`IRoleRpcService`、`ITenantRpcService`、`IOrganizationUnitRpcService`、
+`IStationRpcService`、`ITodoRpcService`、`IAuditLogRpcService`、`ITokenAuthRpcService`、`IUserFingerprintRpcService`、
+`ICustomerRpcService`、`ICommonFavoriteRpcService`、`ISsoTokenRpcService`、`ISysMenuRpcService`、`IWxMaRpcService`、
+`ISmRpcUtil`。
 
-# 运行（默认加载 sit 配置）
-mvn spring-boot:run -Dspring-boot.run.profiles=dev
-# 或 SPRING_PROFILES_ACTIVE=dev mvn spring-boot:run
-```
+Dubbo 扫描包：`com.dusk.module.auth.service`。
 
-## 生产与容器化部署
+## 测试
 
-- **中间件**：使用 https://github.com/MouckIS/dusk 项目的`/docker/docker-compose.yaml` 一键拉起 Postgres、Redis、Nacos、RocketMQ、EMQX、MinIO 及 Prometheus/Grafana/Tempo 可观测组件。
-- **服务部署**：仓库内置 `Dockerfile`（多阶段构建，以非 root 用户运行），内部依赖托管于 GitHub Packages
+- 44 个测试类（`src/test/java`），以 Mockito 单元测试为主。
+- `CruxModuleAuthApplicationTests` 在 surefire 中被排除（需要真实 PostgreSQL/Redis/Nacos）。
+- JaCoCo 门槛：`com.dusk.module.auth.service.impl` 与 `common.util` 包分支覆盖率 ≥ 60%、行覆盖率 ≥ 70%，不达标构建失败。
 
-  ```bash
-  cd dusk-module-auth
-  docker build -t dusk-module-auth .
-  docker run -d -p 53201:53201 \
-      -e SPRING_PROFILES_ACTIVE=sit \
-      -e SPRING_DATASOURCE_URL=jdbc:postgresql://<host>:5432/dusk \
-      -e SPRING_DATASOURCE_USERNAME=<user> \
-      -e SPRING_DATASOURCE_PASSWORD=<password> \
-      dusk-module-auth
-  ```
+## 相关文档
 
-  镜像默认暴露 `8080` 端口，默认 profile 为 `sit`；请通过环境变量注入真实中间件地址与密钥。若本机已配置好 `~/.m2/settings.xml`，也可挂载该文件跳过 `--build-arg`。
-- **线上地址**：暂无公开演示环境。
-
-## 开发者指引
-
-### 接口文档
-
-项目集成 [springdoc-openapi](https://springdoc.org/)，启动后访问：
-
-- Swagger UI：`http://localhost:53201/swagger-ui/index.html`
-- OpenAPI JSON：`http://localhost:53201/v3/api-docs`
-
-### 测试
-
-```bash
-bash run-tests.sh            # 编译 + 全部测试 + 生成 JaCoCo 覆盖率报告
-mvn test -Dtest=UserServiceImplTest            # 运行单个测试类
-mvn test -Dtest=UserServiceImplTest#testMethod # 运行单个测试方法
-```
-
-测试框架：JUnit 5 + Mockito + AssertJ。`pom.xml` 内置 JaCoCo 覆盖率门槛（`service.impl`、`common.util` 分支 ≥ 60%、行 ≥ 70%），未达标的改动会导致构建失败。单元测试框架与最佳实践详见 `UNIT_TEST_GUIDE.md`，项目成果总结见 `TEST_SUMMARY.md`。
-
-### 贡献指南 (Contributing)
-
-当前仓库暂无 `CONTRIBUTING.md`，请遵循以下约定：
-
-1. 先阅读仓库根目录 `AGENTS.md`（工作空间规范）与本文件；如有疑问请先开 Issue 讨论
-2. 提交信息使用 Conventional Commits：`type(scope): subject`（如 `feat(auth): 支持手机验证码登录`），说明改动内容与原因
-3. 提交 PR 前确保 `mvn test` 通过、Java 21 编译无告警，并附上相关变更说明（UI 改动附截图）
-4. CI（`.github/workflows/ci.yml`）会在 PR 上自动构建校验
+- [`docs/登录认证授权完整流程.md`](../docs/登录认证授权完整流程.md)
+- [`docs/权限优化方案-整理版.md`](../docs/权限优化方案-整理版.md)
+- [`docs/数据维度控制设计实现方案.md`](../docs/数据维度控制设计实现方案.md)
 
 ## 权限注册与运行态回源（2026-10 方案落地）
 
@@ -222,4 +163,4 @@ mvn test -Dtest=UserServiceImplTest#testMethod # 运行单个测试方法
 
 ## License
 
-本项目基于 [Apache License 2.0](LICENSE) 开源。
+[Apache License 2.0](LICENSE)
