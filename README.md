@@ -137,6 +137,30 @@ Dubbo 扫描包：`com.dusk.module.auth.service`。
 - [`docs/权限优化方案-整理版.md`](../docs/权限优化方案-整理版.md)
 - [`docs/数据维度控制设计实现方案.md`](../docs/数据维度控制设计实现方案.md)
 
-## 许可证
+## 权限注册与运行态回源（2026-10 方案落地）
+
+- **同步注册（Dubbo）**：`IPermissionRegistryRpcService#registerSnapshot`，实现类
+  `com.dusk.module.auth.registry.rpc.PermissionRegistryRpcServiceImpl`。SDK 在 readiness 之前调用，
+  只有 `ACCEPTED` / `UNCHANGED` 才允许就绪；`REBIND_APPROVAL_REQUIRED`、`ACTIVE_RELEASE_CONFLICT`、
+  `INVALID_SNAPSHOT`、`UNKNOWN_PERMISSION` 都是确定性结果，不自动重试。
+- **Release 身份不可变**：`(serviceId, serviceVersion, resourceVersion)`。同一 serviceVersion 的快照内容变化
+  会创建新 Release，迟到的旧请求返回 `UNCHANGED`。服务级 `resourceRevision` 单调递增，事件与 Redis
+  投影都按它排序；`resourceVersion` 只是内容哈希，禁止比较大小。
+- **换绑是发布门禁**：发现同路径换绑时，候选 Release 进入 `PENDING_APPROVAL`，不参与运行并集。
+  审批端点（内网 + 服务间密钥）：
+  - `POST /internal/registry/rebinds/{id}:approve`
+  - `POST /internal/registry/rebinds/{id}:reject`
+- **运行态回源**：`IAuthorizationRuntimeRpcService` 提供 `getResourceSnapshot` / `getRolePermissions` /
+  `getSubject`。Redis 投影键：`auth:resource:{serviceId}`、
+  `auth:authorization:{scope}:role:{roleId}`、`auth:subject:{scope}:user:{userId}`；
+  `scope` 为 `HOST` 或 `TENANT:<id>`，禁止用 `null` 表示 Host。
+- **Outbox**：`sys_authz_outbox_event` 增加 `revision`、`projection_status`、`lease_owner`、`lease_until`。
+  投影失败不发送事件；多实例通过 `FOR UPDATE SKIP LOCKED` + 租约领取。
+- **套餐权限变更**：修改 `TenantPermission` 后会推进受影响租户下所有角色的 `permissionVersion` 并发出
+  `PERMISSION_CHANGED`；修改用户角色/状态会推进 `subjectVersion` 并发出 `SUBJECT_CHANGED`。
+
+迁移脚本：`db/migration/R__202610250001_authz_revision_and_rebind.sql`（幂等，dev 下需手动执行）。
+
+## License
 
 [Apache License 2.0](LICENSE)

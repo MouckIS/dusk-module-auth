@@ -18,14 +18,13 @@ import com.dusk.common.core.service.impl.BaseService;
 import com.dusk.common.core.tenant.TenantContextHolder;
 import com.dusk.common.core.utils.MapperUtil;
 import com.dusk.common.core.utils.UtBeanUtils;
+import com.dusk.module.auth.authz.service.AuthzEventPublisher;
+import com.dusk.module.auth.authz.version.AuthzPermissionVersionService;
+import com.dusk.module.auth.common.permission.IAuthPermissionManager;
 import com.dusk.module.auth.dto.BindRoleToUserInput;
 import com.dusk.module.auth.dto.RoleSimpleDto;
-import com.dusk.module.auth.dto.orga.OrganizationUnitUserListDto;
-import com.dusk.module.auth.dto.role.RoleListDto;
-import com.dusk.module.auth.dto.role.RolePermissionDto;
-import com.dusk.module.auth.service.IRoleRpcService;
-import com.dusk.module.auth.common.permission.IAuthPermissionManager;
 import com.dusk.module.auth.dto.orga.BindRoleToOrgInput;
+import com.dusk.module.auth.dto.orga.OrganizationUnitUserListDto;
 import com.dusk.module.auth.dto.role.*;
 import com.dusk.module.auth.dto.user.GetUserByRoleDto;
 import com.dusk.module.auth.dto.user.UnbindRoleForUserDto;
@@ -36,6 +35,7 @@ import com.dusk.module.auth.repository.IGrantPermissionRepository;
 import com.dusk.module.auth.repository.IRoleRepository;
 import com.dusk.module.auth.repository.IUserRepository;
 import com.dusk.module.auth.service.IOrganizationUnitService;
+import com.dusk.module.auth.service.IRoleRpcService;
 import com.dusk.module.auth.service.IRoleService;
 import com.dusk.module.auth.service.ITenantPermissionService;
 import com.querydsl.core.types.QBean;
@@ -74,6 +74,23 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
     private ITenantPermissionService tenantPermissionService;
     @Resource
     private JPAQueryFactory queryFactory;
+    /**
+     * 权限变更事件发布入口（8.5）。事件在<b>本方法所在事务内</b>写入 Outbox，提交后投递。
+     */
+    @Resource
+    private AuthzEventPublisher authzEventPublisher;
+    /**
+     * 角色权限版本号分配（8.5，permissionVersion 的单调来源）。
+     */
+    @Resource
+    private AuthzPermissionVersionService authzPermissionVersionService;
+    /**
+     * 用户角色变化必须推进 {@code subjectVersion}（5.3）。
+     */
+    @Resource
+    private com.dusk.module.auth.authz.version.AuthzSubjectVersionService authzSubjectVersionService;
+    @Resource
+    private com.dusk.module.auth.authz.service.AuthzEventPublisher authzSubjectEventPublisher;
 
     @Override
     public List<Role> getRoles() {
@@ -123,6 +140,8 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
         Role save = repository.save(entity);
         //刷新权限缓存
         authPermissionManager.refreshAll();
+        //推送 PERMISSION_CHANGED，令网关精确失效该角色的 rolePermCache 条目（8.5）
+        publishPermissionChanged(save);
         return save;
     }
 
@@ -147,6 +166,22 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
 
         //刷新权限缓存
         authPermissionManager.refreshAll();
+        //推送 PERMISSION_CHANGED：角色删除同样改变授权集合，网关必须失效对应缓存（8.5）
+        publishPermissionChanged(entity);
+    }
+
+    /**
+     * 为角色申请新的 {@code permissionVersion} 并推送 {@code PERMISSION_CHANGED}（8.5）。
+     *
+     * <p>刻意<b>不吞异常</b>：Outbox 写入与业务写入同事务，任一步失败整体回滚——这正是 Outbox
+     * 要保证的「不会出现事实变更而事件缺失」。若事件推送失败，权限变更也应一并失败以便重试。</p>
+     */
+    private void publishPermissionChanged(Role role) {
+        if (role == null || role.getId() == null) {
+            return;
+        }
+        long version = authzPermissionVersionService.nextVersion(role.getTenantId(), role.getId());
+        authzEventPublisher.permissionChanged(role.getTenantId(), role.getId(), version);
     }
 
     @Override
@@ -232,6 +267,8 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
         save(role);
         //刷新权限缓存
         authPermissionManager.refreshAll();
+        //推送 PERMISSION_CHANGED（8.5）
+        publishPermissionChanged(role);
     }
 
     @Override
@@ -326,6 +363,7 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
         userList = userList.stream().filter((e) -> role.getUserRoles().stream().noneMatch(u -> u.getId().equals(e.getId()))).toList();
         role.getUserRoles().addAll(userList);
         save(role);
+        bumpSubjects(userList);
     }
 
     @Override
@@ -382,6 +420,21 @@ public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implemen
         }
 
         save(role);
+        bumpSubjects(userRepository.findAllById(roleForUserDto.getUserIds()));
+    }
+
+    /**
+     * 用户角色变化后推进每个受影响用户的 {@code subjectVersion} 并广播失效事件（5.3）。
+     */
+    private void bumpSubjects(List<User> users) {
+        for (User user : users) {
+            if (user == null || user.getId() == null) {
+                continue;
+            }
+            String scope = com.dusk.common.core.auth.registry.AuthzScope.of(user.getTenantId());
+            long version = authzSubjectVersionService.nextVersion(scope, user.getId());
+            authzSubjectEventPublisher.subjectChanged(scope, user.getId(), version, user.isActive());
+        }
     }
 
     @Override

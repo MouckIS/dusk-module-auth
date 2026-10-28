@@ -14,3 +14,65 @@ dubbo:
     # 元数据优化
     metadataType: remote
     register-mode: instance
+
+app:
+  registry:
+    # 权限注册内网端点（POST /internal/registry/snapshot）的服务间密钥。
+    # 必须与各业务服务的 app.permission.sdk.service-secret 配置为同一值（承载请求头 X-Service-Secret）。
+    # 留空 + require-service-secret=true（默认）时端点会拒绝所有注册请求，是刻意的 fail-closed 默认值：
+    # 该端点直接写权限事实（PostgreSQL），漏配密钥不能等同于对外开放。内网开发环境见 application-dev.yml。
+    service-secret: ${APP_REGISTRY_SERVICE_SECRET:}
+    # 服务间密钥请求头名，需与 SDK 的 app.permission.sdk.service-secret-header 一致。
+    service-secret-header: ${APP_REGISTRY_SERVICE_SECRET_HEADER:X-Service-Secret}
+    # 是否强制要求密钥；true 且未配置密钥时拒绝一切注册请求。
+    require-service-secret: ${APP_REGISTRY_REQUIRE_SERVICE_SECRET:true}
+    # 是否校验快照 resourceVersion 与内容一致（3.3 契约）。强烈建议保持 true。
+    strict-resource-version: ${APP_REGISTRY_STRICT_RESOURCE_VERSION:true}
+    # 是否拒绝权限目录中不存在的权限码。迁移阶段先关闭，权限树盘点完成后在环境变量中打开。
+    strict-permission-catalogue: ${APP_REGISTRY_STRICT_PERMISSION_CATALOGUE:false}
+    read-model:
+      # 注册提交后是否投影 Redis 运行读模型 auth:resource:{serviceId}（5.7，供网关 L2 消费）。
+      enabled: ${APP_REGISTRY_READ_MODEL_ENABLED:true}
+      # L2 条目 TTL（5.4），给「投影失败 / 事件丢失」一个上界。
+      ttl: ${APP_REGISTRY_READ_MODEL_TTL:30m}
+  # ---------------------------------------------------------------------------------------------------
+  # 权限事件推送（MQ），见《权限优化方案-整理版》第八章。
+  # 默认全关：app.authz.mq.enabled=false 时不写 Outbox、不投递、不装配消费者。
+  # 启用顺序（8.11）：① dusk.mq.rocketmq.enabled=true（需 broker 可达，否则 RocketMQMessageSender
+  # 启动失败会让本服务起不来）→ ② app.authz.mq.enabled=true → ③ 网关侧对应打开。
+  # ---------------------------------------------------------------------------------------------------
+  authz:
+    mq:
+      enabled: ${APP_AUTHZ_MQ_ENABLED:false}
+      domain: ${APP_AUTHZ_MQ_DOMAIN:authz}
+      # 以下主题名是跨仓契约，默认值不得随意更改（8.2）；名称须与网关
+      # app.authorization.mq.permission-changed-topic / resource-changed-topic / subject-changed-topic 逐字一致。
+      resource-changed-topic: ${APP_AUTHZ_MQ_RESOURCE_CHANGED_TOPIC:RESOURCE_CHANGED}
+      permission-changed-topic: ${APP_AUTHZ_MQ_PERMISSION_CHANGED_TOPIC:PERMISSION_CHANGED}
+      subject-changed-topic: ${APP_AUTHZ_MQ_SUBJECT_CHANGED_TOPIC:SUBJECT_CHANGED}
+      snapshot-register-topic: ${APP_AUTHZ_MQ_SNAPSHOT_TOPIC:RESOURCE_SNAPSHOT_REGISTERED}
+      # 角色权限/账号状态 Redis 投影 TTL
+      read-model-ttl: ${APP_AUTHZ_READ_MODEL_TTL:30m}
+      subject-read-model-ttl: ${APP_AUTHZ_SUBJECT_READ_MODEL_TTL:1m}
+      # 投递前先刷 Redis 读模型，保证网关收到失效事件时 L2 已是新值（3.8 第 1 点）。
+      refresh-read-model-before-publish: ${APP_AUTHZ_MQ_REFRESH_READ_MODEL:true}
+      outbox:
+        enabled: ${APP_AUTHZ_MQ_OUTBOX_ENABLED:true}
+        # 兜底轮询间隔（毫秒）；正常路径由事务提交后立即唤醒投递。
+        poll-interval-ms: ${APP_AUTHZ_MQ_OUTBOX_POLL_MS:1000}
+        batch-size: ${APP_AUTHZ_MQ_OUTBOX_BATCH_SIZE:200}
+        max-attempts: ${APP_AUTHZ_MQ_OUTBOX_MAX_ATTEMPTS:10}
+        initial-backoff-ms: ${APP_AUTHZ_MQ_OUTBOX_BACKOFF_MS:1000}
+        max-backoff-ms: ${APP_AUTHZ_MQ_OUTBOX_MAX_BACKOFF_MS:300000}
+        # 数据库租约时长（秒），多实例领取时使用 FOR UPDATE SKIP LOCKED + 租约。
+        lease-seconds: ${APP_AUTHZ_MQ_OUTBOX_LEASE_SECONDS:30}
+
+# RocketMQ 通用层总闸（dusk-common-mqs 的 RocketMQEnableCondition）。
+# 权限事件链路要真正流动，必须同时打开本开关与 app.authz.mq.enabled（8.9 / 8.11）。
+# 默认关闭：未配置 broker 的环境不应因为缺配置而启动失败；打开后 RocketMQMessageSender
+# 会在启动期连接 NameServer，连不上会导致本服务启动失败。
+dusk:
+  mq:
+    rocketmq:
+      enabled: ${DUSK_MQ_ROCKETMQ_ENABLED:false}
+      name-server: ${DUSK_MQ_ROCKETMQ_NAME_SERVER:localhost:9876}
