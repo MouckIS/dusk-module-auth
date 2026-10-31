@@ -2,26 +2,20 @@ package com.dusk.module.auth.service.impl;
 
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.module.auth.common.datafilter.IDataFilterDefinitionContext;
-import com.dusk.module.auth.dto.station.AddUsersToStationInput;
-import com.dusk.module.auth.dto.station.CreateOrUpdateStationInput;
-import com.dusk.module.auth.dto.station.GetNotAssignedStationUsersInput;
-import com.dusk.module.auth.dto.station.GetStationUsersInput;
-import com.dusk.module.auth.dto.station.RemoveUserFromStationInput;
-import com.dusk.module.auth.dto.station.StationDto;
-import com.dusk.module.auth.dto.station.StationUserDto;
-import com.dusk.module.auth.dto.station.StationUserListDto;
-import com.dusk.module.auth.dto.station.StationsOfLoginUserDto;
+import com.dusk.module.auth.dto.station.*;
 import com.dusk.module.auth.entity.Station;
 import com.dusk.module.auth.entity.User;
 import com.dusk.module.auth.repository.IStationRepository;
 import com.dusk.module.auth.repository.IUserRepository;
 import com.dusk.module.metadata.enums.EnumResetType;
 import com.dusk.module.metadata.service.ISerialNoRpcService;
+import jakarta.persistence.criteria.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -38,16 +32,8 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * {@link StationServiceImpl} 单元测试，目标：覆盖 service.impl 门禁包的厂站管理与用户关联逻辑。
@@ -67,13 +53,25 @@ class StationServiceImplTest {
 
     private StationServiceImpl service;
 
-    @BeforeEach
-    void setUp() {
-        service = spy(new StationServiceImpl());
-        ReflectionTestUtils.setField(service, "repository", repository);
-        ReflectionTestUtils.setField(service, "userRepository", userRepository);
-        ReflectionTestUtils.setField(service, "dataFilterDefinitionContext", dataFilterDefinitionContext);
-        ReflectionTestUtils.setField(service, "serialNoService", serialNoService);
+    /**
+     * 触发 {@link Specification#toPredicate}，让 {@code Specifications.where(...)} 中的 lambda 真正执行。
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static void evaluateSpecification(Specification<?> specification) {
+        Root root = org.mockito.Mockito.mock(Root.class);
+        CriteriaQuery<?> query = org.mockito.Mockito.mock(CriteriaQuery.class);
+        CriteriaBuilder builder = org.mockito.Mockito.mock(CriteriaBuilder.class);
+        Path path = org.mockito.Mockito.mock(Path.class);
+        Join join = org.mockito.Mockito.mock(Join.class);
+        Predicate conjunction = org.mockito.Mockito.mock(Predicate.class);
+        when(root.get(anyString())).thenReturn(path);
+        when(root.join(anyString(), any(JoinType.class))).thenReturn(join);
+        when(join.get(anyString())).thenReturn(path);
+        when(conjunction.getExpressions()).thenReturn(new ArrayList<>());
+        when(builder.conjunction()).thenReturn(conjunction);
+        when(builder.disjunction()).thenReturn(conjunction);
+
+        ((Specification) specification).toPredicate(root, query, builder);
     }
 
     @AfterEach
@@ -269,8 +267,18 @@ class StationServiceImplTest {
         assertThat(service.findOneByDisplayName("none")).isNull();
     }
 
+    @BeforeEach
+    void setUp() {
+        service = spy(new StationServiceImpl());
+        ReflectionTestUtils.setField(service, "repository", repository);
+        ReflectionTestUtils.setField(service, "userRepository", userRepository);
+        ReflectionTestUtils.setField(service, "dataFilterDefinitionContext", dataFilterDefinitionContext);
+        ReflectionTestUtils.setField(service, "serialNoRpcService", serialNoService);
+    }
+
     @Test
     @DisplayName("findOneByDisplayName：命中返回 DTO")
+    @SuppressWarnings("unchecked")
     void findOneByDisplayName_found() {
         doReturn(List.of(station(1L, null, "1", "st"))).when(service).findAll(any(Specification.class));
 
@@ -278,26 +286,10 @@ class StationServiceImplTest {
 
         assertThat(dto).isNotNull();
         assertThat(dto.getDisplayName()).isEqualTo("st");
-    }
 
-    @Test
-    @DisplayName("getStationsForFrontByUserId：映射下拉项并识别集控站与默认站")
-    void getStationsForFrontByUserId() {
-        Station parent = station(1L, null, "1", "parent");
-        Station child = station(2L, 1L, "1/2", "child");
-        when(repository.getStationsByUser(9L)).thenReturn(List.of(parent, child));
-        doReturn(List.of(1L, 2L)).when(service).getAllDescendantIds(anyLong(), anyBoolean());
-        doReturn(List.of(parent, child)).when(service).findAll(any(Specification.class));
-        User u = user(9L);
-        u.setDefaultStation(1L);
-        when(userRepository.findById(9L)).thenReturn(Optional.of(u));
-
-        List<StationsOfLoginUserDto> result = service.getStationsForFrontByUserId(9L);
-
-        assertThat(result).hasSize(2);
-        StationsOfLoginUserDto first = result.getFirst();
-        assertThat(first.isMainStation()).isTrue();
-        assertThat(first.isDefaultBy()).isTrue();
+        ArgumentCaptor<Specification<Station>> captor = ArgumentCaptor.forClass(Specification.class);
+        verify(service).findAll(captor.capture());
+        evaluateSpecification(captor.getValue());
     }
 
     @Test
@@ -318,16 +310,28 @@ class StationServiceImplTest {
     // ------------------------------------------------------------------
 
     @Test
-    @DisplayName("getSerialNos：去除前导 0")
-    void getSerialNos_stripsLeadingZeros() {
-        when(serialNoService.getSerialNos(anyString(), any(EnumResetType.class), anyString(), anyInt(), anyInt()))
-                .thenReturn(new String[]{"0007", "0008"});
-        StationServiceImpl plain = new StationServiceImpl();
-        ReflectionTestUtils.setField(plain, "serialNoService", serialNoService);
+    @DisplayName("getStationsForFrontByUserId：映射下拉项并识别集控站与默认站")
+    @SuppressWarnings("unchecked")
+    void getStationsForFrontByUserId() {
+        Station parent = station(1L, null, "1", "parent");
+        Station child = station(2L, 1L, "1/2", "child");
+        when(repository.getStationsByUser(9L)).thenReturn(List.of(parent, child));
+        doReturn(List.of(1L, 2L)).when(service).getAllDescendantIds(anyLong(), anyBoolean());
+        doReturn(List.of(parent, child)).when(service).findAll(any(Specification.class));
+        User u = user(9L);
+        u.setDefaultStation(1L);
+        when(userRepository.findById(9L)).thenReturn(Optional.of(u));
 
-        String[] result = ReflectionTestUtils.invokeMethod(plain, "getSerialNos", 2);
+        List<StationsOfLoginUserDto> result = service.getStationsForFrontByUserId(9L);
 
-        assertThat(result).containsExactly("7", "8");
+        assertThat(result).hasSize(2);
+        StationsOfLoginUserDto first = result.getFirst();
+        assertThat(first.isMainStation()).isTrue();
+        assertThat(first.isDefaultBy()).isTrue();
+
+        ArgumentCaptor<Specification<Station>> captor = ArgumentCaptor.forClass(Specification.class);
+        verify(service).findAll(captor.capture());
+        evaluateSpecification(captor.getValue());
     }
 
     @Test
@@ -369,5 +373,74 @@ class StationServiceImplTest {
         service.saveAll(new ArrayList<>(List.of(s)));
 
         verify(dataFilterDefinitionContext).refresh();
+    }
+
+    @Test
+    @DisplayName("getSerialNos：去除前导 0")
+    void getSerialNos_stripsLeadingZeros() {
+        when(serialNoService.getSerialNos(anyString(), any(EnumResetType.class), anyString(), anyInt(), anyInt()))
+                .thenReturn(new String[]{"0007", "0008"});
+        StationServiceImpl plain = new StationServiceImpl();
+        ReflectionTestUtils.setField(plain, "serialNoRpcService", serialNoService);
+
+        String[] result = ReflectionTestUtils.invokeMethod(plain, "getSerialNos", 2);
+
+        assertThat(result).containsExactly("7", "8");
+    }
+
+    @Test
+    @DisplayName("createOrUpdate：根节点名称唯一校验通过并执行 Specification")
+    @SuppressWarnings("unchecked")
+    void createOrUpdate_rootNameUnique() {
+        Station existing = station(5L, null, "5", "old");
+        doReturn(Optional.of(existing)).when(service).findById(5L);
+        doReturn(existing).when(service).save(any(Station.class));
+        when(repository.findAll(any(Specification.class))).thenReturn(List.of(existing));
+        CreateOrUpdateStationInput input = new CreateOrUpdateStationInput();
+        input.setId(5L);
+        input.setDisplayName("new");
+
+        service.createOrUpdate(input);
+
+        ArgumentCaptor<Specification<Station>> captor = ArgumentCaptor.forClass(Specification.class);
+        verify(repository).findAll(captor.capture());
+        evaluateSpecification(captor.getValue());
+    }
+
+    @Test
+    @DisplayName("createOrUpdate：子节点名称唯一校验通过并执行 Specification")
+    @SuppressWarnings("unchecked")
+    void createOrUpdate_childNameUnique() {
+        Station existing = station(6L, 1L, "1/6", "old");
+        doReturn(Optional.of(existing)).when(service).findById(6L);
+        doReturn(existing).when(service).save(any(Station.class));
+        when(repository.findAll(any(Specification.class))).thenReturn(List.of(existing));
+        CreateOrUpdateStationInput input = new CreateOrUpdateStationInput();
+        input.setId(6L);
+        input.setDisplayName("new");
+        input.setParentId(1L);
+
+        service.createOrUpdate(input);
+
+        ArgumentCaptor<Specification<Station>> captor = ArgumentCaptor.forClass(Specification.class);
+        verify(repository).findAll(captor.capture());
+        evaluateSpecification(captor.getValue());
+    }
+
+    @Test
+    @DisplayName("createOrUpdate：同层级名称重复时抛业务异常")
+    void createOrUpdate_duplicateName() {
+        Station existing = station(5L, null, "5", "old");
+        doReturn(Optional.of(existing)).when(service).findById(5L);
+        doReturn(existing).when(service).save(any(Station.class));
+        when(repository.findAll(any(Specification.class)))
+                .thenReturn(List.of(existing, station(8L, null, "8", "old")));
+        CreateOrUpdateStationInput input = new CreateOrUpdateStationInput();
+        input.setId(5L);
+        input.setDisplayName("dup");
+
+        assertThatThrownBy(() -> service.createOrUpdate(input))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("该层级下已存在相同名称的厂站");
     }
 }

@@ -291,6 +291,77 @@ class SettingServiceImplTest {
     }
 
     @Test
+    @DisplayName("updateTenantSettings：同名但值未变化时不写入")
+    void updateTenantSettings_unchanged() {
+        when(settingsCache.getAllTenantSettingDefinitions())
+                .thenReturn(mapOf(definition("T", SettingAccessLevel.Login)));
+        when(settingManager.getSettingValueForTenant("T")).thenReturn("same");
+
+        service.updateTenantSettings(inputOf("T", "same"));
+
+        verify(settingManager, never()).changeSettingForTenant(anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("updateStationSettings：同名但值未变化时不写入")
+    void updateStationSettings_unchanged() {
+        DataFilterContextHolder.setDataFilterId("7");
+        when(settingsCache.getAllStationSettingDefinitions())
+                .thenReturn(mapOf(definition("S", SettingAccessLevel.Login)));
+        when(settingManager.getSettingValueForStation("S")).thenReturn("same");
+
+        service.updateStationSettings(inputOf("S", "same"));
+
+        verify(settingManager, never()).changeSettingForStation(anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("updateUserSettings：同名但值未变化时不写入")
+    void updateUserSettings_unchanged() {
+        when(settingsCache.getAllUserSettingDefinitions())
+                .thenReturn(mapOf(definition("U", SettingAccessLevel.Login)));
+        when(settingManager.getSettingValueForUser("U")).thenReturn("same");
+
+        service.updateUserSettings(inputOf("U", "same"));
+
+        verify(settingManager, never()).changeSettingForUser(anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("updateTenantSettings：名称不匹配时不写入")
+    void updateTenantSettings_nameMismatch() {
+        when(settingsCache.getAllTenantSettingDefinitions())
+                .thenReturn(mapOf(definition("T", SettingAccessLevel.Login)));
+
+        service.updateTenantSettings(inputOf("other", "new"));
+
+        verify(settingManager, never()).changeSettingForTenant(anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("updateStationSettings：名称不匹配时不写入")
+    void updateStationSettings_nameMismatch() {
+        DataFilterContextHolder.setDataFilterId("7");
+        when(settingsCache.getAllStationSettingDefinitions())
+                .thenReturn(mapOf(definition("S", SettingAccessLevel.Login)));
+
+        service.updateStationSettings(inputOf("other", "new"));
+
+        verify(settingManager, never()).changeSettingForStation(anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("updateUserSettings：名称不匹配时不写入")
+    void updateUserSettings_nameMismatch() {
+        when(settingsCache.getAllUserSettingDefinitions())
+                .thenReturn(mapOf(definition("U", SettingAccessLevel.Login)));
+
+        service.updateUserSettings(inputOf("other", "new"));
+
+        verify(settingManager, never()).changeSettingForUser(anyString(), anyString());
+    }
+
+    @Test
     @DisplayName("updateStationSettings：未选厂站抛业务异常")
     void updateStationSettings_noStation() {
         assertThatThrownBy(() -> service.updateStationSettings(inputOf("S", "x")))

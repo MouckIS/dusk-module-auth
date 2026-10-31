@@ -15,7 +15,7 @@ import com.dusk.module.auth.repository.IUserRepository;
 import com.dusk.module.auth.service.ICaptchaService;
 import com.dusk.module.auth.service.IFeatureService;
 import com.dusk.module.auth.service.IUserService;
-import com.dusk.module.notification.service.INotificationPushRpcServicve;
+import com.dusk.module.notification.service.IAuthPushRpcService;
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Predicate;
@@ -38,13 +38,8 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * {@link MobileLoginServiceImpl} 单元测试，目标：100% 分支覆盖。
@@ -64,7 +59,7 @@ class MobileLoginServiceImplTest {
     @Mock
     private SmsPushConfig smsPushConfig;
     @Mock
-    private INotificationPushRpcServicve pushManager;
+    private IAuthPushRpcService pushRpcService;
     @Mock
     private IFeatureService featureService;
     @Mock
@@ -84,7 +79,7 @@ class MobileLoginServiceImplTest {
         ReflectionTestUtils.setField(service, "tokenAuthManager", tokenAuthManager);
         ReflectionTestUtils.setField(service, "queryFactory", queryFactory);
         ReflectionTestUtils.setField(service, "smsPushConfig", smsPushConfig);
-        ReflectionTestUtils.setField(service, "pushManager", pushManager);
+        ReflectionTestUtils.setField(service, "pushRpcService", pushRpcService);
         ReflectionTestUtils.setField(service, "featureService", featureService);
         ReflectionTestUtils.setField(service, "userRepository", userRepository);
         ReflectionTestUtils.setField(service, "userService", userService);
@@ -130,7 +125,7 @@ class MobileLoginServiceImplTest {
     @Test
     @DisplayName("captcha：推送服务未启用时抛出业务异常")
     void captchaThrowsWhenPushManagerDisabled() {
-        ReflectionTestUtils.setField(service, "pushManager", null);
+        ReflectionTestUtils.setField(service, "pushRpcService", null);
 
         assertThatThrownBy(() -> service.captcha(captchaInput(), request))
                 .isInstanceOf(BusinessException.class)
@@ -182,7 +177,7 @@ class MobileLoginServiceImplTest {
 
         verify(redisUtil, org.mockito.Mockito.times(2))
                 .setCache(anyString(), anyString(), anyLong());
-        verify(pushManager).smsPushAsync(any(PushSMS.class));
+        verify(pushRpcService).smsPushAsync(any(PushSMS.class));
         verify(captchaService).setMobileSendCaptchaCount(request);
     }
 
@@ -308,6 +303,6 @@ class MobileLoginServiceImplTest {
 
         service.sendCaptchaSms("13800000000", "123456");
 
-        verify(pushManager).smsPushAsync(any(PushSMS.class));
+        verify(pushRpcService).smsPushAsync(any(PushSMS.class));
     }
 }

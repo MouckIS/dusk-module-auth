@@ -4,20 +4,18 @@ import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.model.UserContext;
 import com.dusk.common.core.utils.SecurityUtils;
 import com.dusk.common.mqs.utils.MqttUtils;
-import com.dusk.module.auth.dto.fingerprint.GetAllInputDto;
-import com.dusk.module.auth.dto.fingerprint.UserFingerprintDto;
-import com.dusk.module.metadata.enums.EnumResetType;
-import com.dusk.module.metadata.service.ISerialNoRpcService;
 import com.dusk.module.auth.cache.IUserFingerprintCacheService;
-import com.dusk.module.auth.dto.fingerprint.IdentifyInputDto;
-import com.dusk.module.auth.dto.fingerprint.RegisterFingerprintInputDto;
-import com.dusk.module.auth.dto.fingerprint.SaveFingerprintInputDto;
+import com.dusk.module.auth.dto.fingerprint.*;
 import com.dusk.module.auth.entity.UserFingerprint;
 import com.dusk.module.auth.repository.IUserFingerprintRepository;
+import com.dusk.module.metadata.enums.EnumResetType;
+import com.dusk.module.metadata.service.ISerialNoRpcService;
+import jakarta.persistence.criteria.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -26,18 +24,15 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * {@link UserFingerprintServiceImpl} 单元测试，目标：100% 分支覆盖。
@@ -137,21 +132,25 @@ class UserFingerprintServiceImplTest {
         verify(serialNoRpcService, never()).getSerialNo(anyString(), any(), any(), any(Integer.class));
     }
 
-    @Test
-    @DisplayName("registerFingerprint：缓存与库均无 userSeq 时通过序列号服务生成")
-    void registerFingerprintGeneratesUserSeq() {
-        when(userFingerprintCacheService.getUserSeq(1L)).thenReturn(null);
-        when(repository.findAll(any(Specification.class))).thenReturn(List.of());
-        when(serialNoRpcService.getSerialNo(eq("userSeq"), eq(EnumResetType.Never), any(), eq(5)))
-                .thenReturn("00009");
+    /**
+     * 触发 {@link Specification#toPredicate}，让 {@code Specifications.where(...)} 中的 lambda 真正执行。
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static void evaluateSpecification(Specification<?> specification) {
+        Root root = mock(Root.class);
+        CriteriaQuery<?> query = mock(CriteriaQuery.class);
+        CriteriaBuilder builder = mock(CriteriaBuilder.class);
+        Path path = mock(Path.class);
+        Join join = mock(Join.class);
+        Predicate conjunction = mock(Predicate.class);
+        when(root.get(anyString())).thenReturn(path);
+        when(root.join(anyString(), any(JoinType.class))).thenReturn(join);
+        when(join.get(anyString())).thenReturn(path);
+        when(conjunction.getExpressions()).thenReturn(new ArrayList<>());
+        when(builder.conjunction()).thenReturn(conjunction);
+        when(builder.disjunction()).thenReturn(conjunction);
 
-        RegisterFingerprintInputDto input = new RegisterFingerprintInputDto();
-        input.setUserId(1L);
-        input.setDeviceNo("DEV-1");
-        service.registerFingerprint(input);
-
-        verify(userFingerprintCacheService).saveUserSeq(1L, 9);
-        verify(mqttUtils).publishMsgAsync(anyString(), any());
+        ((Specification) specification).toPredicate(root, query, builder);
     }
 
     // ---------------- saveFingerprint ----------------
@@ -382,5 +381,101 @@ class UserFingerprintServiceImplTest {
 
         verify(mqttUtils).publishMsgAsync(anyString(), any());
         verify(userFingerprintCacheService, never()).saveUserSeq(any(), any());
+    }
+
+    @Test
+    @DisplayName("registerFingerprint：缓存与库均无 userSeq 时通过序列号服务生成")
+    @SuppressWarnings("unchecked")
+    void registerFingerprintGeneratesUserSeq() {
+        when(userFingerprintCacheService.getUserSeq(1L)).thenReturn(null);
+        when(repository.findAll(any(Specification.class))).thenReturn(List.of());
+        when(serialNoRpcService.getSerialNo(eq("userSeq"), eq(EnumResetType.Never), any(), eq(5)))
+                .thenReturn("00009");
+
+        RegisterFingerprintInputDto input = new RegisterFingerprintInputDto();
+        input.setUserId(1L);
+        input.setDeviceNo("DEV-1");
+        service.registerFingerprint(input);
+
+        verify(userFingerprintCacheService).saveUserSeq(1L, 9);
+        verify(mqttUtils).publishMsgAsync(anyString(), any());
+
+        ArgumentCaptor<Specification<UserFingerprint>> captor = ArgumentCaptor.forClass(Specification.class);
+        verify(repository).findAll(captor.capture());
+        evaluateSpecification(captor.getValue());
+    }
+
+    @Test
+    @DisplayName("saveFingerprint：新增场景下两个计数 Specification 均可执行")
+    @SuppressWarnings("unchecked")
+    void saveFingerprintNewSpecifications() {
+        when(repository.count(any(Specification.class))).thenReturn(0L, 3L);
+        stubSaveAssignsId();
+
+        service.saveFingerprint(saveInput(null, 1L, "新指纹"));
+
+        ArgumentCaptor<Specification<UserFingerprint>> captor = ArgumentCaptor.forClass(Specification.class);
+        verify(repository, times(2)).count(captor.capture());
+        captor.getAllValues().forEach(UserFingerprintServiceImplTest::evaluateSpecification);
+    }
+
+    @Test
+    @DisplayName("saveFingerprint：更新场景下名称去重 Specification 可执行")
+    @SuppressWarnings("unchecked")
+    void saveFingerprintUpdateSpecification() {
+        when(repository.count(any(Specification.class))).thenReturn(0L);
+        when(repository.findById(5L)).thenReturn(Optional.of(fingerprint(5L, 1L, 1)));
+        stubSaveAssignsId();
+
+        service.saveFingerprint(saveInput(5L, 1L, "改名后"));
+
+        ArgumentCaptor<Specification<UserFingerprint>> captor = ArgumentCaptor.forClass(Specification.class);
+        verify(repository).count(captor.capture());
+        evaluateSpecification(captor.getValue());
+    }
+
+    @Test
+    @DisplayName("getAll：全空与全开两组条件对应的 Specification 均可执行")
+    @SuppressWarnings("unchecked")
+    void getAllSpecifications() {
+        when(repository.findAll(any(Specification.class), any(Sort.class)))
+                .thenReturn(Collections.emptyList());
+
+        GetAllInputDto empty = new GetAllInputDto();
+        empty.setUserIds(Collections.emptyList());
+        service.getAll(empty);
+
+        GetAllInputDto full = new GetAllInputDto();
+        full.setUserIds(List.of(1L));
+        full.setFilter("finger");
+        full.setFingerprintId("9");
+        service.getAll(full);
+
+        ArgumentCaptor<Specification<UserFingerprint>> captor = ArgumentCaptor.forClass(Specification.class);
+        verify(repository, times(2)).findAll(captor.capture(), any(Sort.class));
+        captor.getAllValues().forEach(UserFingerprintServiceImplTest::evaluateSpecification);
+    }
+
+    @Test
+    @DisplayName("identify：是否指定 fingerprintId 两种情况下的 Specification 均可执行")
+    @SuppressWarnings("unchecked")
+    void identifySpecifications() {
+        when(repository.findAll(any(Specification.class)))
+                .thenReturn(List.of(fingerprint(1L, 1L, 5)));
+
+        IdentifyInputDto withoutId = new IdentifyInputDto();
+        withoutId.setUserId(1L);
+        withoutId.setDeviceNo("DEV-1");
+        service.identify(withoutId);
+
+        IdentifyInputDto withId = new IdentifyInputDto();
+        withId.setUserId(1L);
+        withId.setFingerprintId(1L);
+        withId.setDeviceNo("DEV-2");
+        service.identify(withId);
+
+        ArgumentCaptor<Specification<UserFingerprint>> captor = ArgumentCaptor.forClass(Specification.class);
+        verify(repository, times(2)).findAll(captor.capture());
+        captor.getAllValues().forEach(UserFingerprintServiceImplTest::evaluateSpecification);
     }
 }

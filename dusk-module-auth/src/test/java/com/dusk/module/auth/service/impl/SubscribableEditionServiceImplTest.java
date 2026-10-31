@@ -1,5 +1,8 @@
 package com.dusk.module.auth.service.impl;
 
+import com.alibaba.excel.EasyExcelFactory;
+import com.alibaba.excel.read.builder.ExcelReaderBuilder;
+import com.alibaba.excel.read.builder.ExcelReaderSheetBuilder;
 import com.dusk.common.core.auth.permission.MultiTenancySides;
 import com.dusk.common.core.auth.permission.Permission;
 import com.dusk.common.core.exception.BusinessException;
@@ -8,6 +11,7 @@ import com.dusk.module.auth.dto.edition.EditionEditDto;
 import com.dusk.module.auth.dto.edition.GetEditionInput;
 import com.dusk.module.auth.entity.SubscribableEdition;
 import com.dusk.module.auth.entity.Tenant;
+import com.dusk.module.auth.excel.EditionExcelExportWriter;
 import com.dusk.module.auth.repository.IFeatureValueRepository;
 import com.dusk.module.auth.repository.ISubscribableEditionRepository;
 import com.dusk.module.auth.repository.ITenantPermissionRepository;
@@ -17,12 +21,15 @@ import com.dusk.module.auth.service.ITenantPermissionService;
 import com.querydsl.core.types.Expression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.criteria.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -32,23 +39,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * {@link SubscribableEditionServiceImpl} 单元测试，目标：100% 分支覆盖。
@@ -350,6 +348,200 @@ class SubscribableEditionServiceImplTest {
         assertThatThrownBy(() -> service.export(1L))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("版本不存在或已被删除");
+    }
+
+    // ---------------- importEdition ----------------
+
+    private static Map<Integer, String> row(String displayName) {
+        Map<Integer, String> map = new LinkedHashMap<>();
+        if (displayName != null) {
+            map.put(2, displayName);
+        }
+        return map;
+    }
+
+    /**
+     * 触发 {@link Specification#toPredicate}，让 {@code Specifications.where(...)} 中的 lambda 真正执行。
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static void evaluateSpecification(Specification<?> specification) {
+        Root root = mock(Root.class);
+        CriteriaQuery<?> query = mock(CriteriaQuery.class);
+        CriteriaBuilder builder = mock(CriteriaBuilder.class);
+        Path path = mock(Path.class);
+        Join join = mock(Join.class);
+        Predicate conjunction = mock(Predicate.class);
+        when(root.get(anyString())).thenReturn(path);
+        when(root.join(anyString(), any(JoinType.class))).thenReturn(join);
+        when(join.get(anyString())).thenReturn(path);
+        when(conjunction.getExpressions()).thenReturn(new ArrayList<>());
+        when(builder.conjunction()).thenReturn(conjunction);
+        when(builder.disjunction()).thenReturn(conjunction);
+
+        ((Specification) specification).toPredicate(root, query, builder);
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private void stubEasyExcelRead(List<Map<Integer, String>> rows) {
+        ExcelReaderBuilder builder = mock(ExcelReaderBuilder.class);
+        ExcelReaderSheetBuilder sheetBuilder = mock(ExcelReaderSheetBuilder.class);
+        when(builder.sheet()).thenReturn(sheetBuilder);
+        when(sheetBuilder.headRowNumber(0)).thenReturn(sheetBuilder);
+        when(sheetBuilder.doReadSync()).thenReturn((List) rows);
+        try (MockedStatic<EasyExcelFactory> mocked = mockStatic(EasyExcelFactory.class)) {
+            mocked.when(() -> EasyExcelFactory.read(any(InputStream.class))).thenReturn(builder);
+            service.importEdition(new ByteArrayInputStream(new byte[0]));
+        }
+    }
+
+    @Test
+    @DisplayName("importEdition：Excel 解析失败时抛出业务异常")
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    void importEditionThrowsWhenExcelUnreadable() {
+        ExcelReaderBuilder builder = mock(ExcelReaderBuilder.class);
+        ExcelReaderSheetBuilder sheetBuilder = mock(ExcelReaderSheetBuilder.class);
+        when(builder.sheet()).thenReturn(sheetBuilder);
+        when(sheetBuilder.headRowNumber(0)).thenReturn(sheetBuilder);
+        when(sheetBuilder.doReadSync()).thenThrow(new RuntimeException("bad file"));
+
+        try (MockedStatic<EasyExcelFactory> mocked = mockStatic(EasyExcelFactory.class)) {
+            mocked.when(() -> EasyExcelFactory.read(any(InputStream.class))).thenReturn(builder);
+
+            assertThatThrownBy(() -> service.importEdition(new ByteArrayInputStream(new byte[0])))
+                    .isInstanceOf(BusinessException.class)
+                    .hasMessageContaining("无法识别的Excel文件");
+        }
+    }
+
+    @Test
+    @DisplayName("importEdition：数据行不足两行时抛出业务异常")
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    void importEditionThrowsWhenTooFewRows() {
+        assertThatThrownBy(() -> stubEasyExcelRead(List.<Map<Integer, String>>of(row("专业版"))))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("数据行数少于两行");
+    }
+
+    @Test
+    @DisplayName("importEdition：版本名称为空时抛出业务异常")
+    void importEditionThrowsWhenDisplayNameBlank() {
+        List<Map<Integer, String>> rows = new ArrayList<>();
+        rows.add(new LinkedHashMap<>());
+        rows.add(new LinkedHashMap<>());
+
+        assertThatThrownBy(() -> stubEasyExcelRead(rows))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("版本名称不能为空");
+    }
+
+    @Test
+    @DisplayName("importEdition：新版本导入时保存版本、权限与特性")
+    void importEditionCreatesEdition() {
+        List<Map<Integer, String>> rows = new ArrayList<>();
+        rows.add(row("专业版"));
+        rows.add(new LinkedHashMap<>());
+        Map<Integer, String> permissionRow = new LinkedHashMap<>();
+        permissionRow.put(0, "Pages.Role");
+        permissionRow.put(2, "是");
+        permissionRow.put(EditionExcelExportWriter.FEATURE_START_INDEX, "featureA");
+        permissionRow.put(EditionExcelExportWriter.FEATURE_START_INDEX + 2, "v1->desc");
+        rows.add(permissionRow);
+        Map<Integer, String> blankRow = new LinkedHashMap<>();
+        blankRow.put(0, "");
+        blankRow.put(2, "否");
+        rows.add(blankRow);
+
+        Permission parent = new Permission("Pages.Administration", "管理", MultiTenancySides.All);
+        Permission child = parent.createChildPermission("Pages.Role", "角色");
+        when(authPermissionManager.getDefinitionPermissionTree(true)).thenReturn(List.of(parent, child));
+        when(repository.findByDisplayName("专业版")).thenReturn(Optional.empty());
+        when(repository.save(any(SubscribableEdition.class))).thenAnswer(inv -> {
+            SubscribableEdition saved = inv.getArgument(0);
+            saved.setId(11L);
+            return saved;
+        });
+
+        stubEasyExcelRead(rows);
+
+        verify(repository).save(any(SubscribableEdition.class));
+        verify(tenantPermissionService).setEditionPermissions(any());
+        verify(featureService).setEditionFeatures(eq(11L), any());
+    }
+
+    @Test
+    @DisplayName("importEdition：已存在版本时复用并直接写入权限与特性")
+    void importEditionReusesExistingEdition() {
+        List<Map<Integer, String>> rows = new ArrayList<>();
+        rows.add(row("专业版"));
+        rows.add(new LinkedHashMap<>());
+        Map<Integer, String> featureRow = new LinkedHashMap<>();
+        featureRow.put(0, "Pages.Role");
+        featureRow.put(2, "否");
+        featureRow.put(EditionExcelExportWriter.FEATURE_START_INDEX, "featureB");
+        rows.add(featureRow);
+
+        when(authPermissionManager.getDefinitionPermissionTree(true)).thenReturn(new ArrayList<>());
+        when(repository.findByDisplayName("专业版"))
+                .thenReturn(Optional.of(edition(3L, "专业版", BigDecimal.TEN, BigDecimal.TEN)));
+
+        stubEasyExcelRead(rows);
+
+        verify(repository, never()).save(any(SubscribableEdition.class));
+        verify(featureService).setEditionFeatures(eq(3L), any());
+    }
+
+    // ---------------- Specification 执行 ----------------
+
+    @Test
+    @DisplayName("importEdition：特性值为空时回落为空串")
+    void importEditionHandlesNullFeatureValue() {
+        List<Map<Integer, String>> rows = new ArrayList<>();
+        rows.add(row("专业版"));
+        rows.add(new LinkedHashMap<>());
+        Map<Integer, String> featureRow = new LinkedHashMap<>();
+        featureRow.put(EditionExcelExportWriter.FEATURE_START_INDEX, "featureC");
+        rows.add(featureRow);
+
+        when(authPermissionManager.getDefinitionPermissionTree(true)).thenReturn(new ArrayList<>());
+        when(repository.findByDisplayName("专业版")).thenReturn(Optional.empty());
+        when(repository.save(any(SubscribableEdition.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        assertThatCode(() -> stubEasyExcelRead(rows)).doesNotThrowAnyException();
+        verify(featureService).setEditionFeatures(any(), any());
+    }
+
+    @Test
+    @DisplayName("getEditions：filter 空/非空两种 Specification 均可执行")
+    @SuppressWarnings("unchecked")
+    void getEditionsSpecifications() {
+        Pageable pageable = PageRequest.of(0, 10);
+        when(repository.findAll(any(Specification.class), eq(pageable))).thenReturn(Page.empty());
+
+        GetEditionInput blank = new GetEditionInput();
+        blank.setFilter("  ");
+        service.getEditions(blank);
+
+        GetEditionInput full = new GetEditionInput();
+        full.setFilter("专业");
+        service.getEditions(full);
+
+        ArgumentCaptor<Specification<SubscribableEdition>> captor = ArgumentCaptor.forClass(Specification.class);
+        verify(repository, org.mockito.Mockito.times(2)).findAll(captor.capture(), eq(pageable));
+        captor.getAllValues().forEach(SubscribableEditionServiceImplTest::evaluateSpecification);
+    }
+
+    @Test
+    @DisplayName("deleteEdition：租户关联检查 Specification 可执行")
+    @SuppressWarnings("unchecked")
+    void deleteEditionSpecification() {
+        when(repository.findById(1L)).thenReturn(Optional.of(freeEdition(1L)));
+        when(tenantRepository.count(any(Specification.class))).thenReturn(0L);
+
+        service.deleteEdition(1L);
+
+        ArgumentCaptor<Specification<Tenant>> captor = ArgumentCaptor.forClass(Specification.class);
+        verify(tenantRepository).count(captor.capture());
+        evaluateSpecification(captor.getValue());
     }
 
     // ---------------- 内部权限递归 ----------------
