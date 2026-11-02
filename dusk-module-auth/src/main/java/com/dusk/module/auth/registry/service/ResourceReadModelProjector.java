@@ -4,6 +4,7 @@ import com.dusk.common.rpc.authz.ResourceRuntimeSnapshot;
 import com.dusk.module.auth.registry.config.RegistryProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
@@ -61,6 +62,7 @@ public class ResourceReadModelProjector {
     private final ObjectProvider<StringRedisTemplate> redisTemplateProvider;
     private final ObjectMapper objectMapper;
 
+    @Autowired
     public ResourceReadModelProjector(RegistryProperties properties,
                                       ResourceRuntimeResolver resolver,
                                       ObjectProvider<StringRedisTemplate> redisTemplateProvider,

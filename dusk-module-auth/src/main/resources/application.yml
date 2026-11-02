@@ -7,6 +7,19 @@ spring:
   config:
     import:
       - optional:nacos:${spring.application.name}.yaml
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_ADDRESS}
+        username: ${NACOS_USERNAME}
+        password: ${NACOS_PASSWORD}
+        namespace: sit
+        group: services
+      config:
+        server-addr: ${NACOS_ADDRESS}
+        username: ${NACOS_USERNAME}
+        password: ${NACOS_PASSWORD}
+        namespace: sit
 dubbo:
   application:
     # todo: 暂时禁用序列化安全检查，后续补充自定义序列化白名单
