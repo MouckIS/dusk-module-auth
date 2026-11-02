@@ -1,15 +1,9 @@
 package com.dusk.module.auth.service.impl;
 
+import cn.hutool.json.JSONUtil;
 import com.dusk.common.core.dto.PagedResultDto;
 import com.dusk.common.core.exception.BusinessException;
-import com.dusk.module.auth.dto.dashboard.CopyModuleItemInput;
-import com.dusk.module.auth.dto.dashboard.CopyModuleItemsInput;
-import com.dusk.module.auth.dto.dashboard.CreateOrUpdateModule;
-import com.dusk.module.auth.dto.dashboard.CreateOrUpdateModuleItem;
-import com.dusk.module.auth.dto.dashboard.GetModuleInput;
-import com.dusk.module.auth.dto.dashboard.ModuleDetailDto;
-import com.dusk.module.auth.dto.dashboard.ModuleItemListDto;
-import com.dusk.module.auth.dto.dashboard.ModuleListDto;
+import com.dusk.module.auth.dto.dashboard.*;
 import com.dusk.module.auth.entity.dashboard.DashboardModule;
 import com.dusk.module.auth.entity.dashboard.DashboardModuleItem;
 import com.dusk.module.auth.entity.dashboard.DashboardZoneItemRef;
@@ -25,7 +19,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -45,16 +41,8 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * {@link DashBoardModuleServiceImpl} 单元测试，目标：覆盖 service.impl 门禁包的数据大屏模块管理逻辑。
@@ -511,5 +499,154 @@ class DashBoardModuleServiceImplTest {
 
         verify(service).saveModuleItem(any(CreateOrUpdateModuleItem.class));
         Files.deleteIfExists(file);
+    }
+
+    @Test
+    @DisplayName("saveModule：同名且 id 为空时同样判定为重复")
+    void saveModule_duplicateWithNullId() {
+        CreateOrUpdateModule input = new CreateOrUpdateModule();
+        input.setName("m1");
+        input.setId(null);
+        when(moduleRepository.findByName("m1")).thenReturn(module(1L, "m1"));
+
+        assertThatThrownBy(() -> service.saveModule(input))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("已存在");
+    }
+
+    @Test
+    @DisplayName("saveModuleItem：同模块同名但为自身时允许保存")
+    void saveModuleItem_sameIdAllowed() {
+        CreateOrUpdateModuleItem input = new CreateOrUpdateModuleItem();
+        input.setId(5L);
+        input.setModuleId(1L);
+        input.setName("dup");
+        when(moduleItemRepository.findAllByModuleIdAndName(1L, "dup"))
+                .thenReturn(List.of(item(5L, 1L, "dup")));
+        when(moduleItemRepository.findById(5L)).thenReturn(Optional.of(item(5L, 1L, "dup")));
+
+        service.saveModuleItem(input);
+
+        verify(moduleItemRepository).save(any(DashboardModuleItem.class));
+    }
+
+    @Test
+    @DisplayName("importModule：更新已有模块时仅导入有权限的新统计项")
+    void importModule_updateModuleAddsPermittedItem() throws IOException {
+        String json = "[{\"name\":\"m1\",\"code\":\"c1\",\"centerModule\":false,"
+                + "\"moduleItems\":[{\"code\":\"i2\",\"name\":\"item2\"},"
+                + "{\"code\":\"i3\",\"name\":\"item3\"}]}]";
+        Path file = Files.createTempFile("dusk-module-update-items", ".json");
+        Files.write(file, json.getBytes(StandardCharsets.UTF_8));
+        MultipartFile upload = mock(MultipartFile.class);
+        when(upload.getOriginalFilename()).thenReturn(file.toString());
+        when(upload.getInputStream())
+                .thenReturn(new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8)));
+
+        DashboardModuleItem repoItem = item(7L, 1L, "item1");
+        repoItem.setCode("i1");
+        doReturn(new ArrayList<>(List.of(module(1L, "m1")))).when(service).findAll();
+        when(moduleItemRepository.findAllByModuleIdOrderByCreateTime(1L))
+                .thenReturn(new ArrayList<>(List.of(repoItem)));
+        when(moduleRepository.findByName("m1")).thenReturn(module(1L, "m1"));
+        doReturn(module(1L, "m1")).when(service).save(any(DashboardModule.class));
+        doReturn(item(8L, 1L, "item2")).when(service).saveModuleItem(any());
+
+        ModuleItemPermissionInput permission = new ModuleItemPermissionInput();
+        permission.setBusinessItemPermission(new ArrayList<>(List.of("i2")));
+
+        service.importModule(upload, permission);
+
+        ArgumentCaptor<CreateOrUpdateModuleItem> captor = ArgumentCaptor.forClass(CreateOrUpdateModuleItem.class);
+        verify(service, times(1)).saveModuleItem(captor.capture());
+        assertThat(captor.getValue().getCode()).isEqualTo("i2");
+        assertThat(captor.getValue().getId()).isNull();
+        Files.deleteIfExists(file);
+    }
+
+    @Test
+    @DisplayName("importModule：新增模块时跳过无权限统计项")
+    void importModule_newModuleSkipsUnpermittedItem() throws IOException {
+        String json = "[{\"name\":\"m2\",\"code\":\"c2\",\"centerModule\":false,"
+                + "\"moduleItems\":[{\"code\":\"i4\",\"name\":\"item4\"},"
+                + "{\"code\":\"i5\",\"name\":\"item5\"}]}]";
+        Path file = Files.createTempFile("dusk-module-new-items", ".json");
+        Files.write(file, json.getBytes(StandardCharsets.UTF_8));
+        MultipartFile upload = mock(MultipartFile.class);
+        when(upload.getOriginalFilename()).thenReturn(file.toString());
+        when(upload.getInputStream())
+                .thenReturn(new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8)));
+        doReturn(new ArrayList<>()).when(service).findAll();
+        doReturn(module(200L, "m2")).when(service).save(any(DashboardModule.class));
+
+        ModuleItemPermissionInput permission = new ModuleItemPermissionInput();
+        permission.setBusinessItemPermission(new ArrayList<>(List.of("i4")));
+
+        service.importModule(upload, permission);
+
+        ArgumentCaptor<List<DashboardModuleItem>> captor = ArgumentCaptor.forClass(List.class);
+        verify(moduleItemRepository, times(1)).saveAll(captor.capture());
+        assertThat(captor.getValue()).extracting(DashboardModuleItem::getCode).containsExactly("i4");
+        Files.deleteIfExists(file);
+    }
+
+    @Test
+    @DisplayName("hasPermission：中心/业务模块与空权限清单组合全覆盖")
+    void hasPermission_allBranches() {
+        ModuleItemListDto item = new ModuleItemListDto();
+        item.setCode("i1");
+
+        ModuleDetailDto center = new ModuleDetailDto();
+        center.setCenterModule(true);
+        ModuleItemPermissionInput centerPermission = new ModuleItemPermissionInput();
+        centerPermission.setCenterItemPermission(new ArrayList<>(List.of("i1")));
+        assertThat(invokeHasPermission(centerPermission, center, item)).isTrue();
+
+        centerPermission.setCenterItemPermission(null);
+        assertThat(invokeHasPermission(centerPermission, center, item)).isFalse();
+
+        centerPermission.setCenterItemPermission(new ArrayList<>());
+        assertThat(invokeHasPermission(centerPermission, center, item)).isFalse();
+
+        ModuleDetailDto business = new ModuleDetailDto();
+        business.setCenterModule(false);
+        ModuleItemPermissionInput businessPermission = new ModuleItemPermissionInput();
+        businessPermission.setBusinessItemPermission(new ArrayList<>(List.of("i1")));
+        assertThat(invokeHasPermission(businessPermission, business, item)).isTrue();
+
+        businessPermission.setBusinessItemPermission(null);
+        assertThat(invokeHasPermission(businessPermission, business, item)).isFalse();
+
+        businessPermission.setBusinessItemPermission(new ArrayList<>());
+        assertThat(invokeHasPermission(businessPermission, business, item)).isFalse();
+    }
+
+    @Test
+    @DisplayName("importModule：JSON 解析结果为 null 时按配置为空处理")
+    void importModule_nullConfig() throws IOException {
+        Path file = Files.createTempFile("dusk-module-null", ".json");
+        Files.write(file, "x".getBytes(StandardCharsets.UTF_8));
+        MultipartFile upload = mock(MultipartFile.class);
+        when(upload.getOriginalFilename()).thenReturn(file.toString());
+        when(upload.getInputStream())
+                .thenReturn(new ByteArrayInputStream("x".getBytes(StandardCharsets.UTF_8)));
+
+        try (MockedStatic<JSONUtil> json = mockStatic(JSONUtil.class)) {
+            json.when(() -> JSONUtil.toList(anyString(), eq(ModuleDetailDto.class))).thenReturn(null);
+
+            assertThatThrownBy(() -> service.importModule(upload, null))
+                    .isInstanceOf(BusinessException.class)
+                    .hasMessageContaining("配置为空");
+        }
+
+        Files.deleteIfExists(file);
+    }
+
+    private boolean invokeHasPermission(ModuleItemPermissionInput permission,
+                                        ModuleDetailDto module,
+                                        ModuleItemListDto item) {
+        Boolean result = ReflectionTestUtils.invokeMethod(service, "hasPermission", permission, module, item);
+        assertThat(result).isNotNull();
+        return result;
     }
 }

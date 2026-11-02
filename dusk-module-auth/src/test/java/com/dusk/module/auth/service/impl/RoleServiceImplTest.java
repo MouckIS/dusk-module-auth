@@ -1,5 +1,10 @@
 package com.dusk.module.auth.service.impl;
 
+import com.alibaba.excel.EasyExcelFactory;
+import com.alibaba.excel.ExcelWriter;
+import com.alibaba.excel.write.builder.ExcelWriterBuilder;
+import com.alibaba.excel.write.builder.ExcelWriterSheetBuilder;
+import com.alibaba.excel.write.metadata.WriteSheet;
 import com.dusk.common.core.auth.permission.MultiTenancySides;
 import com.dusk.common.core.auth.permission.Permission;
 import com.dusk.common.core.dto.EntityDto;
@@ -8,19 +13,12 @@ import com.dusk.common.core.enums.EUnitType;
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.common.core.service.impl.BaseService;
 import com.dusk.common.core.tenant.TenantContextHolder;
+import com.dusk.module.auth.common.permission.IAuthPermissionManager;
 import com.dusk.module.auth.dto.BindRoleToUserInput;
 import com.dusk.module.auth.dto.RoleSimpleDto;
-import com.dusk.module.auth.dto.orga.OrganizationUnitUserListDto;
-import com.dusk.module.auth.dto.role.RoleListDto;
-import com.dusk.module.auth.dto.role.RolePermissionDto;
-import com.dusk.module.auth.common.permission.IAuthPermissionManager;
 import com.dusk.module.auth.dto.orga.BindRoleToOrgInput;
-import com.dusk.module.auth.dto.role.CreateOrEditRolePermissionDto;
-import com.dusk.module.auth.dto.role.ExportRolePermissionDto;
-import com.dusk.module.auth.dto.role.GetRolesInput;
-import com.dusk.module.auth.dto.role.RoleCreateOrEditDto;
-import com.dusk.module.auth.dto.role.RoleDto;
-import com.dusk.module.auth.dto.role.UpdateRolePermissionDto;
+import com.dusk.module.auth.dto.orga.OrganizationUnitUserListDto;
+import com.dusk.module.auth.dto.role.*;
 import com.dusk.module.auth.dto.user.GetUserByRoleDto;
 import com.dusk.module.auth.dto.user.UnbindRoleForUserDto;
 import com.dusk.module.auth.entity.GrantPermission;
@@ -37,13 +35,18 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPADeleteClause;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -55,37 +58,23 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.ReflectionUtils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * {@link RoleServiceImpl} 单元测试，目标：覆盖 service.impl 门禁包的分支与行。
  *
- * <p>说明：{@code exportRole} 依赖 EasyExcel 模板写出，当前依赖树中 commons-io 被解析为 2.5
- * （经 weixin-java-miniapp 传递），低于 easyexcel 4.0.3 要求的 2.12，运行期抛
+ * <p>说明：{@code exportRole} 的 Excel 写出由 EasyExcel 静态入口驱动。当前依赖树中 commons-io 被解析为 2.5
+ * （经 weixin-java-miniapp 传递），低于 easyexcel 4.0.3 要求的 2.12，运行期可能抛
  * {@code NoClassDefFoundError: org/apache/commons/io/output/UnsynchronizedByteArrayOutputStream}。
- * 该缺陷属既有生产问题（按 AGENTS.md 约定不在本模块 pom 自行调整版本），故本测试类暂不覆盖
- * Excel 写出路径，待 BOM 升级 commons-io 后补测。
+ * 因此导出用例通过 {@code mockStatic(EasyExcelFactory.class)} 隔离真实写出，只验证权限树折叠、
+ * 模板填充与资源关闭等编排逻辑。
  */
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -108,19 +97,23 @@ class RoleServiceImplTest {
     private ITenantPermissionService tenantPermissionService;
     @Mock
     private JPAQueryFactory queryFactory;
+    @Mock
+    private com.dusk.module.auth.authz.version.AuthzPermissionVersionService authzPermissionVersionService;
+    @Mock
+    private com.dusk.module.auth.authz.version.AuthzSubjectVersionService authzSubjectVersionService;
+    @Mock
+    private com.dusk.module.auth.authz.service.AuthzEventPublisher authzEventPublisher;
+    @Mock
+    private com.dusk.module.auth.authz.service.AuthzEventPublisher authzSubjectEventPublisher;
 
     private RoleServiceImpl service;
 
-    @BeforeEach
-    void setUp() {
-        service = spy(new RoleServiceImpl());
-        injectRepository(repository);
-        ReflectionTestUtils.setField(service, "userRepository", userRepository);
-        ReflectionTestUtils.setField(service, "organizationUnitService", organizationUnitService);
-        ReflectionTestUtils.setField(service, "permissionRepository", permissionRepository);
-        ReflectionTestUtils.setField(service, "authPermissionManager", authPermissionManager);
-        ReflectionTestUtils.setField(service, "tenantPermissionService", tenantPermissionService);
-        ReflectionTestUtils.setField(service, "queryFactory", queryFactory);
+    private static void evaluateSpecification(Specification<Role> specification) {
+        Root<Role> root = mock(Root.class);
+        CriteriaQuery<?> query = mock(CriteriaQuery.class);
+        CriteriaBuilder builder = mock(CriteriaBuilder.class);
+
+        assertThatCode(() -> specification.toPredicate(root, query, builder)).doesNotThrowAnyException();
     }
 
     @AfterEach
@@ -1070,5 +1063,159 @@ class RoleServiceImplTest {
         service.appendTenantPermission("missing", set, tenantPermissions);
 
         assertThat(set).isEmpty();
+    }
+
+    // ------------------------------------------------------------------
+    // 过滤规格求值与权限事件
+    // ------------------------------------------------------------------
+
+    @BeforeEach
+    void setUp() {
+        service = spy(new RoleServiceImpl());
+        injectRepository(repository);
+        ReflectionTestUtils.setField(service, "userRepository", userRepository);
+        ReflectionTestUtils.setField(service, "organizationUnitService", organizationUnitService);
+        ReflectionTestUtils.setField(service, "permissionRepository", permissionRepository);
+        ReflectionTestUtils.setField(service, "authPermissionManager", authPermissionManager);
+        ReflectionTestUtils.setField(service, "tenantPermissionService", tenantPermissionService);
+        ReflectionTestUtils.setField(service, "queryFactory", queryFactory);
+        ReflectionTestUtils.setField(service, "authzPermissionVersionService", authzPermissionVersionService);
+        ReflectionTestUtils.setField(service, "authzSubjectVersionService", authzSubjectVersionService);
+        ReflectionTestUtils.setField(service, "authzEventPublisher", authzEventPublisher);
+        ReflectionTestUtils.setField(service, "authzSubjectEventPublisher", authzSubjectEventPublisher);
+    }
+
+    @Test
+    @DisplayName("getRoles(GetRolesInput)：带过滤条件时规格谓词可正常求值")
+    void getRolesWithFilterSpecificationEvaluated() {
+        Page<Role> page = new PageImpl<>(List.of(), PageRequest.of(0, 10), 0);
+        when(repository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
+        GetRolesInput input = new GetRolesInput();
+        input.setFilter("adm");
+
+        service.getRoles(input);
+
+        ArgumentCaptor<Specification<Role>> captor = ArgumentCaptor.forClass(Specification.class);
+        verify(repository).findAll(captor.capture(), any(Pageable.class));
+        evaluateSpecification(captor.getValue());
+    }
+
+    @Test
+    @DisplayName("getRoles(GetRolesInput)：过滤条件为空时规格谓词同样可求值")
+    void getRolesWithoutFilterSpecificationEvaluated() {
+        Page<Role> page = new PageImpl<>(List.of(), PageRequest.of(0, 10), 0);
+        when(repository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
+        GetRolesInput input = new GetRolesInput();
+        input.setFilter("   ");
+
+        service.getRoles(input);
+
+        ArgumentCaptor<Specification<Role>> captor = ArgumentCaptor.forClass(Specification.class);
+        verify(repository).findAll(captor.capture(), any(Pageable.class));
+        evaluateSpecification(captor.getValue());
+    }
+
+    @Test
+    @DisplayName("publishPermissionChanged：角色为 null 时直接跳过版本分配")
+    void publishPermissionChangedSkipsNullRole() {
+        ReflectionTestUtils.invokeMethod(service, "publishPermissionChanged", (Role) null);
+
+        verifyNoInteractions(authzPermissionVersionService, authzEventPublisher);
+    }
+
+    @Test
+    @DisplayName("publishPermissionChanged：角色无 id 时跳过版本分配")
+    void publishPermissionChangedSkipsRoleWithoutId() {
+        Role roleWithoutId = role(null, "R", "N");
+        when(repository.findById(null)).thenReturn(Optional.of(roleWithoutId));
+
+        service.deleteRole(new EntityDto());
+
+        verifyNoInteractions(authzPermissionVersionService, authzEventPublisher);
+    }
+
+    @Test
+    @DisplayName("unbindRoleToUser：用户 id 不匹配时保留原有绑定")
+    void unbindRoleToUserKeepsUnmatchedUser() {
+        User bound = user(10L);
+        Role role = role(ROLE_ID, "R", "N");
+        role.getUserRoles().add(bound);
+        doReturn(role).when(service).getOne(ROLE_ID);
+        when(userRepository.findAllById(any())).thenReturn(List.of());
+
+        UnbindRoleForUserDto dto = new UnbindRoleForUserDto();
+        dto.setRoleId(ROLE_ID);
+        dto.setUserIds(List.of(99L));
+
+        service.unbindRoleToUser(dto);
+
+        assertThat(role.getUserRoles()).containsExactly(bound);
+        verify(repository).save(role);
+    }
+
+    // ------------------------------------------------------------------
+    // exportRole
+    // ------------------------------------------------------------------
+
+    @Test
+    @DisplayName("bumpSubjects：跳过 null 用户与无 id 用户，仅推进有效用户版本")
+    void bumpSubjectsSkipsInvalidUsers() {
+        Role role = role(ROLE_ID, "R", "N");
+        doReturn(role).when(service).getOne(ROLE_ID);
+        User valid = user(1L);
+        User withoutId = user(null);
+        when(userRepository.findAllById(any())).thenReturn(java.util.Arrays.asList(null, withoutId, valid));
+
+        UnbindRoleForUserDto dto = new UnbindRoleForUserDto();
+        dto.setRoleId(ROLE_ID);
+        dto.setUserIds(List.of(1L));
+
+        service.unbindRoleToUser(dto);
+
+        verify(authzSubjectVersionService, times(1)).nextVersion(any(), any());
+        verify(authzSubjectEventPublisher, times(1)).subjectChanged(any(), any(), anyLong(), anyBoolean());
+    }
+
+    @Test
+    @DisplayName("exportRole：折叠权限树后按模板填充并关闭 ExcelWriter")
+    void exportRoleFillsTemplateAndClosesWriter() {
+        TenantContextHolder.setTenantId(TENANT_ID);
+        Role existing = role(ROLE_ID, "R", "N");
+        existing.addPermission(grant("P", null));
+        when(repository.findById(ROLE_ID)).thenReturn(Optional.of(existing));
+        when(tenantPermissionService.getTenantPermissions(TENANT_ID))
+                .thenReturn(List.of(granted("P", "P-display", null), granted("C", "C-display", "P")));
+
+        try (MockedStatic<EasyExcelFactory> excel = mockStatic(EasyExcelFactory.class)) {
+            ExcelWriter writer = mock(ExcelWriter.class);
+            ExcelWriterBuilder builder = mock(ExcelWriterBuilder.class, Answers.RETURNS_SELF);
+            when(builder.build()).thenReturn(writer);
+            ExcelWriterSheetBuilder sheetBuilder = mock(ExcelWriterSheetBuilder.class, Answers.RETURNS_SELF);
+            when(sheetBuilder.build()).thenReturn(mock(WriteSheet.class));
+            excel.when(() -> EasyExcelFactory.write(any(OutputStream.class))).thenReturn(builder);
+            excel.when(() -> EasyExcelFactory.writerSheet(0)).thenReturn(sheetBuilder);
+
+            service.exportRole(ROLE_ID, new ByteArrayOutputStream());
+
+            verify(writer, times(2)).fill(any(Object.class), any(WriteSheet.class));
+            verify(writer).finish();
+        }
+    }
+
+    @Test
+    @DisplayName("exportRole：Excel 写出失败时仍执行资源清理并向上抛出")
+    void exportRoleClosesStreamWhenWriteFails() {
+        Role existing = role(ROLE_ID, "R", "N");
+        when(repository.findById(ROLE_ID)).thenReturn(Optional.of(existing));
+        when(authPermissionManager.getDefinitionPermissionTree(false)).thenReturn(List.of());
+
+        try (MockedStatic<EasyExcelFactory> excel = mockStatic(EasyExcelFactory.class)) {
+            excel.when(() -> EasyExcelFactory.write(any(OutputStream.class)))
+                    .thenThrow(new IllegalStateException("excel"));
+
+            assertThatThrownBy(() -> service.exportRole(ROLE_ID, new ByteArrayOutputStream()))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessage("excel");
+        }
     }
 }

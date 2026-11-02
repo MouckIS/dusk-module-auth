@@ -7,16 +7,11 @@ import com.dusk.common.core.dto.PagedResultDto;
 import com.dusk.common.core.enums.EUnitType;
 import com.dusk.common.core.enums.UserStatus;
 import com.dusk.common.core.exception.BusinessException;
-import com.dusk.module.auth.dto.CreateOrUpdateUserInput;
-import com.dusk.module.auth.dto.GetUsersByOrgInput;
-import com.dusk.module.auth.dto.UserFullListDto;
-import com.dusk.module.auth.dto.UserInputDto;
-import com.dusk.module.auth.dto.UserOrgDto;
-import com.dusk.module.auth.dto.UserSimpleDto;
+import com.dusk.module.auth.common.manage.TokenAuthManager;
+import com.dusk.module.auth.dto.*;
 import com.dusk.module.auth.dto.orga.GetOrganizationUnitUsersInput;
 import com.dusk.module.auth.dto.orga.OrganizationUnitDto;
 import com.dusk.module.auth.dto.orga.OrganizationUnitUserDto;
-import com.dusk.module.auth.common.manage.TokenAuthManager;
 import com.dusk.module.auth.dto.user.UserIdAndPermissionDto;
 import com.dusk.module.auth.entity.OrganizationUnit;
 import com.dusk.module.auth.entity.Role;
@@ -32,11 +27,13 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -51,17 +48,14 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * {@link UserRpcServiceImpl} 单元测试（第一批：委托型与业务逻辑型方法）。
@@ -725,6 +719,229 @@ class UserRpcServiceImplTest {
 
         service.syncUserByWeChatFromLdap(userDto, List.of(orgDto(100L, "ORG", null)),
                 new OrganizationUnitUserDto(100L, 11L));
+
+        verify(repository).save(any(User.class));
+    }
+
+    // ------------------------------------------------------------------
+    // Specification / 同步分支补充
+    // ------------------------------------------------------------------
+
+    private static UserSimpleDto userDto(Long id, String userName, String workNumber) {
+        UserSimpleDto dto = new UserSimpleDto();
+        dto.setId(id);
+        dto.setUserName(userName);
+        dto.setWorkNumber(workNumber);
+        return dto;
+    }
+
+    /**
+     * 触发 {@link Specification#toPredicate}，让 {@code Specifications.where(...)} 中的 lambda 真正执行。
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static void evaluateSpecification(Specification<?> specification) {
+        Root root = mock(Root.class);
+        CriteriaQuery<?> query = mock(CriteriaQuery.class);
+        CriteriaBuilder builder = mock(CriteriaBuilder.class);
+        Path path = mock(Path.class);
+        Join join = mock(Join.class);
+        jakarta.persistence.criteria.Predicate conjunction = mock(jakarta.persistence.criteria.Predicate.class);
+        when(root.get(anyString())).thenReturn(path);
+        when(root.join(anyString(), any(JoinType.class))).thenReturn(join);
+        when(join.get(anyString())).thenReturn(path);
+        when(conjunction.getExpressions()).thenReturn(new ArrayList<>());
+        when(builder.conjunction()).thenReturn(conjunction);
+        when(builder.disjunction()).thenReturn(conjunction);
+
+        ((Specification) specification).toPredicate(root, query, builder);
+    }
+
+    @Test
+    @DisplayName("getUserIdsByNameLike：Specification 可执行")
+    @SuppressWarnings("unchecked")
+    void getUserIdsByNameLikeSpecification() {
+        when(repository.findAll(any(Specification.class)))
+                .thenReturn(List.of(user(1L, EUnitType.Inner, UserStatus.OnJob)));
+
+        service.getUserIdsByNameLike("na");
+
+        ArgumentCaptor<Specification<User>> captor = ArgumentCaptor.forClass(Specification.class);
+        verify(repository).findAll(captor.capture());
+        evaluateSpecification(captor.getValue());
+    }
+
+    @Test
+    @DisplayName("getUsersContainsName：两个重载的 Specification 均可执行")
+    @SuppressWarnings("unchecked")
+    void getUsersContainsNameSpecifications() {
+        when(repository.findAll(any(Specification.class)))
+                .thenReturn(List.of(user(1L, EUnitType.Inner, UserStatus.OnJob)));
+
+        service.getUsersContainsName("na");
+        service.getUsersContainsName("na", List.of(EUnitType.Inner));
+
+        ArgumentCaptor<Specification<User>> captor = ArgumentCaptor.forClass(Specification.class);
+        verify(repository, times(2)).findAll(captor.capture());
+        captor.getAllValues().forEach(UserRpcServiceImplTest::evaluateSpecification);
+    }
+
+    @Test
+    @DisplayName("getUsersByOrg：orgIds 为 null 时返回空集合")
+    void getUsersByOrgNullOrgIds() {
+        GetUsersByOrgInput input = new GetUsersByOrgInput();
+        input.setOrgIds(null);
+
+        assertThat(service.getUsersByOrg(input)).isEmpty();
+    }
+
+    @Test
+    @DisplayName("syncUserAndOrg：覆盖管理员跳过、已存在用户、新用户与组织匹配分支")
+    void syncUserAndOrgHandlesExistingAdminAndNewUsers() {
+        JPAQuery query = queryMock();
+        when(queryFactory.selectFrom(any(EntityPath.class))).thenReturn(query);
+        when(query.fetch()).thenReturn(
+                (List) new ArrayList<>(),
+                (List) new ArrayList<>(List.of(role(1L, "default"))));
+
+        User unmatched = user(12L, EUnitType.Inner, UserStatus.OnJob);
+        User admin = user(1L, EUnitType.Inner, UserStatus.OnJob);
+        admin.setAdmin(true);
+        User existing = user(10L, EUnitType.Inner, UserStatus.OnJob);
+        existing.setUserName("u10");
+        existing.setPassword("pwd");
+        existing.setWorkNumber("w10");
+        existing.getUserRoles().add(role(2L, "r"));
+        User blankPassword = user(11L, EUnitType.Inner, UserStatus.OnJob);
+        blankPassword.setUserName("u11");
+        blankPassword.setWorkNumber("w11");
+        when(repository.findAll()).thenReturn(new ArrayList<>(List.of(unmatched, admin, existing, blankPassword)));
+        when(passwordEncoder.encode("w11")).thenReturn("ENC");
+
+        List<UserSimpleDto> saveUserList = new ArrayList<>();
+        saveUserList.add(userDto(10L, "u10", "w10"));
+        saveUserList.add(userDto(11L, "u11", "w11"));
+        saveUserList.add(userDto(null, "u12", "w12"));
+
+        List<OrganizationUnitUserDto> saveOrgUserList = new ArrayList<>(List.of(
+                new OrganizationUnitUserDto(100L, 10L),
+                new OrganizationUnitUserDto(777L, 11L),
+                new OrganizationUnitUserDto(999L, 99L)));
+
+        service.syncUserAndOrg(saveUserList,
+                List.of(orgDto(100L, "ORG100", null)),
+                saveOrgUserList,
+                null);
+
+        assertThat(existing.getOrganizationUnit()).extracting(OrganizationUnit::getId).containsExactly(100L);
+        verify(entityManager, atLeastOnce()).persist(any(User.class));
+    }
+
+    @Test
+    @DisplayName("syncUserAndOrg：组织树命中已有节点且父子层级重排")
+    void syncUserAndOrgRebuildsOrgTree() {
+        JPAQuery query = queryMock();
+        when(queryFactory.selectFrom(any(EntityPath.class))).thenReturn(query);
+        when(query.fetch()).thenReturn(
+                (List) new ArrayList<>(List.of(orgUnit(1L, "C1", null), orgUnit(8L, "C8", null))),
+                (List) new ArrayList<>());
+        when(repository.findAll()).thenReturn(new ArrayList<>());
+
+        service.syncUserAndOrg(new ArrayList<>(),
+                List.of(orgDto(1L, "C1", null), orgDto(2L, "C2", 1L)),
+                new ArrayList<>(),
+                null);
+
+        verify(organizationUnitService, times(2)).save(any(OrganizationUnit.class));
+    }
+
+    @Test
+    @DisplayName("syncFromLdap：多层级组织、重复 code 去重与已存在用户组织去重")
+    void syncFromLdapHandlesMultiLevelAndDuplicateOrgs() {
+        JPAQuery query = queryMock();
+        when(queryFactory.selectFrom(any(EntityPath.class))).thenReturn(query);
+        when(query.fetch()).thenReturn(
+                (List) new ArrayList<>(List.of(orgUnit(1L, "C1", null))),
+                (List) new ArrayList<>(List.of(role(1L, "default"))),
+                (List) new ArrayList<>(List.of(role(1L, "default"))));
+
+        User existing = user(50L, EUnitType.Inner, UserStatus.OnJob);
+        existing.setUserName("u1");
+        existing.setWorkNumber("w1");
+        when(repository.findById(50L)).thenReturn(Optional.of(existing));
+        when(organizationUnitService.getOrganizationUnitsByUser(any(EntityDto.class)))
+                .thenReturn(new ArrayList<>(List.of(orgUnit(10L, "X", null), orgUnit(11L, "X", null))));
+        when(passwordEncoder.encode("w1")).thenReturn("ENC");
+        User second = user(51L, EUnitType.Inner, UserStatus.OnJob);
+        second.setUserName("u2");
+        second.setPassword("pwd");
+        when(repository.findById(51L)).thenReturn(Optional.of(second));
+
+        Map<String, List<OrganizationUnitDto>> userOrgMap = new java.util.HashMap<>();
+        userOrgMap.put("u1", List.of(
+                orgDto(1L, "C1", null),
+                orgDto(null, "C2", null),
+                orgDto(null, "C2", null),
+                orgDto(null, "C2", null)));
+        userOrgMap.put("u-empty", new ArrayList<>());
+
+        service.syncFromLdap(List.of(userDto(50L, "u1", "w1"), userDto(51L, "u2", "w2")),
+                new ArrayList<>(), userOrgMap);
+
+        assertThat(existing.getOrganizationUnit()).extracting(OrganizationUnit::getCode)
+                .contains("X", "C2");
+        verify(organizationUnitService, atLeastOnce()).saveAndFlush(any(OrganizationUnit.class));
+        verify(entityManager, atLeastOnce()).persist(any(User.class));
+    }
+
+    @Test
+    @DisplayName("syncFromLdap：用户无 id 时走新增分支且无组织映射")
+    void syncFromLdapCreatesUserWithoutId() {
+        JPAQuery query = queryMock();
+        when(queryFactory.selectFrom(any(EntityPath.class))).thenReturn(query);
+        when(query.fetch()).thenReturn(
+                (List) new ArrayList<>(),
+                (List) new ArrayList<>(List.of(role(1L, "default"))),
+                (List) new ArrayList<>(List.of(role(1L, "default"))));
+        when(passwordEncoder.encode("w-new")).thenReturn("ENC");
+
+        UserSimpleDto dto = userDto(null, "unew", "w-new");
+        dto.setName("新用户");
+
+        service.syncFromLdap(List.of(dto), new ArrayList<>(), new java.util.HashMap<>());
+
+        verify(entityManager, atLeastOnce()).persist(any(User.class));
+    }
+
+    @Test
+    @DisplayName("syncUserByWeChatFromLdap：多级组织时按父节点写 parentId 并命中目标组织")
+    void syncUserByWeChatFromLdapMultiLevelOrgs() {
+        User existing = user(10L, EUnitType.Inner, UserStatus.OnJob);
+        existing.setPassword("pwd");
+        when(repository.findById(10L)).thenReturn(Optional.of(existing));
+        when(organizationUnitService.findById(100L)).thenReturn(Optional.empty());
+        when(organizationUnitService.findById(101L)).thenReturn(Optional.empty());
+
+        UserSimpleDto dto = userDto(10L, "u10", "w10");
+        service.syncUserByWeChatFromLdap(dto,
+                List.of(orgDto(100L, "A", null), orgDto(101L, "B", 100L)),
+                new OrganizationUnitUserDto(101L, 10L));
+
+        verify(organizationUnitService, times(2)).save(any(OrganizationUnit.class));
+        assertThat(existing.getOrganizationUnit()).extracting(OrganizationUnit::getId).containsExactly(101L);
+    }
+
+    @Test
+    @DisplayName("syncUserByWeChatFromLdap：组织与目标不一致时不绑定任何组织")
+    void syncUserByWeChatFromLdapWithoutMatchingOrg() {
+        when(repository.findById(11L)).thenReturn(Optional.empty());
+        stubSelectFromList(List.of(role(1L, "default")));
+        when(organizationUnitService.findById(200L)).thenReturn(Optional.of(orgUnit(200L, "ORG", null)));
+        when(passwordEncoder.encode("w11")).thenReturn("ENC");
+
+        UserSimpleDto dto = userDto(11L, "u11", "w11");
+        service.syncUserByWeChatFromLdap(dto,
+                List.of(orgDto(200L, "ORG", null)),
+                new OrganizationUnitUserDto(999L, 11L));
 
         verify(repository).save(any(User.class));
     }

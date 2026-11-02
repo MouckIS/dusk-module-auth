@@ -1,19 +1,22 @@
 package com.dusk.module.auth.service.impl;
 
+import com.alibaba.excel.EasyExcelFactory;
+import com.alibaba.excel.write.builder.ExcelWriterBuilder;
+import com.alibaba.excel.write.builder.ExcelWriterSheetBuilder;
 import com.dusk.common.core.exception.BusinessException;
-import com.dusk.module.auth.dto.auditlog.AuditLogDetailDto;
-import com.dusk.module.auth.dto.auditlog.AuditLogListDto;
-import com.dusk.module.auth.dto.auditlog.GetAuditLogsInput;
+import com.dusk.module.auth.dto.auditlog.*;
 import com.dusk.module.auth.repository.IAuditLogRepository;
 import com.querydsl.core.types.Expression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.servlet.ServletOutputStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -29,11 +32,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.*;
 
 /**
  * {@link AuditLogServiceImpl} 单元测试，目标：100% 分支覆盖。
@@ -238,14 +238,87 @@ class AuditLogServiceImplTest {
     // ---------------- exportLog ----------------
 
     /*
-     * exportLog 未纳入单元测试：末尾调用 EasyExcel.write(...).sheet().doWrite(...) 写出工作簿，
-     * 而当前依赖树中 commons-io 被解析为 2.5（经 weixin-java-miniapp 传递），
-     * 缺少 easyexcel:4.0.3 依赖的 org.apache.commons.io.output.UnsynchronizedByteArrayOutputStream，
-     * 任何 Excel 写出都会抛 ExcelGenerateException/NoClassDefFoundError。
-     *
-     * 该缺陷同时影响 RoleServiceImpl 权限模板导出、SubscribableEditionServiceImpl.export、
-     * UserServiceImpl.getUsersToExcel 等全部导出链路，属生产级问题。
-     * 按仓库约定（依赖版本须由 dusk-dependencies BOM 统一管理，不得在本模块自行添加版本），
-     * 此处不擅自修改 pom，待 BOM 侧将 commons-io 升至 >= 2.12 后补齐本段测试。
+     * exportLog 末尾调用 EasyExcel.write(...).sheet().doWrite(...)。当前依赖树中 commons-io 被解析为 2.5
+     * （经 weixin-java-miniapp 传递），缺少 easyexcel:4.0.3 依赖的
+     * org.apache.commons.io.output.UnsynchronizedByteArrayOutputStream，真实写出会抛
+     * ExcelGenerateException/NoClassDefFoundError。因此这里用静态 mock 替换 EasyExcel 的写出入口，
+     * 只验证查询构造、DTO 映射与写出调用；该依赖缺陷属生产级问题，不在测试侧修复。
      */
+
+    @Test
+    @DisplayName("exportLog：全部过滤条件命中时构造查询并写出工作簿")
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    void exportLogWithAllFilters() {
+        JPAQuery query = stubQuery();
+        when(query.fetch()).thenReturn(List.of(detail()));
+
+        ExportAuditLogsInput input = new ExportAuditLogsInput();
+        input.setStartDate(LocalDateTime.of(2026, 1, 1, 0, 0));
+        input.setEndDate(LocalDateTime.of(2026, 1, 2, 0, 0));
+        input.setUserName("tester");
+        input.setServiceName("auth");
+        input.setMethodName("login");
+        input.setBrowserInfo("Chrome");
+        input.setHasException(true);
+
+        ExcelWriterBuilder builder = mock(ExcelWriterBuilder.class);
+        ExcelWriterSheetBuilder sheetBuilder = mock(ExcelWriterSheetBuilder.class);
+        when(builder.sheet()).thenReturn(sheetBuilder);
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+
+        try (MockedStatic<EasyExcelFactory> mocked = mockStatic(EasyExcelFactory.class)) {
+            mocked.when(() -> EasyExcelFactory.write(outputStream, AuditLogExportDto.class)).thenReturn(builder);
+
+            service.exportLog(input, outputStream);
+        }
+
+        verify(sheetBuilder).doWrite(anyList());
+    }
+
+    @Test
+    @DisplayName("exportLog：hasException 为空时不追加异常过滤")
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    void exportLogWithoutExceptionFilter() {
+        JPAQuery query = stubQuery();
+        when(query.fetch()).thenReturn(List.of());
+
+        ExportAuditLogsInput input = new ExportAuditLogsInput();
+
+        ExcelWriterBuilder builder = mock(ExcelWriterBuilder.class);
+        ExcelWriterSheetBuilder sheetBuilder = mock(ExcelWriterSheetBuilder.class);
+        when(builder.sheet()).thenReturn(sheetBuilder);
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+
+        try (MockedStatic<EasyExcelFactory> mocked = mockStatic(EasyExcelFactory.class)) {
+            mocked.when(() -> EasyExcelFactory.write(outputStream, AuditLogExportDto.class)).thenReturn(builder);
+
+            service.exportLog(input, outputStream);
+        }
+
+        verify(sheetBuilder).doWrite(anyList());
+    }
+
+    @Test
+    @DisplayName("exportLog：无过滤条件且 hasException=false 时写出空数据")
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    void exportLogWithoutFiltersAndNoException() {
+        JPAQuery query = stubQuery();
+        when(query.fetch()).thenReturn(List.of());
+
+        ExportAuditLogsInput input = new ExportAuditLogsInput();
+        input.setHasException(false);
+
+        ExcelWriterBuilder builder = mock(ExcelWriterBuilder.class);
+        ExcelWriterSheetBuilder sheetBuilder = mock(ExcelWriterSheetBuilder.class);
+        when(builder.sheet()).thenReturn(sheetBuilder);
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+
+        try (MockedStatic<EasyExcelFactory> mocked = mockStatic(EasyExcelFactory.class)) {
+            mocked.when(() -> EasyExcelFactory.write(outputStream, AuditLogExportDto.class)).thenReturn(builder);
+
+            service.exportLog(input, outputStream);
+        }
+
+        verify(sheetBuilder).doWrite(anyList());
+    }
 }

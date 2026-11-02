@@ -2,13 +2,13 @@ package com.dusk.module.auth.service.impl;
 
 import com.dusk.common.mqs.utils.MqttUtils;
 import com.dusk.module.auth.dto.ToDoDto;
-import com.dusk.module.auth.enums.ToDoTargetType;
-import com.dusk.module.auth.service.IUserRpcService;
 import com.dusk.module.auth.entity.Todo;
 import com.dusk.module.auth.entity.TodoPermission;
 import com.dusk.module.auth.enums.ToDoMQTTTypeEnum;
+import com.dusk.module.auth.enums.ToDoTargetType;
 import com.dusk.module.auth.manage.IUserManage;
-import com.dusk.module.notification.service.INotificationPushRpcServicve;
+import com.dusk.module.auth.service.IUserRpcService;
+import com.dusk.module.notification.service.IAuthPushRpcService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,12 +22,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * {@link ToDoPushServiceImpl} 单元测试，目标：100% 分支覆盖。
@@ -43,7 +39,7 @@ class ToDoPushServiceImplTest {
     @Mock
     private IUserRpcService userRpcService;
     @Mock
-    private INotificationPushRpcServicve pushManager;
+    private IAuthPushRpcService pushRpcService;
 
     private ToDoPushServiceImpl service;
 
@@ -53,7 +49,7 @@ class ToDoPushServiceImplTest {
         ReflectionTestUtils.setField(service, "mqttUtils", mqttUtils);
         ReflectionTestUtils.setField(service, "userManage", userManage);
         ReflectionTestUtils.setField(service, "userRpcService", userRpcService);
-        ReflectionTestUtils.setField(service, "pushManager", pushManager);
+        ReflectionTestUtils.setField(service, "pushRpcService", pushRpcService);
     }
 
     private static Todo todo(ToDoTargetType type, String... permissions) {
@@ -123,7 +119,7 @@ class ToDoPushServiceImplTest {
 
         service.pushMsg(todo(ToDoTargetType.UserId, "3"), dto, ToDoMQTTTypeEnum.ADD);
 
-        verify(pushManager, never()).mobilePush(any(), any(), any(), any());
+        verify(pushRpcService, never()).pushAppMsg(any(), any(), any(), any());
     }
 
     @Test
@@ -136,13 +132,13 @@ class ToDoPushServiceImplTest {
 
         service.pushMsg(todo(ToDoTargetType.UserId, "3"), dto, ToDoMQTTTypeEnum.ADD);
 
-        verify(pushManager).mobilePush(any(), any(), any(), any());
+        verify(pushRpcService).pushAppMsg(any(), any(), any(), any());
     }
 
     @Test
     @DisplayName("pushMsg：开启推送且标题/正文已设置，推送管理器不可用时只记录日志")
     void pushMsgUsesProvidedAppFieldsWithoutPushManager() {
-        ReflectionTestUtils.setField(service, "pushManager", null);
+        ReflectionTestUtils.setField(service, "pushRpcService", null);
 
         ToDoDto dto = dto();
         dto.setAutoAppPush(true);
@@ -151,6 +147,6 @@ class ToDoPushServiceImplTest {
 
         service.pushMsg(todo(ToDoTargetType.UserId, "3"), dto, ToDoMQTTTypeEnum.ADD);
 
-        verify(pushManager, never()).mobilePush(any(), any(), any(), any());
+        verify(pushRpcService, never()).pushAppMsg(any(), any(), any(), any());
     }
 }

@@ -3,10 +3,10 @@ package com.dusk.module.auth.service.impl;
 import com.dusk.common.core.auth.permission.MultiTenancySides;
 import com.dusk.common.core.auth.permission.Permission;
 import com.dusk.common.core.exception.BusinessException;
-import com.dusk.module.auth.dto.role.RolePermissionDto;
 import com.dusk.module.auth.common.config.AppAuthConfig;
 import com.dusk.module.auth.common.permission.IAuthPermissionManager;
 import com.dusk.module.auth.dto.permission.EditionPermissionInputDto;
+import com.dusk.module.auth.dto.role.RolePermissionDto;
 import com.dusk.module.auth.entity.SubscribableEdition;
 import com.dusk.module.auth.entity.Tenant;
 import com.dusk.module.auth.entity.TenantPermission;
@@ -37,11 +37,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * {@link TenantPermissionServiceImpl} 单元测试，目标：100% 分支覆盖。
@@ -60,6 +56,8 @@ class TenantPermissionServiceImplTest {
     private ITenantPermissionRepository repository;
     @Mock
     private AppAuthConfig appAuthConfig;
+    @Mock
+    private com.dusk.module.auth.authz.version.TenantPermissionInvalidationService tenantPermissionInvalidationService;
 
     private TenantPermissionServiceImpl service;
 
@@ -71,6 +69,7 @@ class TenantPermissionServiceImplTest {
         ReflectionTestUtils.setField(service, "tenantRepository", tenantRepository);
         ReflectionTestUtils.setField(service, "repository", repository);
         ReflectionTestUtils.setField(service, "appAuthConfig", appAuthConfig);
+        ReflectionTestUtils.setField(service, "tenantPermissionInvalidationService", tenantPermissionInvalidationService);
     }
 
     private static Permission permission(String name) {

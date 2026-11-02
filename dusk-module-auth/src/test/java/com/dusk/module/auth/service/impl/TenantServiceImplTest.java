@@ -2,18 +2,14 @@ package com.dusk.module.auth.service.impl;
 
 import com.dusk.common.core.exception.BusinessException;
 import com.dusk.module.auth.common.permission.IAuthPermissionManager;
-import com.dusk.module.auth.dto.tenant.CreateTenantInput;
-import com.dusk.module.auth.dto.tenant.GetTenantsInput;
-import com.dusk.module.auth.dto.tenant.IsTenantAvailableInput;
-import com.dusk.module.auth.dto.tenant.IsTenantAvailableOutput;
-import com.dusk.module.auth.dto.tenant.TenantAvailabilityState;
-import com.dusk.module.auth.dto.tenant.TenantEditDto;
+import com.dusk.module.auth.dto.tenant.*;
 import com.dusk.module.auth.entity.SubscribableEdition;
 import com.dusk.module.auth.entity.Tenant;
 import com.dusk.module.auth.entity.User;
 import com.dusk.module.auth.repository.ITenantRepository;
 import com.dusk.module.auth.repository.IUserRepository;
 import com.dusk.module.auth.service.ISubscribableEditionService;
+import jakarta.persistence.criteria.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,18 +27,14 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * {@link TenantServiceImpl} 单元测试，目标：覆盖 service.impl 门禁包的租户生命周期逻辑。
@@ -282,6 +274,45 @@ class TenantServiceImplTest {
         verify(repository).save(any(Tenant.class));
     }
 
+    /**
+     * 触发 {@link Specification#toPredicate}，让 {@code Specifications.where(...)} 中的 lambda 真正执行。
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static void evaluateSpecification(Specification<?> specification) {
+        Root root = mock(Root.class);
+        CriteriaQuery<?> query = mock(CriteriaQuery.class);
+        CriteriaBuilder builder = mock(CriteriaBuilder.class);
+        Path path = mock(Path.class);
+        Join join = mock(Join.class);
+        Predicate conjunction = mock(Predicate.class);
+        when(root.get(anyString())).thenReturn(path);
+        when(root.join(anyString(), any(JoinType.class))).thenReturn(join);
+        when(join.get(anyString())).thenReturn(path);
+        when(conjunction.getExpressions()).thenReturn(new ArrayList<>());
+        when(builder.conjunction()).thenReturn(conjunction);
+        when(builder.disjunction()).thenReturn(conjunction);
+
+        ((Specification) specification).toPredicate(root, query, builder);
+    }
+
+    @Test
+    @DisplayName("updateTenant：非试用期选择付费版本时不校验免费版限制")
+    void updateTenant_paidEditionWithoutTrial() {
+        when(repository.findById(1L)).thenReturn(Optional.of(tenant(1L, "t1", true)));
+        when(repository.findByTenantName("t1")).thenReturn(Optional.of(tenant(1L, "t1", true)));
+        when(editionService.findById(8L)).thenReturn(Optional.of(edition(8L, BigDecimal.TEN)));
+        TenantEditDto dto = new TenantEditDto();
+        dto.setId(1L);
+        dto.setTenantName("t1");
+        dto.setEditionId(8L);
+        dto.setInTrialPeriod(false);
+        dto.setVersion(0);
+
+        service.updateTenant(dto);
+
+        verify(repository).save(any(Tenant.class));
+    }
+
     // ------------------------------------------------------------------
     // 查询 / 可用性
     // ------------------------------------------------------------------
@@ -382,5 +413,71 @@ class TenantServiceImplTest {
 
         verify(repository).deleteById(anyLong());
         verify(authPermissionManager).refreshAll();
+    }
+
+    @Test
+    @DisplayName("updateTenant：指定版本不存在时抛业务异常")
+    void updateTenant_editionNotFound() {
+        when(repository.findById(1L)).thenReturn(Optional.of(tenant(1L, "t1", true)));
+        when(repository.findByTenantName("t1")).thenReturn(Optional.of(tenant(1L, "t1", true)));
+        when(editionService.findById(404L)).thenReturn(Optional.empty());
+        TenantEditDto dto = new TenantEditDto();
+        dto.setId(1L);
+        dto.setTenantName("t1");
+        dto.setEditionId(404L);
+        dto.setVersion(0);
+
+        assertThatThrownBy(() -> service.updateTenant(dto))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("未找到相应的版本信息");
+    }
+
+    @Test
+    @DisplayName("getTenants：全部过滤条件对应的 Specification 可执行")
+    @SuppressWarnings("unchecked")
+    void getTenantsSpecificationWithAllFilters() {
+        when(repository.findAll(any(Specification.class), any(org.springframework.data.domain.Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(tenant(1L, "t1", true))));
+
+        GetTenantsInput input = new GetTenantsInput();
+        input.setFilter("abc");
+        input.setCreationDateStart(LocalDateTime.of(2026, 1, 1, 0, 0));
+        input.setCreationDateEnd(LocalDateTime.of(2026, 6, 1, 0, 0));
+        input.setSubscriptionEndDateStart(LocalDateTime.of(2026, 1, 1, 0, 0));
+        input.setSubscriptionEndDateEnd(LocalDateTime.of(2026, 12, 31, 0, 0));
+        input.setEditionId("3");
+
+        service.getTenants(input);
+
+        ArgumentCaptor<Specification<Tenant>> captor = ArgumentCaptor.forClass(Specification.class);
+        verify(repository).findAll(captor.capture(), any(org.springframework.data.domain.Pageable.class));
+        evaluateSpecification(captor.getValue());
+    }
+
+    @Test
+    @DisplayName("getTenants：无过滤条件对应的 Specification 可执行")
+    @SuppressWarnings("unchecked")
+    void getTenantsSpecificationWithoutFilters() {
+        when(repository.findAll(any(Specification.class), any(org.springframework.data.domain.Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of()));
+
+        service.getTenants(new GetTenantsInput());
+
+        ArgumentCaptor<Specification<Tenant>> captor = ArgumentCaptor.forClass(Specification.class);
+        verify(repository).findAll(captor.capture(), any(org.springframework.data.domain.Pageable.class));
+        evaluateSpecification(captor.getValue());
+    }
+
+    @Test
+    @DisplayName("countTenantsByEdition：Specification 可执行")
+    @SuppressWarnings("unchecked")
+    void countTenantsByEditionSpecification() {
+        when(repository.count(any(Specification.class))).thenReturn(1L);
+
+        service.countTenantsByEdition(5L);
+
+        ArgumentCaptor<Specification<Tenant>> captor = ArgumentCaptor.forClass(Specification.class);
+        verify(repository).count(captor.capture());
+        evaluateSpecification(captor.getValue());
     }
 }

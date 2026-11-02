@@ -1,5 +1,9 @@
 package com.dusk.module.auth.service.impl;
 
+import com.alibaba.excel.EasyExcelFactory;
+import com.alibaba.excel.read.builder.ExcelReaderBuilder;
+import com.alibaba.excel.read.builder.ExcelReaderSheetBuilder;
+import com.alibaba.excel.read.listener.ReadListener;
 import com.dusk.common.core.auth.authentication.LoginUserIdContextHolder;
 import com.dusk.common.core.datafilter.DataFilterContextHolder;
 import com.dusk.common.core.dto.EntityDto;
@@ -16,6 +20,7 @@ import com.dusk.module.metadata.enums.EnumResetType;
 import com.dusk.module.auth.dto.orga.CreateOrganizationUnitInput;
 import com.dusk.module.auth.dto.orga.GetOrganizationUnitUsersExtInput;
 import com.dusk.module.auth.dto.orga.GetOrganizationUnitUsersForSelectInput;
+import com.dusk.module.auth.dto.orga.ImportOrganizationExcelDto;
 import com.dusk.module.auth.dto.orga.MoveOrganizationUnitInput;
 import com.dusk.module.auth.dto.orga.OrganizationStationUnitDto;
 import com.dusk.module.auth.dto.orga.OrganizationUnitUserInfoListDto;
@@ -26,6 +31,7 @@ import com.dusk.module.auth.dto.station.StationsOfLoginUserDto;
 import com.dusk.module.auth.entity.OrganizationManager;
 import com.dusk.module.auth.entity.OrganizationUnit;
 import com.dusk.module.auth.entity.User;
+import com.dusk.module.auth.listener.ExcelDataListener;
 import com.dusk.module.auth.repository.IOrganizationManagerRepository;
 import com.dusk.module.auth.repository.IOrganizationUnitRepository;
 import com.dusk.module.auth.repository.IUserRepository;
@@ -36,13 +42,19 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPADeleteClause;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.MockedConstruction;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -53,23 +65,33 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -105,14 +127,14 @@ class OrganizationUnitServiceImplTest {
 
     private OrganizationUnitServiceImpl service;
 
-    @BeforeEach
-    void setUp() {
-        service = org.mockito.Mockito.spy(new OrganizationUnitServiceImpl());
-        ReflectionTestUtils.setField(service, "repository", repository);
-        ReflectionTestUtils.setField(service, "queryFactory", queryFactory);
-        ReflectionTestUtils.setField(service, "serialNoService", serialNoService);
-        ReflectionTestUtils.setField(service, "userRepository", userRepository);
-        ReflectionTestUtils.setField(service, "organizationManagerRepository", organizationManagerRepository);
+    private static ImportOrganizationExcelDto excelRow(String displayName, String parentOrg, String typeStr) {
+        ImportOrganizationExcelDto dto = new ImportOrganizationExcelDto();
+        dto.setRootName("R");
+        dto.setCode("code-" + displayName);
+        dto.setDisplayName(displayName);
+        dto.setParentOrg(parentOrg);
+        dto.setTypeStr(typeStr);
+        return dto;
     }
 
     @AfterEach
@@ -924,17 +946,14 @@ class OrganizationUnitServiceImplTest {
     // 序列号 / Excel 导入
     // ------------------------------------------------------------------
 
-    @Test
-    @DisplayName("getSerialNos：去除前导 0 后返回")
-    void getSerialNos_stripsLeadingZeros() {
-        OrganizationUnitServiceImpl real = new OrganizationUnitServiceImpl();
-        ReflectionTestUtils.setField(real, "serialNoService", serialNoService);
-        when(serialNoService.getSerialNos(anyString(), any(EnumResetType.class), anyString(), anyInt(), anyInt()))
-                .thenReturn(new String[]{"0001", "0002"});
-
-        String[] result = ReflectionTestUtils.invokeMethod(real, "getSerialNos", 2);
-
-        assertThat(result).containsExactly("1", "2");
+    @BeforeEach
+    void setUp() {
+        service = org.mockito.Mockito.spy(new OrganizationUnitServiceImpl());
+        ReflectionTestUtils.setField(service, "repository", repository);
+        ReflectionTestUtils.setField(service, "queryFactory", queryFactory);
+        ReflectionTestUtils.setField(service, "serialNoRpcService", serialNoService);
+        ReflectionTestUtils.setField(service, "userRepository", userRepository);
+        ReflectionTestUtils.setField(service, "organizationManagerRepository", organizationManagerRepository);
     }
 
     @Test
@@ -959,5 +978,282 @@ class OrganizationUnitServiceImplTest {
         assertThatThrownBy(() -> service.importUnitByExcel(file))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("boom");
+    }
+
+    // ------------------------------------------------------------------
+    // 组织树层级与父节点校验
+    // ------------------------------------------------------------------
+
+    @Test
+    @DisplayName("getSerialNos：去除前导 0 后返回")
+    void getSerialNos_stripsLeadingZeros() {
+        OrganizationUnitServiceImpl real = new OrganizationUnitServiceImpl();
+        ReflectionTestUtils.setField(real, "serialNoRpcService", serialNoService);
+        when(serialNoService.getSerialNos(anyString(), any(EnumResetType.class), anyString(), anyInt(), anyInt()))
+                .thenReturn(new String[]{"0001", "0002"});
+
+        String[] result = ReflectionTestUtils.invokeMethod(real, "getSerialNos", 2);
+
+        assertThat(result).containsExactly("1", "2");
+    }
+
+    @Test
+    @DisplayName("saveAll：空集合委托 TreeService 批量保存")
+    void saveAll_emptyIterable() {
+        when(repository.findAll()).thenReturn(List.of());
+        when(repository.saveAll(anyList())).thenReturn(List.of());
+
+        assertThat(service.saveAll(new ArrayList<OrganizationUnit>())).isEmpty();
+    }
+
+    @Test
+    @DisplayName("createExternalOrganization：内部人员创建根节点不受限制")
+    void createExternalOrganization_innerRootAllowed() {
+        LoginUserIdContextHolder.setUserId(1L);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user(1L, EUnitType.Inner)));
+        CreateOrganizationUnitInput input = new CreateOrganizationUnitInput();
+        input.setParentId(null);
+        input.setDisplayName("内部根节点");
+        doReturn(unit(104L, null, "104", "内部根节点", false, true))
+                .when(service).save(any(OrganizationUnit.class));
+        stubFindAllSpec(List.of());
+
+        assertThat(service.createExternalOrganization(input)).isNotNull();
+    }
+
+    @Test
+    @DisplayName("saveAllOrgas：新增节点带父节点时写入父子关系")
+    void saveAllOrgas_addWithParent() {
+        OrganizationUnit parent = unit(3L, 1L, "1/3", "parent", false, true);
+        doReturn(Optional.of(parent)).when(service).findById(3L);
+        doReturn(List.of()).when(service).getAncestors(3L);
+        echoSaveAll();
+
+        OrganizationUnitDto add = new OrganizationUnitDto();
+        add.setDisplayName("child");
+        add.setParentId(3L);
+
+        List<OrganizationUnitDto> result = service.saveAllOrgas(new ArrayList<>(List.of(add)));
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().getParentId()).isEqualTo(3L);
+    }
+
+    @Test
+    @DisplayName("saveAllOrgas：新增节点的父节点不存在抛业务异常")
+    void saveAllOrgas_addWithMissingParent() {
+        doReturn(Optional.empty()).when(service).findById(3L);
+        OrganizationUnitDto add = new OrganizationUnitDto();
+        add.setDisplayName("child");
+        add.setParentId(3L);
+
+        assertThatThrownBy(() -> service.saveAllOrgas(new ArrayList<>(List.of(add))))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("未找到相应的父组织机构");
+    }
+
+    @Test
+    @DisplayName("saveAllOrgas：更新节点父节点为 null 时跳过层级校验")
+    void saveAllOrgas_updateParentNull() {
+        OrganizationUnit existing = unit(7L, 1L, "1/7", "old", false, true);
+        when(repository.findAllById(anyList())).thenReturn(List.of(existing));
+        echoSaveAll();
+
+        OrganizationUnitDto upd = new OrganizationUnitDto();
+        upd.setId(7L);
+        upd.setParentId(null);
+
+        List<OrganizationUnitDto> result = service.saveAllOrgas(new ArrayList<>(List.of(upd)));
+
+        assertThat(result).hasSize(1);
+        assertThat(existing.getParentId()).isNull();
+        verify(service, never()).getParentOrganizations(any(EntityDto.class));
+    }
+
+    @Test
+    @DisplayName("saveAllOrgas：更新节点父节点未变化时跳过层级校验")
+    void saveAllOrgas_updateParentUnchanged() {
+        OrganizationUnit existing = unit(7L, 1L, "1/7", "old", false, true);
+        when(repository.findAllById(anyList())).thenReturn(List.of(existing));
+        echoSaveAll();
+
+        OrganizationUnitDto upd = new OrganizationUnitDto();
+        upd.setId(7L);
+        upd.setParentId(1L);
+
+        service.saveAllOrgas(new ArrayList<>(List.of(upd)));
+
+        assertThat(existing.getParentId()).isEqualTo(1L);
+        verify(service, never()).getParentOrganizations(any(EntityDto.class));
+    }
+
+    @Test
+    @DisplayName("setParent：把自身或子孙设为父节点时抛业务异常")
+    void setParent_updateParentCycle() {
+        OrganizationUnit existing = unit(7L, 1L, "1/7", "old", false, true);
+        doReturn(Optional.of(unit(3L, null, "3", "p", false, true))).when(service).findById(3L);
+        doReturn(List.of(existing)).when(service).getParentOrganizations(any(EntityDto.class));
+
+        assertThatThrownBy(() -> ReflectionTestUtils.invokeMethod(service, "setParent", existing, 3L))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("不能选择子组织机构");
+    }
+
+    @Test
+    @DisplayName("saveAllOrgas：仓储返回的实体不在更新清单中时原样保留")
+    void saveAllOrgas_updateEntityNotInInput() {
+        OrganizationUnit existing = unit(8L, 1L, "1/8", "untouched", false, true);
+        when(repository.findAllById(anyList())).thenReturn(List.of(existing));
+        echoSaveAll();
+
+        OrganizationUnitDto upd = new OrganizationUnitDto();
+        upd.setId(7L);
+        upd.setDisplayName("changed");
+
+        List<OrganizationUnitDto> result = service.saveAllOrgas(new ArrayList<>(List.of(upd)));
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().getDisplayName()).isEqualTo("untouched");
+    }
+
+    @Test
+    @DisplayName("setParent：父节点为空时直接清空 parentId")
+    void setParent_nullParentId() {
+        OrganizationUnit org = unit(7L, 1L, "1/7", "org", false, true);
+
+        ReflectionTestUtils.invokeMethod(service, "setParent", org, (Long) null);
+
+        assertThat(org.getParentId()).isNull();
+        verify(service, never()).findById(anyLong());
+    }
+
+    @Test
+    @DisplayName("getOrganizationUnitUsers（分页重载）：orgIds 显式传 null 时不追加条件")
+    void getOrganizationUnitUsers_pagedOverloadNullOrgIds() {
+        when(repository.getOrganizationUnitUsers(any(), any(), any(), any()))
+                .thenReturn(new PageImpl<>(List.of()));
+
+        PagedResultDto<OrganizationUnitUserListDto> result =
+                service.getOrganizationUnitUsers(new PagedAndSortedInputDto(), "f", false, (Long[]) null);
+
+        assertThat(result.getItems()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("getStationTreeByUserId：重复厂站只保留一次，重复子节点提前返回")
+    void getStationTreeByUserId_duplicateStations() {
+        OrganizationUnit station = unit(10L, null, "1/10", "st", true, true);
+        OrganizationUnit mid = unit(20L, 10L, "1/10/20", "mid", false, true);
+        OrganizationUnit midAgain = unit(20L, 10L, "1/10/20", "mid", false, true);
+        OrganizationUnit leaf = unit(30L, 20L, "1/10/20/30", "leaf", true, true);
+        doReturn(List.of(station, station)).when(service).getStationsByUserId(1L);
+        doReturn(List.of(mid, midAgain, leaf)).when(service).findDescendants(10L);
+
+        assertThat(service.getStationTreeByUserId(1L))
+                .extracting(OrganizationUnit::getId)
+                .containsExactly(10L, 20L);
+    }
+
+    @Test
+    @DisplayName("validDisplayNameUnique：两种父节点形态的规格条件均可求值")
+    void validDisplayNameUnique_specificationEvaluated() {
+        doReturn(unit(110L, null, "110", "root", false, true),
+                unit(111L, 3L, "3/111", "child", false, true))
+                .when(service).save(any(OrganizationUnit.class));
+        stubFindAllSpec(List.of());
+
+        CreateOrganizationUnitInput root = new CreateOrganizationUnitInput();
+        root.setDisplayName("root");
+        root.setParentId(null);
+        service.create(root);
+
+        CreateOrganizationUnitInput child = new CreateOrganizationUnitInput();
+        child.setDisplayName("child");
+        child.setParentId(3L);
+        service.create(child);
+
+        ArgumentCaptor<Specification<OrganizationUnit>> captor = ArgumentCaptor.forClass(Specification.class);
+        verify(service, times(2)).findAll(captor.capture());
+        Root<OrganizationUnit> rootMock = mock(Root.class);
+        CriteriaQuery<?> queryMock = mock(CriteriaQuery.class);
+        CriteriaBuilder builderMock = mock(CriteriaBuilder.class);
+        for (Specification<OrganizationUnit> specification : captor.getAllValues()) {
+            assertThat(specification.toPredicate(rootMock, queryMock, builderMock)).isNull();
+        }
+    }
+
+    @Test
+    @DisplayName("importUnitByExcel：两级组织按内外单位挂载父节点并批量保存")
+    void importUnitByExcel_importsHierarchy() throws IOException {
+        LoginUserIdContextHolder.setUserId(1L);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user(1L, EUnitType.Inner)));
+        stubFindAllSpec(List.of());
+
+        AtomicInteger rootId = new AtomicInteger(100);
+        doAnswer(inv -> {
+            OrganizationUnit saved = inv.getArgument(0);
+            if (saved.getId() == null) {
+                saved.setId((long) rootId.getAndIncrement());
+            }
+            return saved;
+        }).when(service).save(any(OrganizationUnit.class));
+
+        List<List<OrganizationUnit>> batches = new ArrayList<>();
+        AtomicInteger unitId = new AtomicInteger(200);
+        doAnswer(inv -> {
+            Iterable<OrganizationUnit> iterable = inv.getArgument(0);
+            List<OrganizationUnit> saved = new ArrayList<>();
+            for (OrganizationUnit u : iterable) {
+                u.setId((long) unitId.getAndIncrement());
+                saved.add(u);
+            }
+            batches.add(saved);
+            return saved;
+        }).when(service).saveAll(anyList());
+
+        Map<Integer, List<ImportOrganizationExcelDto>> importData = new LinkedHashMap<>();
+        importData.put(1, List.of(excelRow("A", "", "INNER"), excelRow("D", "", "EXTERNAL")));
+        importData.put(2, List.of(excelRow("B", "A", "INNER"), excelRow("E", "D", "EXTERNAL")));
+
+        try (MockedStatic<EasyExcelFactory> excel = mockStatic(EasyExcelFactory.class);
+             MockedConstruction<ExcelDataListener> listener =
+                     mockConstruction(ExcelDataListener.class, (mockListener, context) -> {
+                         when(mockListener.getRootUnitName()).thenReturn("R");
+                         when(mockListener.getMap()).thenReturn(importData);
+                     })) {
+            ExcelReaderBuilder readerBuilder = mock(ExcelReaderBuilder.class, Answers.RETURNS_SELF);
+            ExcelReaderSheetBuilder sheetBuilder = mock(ExcelReaderSheetBuilder.class, Answers.RETURNS_SELF);
+            when(readerBuilder.sheet()).thenReturn(sheetBuilder);
+            excel.when(() -> EasyExcelFactory.read(any(InputStream.class), any(Class.class),
+                            any(ReadListener.class)))
+                    .thenReturn(readerBuilder);
+
+            MultipartFile file = mock(MultipartFile.class);
+            when(file.getInputStream()).thenReturn(new ByteArrayInputStream(new byte[]{1}));
+            service.importUnitByExcel(file);
+        }
+
+        assertThat(batches).hasSize(2);
+        Map<String, OrganizationUnit> saved = batches.stream()
+                .flatMap(List::stream)
+                .collect(Collectors.toMap(OrganizationUnit::getDisplayName, u -> u));
+        assertThat(saved).containsOnlyKeys("A", "B", "D", "E");
+        assertThat(saved.get("A").getParentId()).isEqualTo(100L);
+        assertThat(saved.get("D").getParentId()).isEqualTo(101L);
+        assertThat(saved.get("A").getType()).isEqualTo(EUnitType.Inner);
+        assertThat(saved.get("D").getType()).isEqualTo(EUnitType.External);
+        assertThat(saved.get("B").getParentId()).isEqualTo(saved.get("A").getId());
+        assertThat(saved.get("E").getParentId()).isEqualTo(saved.get("D").getId());
+        assertThat(saved.get("B").getType()).isEqualTo(EUnitType.Inner);
+        assertThat(saved.get("E").getType()).isEqualTo(EUnitType.External);
+    }
+
+    private void echoSaveAll() {
+        doAnswer(inv -> {
+            Iterable<OrganizationUnit> iterable = inv.getArgument(0);
+            List<OrganizationUnit> result = new ArrayList<>();
+            iterable.forEach(result::add);
+            return result;
+        }).when(service).saveAll(anyList());
     }
 }

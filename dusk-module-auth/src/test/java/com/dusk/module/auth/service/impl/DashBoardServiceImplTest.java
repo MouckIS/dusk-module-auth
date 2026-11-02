@@ -5,34 +5,12 @@ import com.dusk.common.core.exception.BusinessException;
 import com.dusk.module.auth.dto.RoleSimpleDto;
 import com.dusk.module.auth.dto.UserFullListDto;
 import com.dusk.module.auth.dto.UserRoleDto;
+import com.dusk.module.auth.dto.dashboard.*;
 import com.dusk.module.auth.dto.role.RoleListDto;
+import com.dusk.module.auth.entity.dashboard.*;
+import com.dusk.module.auth.repository.dashboard.*;
 import com.dusk.module.auth.service.IRoleRpcService;
 import com.dusk.module.auth.service.IUserRpcService;
-import com.dusk.module.auth.dto.dashboard.ClassifyDetailDto;
-import com.dusk.module.auth.dto.dashboard.CreateOrUpdateClassify;
-import com.dusk.module.auth.dto.dashboard.CreateOrUpdateDashBoardPermission;
-import com.dusk.module.auth.dto.dashboard.CreateOrUpdateTheme;
-import com.dusk.module.auth.dto.dashboard.CreateOrUpdateZone;
-import com.dusk.module.auth.dto.dashboard.CreateOrUpdateZoneItemRef;
-import com.dusk.module.auth.dto.dashboard.GetThemeInput;
-import com.dusk.module.auth.dto.dashboard.RemoveDashBoardPermission;
-import com.dusk.module.auth.dto.dashboard.ThemeDetailDto;
-import com.dusk.module.auth.dto.dashboard.ThemeListDto;
-import com.dusk.module.auth.dto.dashboard.UserMainDashBoardDto;
-import com.dusk.module.auth.entity.dashboard.DashboardClassify;
-import com.dusk.module.auth.entity.dashboard.DashboardModule;
-import com.dusk.module.auth.entity.dashboard.DashboardModuleItem;
-import com.dusk.module.auth.entity.dashboard.DashboardPermission;
-import com.dusk.module.auth.entity.dashboard.DashboardTheme;
-import com.dusk.module.auth.entity.dashboard.DashboardZone;
-import com.dusk.module.auth.entity.dashboard.DashboardZoneItemRef;
-import com.dusk.module.auth.repository.dashboard.IDashBoardClassifyRepository;
-import com.dusk.module.auth.repository.dashboard.IDashBoardModuleItemRepository;
-import com.dusk.module.auth.repository.dashboard.IDashBoardModuleRepository;
-import com.dusk.module.auth.repository.dashboard.IDashBoardPermissionRepository;
-import com.dusk.module.auth.repository.dashboard.IDashBoardThemeRepository;
-import com.dusk.module.auth.repository.dashboard.IDashBoardZoneItemRefRepository;
-import com.dusk.module.auth.repository.dashboard.IDashBoardZoneRepository;
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Predicate;
@@ -58,12 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * {@link DashBoardServiceImpl} 单元测试，目标：覆盖 service.impl 门禁包的数据大屏主题/栏目/区域逻辑。
@@ -612,5 +585,59 @@ class DashBoardServiceImplTest {
 
         assertThat(service.getThemeList(input).getItems()).isEmpty();
         verify(query).where(any(Predicate.class));
+    }
+
+    @Test
+    @DisplayName("saveTheme：名称重复但为自身时允许更新")
+    void saveTheme_sameIdAllowed() {
+        CreateOrUpdateTheme input = new CreateOrUpdateTheme();
+        input.setName("th");
+        input.setId(1L);
+        when(themeRepository.findAllByName("th")).thenReturn(List.of(theme(1L, "th", false)));
+        DashboardTheme updated = theme(1L, "th", false);
+        doReturn(updated).when(service).createOrUpdate(any(), any(), any(Class.class));
+
+        assertThat(service.saveTheme(input)).isSameAs(updated);
+    }
+
+    @Test
+    @DisplayName("getDashBoardThemeByUserId：用户角色为 null 时返回空列表")
+    void getDashBoardThemeByUserId_nullRoles() {
+        UserFullListDto user = new UserFullListDto();
+        user.setUserRoles(null);
+        when(userRpcService.getUserFullById(1L)).thenReturn(user);
+
+        assertThat(service.getDashBoardThemeByUserId(1L)).isEmpty();
+    }
+
+    @Test
+    @DisplayName("getUserMainDashBoard：用户角色为 null 时返回无权限")
+    void getUserMainDashBoard_nullRoles() {
+        when(themeRepository.findFirstByMainPage(true)).thenReturn(theme(1L, "th", true));
+        UserFullListDto user = new UserFullListDto();
+        user.setUserRoles(null);
+        when(userRpcService.getUserFullById(1L)).thenReturn(user);
+
+        UserMainDashBoardDto result = service.getUserMainDashBoard(1L);
+
+        assertThat(result.getMainDashBoardId()).isNull();
+        assertThat(result.getPermission()).isFalse();
+    }
+
+    @Test
+    @DisplayName("getUserMainDashBoard：未命中角色授权时返回主大屏 id 但无权限")
+    void getUserMainDashBoard_permissionMissing() {
+        when(themeRepository.findFirstByMainPage(true)).thenReturn(theme(1L, "th", true));
+        UserFullListDto user = new UserFullListDto();
+        user.setUserRoles(new ArrayList<>(List.of(userRole(7L))));
+        when(userRpcService.getUserFullById(1L)).thenReturn(user);
+        JPAQuery query = mock(JPAQuery.class, Answers.RETURNS_SELF);
+        when(queryFactory.selectFrom(any(EntityPath.class))).thenReturn(query);
+        when(query.fetchCount()).thenReturn(0L);
+
+        UserMainDashBoardDto result = service.getUserMainDashBoard(1L);
+
+        assertThat(result.getMainDashBoardId()).isEqualTo(1L);
+        assertThat(result.getPermission()).isFalse();
     }
 }

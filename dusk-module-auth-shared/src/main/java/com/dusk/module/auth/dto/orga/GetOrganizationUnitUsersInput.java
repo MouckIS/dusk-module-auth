@@ -44,14 +44,15 @@ public class GetOrganizationUnitUsersInput extends PagedAndSortedInputDto {
             return getDefaultSort();
         }
 
-        if (OrganizationUnitUserListDto.Fields.organizationUnitId.equals(sorting)) {
-            sorting = BaseEntity.Fields.id;
-        } else if (OrganizationUnitUserListDto.Fields.organizationUnitName.equals(sorting)) {
-            sorting = TreeEntity.Fields.displayName;
+        String sortField = sorting;
+        if (OrganizationUnitUserListDto.Fields.organizationUnitId.equals(sortField)) {
+            sortField = BaseEntity.Fields.id;
+        } else if (OrganizationUnitUserListDto.Fields.organizationUnitName.equals(sortField)) {
+            sortField = TreeEntity.Fields.displayName;
         } else {
-            sorting = "u." + sorting;
+            sortField = "u." + sortField;
         }
 
-        return Sort.by(sortingDirection, sorting);
+        return Sort.by(sortingDirection, sortField);
     }
 }

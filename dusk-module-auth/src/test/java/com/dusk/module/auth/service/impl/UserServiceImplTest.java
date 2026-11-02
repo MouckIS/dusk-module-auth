@@ -1,5 +1,7 @@
 package com.dusk.module.auth.service.impl;
 
+import cn.hutool.core.util.HexUtil;
+import cn.hutool.crypto.SmUtil;
 import com.dusk.common.core.auth.authentication.LoginUserIdContextHolder;
 import com.dusk.common.core.dto.EntityDto;
 import com.dusk.common.core.enums.EUnitType;
@@ -20,15 +22,12 @@ import com.dusk.module.auth.dto.CreateOrUpdateUserInput;
 import com.dusk.module.auth.dto.UserEditDto;
 import com.dusk.module.auth.dto.orga.GetOrganizationUnitUsersInput;
 import com.dusk.module.auth.dto.orga.OrganizationUnitUserListDto;
+import com.dusk.module.auth.dto.station.StationsOfLoginUserDto;
 import com.dusk.module.auth.dto.user.*;
-import com.dusk.module.auth.entity.OrganizationManager;
-import com.dusk.module.auth.entity.OrganizationUnit;
-import com.dusk.module.auth.entity.Role;
-import com.dusk.module.auth.entity.Station;
-import com.dusk.module.auth.entity.Tenant;
-import com.dusk.module.auth.entity.User;
+import com.dusk.module.auth.entity.*;
 import com.dusk.module.auth.enums.ELevel;
 import com.dusk.module.auth.feature.UserFeatureProvider;
+import com.dusk.module.auth.mapper.RoleMapper;
 import com.dusk.module.auth.repository.IGrantPermissionRepository;
 import com.dusk.module.auth.repository.IOrganizationManagerRepository;
 import com.dusk.module.auth.repository.ITenantRepository;
@@ -38,28 +37,27 @@ import com.dusk.module.auth.service.IOrganizationUnitService;
 import com.dusk.module.auth.service.IRoleService;
 import com.dusk.module.auth.service.IStationService;
 import com.dusk.module.metadata.service.ISettingRpcService;
+import com.dusk.module.notification.service.IAuthPushRpcService;
 import com.dusk.module.notification.service.IEmailRpcService;
-import com.dusk.module.notification.service.INotificationPushRpcServicve;
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -71,13 +69,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyBoolean;
 
 /**
  * {@link UserServiceImpl} 单元测试。
@@ -118,9 +113,9 @@ class UserServiceImplTest {
     @Mock
     private SmsPushConfig smsPushConfig;
     @Mock
-    private INotificationPushRpcServicve pushManager;
+    private IAuthPushRpcService pushRpcService;
     @Mock
-    private IEmailRpcService emailService;
+    private IEmailRpcService emailRpcService;
     @Mock
     private TokenAuthManager tokenAuthManager;
     @Mock
@@ -135,36 +130,33 @@ class UserServiceImplTest {
     private MessageSender sender;
     @Mock
     private EntityManager entityManager;
+    @Mock
+    private com.dusk.module.auth.authz.version.AuthzSubjectVersionService authzSubjectVersionService;
+    @Mock
+    private com.dusk.module.auth.authz.service.AuthzEventPublisher authzEventPublisher;
 
     private UserServiceImpl service;
 
-    @BeforeEach
-    void setUp() {
-        service = spy(new UserServiceImpl());
-        ReflectionTestUtils.setField(service, "repository", userRepository);
-        ReflectionTestUtils.setField(service, "em", entityManager);
-        ReflectionTestUtils.setField(service, "userRepository", userRepository);
-        ReflectionTestUtils.setField(service, "grantPermissionRepository", grantPermissionRepository);
-        ReflectionTestUtils.setField(service, "passwordEncoder", passwordEncoder);
-        ReflectionTestUtils.setField(service, "roleService", roleService);
-        ReflectionTestUtils.setField(service, "organizationUnitService", organizationUnitService);
-        ReflectionTestUtils.setField(service, "featureChecker", featureChecker);
-        ReflectionTestUtils.setField(service, "redisUtil", redisUtil);
-        ReflectionTestUtils.setField(service, "queryFactory", queryFactory);
-        ReflectionTestUtils.setField(service, "tenantRepository", tenantRepository);
-        ReflectionTestUtils.setField(service, "appAuthConfig", appAuthConfig);
-        ReflectionTestUtils.setField(service, "smsPushConfig", smsPushConfig);
-        ReflectionTestUtils.setField(service, "pushManager", pushManager);
-        ReflectionTestUtils.setField(service, "emailService", emailService);
-        ReflectionTestUtils.setField(service, "tokenAuthManager", tokenAuthManager);
-        ReflectionTestUtils.setField(service, "securityUtils", securityUtils);
-        ReflectionTestUtils.setField(service, "organizationManagerRepository", organizationManagerRepository);
-        ReflectionTestUtils.setField(service, "stationService", stationService);
-        ReflectionTestUtils.setField(service, "settingRpcService", settingRpcService);
-        ReflectionTestUtils.setField(service, "sender", sender);
-        ReflectionTestUtils.setField(service, "passwdLen", 8);
-        ReflectionTestUtils.setField(service, "activeAddr", "http://active");
-        when(appAuthConfig.getLoginEncryptKey()).thenReturn(null);
+    /**
+     * 触发 {@link Specification#toPredicate}，让 {@code Specifications.where(...)} 中的 lambda 真正执行。
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static void evaluateSpecification(Specification<?> specification) {
+        Root root = mock(Root.class);
+        CriteriaQuery<?> query = mock(CriteriaQuery.class);
+        CriteriaBuilder builder = mock(CriteriaBuilder.class);
+        Path path = mock(Path.class);
+        Join join = mock(Join.class);
+        jakarta.persistence.criteria.Predicate conjunction =
+                mock(jakarta.persistence.criteria.Predicate.class);
+        when(root.get(anyString())).thenReturn(path);
+        when(root.join(anyString(), any(JoinType.class))).thenReturn(join);
+        when(join.get(anyString())).thenReturn(path);
+        when(conjunction.getExpressions()).thenReturn(new ArrayList<>());
+        when(builder.conjunction()).thenReturn(conjunction);
+        when(builder.disjunction()).thenReturn(conjunction);
+
+        ((Specification) specification).toPredicate(root, query, builder);
     }
 
     @AfterEach
@@ -932,6 +924,37 @@ class UserServiceImplTest {
                 .hasMessageContaining("用户数超出当前限制");
     }
 
+    @BeforeEach
+    void setUp() {
+        service = spy(new UserServiceImpl());
+        ReflectionTestUtils.setField(service, "repository", userRepository);
+        ReflectionTestUtils.setField(service, "em", entityManager);
+        ReflectionTestUtils.setField(service, "userRepository", userRepository);
+        ReflectionTestUtils.setField(service, "grantPermissionRepository", grantPermissionRepository);
+        ReflectionTestUtils.setField(service, "passwordEncoder", passwordEncoder);
+        ReflectionTestUtils.setField(service, "roleService", roleService);
+        ReflectionTestUtils.setField(service, "organizationUnitService", organizationUnitService);
+        ReflectionTestUtils.setField(service, "featureChecker", featureChecker);
+        ReflectionTestUtils.setField(service, "redisUtil", redisUtil);
+        ReflectionTestUtils.setField(service, "queryFactory", queryFactory);
+        ReflectionTestUtils.setField(service, "tenantRepository", tenantRepository);
+        ReflectionTestUtils.setField(service, "appAuthConfig", appAuthConfig);
+        ReflectionTestUtils.setField(service, "smsPushConfig", smsPushConfig);
+        ReflectionTestUtils.setField(service, "pushRpcService", pushRpcService);
+        ReflectionTestUtils.setField(service, "emailRpcService", emailRpcService);
+        ReflectionTestUtils.setField(service, "tokenAuthManager", tokenAuthManager);
+        ReflectionTestUtils.setField(service, "securityUtils", securityUtils);
+        ReflectionTestUtils.setField(service, "organizationManagerRepository", organizationManagerRepository);
+        ReflectionTestUtils.setField(service, "stationService", stationService);
+        ReflectionTestUtils.setField(service, "settingRpcService", settingRpcService);
+        ReflectionTestUtils.setField(service, "sender", sender);
+        ReflectionTestUtils.setField(service, "passwdLen", 8);
+        ReflectionTestUtils.setField(service, "activeAddr", "http://active");
+        ReflectionTestUtils.setField(service, "authzSubjectVersionService", authzSubjectVersionService);
+        ReflectionTestUtils.setField(service, "authzEventPublisher", authzEventPublisher);
+        when(appAuthConfig.getLoginEncryptKey()).thenReturn(null);
+    }
+
     @Test
     @DisplayName("createUser：随机密码模式发送邮件并创建用户")
     void createUserWithRandomPassword() {
@@ -949,25 +972,7 @@ class UserServiceImplTest {
         });
 
         assertThat(service.createUser(input, EUnitType.Inner)).isEqualTo(102L);
-        verify(emailService).sendEmail(anyString(), anyString(), anyString());
-    }
-
-    @Test
-    @DisplayName("createUser：邮箱发送失败时包装为业务异常")
-    void createUserThrowsWhenMailFails() {
-        CreateOrUpdateUserInput input = new CreateOrUpdateUserInput();
-        UserEditDto dto = new UserEditDto();
-        dto.setName("n");
-        dto.setPassword("p");
-        dto.setEmailAddress("mail@dusk.com");
-        input.setUser(dto);
-        input.setSetRandomPassword(true);
-        doThrow(new RuntimeException("smtp down"))
-                .when(emailService).sendEmail(anyString(), anyString(), anyString());
-
-        assertThatThrownBy(() -> service.createUser(input, EUnitType.Inner))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("邮件发送失败");
+        verify(emailRpcService).sendEmail(anyString(), anyString(), anyString());
     }
 
     @Test
@@ -1159,14 +1164,26 @@ class UserServiceImplTest {
     // ------------------------------------------------------------------
 
     @Test
-    @DisplayName("getForgetPwdCaptchaByMobile：未启用推送/租户策略不允许/手机号不匹配/发送过频均抛异常")
-    void getForgetPwdCaptchaByMobileGuards() {
-        ReflectionTestUtils.setField(service, "pushManager", null);
-        assertThatThrownBy(() -> service.getForgetPwdCaptchaByMobile("u", "13800000000"))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("消息推送服务未启用");
-        ReflectionTestUtils.setField(service, "pushManager", pushManager);
+    @DisplayName("createUser：邮箱发送失败时包装为业务异常")
+    void createUserThrowsWhenMailFails() {
+        CreateOrUpdateUserInput input = new CreateOrUpdateUserInput();
+        UserEditDto dto = new UserEditDto();
+        dto.setName("n");
+        dto.setPassword("p");
+        dto.setEmailAddress("mail@dusk.com");
+        input.setUser(dto);
+        input.setSetRandomPassword(true);
+        doThrow(new RuntimeException("smtp down"))
+                .when(emailRpcService).sendEmail(anyString(), anyString(), anyString());
 
+        assertThatThrownBy(() -> service.createUser(input, EUnitType.Inner))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("邮件发送失败");
+    }
+
+    @Test
+    @DisplayName("getForgetPwdCaptchaByMobile：租户策略不允许/手机号不匹配均抛异常")
+    void getForgetPwdCaptchaByMobileGuards() {
         TenantContextHolder.setTenantId(1L);
         when(featureChecker.getValue(com.dusk.module.auth.feature.LoginFeatureProvider.APP_LOGIN_FORGET_PWD))
                 .thenReturn("email");
@@ -1181,19 +1198,6 @@ class UserServiceImplTest {
         assertThatThrownBy(() -> service.getForgetPwdCaptchaByMobile("user1", "13800000000"))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("手机号不匹配");
-    }
-
-    @Test
-    @DisplayName("getForgetPwdCaptchaByMobile：正常发送验证码并写入缓存")
-    void getForgetPwdCaptchaByMobileSends() {
-        User user = activeUser(1L);
-        user.setPhoneNo("13900000000");
-        when(userRepository.findByUserName("user1")).thenReturn(Optional.of(user));
-
-        service.getForgetPwdCaptchaByMobile("user1", "13900000000");
-
-        verify(pushManager).smsPushAsync(any());
-        verify(redisUtil, times(2)).setCache(anyString(), any(), anyLong());
     }
 
     @Test
@@ -1229,15 +1233,16 @@ class UserServiceImplTest {
     }
 
     @Test
-    @DisplayName("getForgetPwdCaptchaByEmail：正常发送验证码")
-    void getForgetPwdCaptchaByEmailSends() {
+    @DisplayName("getForgetPwdCaptchaByMobile：正常发送验证码并写入缓存")
+    void getForgetPwdCaptchaByMobileSends() {
         User user = activeUser(1L);
-        user.setEmailAddress("a@b.c");
+        user.setPhoneNo("13900000000");
         when(userRepository.findByUserName("user1")).thenReturn(Optional.of(user));
 
-        service.getForgetPwdCaptchaByEmail("user1", "a@b.c");
+        service.getForgetPwdCaptchaByMobile("user1", "13900000000");
 
-        verify(emailService).sendEmail(anyString(), anyString(), anyString());
+        verify(pushRpcService).smsPushAsync(any());
+        verify(redisUtil, times(2)).setCache(anyString(), any(), anyLong());
     }
 
     @Test
@@ -1323,5 +1328,1174 @@ class UserServiceImplTest {
 
         assertThat(context.getId()).isEqualTo(1L);
         assertThat(context.getAuthorities()).hasSize(1);
+    }
+
+    // ==================================================================
+    // 补充：登录解密、查询 Specification、角色回填、资料校验、私有分支
+    // ==================================================================
+
+    @Test
+    @DisplayName("getForgetPwdCaptchaByEmail：正常发送验证码")
+    void getForgetPwdCaptchaByEmailSends() {
+        User user = activeUser(1L);
+        user.setEmailAddress("a@b.c");
+        when(userRepository.findByUserName("user1")).thenReturn(Optional.of(user));
+
+        service.getForgetPwdCaptchaByEmail("user1", "a@b.c");
+
+        verify(emailRpcService).sendEmail(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("checkAndGetUser：合法 SM4 密文可成功解密")
+    void checkAndGetUserDecryptsSm4() {
+        String key = "0123456789abcdeffedcba9876543210";
+        when(appAuthConfig.getLoginEncryptKey()).thenReturn(key);
+        String encrypted = SmUtil.sm4(HexUtil.decodeHex(key)).encryptHex("pwd");
+        when(userRepository.findByUserName("user1")).thenReturn(Optional.of(activeUser(1L)));
+
+        assertThat(service.checkAndGetUser("user1", encrypted)).isNotNull();
+    }
+
+    @Test
+    @DisplayName("checkAndGetUser：租户存在但忽略大小写特性关闭时按原样查询")
+    void checkAndGetUserUsesExactNameWhenFeatureDisabled() {
+        TenantContextHolder.setTenantId(1L);
+        when(featureChecker.isEnabled(com.dusk.module.auth.feature.LoginFeatureProvider.APP_LOGIN_IGNORE_CASE))
+                .thenReturn(false);
+        when(userRepository.findByUserName("User1")).thenReturn(Optional.of(activeUser(1L)));
+
+        assertThat(service.checkAndGetUser("User1", "pwd")).isNotNull();
+        verify(userRepository).findByUserName("User1");
+    }
+
+    @Test
+    @DisplayName("getUsers：全部过滤条件的 Specification 均可执行")
+    @SuppressWarnings("unchecked")
+    void getUsersEvaluatesSpecification() {
+        when(userRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(activeUser(1L))));
+        JPAQuery roleQuery = queryMock();
+        when(queryFactory.select(any(Expression.class))).thenReturn(roleQuery);
+        when(roleQuery.fetch()).thenReturn(List.of(10L), List.of(10L), List.of(10L), List.of());
+
+        service.getUsers(new GetUsersInput());
+
+        GetUsersInput full = new GetUsersInput();
+        full.setFilter("na");
+        full.setRoleId(7L);
+        full.setRoleCode("C");
+        full.setRoleName("R");
+        full.setPermission("P");
+        full.setUserType(EUnitType.Inner);
+        full.setDisplayDimissionUsers(false);
+        full.setOnlyLockedUsers(true);
+        service.getUsers(full);
+
+        GetUsersInput emptyRoleFetch = new GetUsersInput();
+        emptyRoleFetch.setFilter("na");
+        emptyRoleFetch.setUserType(null);
+        emptyRoleFetch.setDisplayDimissionUsers(true);
+        emptyRoleFetch.setOnlyLockedUsers(false);
+        service.getUsers(emptyRoleFetch);
+
+        ArgumentCaptor<Specification<User>> captor = ArgumentCaptor.forClass(Specification.class);
+        verify(userRepository, times(3)).findAll(captor.capture(), any(Pageable.class));
+        captor.getAllValues().forEach(UserServiceImplTest::evaluateSpecification);
+    }
+
+    @Test
+    @DisplayName("getUsersList：锁定时间已过时不标记锁定")
+    void getUsersListSkipsExpiredLock() {
+        User expired = activeUser(1L);
+        expired.setLockoutEndDateUtc(LocalDateTime.now().minusHours(1));
+        when(userRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(expired)));
+
+        assertThat(service.getUsersList(new GetUsersInput()).getItems().getFirst().isLock()).isFalse();
+    }
+
+    @Test
+    @DisplayName("getUsersList：未锁定用户的锁定标记为 false")
+    void getUsersListHandlesNullLockDate() {
+        User unlocked = activeUser(2L);
+        unlocked.setLockoutEndDateUtc(null);
+        when(userRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(unlocked)));
+
+        assertThat(service.getUsersList(new GetUsersInput()).getItems().getFirst().isLock()).isFalse();
+    }
+
+    @Test
+    @DisplayName("getUsersForLogin：三个模糊条件的 Specification 可执行")
+    @SuppressWarnings("unchecked")
+    void getUsersForLoginEvaluatesSpecification() {
+        when(userRepository.findAll(any(Specification.class), any(Sort.class)))
+                .thenReturn(List.of(activeUser(1L)));
+
+        service.getUsersForLogin(new GetUsersForLoginInput());
+
+        GetUsersForLoginInput input = new GetUsersForLoginInput();
+        input.setName("na");
+        input.setSurName("su");
+        input.setUserName("user");
+        service.getUsersForLogin(input);
+
+        ArgumentCaptor<Specification<User>> captor = ArgumentCaptor.forClass(Specification.class);
+        verify(userRepository, times(2)).findAll(captor.capture(), any(Sort.class));
+        captor.getAllValues().forEach(UserServiceImplTest::evaluateSpecification);
+    }
+
+    @Test
+    @DisplayName("getOrgaUsers：无角色过滤条件时角色为空")
+    void getOrgaUsersWithoutRoleFilters() {
+        when(organizationUnitService.findById(1L)).thenReturn(Optional.of(orgUnit(1L, null)));
+        JPAQuery query = queryMock();
+        when(queryFactory.selectFrom(any(EntityPath.class))).thenReturn(query);
+        Page<User> page = new PageImpl<>(List.of(activeUser(1L)));
+        doReturn(page).when(service).page(any(), any());
+
+        GetOrgaUsersInput input = new GetOrgaUsersInput();
+        input.setOrgaId(1L);
+
+        assertThat(service.getOrgaUsers(input)).isSameAs(page);
+    }
+
+    @Test
+    @DisplayName("getUsersByRoleCodes：allRoles=true 且 userType 为空")
+    void getUsersByRoleCodesAllRoles() {
+        JPAQuery roleQuery = mock(JPAQuery.class, Answers.RETURNS_SELF);
+        when(queryFactory.select(any(Expression.class))).thenReturn(roleQuery);
+        when(roleQuery.fetch()).thenReturn(List.of(10L));
+        JPAQuery userQuery = mock(JPAQuery.class, Answers.RETURNS_SELF);
+        when(queryFactory.selectFrom(any(EntityPath.class))).thenReturn(userQuery);
+        Page<User> page = new PageImpl<>(List.of(activeUser(1L)));
+        doReturn(page).when(service).page(any(), any());
+
+        GetUsersByRoleCodesInput input = new GetUsersByRoleCodesInput();
+        input.setRoleCodeList(List.of("C1"));
+        input.setAllRoles(true);
+        input.setUserType(null);
+
+        assertThat(service.getUsersByRoleCodes(input)).isSameAs(page);
+    }
+
+    @Test
+    @DisplayName("getUsersByRoleName：userType 为空时跳过滤条件")
+    void getUsersByRoleNameWithoutUserType() {
+        JPAQuery roleQuery = queryMock();
+        when(queryFactory.select(any(Expression.class))).thenReturn(roleQuery);
+        when(roleQuery.fetch()).thenReturn(List.of(1L));
+        JPAQuery userQuery = mock(JPAQuery.class);
+        when(queryFactory.selectDistinct(any(Expression.class))).thenReturn(userQuery);
+        when(userQuery.from(any(EntityPath.class))).thenReturn(userQuery);
+        when(userQuery.where(any(Predicate.class))).thenReturn(userQuery);
+        Page<User> page = new PageImpl<>(List.of(activeUser(1L)));
+        doReturn(page).when(service).page(any(), any());
+
+        GetUsersByRoleNameInput input = new GetUsersByRoleNameInput();
+        input.setRoleNames(List.of("adm"));
+        input.setUserType(null);
+
+        assertThat(service.getUsersByRoleName(input)).isSameAs(page);
+    }
+
+    @Test
+    @DisplayName("getUsersToExcel：无组织映射与空组织列表的用户不写组织路径")
+    void getUsersToExcelHandlesMissingOrgMappings() {
+        List<User> users = new ArrayList<>();
+        for (long id = 1; id <= 4; id++) {
+            User user = activeUser(id);
+            user.setUserType(EUnitType.Inner);
+            users.add(user);
+        }
+        when(userRepository.findAll(any(Specification.class), any(Sort.class))).thenReturn(users);
+
+        OrganizationUnit root = orgUnit(1L, null);
+        OrganizationUnit child = orgUnit(2L, 1L);
+        when(organizationUnitService.findAll()).thenReturn(List.of(root, child));
+
+        OrganizationUnitUserListDto nullOrgId = new OrganizationUnitUserListDto();
+        nullOrgId.setId(1L);
+        OrganizationUnitUserListDto unknownOrgId = new OrganizationUnitUserListDto();
+        unknownOrgId.setId(2L);
+        unknownOrgId.setOrganizationUnitId(99L);
+        OrganizationUnitUserListDto mapped = new OrganizationUnitUserListDto();
+        mapped.setId(3L);
+        mapped.setOrganizationUnitId(2L);
+        when(organizationUnitService.getOrganizationUnitUsers(any(GetOrganizationUnitUsersInput.class)))
+                .thenReturn(new PageImpl<>(List.of(nullOrgId, unknownOrgId, mapped)));
+
+        service.getUsersToExcel(null);
+
+        verify(userRepository).findAll(any(Specification.class), any(Sort.class));
+    }
+
+    @Test
+    @DisplayName("getUserForEdit / getExternalUserEditInfo / getUserInfo：角色回填与上级、管理组织")
+    void roleAssignmentAndManagerInfo() {
+        RoleMapper roleMapper = mock(RoleMapper.class);
+        ReflectionTestUtils.setField(service, "roleMapper", roleMapper);
+        Role role = new Role();
+        role.setId(5L);
+        Role otherRole = new Role();
+        otherRole.setId(6L);
+        UserRoleDto roleDto = new UserRoleDto();
+        roleDto.setRoleId(5L);
+        UserRoleDto otherRoleDto = new UserRoleDto();
+        otherRoleDto.setRoleId(6L);
+        when(roleService.findAll()).thenReturn(List.of(role, otherRole));
+        when(roleMapper.toRoleDto(role)).thenReturn(roleDto);
+        when(roleMapper.toRoleDto(otherRole)).thenReturn(otherRoleDto);
+
+        User user = activeUser(1L);
+        user.getUserRoles().add(role);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(stationService.getStationsForFrontByUserId(1L)).thenReturn(new ArrayList<>());
+        when(organizationUnitService.getOrganizationUnitsByUser(any(EntityDto.class)))
+                .thenReturn(List.of(orgUnit(1L, null)));
+        OrganizationManager manager = new OrganizationManager();
+        manager.setUserId(7L);
+        when(organizationManagerRepository.findOne(any(Specification.class)))
+                .thenReturn(Optional.of(manager));
+        when(userRepository.findById(7L)).thenReturn(Optional.of(activeUser(7L)));
+        stubManagerQuery(List.of(orgUnit(3L, null)));
+
+        GetUserForEditOutput editOutput = service.getUserForEdit(new EntityDto(1L));
+        assertThat(editOutput.getRoles().getFirst().isAssigned()).isTrue();
+
+        GetExternalUserEditOutput externalOutput = service.getExternalUserEditInfo(1L);
+        assertThat(externalOutput.getRoles().getFirst().isAssigned()).isTrue();
+
+        GetUserInfoOutput infoOutput = service.getUserInfo(1L);
+        assertThat(infoOutput.getBaseUserInfoDto().getLevel()).isEqualTo(ELevel.Manager);
+        assertThat(infoOutput.getBaseUserInfoDto().getManagerDtos()).hasSize(1);
+        assertThat(infoOutput.getBaseUserInfoDto().getSuperior()).isEqualTo("user7");
+        assertThat(infoOutput.getAccountInfoDto().getRoles().getFirst().isAssigned()).isTrue();
+    }
+
+    @Test
+    @DisplayName("getUserInfo：无管理组织且无上级时保持普通级别")
+    void getUserInfoWithoutManagerOrSuperior() {
+        when(roleService.findAll()).thenReturn(new ArrayList<>());
+        User user = activeUser(1L);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(organizationUnitService.getOrganizationUnitsByUser(any(EntityDto.class)))
+                .thenReturn(new ArrayList<>());
+        stubManagerQuery(new ArrayList<>());
+
+        GetUserInfoOutput output = service.getUserInfo(1L);
+
+        assertThat(output.getBaseUserInfoDto().getLevel()).isEqualTo(ELevel.General);
+        assertThat(output.getBaseUserInfoDto().getManagerDtos()).isNull();
+        assertThat(output.getBaseUserInfoDto().getSuperior()).isNull();
+    }
+
+    @Test
+    @DisplayName("updatePersonalInfo：工号唯一且管理组织为空时只更新组织关系")
+    void updatePersonalInfoWithUniqueWorkNumberAndNoManagers() {
+        User user = activeUser(1L);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
+        OrganizationUnit station = orgUnit(10L, null);
+        station.setStation(true);
+        when(organizationUnitService.findAllById(List.of(10L))).thenReturn(List.of(station));
+
+        PersonalInfoInput input = new PersonalInfoInput();
+        input.setId(1L);
+        input.setName("newName");
+        input.setWorkNumber("w-new");
+        input.setOrgaId(10L);
+        input.setManagerOrgIds(null);
+
+        service.updatePersonalInfo(input);
+
+        assertThat(user.getDefaultStation()).isEqualTo(10L);
+        assertThat(user.getOrganizationUnit()).containsExactly(station);
+        verify(organizationManagerRepository, never()).saveAll(any());
+    }
+
+    @Test
+    @DisplayName("updatePersonalInfo：工号重复时抛业务异常")
+    void updatePersonalInfoThrowsOnDuplicateWorkNumber() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(activeUser(1L)));
+        when(userRepository.findOne(any(Specification.class))).thenReturn(Optional.of(activeUser(9L)));
+
+        PersonalInfoInput input = new PersonalInfoInput();
+        input.setId(1L);
+        input.setName("n");
+        input.setWorkNumber("dup");
+
+        assertThatThrownBy(() -> service.updatePersonalInfo(input))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("工号已被占用");
+    }
+
+    @Test
+    @DisplayName("createOrUpdateUserExistByUserName：两个重载的更新分支")
+    void createOrUpdateUserExistByUserNameUpdates() {
+        User user = activeUser(5L);
+        user.setName("n5");
+        when(userRepository.findById(5L)).thenReturn(Optional.of(user));
+        when(userRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
+        JPAQuery managerQuery = queryMock();
+        when(queryFactory.select(any(Expression.class))).thenReturn(managerQuery);
+        when(managerQuery.fetch()).thenReturn(new ArrayList<>());
+
+        CreateOrUpdateUserInput input = new CreateOrUpdateUserInput();
+        UserEditDto dto = new UserEditDto();
+        dto.setId(5L);
+        dto.setName("n5");
+        dto.setUserName("u5");
+        dto.setPassword("p");
+        input.setUser(dto);
+        service.createOrUpdateUserExistByUserName(input);
+
+        CreateOrUpdateUserInfoInput infoInput = new CreateOrUpdateUserInfoInput();
+        UserEditDto infoDto = new UserEditDto();
+        infoDto.setId(5L);
+        infoDto.setName("n5");
+        infoDto.setUserName("u5");
+        infoDto.setPassword("p");
+        infoInput.setUser(infoDto);
+        infoInput.setLevel(ELevel.Manager);
+        infoInput.setManagerOrgIds(List.of(10L));
+        infoInput.setStationIds(new ArrayList<>());
+        service.createOrUpdateUserExistByUserName(infoInput);
+
+        verify(organizationManagerRepository).saveAll(any());
+        verify(userRepository, atLeastOnce()).save(any(User.class));
+    }
+
+    @Test
+    @DisplayName("createOrUpdateUserExistByUserName：管理层但未指定管理组织时只清空旧关系")
+    void createOrUpdateUserExistByUserNameManagerWithoutOrgs() {
+        User user = activeUser(5L);
+        user.setName("n5");
+        when(userRepository.findById(5L)).thenReturn(Optional.of(user));
+        when(userRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
+
+        CreateOrUpdateUserInfoInput infoInput = new CreateOrUpdateUserInfoInput();
+        UserEditDto infoDto = new UserEditDto();
+        infoDto.setId(5L);
+        infoDto.setName("n5");
+        infoDto.setUserName("u5");
+        infoDto.setPassword("p");
+        infoInput.setUser(infoDto);
+        infoInput.setLevel(ELevel.Manager);
+        infoInput.setManagerOrgIds(new ArrayList<>());
+        infoInput.setStationIds(new ArrayList<>());
+
+        service.createOrUpdateUserExistByUserName(infoInput);
+
+        verify(organizationManagerRepository).deleteByUserId(5L);
+        verify(organizationManagerRepository, never()).saveAll(any());
+    }
+
+    @Test
+    @DisplayName("createOrUpdateUserExistByUserName：管理组织已存在管理人员时抛异常")
+    void createOrUpdateUserExistByUserNameThrowsWhenManagerExists() {
+        User user = activeUser(5L);
+        user.setName("n5");
+        when(userRepository.findById(5L)).thenReturn(Optional.of(user));
+        when(userRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
+        stubManagerQuery(List.of(orgUnit(10L, null)));
+
+        CreateOrUpdateUserInfoInput infoInput = new CreateOrUpdateUserInfoInput();
+        UserEditDto infoDto = new UserEditDto();
+        infoDto.setId(5L);
+        infoDto.setName("n5");
+        infoDto.setUserName("u5");
+        infoDto.setPassword("p");
+        infoInput.setUser(infoDto);
+        infoInput.setLevel(ELevel.Manager);
+        infoInput.setManagerOrgIds(List.of(10L));
+
+        assertThatThrownBy(() -> service.createOrUpdateUserExistByUserName(infoInput))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("已经存在管理人员");
+    }
+
+    @Test
+    @DisplayName("createExternalUser：工号重复时抛业务异常")
+    void createExternalUserThrowsOnDuplicateWorkNumber() {
+        when(userRepository.findOne(any(Specification.class))).thenReturn(Optional.of(activeUser(9L)));
+
+        CreateExternalUserInput input = new CreateExternalUserInput();
+        input.setName("ext");
+        input.setWorkNumber("w-dup");
+
+        assertThatThrownBy(() -> service.createExternalUser(input))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("工号已被占用");
+    }
+
+    @Test
+    @DisplayName("createExternalUser：租户用户上限配置为空时 parseInt 抛 NumberFormatException（生产缺陷）")
+    void createExternalUserWithNullMaxUsersFailsFast() {
+        TenantContextHolder.setTenantId(1L);
+        when(featureChecker.isEnabled(UserFeatureProvider.APP_USER_MAX_USERS)).thenReturn(true);
+        when(featureChecker.getValue(UserFeatureProvider.APP_USER_MAX_USERS_NUMBER)).thenReturn(null);
+        when(userRepository.count()).thenReturn(1L);
+
+        CreateExternalUserInput input = new CreateExternalUserInput();
+        input.setName("ext");
+
+        assertThatThrownBy(() -> service.createExternalUser(input))
+                .isInstanceOf(NumberFormatException.class);
+    }
+
+    @Test
+    @DisplayName("createExternalUser：租户用户上限特性关闭时正常创建并校验唯一工号")
+    void createExternalUserWithFeatureDisabled() {
+        TenantContextHolder.setTenantId(1L);
+        when(featureChecker.isEnabled(UserFeatureProvider.APP_USER_MAX_USERS)).thenReturn(false);
+        when(userRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> {
+            User u = inv.getArgument(0);
+            u.setId(401L);
+            return u;
+        });
+
+        CreateExternalUserInput input = new CreateExternalUserInput();
+        input.setName("ext");
+        input.setWorkNumber("w-unique");
+
+        assertThat(service.createExternalUser(input)).isEqualTo(401L);
+    }
+
+    @Test
+    @DisplayName("createExternalUser：用户数未达上限时允许创建")
+    void createExternalUserUnderMaxUsers() {
+        TenantContextHolder.setTenantId(1L);
+        when(featureChecker.isEnabled(UserFeatureProvider.APP_USER_MAX_USERS)).thenReturn(true);
+        when(featureChecker.getValue(UserFeatureProvider.APP_USER_MAX_USERS_NUMBER)).thenReturn("10");
+        when(userRepository.count()).thenReturn(1L);
+        when(userRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> {
+            User u = inv.getArgument(0);
+            u.setId(402L);
+            return u;
+        });
+
+        CreateExternalUserInput input = new CreateExternalUserInput();
+        input.setName("ext");
+
+        assertThat(service.createExternalUser(input)).isEqualTo(402L);
+    }
+
+    @Test
+    @DisplayName("saveUserAccount：已有用户但账号为空时重置密码并同步厂站与角色")
+    void saveUserAccountResetsPasswordAndStations() {
+        User user = activeUser(1L);
+        user.setName("张三");
+        user.setUserName("");
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
+        when(passwordEncoder.encode("pwd")).thenReturn("H");
+        Role role = new Role();
+        role.setId(5L);
+        when(roleService.findAllById(List.of(5L))).thenReturn(List.of(role));
+        StationsOfLoginUserDto old1 = new StationsOfLoginUserDto();
+        old1.setValue(1L);
+        StationsOfLoginUserDto old2 = new StationsOfLoginUserDto();
+        old2.setValue(2L);
+        when(stationService.getStationsForFrontByUserId(1L)).thenReturn(List.of(old1, old2));
+        when(userRepository.saveAndFlush(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        ExternalUserSettingDto dto = new ExternalUserSettingDto();
+        dto.setId(1L);
+        dto.setUserName("u1");
+        dto.setPassword("pwd");
+        dto.setStations(new ArrayList<>(List.of(2L, 3L)));
+        dto.setAssignedRoleIds(List.of(5L));
+
+        assertThat(service.updateExternalUserInfo(dto)).isEqualTo(1L);
+
+        assertThat(user.getPassword()).isEqualTo("H");
+        assertThat(user.getUserRoles()).containsExactly(role);
+        verify(stationService).removeUserFromStation(org.mockito.ArgumentMatchers.argThat(
+                r -> r.getStationId().equals(1L)));
+        verify(stationService).addUsersToStation(org.mockito.ArgumentMatchers.argThat(
+                a -> a.getStationId().equals(3L)));
+    }
+
+    @Test
+    @DisplayName("saveUserAccount：账号重复时抛业务异常")
+    void saveUserAccountThrowsOnDuplicateUserName() {
+        User user = activeUser(1L);
+        user.setUserName("u1");
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.findOne(any(Specification.class))).thenReturn(Optional.of(activeUser(9L)));
+
+        ExternalUserSettingDto dto = new ExternalUserSettingDto();
+        dto.setId(1L);
+        dto.setUserName("dup");
+
+        assertThatThrownBy(() -> service.updateExternalUserInfo(dto))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("用户名已被占用");
+    }
+
+    @Test
+    @DisplayName("deleteUsers：null 入参抛异常，登录用户自身被排除")
+    void deleteUsersHandlesNullAndExcludesLoginUser() {
+        assertThatThrownBy(() -> service.deleteUsers(null))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("不能为空");
+
+        LoginUserIdContextHolder.setUserId(1L);
+        when(userRepository.findAllById(List.of(2L))).thenReturn(List.of(activeUser(2L)));
+
+        service.deleteUsers(new ArrayList<>(List.of(new EntityDto(1L), new EntityDto(2L))));
+
+        verify(userRepository).deleteByIdIn(List.of(2L));
+        verify(organizationManagerRepository).deleteByUserIdIn(List.of(2L));
+    }
+
+    @Test
+    @DisplayName("deleteUsers：用户 id 为空时跳过代际推进")
+    void deleteUsersSkipsSubjectChangeForTransientUser() {
+        LoginUserIdContextHolder.setUserId(99L);
+        User transientUser = activeUser(null);
+        when(userRepository.findAllById(List.of(3L))).thenReturn(List.of(transientUser));
+
+        service.deleteUsers(new ArrayList<>(List.of(new EntityDto(3L))));
+
+        verify(authzSubjectVersionService, never()).nextVersion(anyString(), any());
+        verify(userRepository).deleteByIdIn(List.of(3L));
+    }
+
+    @Test
+    @DisplayName("changeStatus：用户 id 为空时跳过代际推进；活跃状态组合分别计算 enabled")
+    void changeStatusPublishesSubjectChangedBranches() {
+        User transientUser = activeUser(null);
+        when(userRepository.findAllById(List.of(1L))).thenReturn(List.of(transientUser));
+        ChangeStatusInput input = new ChangeStatusInput();
+        input.setUserIds(List.of(1L));
+        input.setStatus(UserStatus.OnJob);
+        service.changeStatus(input);
+        verify(authzSubjectVersionService, never()).nextVersion(anyString(), any());
+
+        User inactive = activeUser(2L);
+        inactive.setActive(false);
+        inactive.setUserStatus(null);
+        when(userRepository.findAllById(List.of(2L))).thenReturn(List.of(inactive));
+        ChangeStatusInput second = new ChangeStatusInput();
+        second.setUserIds(List.of(2L));
+        second.setStatus(UserStatus.OnJob);
+        service.changeStatus(second);
+
+        User dimission = activeUser(3L);
+        dimission.setUserStatus(UserStatus.Dimission);
+        when(userRepository.findAllById(List.of(3L))).thenReturn(List.of(dimission));
+        ChangeStatusInput third = new ChangeStatusInput();
+        third.setUserIds(List.of(3L));
+        third.setStatus(UserStatus.Dimission);
+        service.changeStatus(third);
+
+        verify(authzSubjectVersionService, times(2)).nextVersion(anyString(), any());
+        verify(sender).sendAsync(any());
+    }
+
+    @Test
+    @DisplayName("publishSubjectChanged：active 且 status=null 时 enabled=true")
+    void publishSubjectChangedWithNullStatus() {
+        User user = activeUser(1L);
+        user.setUserStatus(null);
+
+        ReflectionTestUtils.invokeMethod(service, "publishSubjectChanged", user);
+
+        verify(authzSubjectVersionService).nextVersion(anyString(), org.mockito.ArgumentMatchers.eq(1L));
+    }
+
+    @Test
+    @DisplayName("publishSubjectChanged：null 用户直接返回")
+    void publishSubjectChangedIgnoresNullUser() {
+        ReflectionTestUtils.invokeMethod(service, "publishSubjectChanged", (User) null);
+        ReflectionTestUtils.invokeMethod(service, "publishSubjectChanged", (User) null, false);
+
+        verify(authzSubjectVersionService, never()).nextVersion(anyString(), any());
+        verify(authzEventPublisher, never()).subjectChanged(anyString(), any(), org.mockito.ArgumentMatchers.anyLong(), anyBoolean());
+    }
+
+    @Test
+    @DisplayName("activeUser：redisUtil 为空或缓存未命中时正常激活")
+    void activeUserHandlesRedisAbsent() {
+        ReflectionTestUtils.setField(service, "redisUtil", null);
+        User user = activeUser(1L);
+        user.setActive(false);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+        service.activeUser(1L, "k", "code");
+
+        assertThat(user.isActive()).isTrue();
+
+        ReflectionTestUtils.setField(service, "redisUtil", redisUtil);
+        when(redisUtil.getCache("k2")).thenReturn(null);
+        User user2 = activeUser(2L);
+        user2.setActive(false);
+        when(userRepository.findById(2L)).thenReturn(Optional.of(user2));
+
+        service.activeUser(2L, "k2", "code");
+
+        assertThat(user2.isActive()).isTrue();
+    }
+
+    @Test
+    @DisplayName("checkUserValid：锁定时间已过期时允许登录")
+    void checkUserValidAllowsExpiredLock() {
+        User user = activeUser(1L);
+        user.setLockoutEndDateUtc(LocalDateTime.now().minusHours(1));
+
+        assertThatCode(() -> service.checkUserValid(user)).doesNotThrowAnyException();
+    }
+
+    @Test
+    @DisplayName("checkUserIsActive：激活开始日期已过时忽略该限制")
+    void checkUserIsActiveWithPastStartDate() {
+        User user = activeUser(1L);
+        user.setActiveStartDate(LocalDate.now().minusDays(1));
+        user.setActiveEndDate(LocalDate.now().plusDays(1));
+
+        assertThat(service.checkUserIsActive(user)).isTrue();
+    }
+
+    @Test
+    @DisplayName("getForgetPwdCaptchaByMobile：租户策略为 mobile / mobileOrEmail 时允许发送")
+    void getForgetPwdCaptchaByMobileAllowedPolicies() {
+        TenantContextHolder.setTenantId(1L);
+        when(featureChecker.getValue(com.dusk.module.auth.feature.LoginFeatureProvider.APP_LOGIN_FORGET_PWD))
+                .thenReturn("mobile", "mobileOrEmail");
+        Tenant tenant = new Tenant();
+        tenant.setActive(true);
+        when(tenantRepository.findById(9L)).thenReturn(Optional.of(tenant));
+        User user = activeUser(1L);
+        user.setTenantId(9L);
+        user.setPhoneNo("13900000000");
+        when(userRepository.findByUserName("user1")).thenReturn(Optional.of(user));
+
+        service.getForgetPwdCaptchaByMobile("user1", "13900000000");
+        service.getForgetPwdCaptchaByMobile("user1", "13900000000");
+
+        verify(pushRpcService, times(2)).smsPushAsync(any());
+        verify(redisUtil, times(4)).setCache(anyString(), any(), anyLong());
+    }
+
+    @Test
+    @DisplayName("getForgetPwdCaptchaByEmail：租户策略为 email / mobileOrEmail 时允许发送并使用租户名做标题")
+    void getForgetPwdCaptchaByEmailAllowedPolicies() {
+        TenantContextHolder.setTenantId(1L);
+        when(featureChecker.getValue(com.dusk.module.auth.feature.LoginFeatureProvider.APP_LOGIN_FORGET_PWD))
+                .thenReturn("email", "mobileOrEmail");
+        Tenant tenant = new Tenant();
+        tenant.setActive(true);
+        tenant.setName("租户A");
+        when(tenantRepository.findById(9L)).thenReturn(Optional.of(tenant));
+        Tenant host = new Tenant();
+        host.setName("租户A");
+        when(tenantRepository.findById(1L)).thenReturn(Optional.of(host));
+        User user = activeUser(1L);
+        user.setTenantId(9L);
+        user.setEmailAddress("a@b.c");
+        when(userRepository.findByUserName("user1")).thenReturn(Optional.of(user));
+
+        service.getForgetPwdCaptchaByEmail("user1", "a@b.c");
+        service.getForgetPwdCaptchaByEmail("user1", "a@b.c");
+
+        ArgumentCaptor<String> subject = ArgumentCaptor.forClass(String.class);
+        verify(emailRpcService, times(2)).sendEmail(subject.capture(), anyString(), org.mockito.ArgumentMatchers.eq("a@b.c"));
+        assertThat(subject.getAllValues()).allMatch(s -> s.startsWith("租户A"));
+    }
+
+    @Test
+    @DisplayName("getForgetPwdCaptchaByEmail：租户不存在时抛业务异常")
+    void getForgetPwdCaptchaByEmailThrowsWhenTenantMissing() {
+        TenantContextHolder.setTenantId(1L);
+        when(featureChecker.getValue(com.dusk.module.auth.feature.LoginFeatureProvider.APP_LOGIN_FORGET_PWD))
+                .thenReturn("email");
+        Tenant tenant = new Tenant();
+        tenant.setActive(true);
+        when(tenantRepository.findById(9L)).thenReturn(Optional.of(tenant));
+        when(tenantRepository.findById(1L)).thenReturn(Optional.empty());
+        User user = activeUser(1L);
+        user.setTenantId(9L);
+        user.setEmailAddress("a@b.c");
+        when(userRepository.findByUserName("user1")).thenReturn(Optional.of(user));
+
+        assertThatThrownBy(() -> service.getForgetPwdCaptchaByEmail("user1", "a@b.c"))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("租户不存在或已被删除");
+    }
+
+    @Test
+    @DisplayName("getForgetPwdCaptchaByEmail：邮件 RPC 抛业务异常时原样抛出，其他异常包装")
+    void getForgetPwdCaptchaByEmailPropagatesSendFailures() {
+        User user = activeUser(1L);
+        user.setEmailAddress("a@b.c");
+        when(userRepository.findByUserName("user1")).thenReturn(Optional.of(user));
+
+        doThrow(new BusinessException("业务失败"))
+                .when(emailRpcService).sendEmail(anyString(), anyString(), anyString());
+        assertThatThrownBy(() -> service.getForgetPwdCaptchaByEmail("user1", "a@b.c"))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("业务失败");
+
+        doThrow(new RuntimeException("smtp down"))
+                .when(emailRpcService).sendEmail(anyString(), anyString(), anyString());
+        assertThatThrownBy(() -> service.getForgetPwdCaptchaByEmail("user1", "a@b.c"))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("邮件发送失败");
+    }
+
+    @Test
+    @DisplayName("resetPwdWithCaptcha：租户用户使用租户维度缓存 key")
+    void resetPwdWithCaptchaTenantUser() {
+        User user = activeUser(1L);
+        user.setTenantId(9L);
+        when(userRepository.findByUserName("user1")).thenReturn(Optional.of(user));
+        when(redisUtil.getCache("CRUX:PWD:RESET:9:user1")).thenReturn("123456");
+        when(passwordEncoder.encode("np")).thenReturn("H");
+
+        service.resetPwdWithCaptcha("user1", "np", "123456");
+
+        assertThat(user.getPassword()).isEqualTo("H");
+        verify(redisUtil).deleteCache("CRUX:PWD:RESET:9:user1");
+    }
+
+    @Test
+    @DisplayName("updatePersonalInfo：手机号格式错误 / 重复时抛业务异常")
+    void updatePersonalInfoValidatesPhone() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(activeUser(1L)));
+        when(userRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
+
+        PersonalInfoInput invalid = new PersonalInfoInput();
+        invalid.setId(1L);
+        invalid.setName("n");
+        invalid.setPhoneNo("123");
+        assertThatThrownBy(() -> service.updatePersonalInfo(invalid))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("手机号码格式错误");
+
+        when(userRepository.findOne(any(Specification.class))).thenReturn(Optional.of(activeUser(9L)));
+        PersonalInfoInput duplicate = new PersonalInfoInput();
+        duplicate.setId(1L);
+        duplicate.setName("n");
+        duplicate.setPhoneNo("13800000000");
+        assertThatThrownBy(() -> service.updatePersonalInfo(duplicate))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("已存在");
+    }
+
+    @Test
+    @DisplayName("updatePersonalInfo：合法手机号与身份证号通过校验")
+    void updatePersonalInfoAcceptsValidPhoneAndIdCard() {
+        User user = activeUser(1L);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
+        when(organizationUnitService.findAllById(any())).thenReturn(new ArrayList<>());
+
+        PersonalInfoInput input = new PersonalInfoInput();
+        input.setId(1L);
+        input.setName("n");
+        input.setPhoneNo("13800000000");
+        input.setIdCard("110101199001011234");
+        input.setOrgaId(null);
+
+        service.updatePersonalInfo(input);
+
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    @DisplayName("updatePersonalInfo：身份证格式错误 / 重复时抛业务异常")
+    void updatePersonalInfoValidatesIdCard() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(activeUser(1L)));
+        when(userRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
+
+        PersonalInfoInput invalid = new PersonalInfoInput();
+        invalid.setId(1L);
+        invalid.setName("n");
+        invalid.setIdCard("abc");
+        assertThatThrownBy(() -> service.updatePersonalInfo(invalid))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("身份证号码格式不正确");
+
+        when(userRepository.findOne(any(Specification.class))).thenReturn(Optional.of(activeUser(9L)));
+        PersonalInfoInput duplicate = new PersonalInfoInput();
+        duplicate.setId(1L);
+        duplicate.setName("n");
+        duplicate.setIdCard("110101199001011234");
+        assertThatThrownBy(() -> service.updatePersonalInfo(duplicate))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("身份证号码已被占用");
+    }
+
+    @Test
+    @DisplayName("createExternalUser：外单位用户手机号/身份证为空且受控时抛业务异常")
+    void createExternalUserRequiresPhoneAndIdCardWhenConfigured() {
+        when(settingRpcService.getValue(UserServiceImpl.PERSONNEL_CONTROL_CONFIRM_PHONE)).thenReturn("true");
+        CreateExternalUserInput noPhone = new CreateExternalUserInput();
+        noPhone.setName("ext");
+        assertThatThrownBy(() -> service.createExternalUser(noPhone))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("手机号码不能为空");
+
+        when(settingRpcService.getValue(UserServiceImpl.PERSONNEL_CONTROL_CONFIRM_PHONE)).thenReturn(null);
+        when(settingRpcService.getValue(UserServiceImpl.PERSONNEL_CONTROL_CONFIRM_ID_CARD)).thenReturn("true");
+        when(userRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
+        CreateExternalUserInput noIdCard = new CreateExternalUserInput();
+        noIdCard.setName("ext");
+        noIdCard.setPhoneNo("13800000000");
+        assertThatThrownBy(() -> service.createExternalUser(noIdCard))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("身份证号码不能为空");
+    }
+
+    @Test
+    @DisplayName("updateUserInfoBySelf：类型为空时即使开启手机号管控也不校验必填")
+    void updateUserInfoBySelfSkipsPhoneRequiredForUnknownType() {
+        LoginUserIdContextHolder.setUserId(1L);
+        when(settingRpcService.getValue(UserServiceImpl.PERSONNEL_CONTROL_CONFIRM_PHONE)).thenReturn("true");
+        when(userRepository.findById(1L)).thenReturn(Optional.of(activeUser(1L)));
+
+        UpdateUserInfo info = new UpdateUserInfo();
+        info.setName("self");
+
+        service.updateUserInfoBySelf(info);
+
+        verify(userRepository).save(any(User.class));
+    }
+
+    @Test
+    @DisplayName("checkAndLockUser：未锁定递增次数、达到上限锁定、锁定过期解锁")
+    void checkAndLockUserBranches() {
+        User first = activeUser(1L);
+        first.setAccessFailedCount(null);
+        first.setLockoutEndDateUtc(null);
+        String firstMsg = ReflectionTestUtils.invokeMethod(service, "checkAndLockUser", first, 3);
+        assertThat(firstMsg).contains("还有3次机会");
+        assertThat(first.getAccessFailedCount()).isEqualTo(1);
+
+        User locked = activeUser(2L);
+        locked.setAccessFailedCount(3);
+        locked.setLockoutEndDateUtc(null);
+        String lockedMsg = ReflectionTestUtils.invokeMethod(service, "checkAndLockUser", locked, 3);
+        assertThat(lockedMsg).contains("已经被锁定");
+        assertThat(locked.getLockoutEndDateUtc()).isAfter(LocalDateTime.now());
+
+        User expired = activeUser(3L);
+        expired.setLockoutEndDateUtc(LocalDateTime.now().minusHours(1));
+        when(userRepository.findById(3L)).thenReturn(Optional.of(expired));
+        String expiredMsg = ReflectionTestUtils.invokeMethod(service, "checkAndLockUser", expired, 3);
+        assertThat(expiredMsg).contains("还有3次机会");
+
+        User future = activeUser(4L);
+        future.setLockoutEndDateUtc(LocalDateTime.now().plusHours(2));
+        String futureMsg = ReflectionTestUtils.invokeMethod(service, "checkAndLockUser", future, 3);
+        assertThat(futureMsg).isEqualTo("帐户名或密码错误！");
+    }
+
+    @Test
+    @DisplayName("checkUserAge：男女超龄与未超龄分支")
+    void checkUserAgeBranches() {
+        assertThatThrownBy(() -> ReflectionTestUtils.invokeMethod(service, "checkUserAge", "110101196001011122"))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("女55岁");
+
+        assertThatCode(() -> ReflectionTestUtils.invokeMethod(service, "checkUserAge", "110101200001011122"))
+                .doesNotThrowAnyException();
+
+        assertThatThrownBy(() -> ReflectionTestUtils.invokeMethod(service, "checkUserAge", "110101195001011111"))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("男60岁");
+
+        assertThatCode(() -> ReflectionTestUtils.invokeMethod(service, "checkUserAge", "110101199001011111"))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    @DisplayName("createUser：租户用户上限特性关闭时不影响创建")
+    void createUserWithMaxUsersFeatureDisabled() {
+        TenantContextHolder.setTenantId(1L);
+        when(featureChecker.isEnabled(UserFeatureProvider.APP_USER_MAX_USERS)).thenReturn(false);
+        when(userRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> {
+            User u = inv.getArgument(0);
+            u.setId(403L);
+            return u;
+        });
+
+        CreateOrUpdateUserInput input = new CreateOrUpdateUserInput();
+        UserEditDto dto = new UserEditDto();
+        dto.setName("张三");
+        dto.setPassword("p");
+        dto.setUserName("u");
+        input.setUser(dto);
+
+        assertThat(service.createUser(input, EUnitType.Inner)).isEqualTo(403L);
+    }
+
+    @Test
+    @DisplayName("createUser：用户数未达上限时允许创建")
+    void createUserUnderMaxUsers() {
+        TenantContextHolder.setTenantId(1L);
+        when(featureChecker.isEnabled(UserFeatureProvider.APP_USER_MAX_USERS)).thenReturn(true);
+        when(featureChecker.getValue(UserFeatureProvider.APP_USER_MAX_USERS_NUMBER)).thenReturn("10");
+        when(userRepository.count()).thenReturn(1L);
+        when(userRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> {
+            User u = inv.getArgument(0);
+            u.setId(404L);
+            return u;
+        });
+
+        CreateOrUpdateUserInput input = new CreateOrUpdateUserInput();
+        UserEditDto dto = new UserEditDto();
+        dto.setName("张三");
+        dto.setPassword("p");
+        dto.setUserName("u");
+        input.setUser(dto);
+
+        assertThat(service.createUser(input, EUnitType.Inner)).isEqualTo(404L);
+    }
+
+    @Test
+    @DisplayName("createUser：未激活时清空激活日期区间")
+    void createUserClearsDatesWhenInactive() {
+        CreateOrUpdateUserInput input = new CreateOrUpdateUserInput();
+        UserEditDto dto = new UserEditDto();
+        dto.setName("张三");
+        dto.setPassword("p");
+        dto.setUserName("u");
+        dto.setActive(false);
+        dto.setActiveStartDate(LocalDate.now());
+        dto.setActiveEndDate(LocalDate.now().plusDays(1));
+        input.setUser(dto);
+        when(userRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        when(userRepository.save(captor.capture())).thenAnswer(inv -> {
+            User u = inv.getArgument(0);
+            u.setId(300L);
+            return u;
+        });
+
+        service.createUser(input, EUnitType.Inner);
+
+        assertThat(captor.getValue().getActiveStartDate()).isNull();
+        assertThat(captor.getValue().getActiveEndDate()).isNull();
+    }
+
+    @Test
+    @DisplayName("createUser：激活结束日期早于开始日期时抛业务异常")
+    void createUserThrowsWhenActiveEndBeforeStart() {
+        CreateOrUpdateUserInput input = new CreateOrUpdateUserInput();
+        UserEditDto dto = new UserEditDto();
+        dto.setName("张三");
+        dto.setPassword("p");
+        dto.setUserName("u");
+        dto.setActive(true);
+        dto.setActiveStartDate(LocalDate.now());
+        dto.setActiveEndDate(LocalDate.now().minusDays(1));
+        input.setUser(dto);
+        when(userRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.createUser(input, EUnitType.Inner))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("激活结束日期必须大于起始日期");
+    }
+
+    @Test
+    @DisplayName("createUser：激活区间合法或仅缺一个端点时允许创建")
+    void createUserAllowsValidOrPartialActiveRange() {
+        when(userRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> {
+            User u = inv.getArgument(0);
+            u.setId(301L);
+            return u;
+        });
+
+        CreateOrUpdateUserInput both = new CreateOrUpdateUserInput();
+        UserEditDto bothDto = new UserEditDto();
+        bothDto.setName("张三");
+        bothDto.setPassword("p");
+        bothDto.setUserName("u1");
+        bothDto.setActive(true);
+        bothDto.setActiveStartDate(LocalDate.now());
+        bothDto.setActiveEndDate(LocalDate.now().plusDays(1));
+        both.setUser(bothDto);
+        assertThat(service.createUser(both, EUnitType.Inner)).isEqualTo(301L);
+
+        CreateOrUpdateUserInput onlyEnd = new CreateOrUpdateUserInput();
+        UserEditDto endDto = new UserEditDto();
+        endDto.setName("李四");
+        endDto.setPassword("p");
+        endDto.setUserName("u2");
+        endDto.setActive(true);
+        endDto.setActiveEndDate(LocalDate.now().plusDays(1));
+        onlyEnd.setUser(endDto);
+        assertThat(service.createUser(onlyEnd, EUnitType.Inner)).isEqualTo(301L);
+
+        CreateOrUpdateUserInput onlyStart = new CreateOrUpdateUserInput();
+        UserEditDto startDto = new UserEditDto();
+        startDto.setName("王五");
+        startDto.setPassword("p");
+        startDto.setUserName("u3");
+        startDto.setActive(true);
+        startDto.setActiveStartDate(LocalDate.now().minusDays(1));
+        onlyStart.setUser(startDto);
+        assertThat(service.createUser(onlyStart, EUnitType.Inner)).isEqualTo(301L);
+    }
+
+    @Test
+    @DisplayName("createUser：用户名 / 工号重复时抛业务异常")
+    void createUserThrowsOnDuplicateUserNameOrWorkNumber() {
+        when(userRepository.findOne(any(Specification.class))).thenReturn(Optional.of(activeUser(9L)));
+        CreateOrUpdateUserInput duplicateName = new CreateOrUpdateUserInput();
+        UserEditDto nameDto = new UserEditDto();
+        nameDto.setName("张三");
+        nameDto.setPassword("p");
+        nameDto.setUserName("dup");
+        duplicateName.setUser(nameDto);
+        assertThatThrownBy(() -> service.createUser(duplicateName, EUnitType.Inner))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("用户名已被占用");
+
+        when(userRepository.findOne(any(Specification.class)))
+                .thenReturn(Optional.empty(), Optional.of(activeUser(9L)));
+        CreateOrUpdateUserInput duplicateWorkNumber = new CreateOrUpdateUserInput();
+        UserEditDto workDto = new UserEditDto();
+        workDto.setName("张三");
+        workDto.setPassword("p");
+        workDto.setUserName("u");
+        workDto.setWorkNumber("w-dup");
+        duplicateWorkNumber.setUser(workDto);
+        assertThatThrownBy(() -> service.createUser(duplicateWorkNumber, EUnitType.Inner))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("工号已被占用");
+    }
+
+    @Test
+    @DisplayName("createUser：工号非空且唯一时允许创建")
+    void createUserAllowsUniqueWorkNumber() {
+        when(userRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> {
+            User u = inv.getArgument(0);
+            u.setId(405L);
+            return u;
+        });
+
+        CreateOrUpdateUserInput input = new CreateOrUpdateUserInput();
+        UserEditDto dto = new UserEditDto();
+        dto.setName("张三");
+        dto.setPassword("p");
+        dto.setUserName("u");
+        dto.setWorkNumber("w-unique");
+        input.setUser(dto);
+
+        assertThat(service.createUser(input, EUnitType.Inner)).isEqualTo(405L);
+    }
+
+    @Test
+    @DisplayName("createUser：指定角色时推进代际并发送激活邮件")
+    void createUserPublishesSubjectAndSendsActivationEmail() {
+        CreateOrUpdateUserInput input = new CreateOrUpdateUserInput();
+        UserEditDto dto = new UserEditDto();
+        dto.setName("张三");
+        dto.setPassword("p");
+        dto.setUserName("u");
+        dto.setEmailAddress("a@b.c");
+        input.setUser(dto);
+        input.setAssignedRoleIds(List.of(5L));
+        input.setSendActivationEmail(true);
+        when(userRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
+        Role role = new Role();
+        role.setId(5L);
+        when(roleService.findAllById(List.of(5L))).thenReturn(List.of(role));
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> {
+            User u = inv.getArgument(0);
+            u.setId(302L);
+            return u;
+        });
+        when(authzSubjectVersionService.nextVersion(anyString(), org.mockito.ArgumentMatchers.eq(302L)))
+                .thenReturn(3L);
+
+        assertThat(service.createUser(input, EUnitType.Inner)).isEqualTo(302L);
+
+        verify(authzSubjectVersionService).nextVersion(anyString(), org.mockito.ArgumentMatchers.eq(302L));
+        verify(emailRpcService).sendEmail(org.mockito.ArgumentMatchers.eq("账号激活通知"),
+                org.mockito.ArgumentMatchers.contains("key="),
+                org.mockito.ArgumentMatchers.eq("a@b.c"));
+        verify(redisUtil).setCache(anyString(), anyString(), org.mockito.ArgumentMatchers.eq(900L));
+    }
+
+    @Test
+    @DisplayName("createUser：发送激活邮件失败时包装为业务异常")
+    void createUserWrapsActivationMailFailure() {
+        CreateOrUpdateUserInput input = new CreateOrUpdateUserInput();
+        UserEditDto dto = new UserEditDto();
+        dto.setName("张三");
+        dto.setPassword("p");
+        dto.setUserName("u");
+        dto.setEmailAddress("a@b.c");
+        input.setUser(dto);
+        input.setSendActivationEmail(true);
+        when(userRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> {
+            User u = inv.getArgument(0);
+            u.setId(303L);
+            return u;
+        });
+        doThrow(new RuntimeException("smtp down"))
+                .when(emailRpcService).sendEmail(anyString(), anyString(), anyString());
+
+        assertThatThrownBy(() -> service.createUser(input, EUnitType.Inner))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("邮件发送失败");
+    }
+
+    @Test
+    @DisplayName("createUser：redisUtil 为空时激活邮件不带 key")
+    void createUserSendsActivationEmailWithoutRedis() {
+        ReflectionTestUtils.setField(service, "redisUtil", null);
+        CreateOrUpdateUserInput input = new CreateOrUpdateUserInput();
+        UserEditDto dto = new UserEditDto();
+        dto.setName("张三");
+        dto.setPassword("p");
+        dto.setUserName("u");
+        dto.setEmailAddress("a@b.c");
+        input.setUser(dto);
+        input.setSendActivationEmail(true);
+        when(userRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> {
+            User u = inv.getArgument(0);
+            u.setId(304L);
+            return u;
+        });
+
+        service.createUser(input, EUnitType.Inner);
+
+        verify(emailRpcService).sendEmail(org.mockito.ArgumentMatchers.eq("账号激活通知"),
+                org.mockito.ArgumentMatchers.eq("http://active?userId=304"),
+                org.mockito.ArgumentMatchers.eq("a@b.c"));
+    }
+
+    @Test
+    @DisplayName("generateToken：用户存在时签发令牌")
+    void generateToken() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(activeUser(1L)));
+        when(tokenAuthManager.generateToken(any(UserContext.class))).thenReturn("T");
+
+        assertThat(service.generateToken(1L)).isEqualTo("T");
+    }
+
+    @Test
+    @DisplayName("decryptSm4：密钥合法时成功解密")
+    void decryptSm4SucceedsWithValidKey() {
+        String key = "0123456789abcdeffedcba9876543210";
+        when(appAuthConfig.getLoginEncryptKey()).thenReturn(key);
+        String encrypted = SmUtil.sm4(HexUtil.decodeHex(key)).encryptHex("secret");
+
+        assertThat(service.decryptSm4(encrypted, "err")).isEqualTo("secret");
     }
 }
