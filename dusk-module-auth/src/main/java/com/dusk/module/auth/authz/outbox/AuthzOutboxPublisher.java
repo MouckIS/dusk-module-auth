@@ -386,7 +386,7 @@ public class AuthzOutboxPublisher implements DisposableBean {
         if (now - last < UNAVAILABLE_WARN_INTERVAL_MS || !lastUnavailableWarnAt.compareAndSet(last, now)) {
             return;
         }
-        log.warn("Outbox 未投递：MessageSender 不可用。请确认 dusk.mq.rocketmq.enabled=true 且 broker 可达；"
+        log.warn("Outbox 未投递：MessageSender 不可用。请确认 dusk.mqs.rocketmq.enabled=true 且 broker 可达；"
                 + "事件将持续保留在 sys_authz_outbox_event（status=PENDING），恢复后自动投递。");
     }
 

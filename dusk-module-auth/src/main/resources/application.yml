@@ -80,6 +80,7 @@ app:
         # 数据库租约时长（秒），多实例领取时使用 FOR UPDATE SKIP LOCKED + 租约。
         lease-seconds: ${APP_AUTHZ_MQ_OUTBOX_LEASE_SECONDS:30}
 
+
 # RocketMQ 通用层总闸（dusk-common-mqs 的 RocketMQEnableCondition）。
 # 权限事件链路要真正流动，必须同时打开本开关与 app.authz.mq.enabled（8.9 / 8.11）。
 # 默认关闭：未配置 broker 的环境不应因为缺配置而启动失败；打开后 RocketMQMessageSender

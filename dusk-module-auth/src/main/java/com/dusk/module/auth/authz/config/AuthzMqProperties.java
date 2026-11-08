@@ -13,7 +13,7 @@ import java.time.Duration;
  * <p><b>主题名默认值即是跨仓契约</b>：消费端在 Gateway（{@code app.authorization.mq.*}），
  * 两侧默认值必须逐字一致（8.2）。改名等价于静默断链，因此这里的默认值不随环境变化。</p>
  *
- * <p>本配置与 {@code dusk.mq.rocketmq.enabled} 是<b>两个独立开关</b>：前者控制「本模块是否
+ * <p>本配置与 {@code dusk.mqs.rocketmq.enabled} 是<b>两个独立开关</b>：前者控制「本模块是否
  * 生产/消费事件」，后者控制「mqs 通用层是否装配」。只有两者都打开，事件才真正流动（8.3 实测约束）。</p>
  *
  * <p><b>为什么用 {@code @Component} 而不是 {@code @EnableConfigurationProperties}</b>：本类需要

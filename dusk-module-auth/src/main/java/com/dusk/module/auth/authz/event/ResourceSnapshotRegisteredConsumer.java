@@ -85,7 +85,7 @@ public class ResourceSnapshotRegisteredConsumer implements MessageConsumer<Resou
 
     @Override
     public String getConsumerGroup() {
-        return env() + "." + properties.getDomain() + ".auth-registry-snapshot";
+        return env() + "_" + properties.getDomain() + "_auth-registry-snapshot";
     }
 
     @Override

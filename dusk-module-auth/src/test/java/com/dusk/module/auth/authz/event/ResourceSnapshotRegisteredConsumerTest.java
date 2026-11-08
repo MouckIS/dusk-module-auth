@@ -17,14 +17,9 @@ import org.mockito.ArgumentCaptor;
 import java.util.List;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * {@link ResourceSnapshotRegisteredConsumer} 测试，覆盖《权限优化方案-整理版》8.4 / 8.6 的 MQ 注册语义。
@@ -133,7 +128,7 @@ class ResourceSnapshotRegisteredConsumerTest {
     void shouldExposeSubscriptionContract() {
         assertThat(consumer.getTopic()).isEqualTo("RESOURCE_SNAPSHOT_REGISTERED");
         assertThat(consumer.getDomain()).isEqualTo("authz");
-        assertThat(consumer.getConsumerGroup()).endsWith(".authz.auth-registry-snapshot");
+        assertThat(consumer.getConsumerGroup()).endsWith("_authz_auth-registry-snapshot");
         assertThat(consumer.getPayloadType()).isEqualTo(ResourceSnapshot.class);
         assertThat(consumer.getConsumeMode()).isEqualTo(ConsumeMode.CONCURRENTLY);
         assertThat(consumer.isIdempotent()).isTrue();
@@ -149,6 +144,6 @@ class ResourceSnapshotRegisteredConsumerTest {
         ResourceSnapshotRegisteredConsumer custom = new ResourceSnapshotRegisteredConsumer(registryService, properties);
 
         assertThat(custom.getTopic()).isEqualTo("RESOURCE_SNAPSHOT_REGISTERED_SIT");
-        assertThat(custom.getConsumerGroup()).endsWith(".authz-sit.auth-registry-snapshot");
+        assertThat(custom.getConsumerGroup()).endsWith("_authz-sit_auth-registry-snapshot");
     }
 }
