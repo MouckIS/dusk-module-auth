@@ -19,7 +19,6 @@ import com.dusk.module.auth.service.ToDoPushService;
 import com.dusk.module.notification.service.IAuthPushRpcService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -47,7 +46,7 @@ public class ToDoPushServiceImpl implements ToDoPushService {
     private IUserManage userManage;
     @Resource
     private IUserRpcService userRpcService;
-    @DubboReference
+    @Autowired
     private IAuthPushRpcService pushRpcService;
 
     @Override

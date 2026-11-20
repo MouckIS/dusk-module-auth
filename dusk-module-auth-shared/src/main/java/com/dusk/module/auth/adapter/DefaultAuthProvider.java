@@ -5,7 +5,7 @@ import com.dusk.common.core.auth.permission.Permission;
 import com.dusk.common.core.auth.permission.UrlPermission;
 import com.dusk.module.auth.service.IAuthRpcService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -19,32 +19,24 @@ import java.util.Map;
 @Component
 @Slf4j
 public class DefaultAuthProvider implements IAuthProvider {
-    @DubboReference(timeout = 5000, retries = 0)
+    @Autowired
     public IAuthRpcService authService;
 
     /**
-     * 简单支持异步重试，如要优雅可以引入guava里的retry包
+     * 推送权限清单。
      *
-     * @param applicationName
-     * @param allowAnonymousPath
-     * @param definitionPermissions
-     * @param urlPermissions
+     * <p>单体化前这是一次跨进程 Dubbo 调用，失败很常见，所以原实现用
+     * {@code while (true) + Thread.sleep(10000)} 无限重试；现在 {@code authService} 是同进程内的
+     * 本地 bean（{@code AuthRpcServiceImpl}），调用不再有网络失败的可能，永久重试只会在
+     * 真正有 bug 时无声地占满 {@code @Async} 线程池。因此改为单次调用，异常只记录日志。</p>
      */
     @Async
     @Override
     public void provideAuthInfo(String applicationName, List<String> allowAnonymousPath, Map<String, Permission> definitionPermissions, Map<String, List<UrlPermission>> urlPermissions) {
-        while (true) {
-            try {
-                authService.provideAuthInfo(applicationName, allowAnonymousPath, definitionPermissions, urlPermissions);
-                return;
-            } catch (Exception ex) {
-                log.error("推送权限清单异常：{}", ex.getMessage());
-                try {
-                    Thread.sleep(10000);
-                } catch (InterruptedException iex) {
-                    log.warn("终止推送权限清单！");
-                }
-            }
+        try {
+            authService.provideAuthInfo(applicationName, allowAnonymousPath, definitionPermissions, urlPermissions);
+        } catch (Exception ex) {
+            log.error("推送权限清单异常：{}", ex.getMessage(), ex);
         }
     }
 }

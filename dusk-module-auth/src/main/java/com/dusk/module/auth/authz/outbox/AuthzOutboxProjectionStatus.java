@@ -1,12 +1,14 @@
 package com.dusk.module.auth.authz.outbox;
 
+import com.dusk.common.core.entity.BaseEnum;
+
 /**
  * Outbox 的投影状态，见《权限优化方案-整理版》6.2。
  *
  * <p>投影与投递是两个可恢复步骤：投影失败不得发送对应事件，也不得把 Outbox 标记为完成。
  * 因此投影状态与发送状态（{@link AuthzOutboxStatus}）必须分开记录。</p>
  */
-public enum AuthzOutboxProjectionStatus {
+public enum AuthzOutboxProjectionStatus implements BaseEnum {
 
     /**
      * 尚未投影。
@@ -26,5 +28,15 @@ public enum AuthzOutboxProjectionStatus {
     /**
      * 该事件不需要投影（未知类型/兼容事件）。
      */
-    SKIPPED
+    SKIPPED;
+
+    @Override
+    public int getValue() {
+        return ordinal();
+    }
+
+    @Override
+    public String getDisplayName() {
+        return name();
+    }
 }

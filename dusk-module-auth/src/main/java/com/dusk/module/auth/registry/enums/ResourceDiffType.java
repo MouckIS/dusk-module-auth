@@ -1,12 +1,14 @@
 package com.dusk.module.auth.registry.enums;
 
+import com.dusk.common.core.entity.BaseEnum;
+
 /**
  * Resource Diff 的结果类型，见《权限优化方案-整理版》4.1。
  *
  * <p>四种类型互斥，判定顺序为：先看 {@code (method, path)} 的存在性（{@link #ADD} / {@link #REMOVE}），
  * 再在 key 相同的前提下比较 permission（{@link #REBIND} 优先于 {@link #UPDATE}）。</p>
  */
-public enum ResourceDiffType {
+public enum ResourceDiffType implements BaseEnum {
 
     /**
      * 新增：新的 {@code (method, path)} 出现。Auth 侧新建 Resource + Permission。
@@ -45,5 +47,10 @@ public enum ResourceDiffType {
 
     public String getDescription() {
         return description;
+    }
+
+    @Override
+    public int getValue() {
+        return ordinal();
     }
 }

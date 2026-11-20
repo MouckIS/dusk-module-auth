@@ -44,7 +44,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.annotation.Resource;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,7 +54,7 @@ import java.io.OutputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@DubboService
+@Service
 @Transactional
 public class RoleServiceImpl extends BaseService<Role, IRoleRepository> implements IRoleRpcService, IRoleService {
 

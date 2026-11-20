@@ -5,7 +5,7 @@ import com.dusk.common.rpc.authz.IPermissionRegistryRpcService;
 import com.dusk.common.rpc.authz.ResourceRegistrationResult;
 import com.dusk.module.auth.registry.service.IResourceRegistryService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.stereotype.Service;
 
 /**
  * 权限注册 Dubbo Provider，见《权限优化方案-整理版》4.3。
@@ -14,7 +14,7 @@ import org.apache.dubbo.config.annotation.DubboService;
  * 不把异常透传给消费者——确定性失败必须映射为稳定结果码，让 SDK 的 readiness 逻辑
  * 不依赖异常类型。</p>
  */
-@DubboService
+@Service
 @Slf4j
 public class PermissionRegistryRpcServiceImpl implements IPermissionRegistryRpcService {
 

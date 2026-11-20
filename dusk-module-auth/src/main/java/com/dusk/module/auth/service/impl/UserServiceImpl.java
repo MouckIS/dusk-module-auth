@@ -66,7 +66,6 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -156,9 +155,9 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     private AppAuthConfig appAuthConfig;
     @Resource
     private SmsPushConfig smsPushConfig;
-    @DubboReference
+    @Autowired
     private IAuthPushRpcService pushRpcService;
-    @DubboReference
+    @Autowired
     private IEmailRpcService emailRpcService;
     @Resource
     private TokenAuthManager tokenAuthManager;
@@ -168,7 +167,7 @@ public class UserServiceImpl extends BaseService<User, IUserRepository> implemen
     private IOrganizationManagerRepository organizationManagerRepository;
     @Resource
     private IStationService stationService;
-    @DubboReference
+    @Autowired
     private ISettingRpcService settingRpcService;
     @Autowired(required = false)
     private MessageSender sender;

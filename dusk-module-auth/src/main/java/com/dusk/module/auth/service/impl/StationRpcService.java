@@ -11,7 +11,7 @@ import com.dusk.module.auth.mapper.StationMapper;
 import com.dusk.module.auth.repository.IStationRepository;
 import com.dusk.module.auth.service.IStationService;
 import jakarta.annotation.Resource;
-import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.stereotype.Service;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ import java.util.List;
  * @author kefuming
  * @date 2022/10/11 19:48
  */
-@DubboService
+@Service
 public class StationRpcService implements IStationRpcService {
     private final StationMapper mapper = StationMapper.INSTANCE;
     @Resource

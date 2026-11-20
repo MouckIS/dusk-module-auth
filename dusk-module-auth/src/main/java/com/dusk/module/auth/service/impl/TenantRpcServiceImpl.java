@@ -7,7 +7,7 @@ import com.dusk.module.auth.entity.Tenant;
 import com.dusk.module.auth.mapper.TenantMapper;
 import com.dusk.module.auth.repository.ITenantRepository;
 import jakarta.annotation.Resource;
-import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,7 @@ import java.util.Optional;
  * @author kefuming
  * @date 2020-07-24 16:35
  */
-@DubboService
+@Service
 public class TenantRpcServiceImpl implements ITenantRpcService {
     private final TenantMapper mapper = TenantMapper.INSTANCE;
     @Resource

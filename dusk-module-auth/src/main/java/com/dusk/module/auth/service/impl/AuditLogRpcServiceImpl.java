@@ -5,14 +5,14 @@ import com.dusk.module.auth.service.IAuditLogRpcService;
 import com.dusk.module.auth.entity.AuditLog;
 import com.dusk.module.auth.repository.IAuditLogRepository;
 import jakarta.annotation.Resource;
-import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.stereotype.Service;
 import org.springframework.beans.BeanUtils;
 
 /**
  * @author kefuming
  * @date 2020-07-24 15:07
  */
-@DubboService(retries = 0, timeout = 2000)
+@Service
 public class AuditLogRpcServiceImpl implements IAuditLogRpcService {
     @Resource
     private IAuditLogRepository repository;

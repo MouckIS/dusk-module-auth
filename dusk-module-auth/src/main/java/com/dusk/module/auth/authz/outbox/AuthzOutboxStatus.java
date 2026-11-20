@@ -1,5 +1,7 @@
 package com.dusk.module.auth.authz.outbox;
 
+import com.dusk.common.core.entity.BaseEnum;
+
 /**
  * Outbox 事件投递状态，见《权限优化方案-整理版》8.5。
  *
@@ -7,7 +9,7 @@ package com.dusk.module.auth.authz.outbox;
  * {@code PENDING → FAILED}（超过最大尝试次数，告警人工介入，<b>不丢弃</b>）；
  * {@code FAILED → SENT}（人工重放）。</p>
  */
-public enum AuthzOutboxStatus {
+public enum AuthzOutboxStatus implements BaseEnum {
 
     /** 已落库，待投递。 */
     PENDING,
@@ -16,5 +18,15 @@ public enum AuthzOutboxStatus {
     SENT,
 
     /** 超过最大尝试次数，需人工介入。 */
-    FAILED
+    FAILED;
+
+    @Override
+    public int getValue() {
+        return ordinal();
+    }
+
+    @Override
+    public String getDisplayName() {
+        return name();
+    }
 }

@@ -3,6 +3,7 @@ package com.dusk.module.auth.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
+import com.dusk.common.core.auth.authentication.AuthorizationContextHolder;
 import com.dusk.common.core.auth.permission.Permission;
 import com.dusk.common.core.auth.permission.UrlPermission;
 import com.dusk.common.core.dto.NameValueDefaultByDto;
@@ -27,8 +28,7 @@ import com.dusk.module.auth.service.IFeatureChecker;
 import com.dusk.module.auth.service.IStationService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.DubboService;
-import org.apache.dubbo.rpc.RpcContext;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
@@ -38,7 +38,7 @@ import java.util.*;
  * @date 2020-05-22 14:01
  */
 @Slf4j
-@DubboService
+@Service
 public class AuthRpcServiceImpl implements IAuthRpcService {
     @Resource
     JwtTokenFactory jwtTokenFactory;
@@ -80,9 +80,16 @@ public class AuthRpcServiceImpl implements IAuthRpcService {
         customAuthProvider.provideAuthInfo(applicationName, allowAnonymousPath, definitionPermissions, urlPermissions);
     }
 
+    /**
+     * 取得当前线程绑定的登录用户上下文。
+     *
+     * <p>原实现从 Dubbo 的 {@code RpcContext} 附件里读 authorization。单体化后不再有跨进程调用，
+     * 同一个线程上 {@link com.dusk.common.core.auth.authentication.AuthorizationContextHolder}
+     * 持有的值与 Dubbo consumer filter 原本写入附件的值是同一个来源，因此直接读 holder 即可。</p>
+     */
     @Override
     public UserContext getUserContext() {
-        String authorization = RpcContext.getContext().getAttachment("authorization");
+        String authorization = AuthorizationContextHolder.getAuthorization();
         UserContext userContext = null;
         if (!StringUtils.isEmpty(authorization)) {
             try {

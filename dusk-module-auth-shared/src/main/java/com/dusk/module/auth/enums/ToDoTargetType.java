@@ -1,10 +1,12 @@
 package com.dusk.module.auth.enums;
 
+import com.dusk.common.core.entity.BaseEnum;
+
 /**
  * @author kefuming
  * @date 2020-08-04 14:21
  */
-public enum ToDoTargetType {
+public enum ToDoTargetType implements BaseEnum {
     /**
      * 指定用户id
      */
@@ -16,5 +18,15 @@ public enum ToDoTargetType {
     /**
      * 指定角色名称（中文名）
      */
-    Role
+    Role;
+
+    @Override
+    public int getValue() {
+        return ordinal();
+    }
+
+    @Override
+    public String getDisplayName() {
+        return name();
+    }
 }

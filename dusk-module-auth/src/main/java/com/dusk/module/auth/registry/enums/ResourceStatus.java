@@ -1,5 +1,7 @@
 package com.dusk.module.auth.registry.enums;
 
+import com.dusk.common.core.entity.BaseEnum;
+
 import com.dusk.common.core.exception.BusinessException;
 
 import java.util.Collections;
@@ -17,7 +19,7 @@ import java.util.Set;
  * 资源先进入 {@link #PENDING_REBIND}，运行时仍按旧绑定执行，
  * 直到管理员确认（→ {@link #ACTIVE}）或拒绝（→ {@link #REBIND_REJECTED}）。</p>
  */
-public enum ResourceStatus {
+public enum ResourceStatus implements BaseEnum {
 
     /**
      * 正常：资源存在且绑定已被接纳，参与运行时映射。
@@ -119,5 +121,10 @@ public enum ResourceStatus {
      */
     public boolean effectiveForRuntime() {
         return this == ACTIVE || this == PENDING_REBIND || this == REBIND_REJECTED;
+    }
+
+    @Override
+    public int getValue() {
+        return ordinal();
     }
 }

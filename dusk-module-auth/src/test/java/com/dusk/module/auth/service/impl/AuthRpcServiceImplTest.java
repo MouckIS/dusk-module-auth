@@ -1,5 +1,6 @@
 package com.dusk.module.auth.service.impl;
 
+import com.dusk.common.core.auth.authentication.AuthorizationContextHolder;
 import com.dusk.common.core.auth.permission.Permission;
 import com.dusk.common.core.auth.permission.UrlPermission;
 import com.dusk.common.core.exception.UserContextException;
@@ -18,7 +19,6 @@ import com.dusk.module.auth.dto.station.StationsOfLoginUserDto;
 import com.dusk.module.auth.feature.CenterControlFeatureProvider;
 import com.dusk.module.auth.service.IFeatureChecker;
 import com.dusk.module.auth.service.IStationService;
-import org.apache.dubbo.rpc.RpcContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -95,7 +95,7 @@ class AuthRpcServiceImplTest {
 
     @AfterEach
     void tearDown() {
-        RpcContext.removeContext();
+        AuthorizationContextHolder.clear();
     }
 
     private static StationsOfLoginUserDto station(long value, boolean defaultBy) {
@@ -163,13 +163,14 @@ class AuthRpcServiceImplTest {
     @Test
     @DisplayName("getUserContext：无 authorization 头时返回 null")
     void getUserContextReturnsNullWhenNoAttachment() {
+        AuthorizationContextHolder.clear();
         assertThat(service.getUserContext()).isNull();
     }
 
     @Test
     @DisplayName("getUserContext：解析成功时返回用户上下文")
     void getUserContextParsesToken() {
-        RpcContext.getContext().setAttachment("authorization", "Bearer abc");
+        AuthorizationContextHolder.setAuthorization("Bearer abc");
         UserContext context = new UserContext();
         when(jwtHeaderTokenExtractor.extract("Bearer abc")).thenReturn("abc");
         when(jwtTokenFactory.parseJwtToken("abc")).thenReturn(context);
@@ -180,7 +181,7 @@ class AuthRpcServiceImplTest {
     @Test
     @DisplayName("getUserContext：解析异常时返回 null")
     void getUserContextReturnsNullWhenParseFails() {
-        RpcContext.getContext().setAttachment("authorization", "Bearer bad");
+        AuthorizationContextHolder.setAuthorization("Bearer bad");
         when(jwtHeaderTokenExtractor.extract("Bearer bad")).thenReturn("bad");
         when(jwtTokenFactory.parseJwtToken("bad")).thenThrow(new IllegalArgumentException("bad token"));
 

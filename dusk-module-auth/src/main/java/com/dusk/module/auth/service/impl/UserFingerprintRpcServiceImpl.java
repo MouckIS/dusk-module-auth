@@ -5,7 +5,7 @@ import com.dusk.module.auth.dto.fingerprint.UserFingerprintDto;
 import com.dusk.module.auth.service.IUserFingerprintRpcService;
 import com.dusk.module.auth.service.IUserFingerprintService;
 import jakarta.annotation.Resource;
-import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ import java.util.List;
  * @author kefuming
  * @date 2021-05-13 8:23
  */
-@DubboService
+@Service
 public class UserFingerprintRpcServiceImpl implements IUserFingerprintRpcService {
     @Resource
     private IUserFingerprintService userFingerprintService;

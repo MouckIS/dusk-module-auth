@@ -3,7 +3,7 @@ package com.dusk.module.auth.impl;
 import com.dusk.module.auth.dto.ToDoDto;
 import com.dusk.module.auth.push.IPushManager;
 import com.dusk.module.auth.service.ITodoRpcService;
-import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class PushManager implements IPushManager {
-    @DubboReference
+    @Autowired
     ITodoRpcService todoRpcService;
 
     @Override

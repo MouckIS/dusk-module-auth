@@ -20,7 +20,6 @@ import com.dusk.module.auth.mapper.UserFingerprintMapper;
 import com.dusk.module.auth.repository.IUserFingerprintRepository;
 import com.dusk.module.auth.service.IUserFingerprintService;
 import jakarta.annotation.Resource;
-import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -46,7 +45,7 @@ public class UserFingerprintServiceImpl extends BaseService<UserFingerprint, IUs
     private MqttUtils mqttUtils;
     @Resource
     private SecurityUtils securityUtils;
-    @DubboReference
+    @Autowired
     private ISerialNoRpcService serialNoRpcService;
 
     @Override

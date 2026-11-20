@@ -39,8 +39,8 @@ import com.querydsl.core.types.QBean;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.annotation.Resource;
-import org.apache.dubbo.config.annotation.DubboReference;
-import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -57,7 +57,7 @@ import java.util.stream.Collectors;
  * @author kefuming
  * @date 2020-05-13 13:42
  */
-@DubboService
+@Service
 @Transactional
 public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, IOrganizationUnitRepository> implements IOrganizationUnitRpcService, IOrganizationUnitService {
     private final OrganizationMapper mapper = OrganizationMapper.INSTANCE;
@@ -67,7 +67,7 @@ public class OrganizationUnitServiceImpl extends TreeService<OrganizationUnit, I
     private IUserRepository userRepository;
     @Resource
     private IOrganizationManagerRepository organizationManagerRepository;
-    @DubboReference
+    @Autowired
     private ISerialNoRpcService serialNoRpcService;
 
     @Override

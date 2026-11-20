@@ -10,7 +10,7 @@ import com.dusk.module.auth.entity.OrganizationUnit;
 import com.dusk.module.auth.mapper.OrganizationMapper;
 import com.dusk.module.auth.service.IOrganizationUnitService;
 import jakarta.annotation.Resource;
-import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.List;
  * @author kefuming
  * @date 2021/5/21
  */
-@DubboService
+@Service
 @Transactional
 public class CustomerRpcServiceImpl implements ICustomerRpcService {
     private final OrganizationMapper mapper = OrganizationMapper.INSTANCE;

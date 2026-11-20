@@ -1,5 +1,7 @@
 package com.dusk.module.auth.registry.enums;
 
+import com.dusk.common.core.entity.BaseEnum;
+
 import com.dusk.common.core.exception.BusinessException;
 
 import java.util.Collections;
@@ -20,7 +22,7 @@ import java.util.Set;
  *       即管理员在抖动期的禁用操作不会被代码部署静默回滚。</li>
  * </ul>
  */
-public enum PermissionStatus {
+public enum PermissionStatus implements BaseEnum {
 
     /**
      * 生效中：至少被一个 ACTIVE Release 使用。
@@ -133,5 +135,10 @@ public enum PermissionStatus {
      */
     public boolean effectiveForRuntime() {
         return this == ACTIVE || this == ORPHANED;
+    }
+
+    @Override
+    public int getValue() {
+        return ordinal();
     }
 }

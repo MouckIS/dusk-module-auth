@@ -6,7 +6,7 @@ import com.dusk.common.core.service.IFavoriteService;
 import com.dusk.module.auth.service.ICommonFavoriteRpcService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.ObjectMapper;
@@ -23,7 +23,7 @@ import java.util.Objects;
 @Service
 @Slf4j
 public class FavoriteServiceImpl<T extends AbstractBaseFavoriteDto> implements IFavoriteService<T> {
-    @DubboReference
+    @Autowired
     ICommonFavoriteRpcService iCommonFavoriteRpcService;
     @Resource
     ObjectMapper jackson;

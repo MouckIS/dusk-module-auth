@@ -5,7 +5,7 @@ import com.dusk.common.core.tenant.TenantContextHolder;
 import com.dusk.module.auth.service.IFeatureChecker;
 import com.dusk.module.auth.service.IFeatureRpcService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class FeatureChecker implements IFeatureChecker {
-    @DubboReference
+    @Autowired
     private IFeatureRpcService featureRpcService;
 
     @Value("${spring.application.name}")

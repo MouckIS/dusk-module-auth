@@ -1,5 +1,7 @@
 package com.dusk.module.auth.registry.enums;
 
+import com.dusk.common.core.entity.BaseEnum;
+
 import com.dusk.common.core.exception.BusinessException;
 
 import java.util.*;
@@ -11,7 +13,7 @@ import java.util.*;
  * 「instance-1 还在 1.0.0、instance-2 已是 1.1.0」的多版本并存问题。
  * 只要旧 Release 仍为 {@link #ACTIVE}，其独有 Resource 对应的 Permission 就必须保持生效。</p>
  */
-public enum ReleaseStatus {
+public enum ReleaseStatus implements BaseEnum {
 
     /**
      * 已注册：SDK 完成注册，但尚无运行实例，也未被部署系统标记为当前有效版本。
@@ -146,5 +148,10 @@ public enum ReleaseStatus {
      */
     public static List<ReleaseStatus> trafficCapableStatuses() {
         return TRAFFIC_CAPABLE;
+    }
+
+    @Override
+    public int getValue() {
+        return ordinal();
     }
 }

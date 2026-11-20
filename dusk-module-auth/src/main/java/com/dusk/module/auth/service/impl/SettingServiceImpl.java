@@ -20,7 +20,7 @@ import com.dusk.module.metadata.enums.SettingAccessLevel;
 import com.dusk.module.metadata.service.ISettingRpcService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ import java.util.Map;
  * @date 2020-05-21 15:12
  */
 @Slf4j
-@DubboService
+@Service
 @Transactional
 public class SettingServiceImpl implements ISettingRpcService, ISettingService {
     private final SettingMapper mapper = SettingMapper.INSTANCE;

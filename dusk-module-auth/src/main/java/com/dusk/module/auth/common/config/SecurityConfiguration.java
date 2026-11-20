@@ -18,7 +18,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -87,8 +87,19 @@ public class SecurityConfiguration {
     }
 
     /* ================ 5. 密码编码器 ================ */
+
+    /**
+     * 密码编码器：<b>必须</b>是裸 BCrypt，不能换成 {@code PasswordEncoderFactories} 的 Delegating 版本。
+     *
+     * <p>库里的 {@code sys_user.password} 是历史写入的裸 bcrypt 串（例如
+     * {@code $2a$10$6wES...}，见 {@code V1__init_20200630.sql}），没有 {@code {bcrypt}} 前缀；
+     * Delegating 版本对无前缀串会走 {@code UnmappedIdPasswordEncoder} 并抛
+     * {@code IllegalArgumentException: There is no PasswordEncoder mapped for the id "null"}，
+     * 导致所有历史账号无法登录。单体化前该 bean 实际由已删除的 {@code DuskAuthApplication}
+     * 提供（同名 bean 覆盖了这里的 Delegating 版本），合并后必须在此显式保留 BCrypt。</p>
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        return new BCryptPasswordEncoder();
     }
 }

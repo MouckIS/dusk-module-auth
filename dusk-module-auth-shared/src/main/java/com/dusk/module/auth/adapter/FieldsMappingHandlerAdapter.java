@@ -3,7 +3,7 @@ package com.dusk.module.auth.adapter;
 import com.dusk.common.core.port.FieldsMappingHandler;
 import com.dusk.module.auth.dto.UserSimpleDto;
 import com.dusk.module.auth.service.IUserRpcService;
-import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  */
 @Service
 public class FieldsMappingHandlerAdapter implements FieldsMappingHandler {
-    @DubboReference
+    @Autowired
     private IUserRpcService userRpcService;
 
     @Override

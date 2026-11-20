@@ -17,7 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -34,7 +34,7 @@ import org.springframework.web.filter.GenericFilterBean;
 public class TenantContextHolderFilter extends GenericFilterBean {
 
     public static final String TENANT_ID_HEADER = "TENANT-ID";
-    @DubboReference
+    @Autowired
     ITenantRpcService tenantRpcService;
     @Resource
     UserContextUtils userContextUtils;

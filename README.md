@@ -1,11 +1,15 @@
 # dusk-module-auth
 
+> **本模块已并入模块化单体 `dusk-module-app`（2026-11）**：不再单独部署，端口/注册名/Nacos dataId 均已由单体统一持有；
+> 模块间调用改为进程内 Spring bean 注入，原 Dubbo 契约已移除。改造详情见
+> [`docs/单体化改造-微服务合并.md`](../docs/单体化改造-微服务合并.md)。
+
 DuskMS 的 **认证与授权服务**：负责登录认证、JWT 签发与校验、用户/角色/租户/组织管理、权限树、功能特性开关、系统设置、待办与审计日志。
 
 - 聚合坐标：`dusk-module:dusk-module-auth-group:1.2.0`
 - 服务坐标：`com.dusk:dusk-module-auth:1.2.0`
 - 契约坐标：`com.dusk:dusk-module-auth-shared:1.2.0`
-- 端口：dev/sit `53201`
+- 端口：并入单体，统一 `53201`（单体进程端口，可用 `SERVER_PORT` 覆盖）
 
 ## 核心能力
 
@@ -23,7 +27,7 @@ DuskMS 的 **认证与授权服务**：负责登录认证、JWT 签发与校验�
 
 ## 技术栈
 
-Java 25 · Spring Boot 4.0.8 · Spring Security · Spring Data JPA · QueryDSL · MapStruct · Dubbo 3.3.6 · Nacos ·
+Java 25 · Spring Boot 4.0.8 · Spring Security · Spring Data JPA · QueryDSL · MapStruct · Nacos ·
 PostgreSQL · Redis · Flyway · EasyExcel · HanLP · EasyCaptcha · BouncyCastle（国密）· 微信小程序 SDK · JJWT。
 
 ## 模块结构
@@ -33,7 +37,7 @@ dusk-module-auth/
 ├── dusk-module-auth/            可运行的认证服务
 │   └── src/main/java/com/dusk/module/auth/
 │       ├── controller/          REST 接口（约 27 个）
-│       ├── service/ + impl/     业务服务 + @DubboService 实现
+│       ├── service/ + impl/     业务服务 + @Service 实现（原 @DubboService）
 │       ├── repository/          Spring Data JPA
 │       ├── entity/              JPA 实体（用户/角色/租户/组织/厂站/待办/审计…）
 │       ├── mapper/              MapStruct（不是 MyBatis）
@@ -114,16 +118,30 @@ mvn -s settings.xml test
   `sys_user_fingerprint`、`sys_todo*`、`sys_dashboard*`。
 - 菜单与权限为 **常量树 + 授权关系表**，没有独立的权限实体表；动态菜单数据在 metadata 服务。
 
-## 对外 RPC
+## 对外服务契约
 
-`dusk-module-auth-shared` 中的 `I*RpcService` 由本服务 `service/impl` 下的 `@DubboService` 实现，主要接口：
+`dusk-module-auth-shared` 中的 `I*RpcService` 由本模块 `service/impl` 下的 `@Service` 实现。**单体化之后它们不再走 RPC**：
+同进程的其他模块直接 `@Autowired` 注入即可；网关则通过 `/internal/auth/**` 内网端点访问。主要接口：
 
 `IAuthRpcService`、`IUserRpcService`、`IRoleRpcService`、`ITenantRpcService`、`IOrganizationUnitRpcService`、
 `IStationRpcService`、`ITodoRpcService`、`IAuditLogRpcService`、`ITokenAuthRpcService`、`IUserFingerprintRpcService`、
 `ICustomerRpcService`、`ICommonFavoriteRpcService`、`ISsoTokenRpcService`、`ISysMenuRpcService`、`IWxMaRpcService`、
 `ISmRpcUtil`。
 
-Dubbo 扫描包：`com.dusk.module.auth.service`。
+网关侧对应端点（`InternalAuthController` / `InternalAuthorizationRuntimeController`，均 `@IgnoreResponseAdvice`）：
+
+| 端点 | 对应方法 |
+|---|---|
+| `POST /internal/auth/check` | `IAuthRpcService#auth` |
+| `POST /internal/auth/linked-org-ids` | `IAuthRpcService#getLinkedOrgIds` |
+| `POST /internal/auth/change-real-token` | `IAuthRpcService#changeRealToken` |
+| `GET  /internal/auth/tenant` | `ITenantRpcService#findByTenantName` |
+| `POST /internal/auth/sso-sm4-token` | `ISsoTokenRpcService#ssoSm4Token` |
+| `GET  /internal/auth/runtime/resource-snapshot` | `IAuthorizationRuntimeRpcService#getResourceSnapshot` |
+| `GET  /internal/auth/runtime/role-permissions` | `IAuthorizationRuntimeRpcService#getRolePermissions` |
+| `GET  /internal/auth/runtime/subject` | `IAuthorizationRuntimeRpcService#getSubject` |
+
+所有端点都校验请求头 `X-Service-Secret`（配置 `app.registry.service-secret`，为空且 `require-service-secret=true` 时拒绝一切请求）。
 
 ## 测试
 
@@ -133,13 +151,13 @@ Dubbo 扫描包：`com.dusk.module.auth.service`。
 
 ## 相关文档
 
-- [`docs/登录认证授权完整流程.md`](../docs/登录认证授权完整流程.md)
+- [`docs/认证授权与网关过滤链.md`](../docs/认证授权与网关过滤链.md)
 - [`docs/权限优化方案-整理版.md`](../docs/权限优化方案-整理版.md)
 - [`docs/数据维度控制设计实现方案.md`](../docs/数据维度控制设计实现方案.md)
 
 ## 权限注册与运行态回源（2026-10 方案落地）
 
-- **同步注册（Dubbo）**：`IPermissionRegistryRpcService#registerSnapshot`，实现类
+- **同步注册（HTTP 内网端点 `POST /internal/registry/snapshot`）**：`IPermissionRegistryRpcService#registerSnapshot`，实现类
   `com.dusk.module.auth.registry.rpc.PermissionRegistryRpcServiceImpl`。SDK 在 readiness 之前调用，
   只有 `ACCEPTED` / `UNCHANGED` 才允许就绪；`REBIND_APPROVAL_REQUIRED`、`ACTIVE_RELEASE_CONFLICT`、
   `INVALID_SNAPSHOT`、`UNKNOWN_PERMISSION` 都是确定性结果，不自动重试。

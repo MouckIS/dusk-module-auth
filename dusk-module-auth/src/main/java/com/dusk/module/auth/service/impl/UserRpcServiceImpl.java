@@ -43,7 +43,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.stereotype.Service;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -59,7 +59,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Transactional
-@DubboService(retries = 0, timeout = 2000)
+@Service
 public class UserRpcServiceImpl extends BaseService<User, IUserRepository> implements IUserRpcService {
     private final QUser qUser = QUser.user;
     private final UserMapper mapper = UserMapper.INSTANCE;

@@ -13,6 +13,8 @@
     <artifactId>dusk-module-auth</artifactId>
 
     <properties>
+        <!-- 作为模块化单体的库被 dusk-module-app 依赖，禁止 repackage 成可执行 fat jar -->
+        <spring-boot.repackage.skip>true</spring-boot.repackage.skip>
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

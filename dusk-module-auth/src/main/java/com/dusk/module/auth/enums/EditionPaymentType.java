@@ -1,10 +1,12 @@
 package com.dusk.module.auth.enums;
 
+import com.dusk.common.core.entity.BaseEnum;
+
 /**
  * @author kefuming
  * @date 2020-05-19 9:50
  */
-public enum EditionPaymentType {
+public enum EditionPaymentType implements BaseEnum {
     /**
      * Payment on first tenant registration.
      */
@@ -24,5 +26,15 @@ public enum EditionPaymentType {
     /**
      * A tenant is extending it's current edition (without changing the edition).
      */
-    Extend
+    Extend;
+
+    @Override
+    public int getValue() {
+        return ordinal();
+    }
+
+    @Override
+    public String getDisplayName() {
+        return name();
+    }
 }

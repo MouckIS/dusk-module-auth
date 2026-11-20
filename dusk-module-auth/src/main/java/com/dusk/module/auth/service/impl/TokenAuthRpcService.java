@@ -15,7 +15,7 @@ import com.dusk.module.auth.common.manage.TokenAuthManager;
 import com.dusk.module.auth.service.IRoleService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.stereotype.Service;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  * @date 2023/2/9 19:23
  */
 @Slf4j
-@DubboService(retries = 0, timeout = 2000)
+@Service
 public class TokenAuthRpcService implements ITokenAuthRpcService {
     private static final String JWT_NONUSER_TOKEN_PREFIX = "CRUX:AUTH:NONUSER:TOKEN:";
     @Resource

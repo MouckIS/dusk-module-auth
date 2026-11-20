@@ -19,7 +19,7 @@ import com.dusk.module.auth.repository.IUserRepository;
 import com.dusk.module.auth.service.IStationService;
 import com.dusk.module.metadata.service.ISerialNoRpcService;
 import jakarta.annotation.Resource;
-import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -39,7 +39,7 @@ public class StationServiceImpl extends TreeService<Station, IStationRepository>
     private IUserRepository userRepository;
     @Resource
     private IDataFilterDefinitionContext dataFilterDefinitionContext;
-    @DubboReference
+    @Autowired
     private ISerialNoRpcService serialNoRpcService;
 
     @Override

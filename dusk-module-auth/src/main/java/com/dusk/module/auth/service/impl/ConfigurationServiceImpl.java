@@ -28,7 +28,7 @@ import com.dusk.module.metadata.service.IDynamicMenuRpcService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -66,7 +66,7 @@ public class ConfigurationServiceImpl extends CruxBaseServiceImpl implements ICo
     private IUserService userService;
     @Resource
     private TokenAuthManager tokenAuthManager;
-    @DubboReference
+    @Autowired
     private IDynamicMenuRpcService dynamicMenuRpcService;
 
     /**

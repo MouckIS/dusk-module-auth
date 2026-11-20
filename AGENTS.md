@@ -12,7 +12,7 @@
 ```text
 dusk-module-auth/
 ├── dusk-module-auth/          可运行服务（Spring Boot）
-└── dusk-module-auth-shared/   Dubbo RPC 契约 + DTO（70 个类）
+└── dusk-module-auth-shared/   跨模块服务契约 + DTO（70 个类）
 ```
 
 ## 2. 构建 / 运行 / 测试
@@ -44,7 +44,7 @@ mvn -s settings.xml test -Dtest=UserServiceImplTest
 com/dusk/module/auth/
 ├── controller/       REST 控制器（约 27 个）
 ├── service/          业务接口 + RPC 接口（本地定义）
-├── service/impl/     业务实现 + @DubboService RPC 实现
+├── service/impl/     业务实现 + @Service（原 @DubboService，现为同进程 bean）
 ├── repository/       Spring Data JPA（继承 IBaseRepository）
 ├── entity/           JPA 实体（27+，含 dashboard 子包）
 ├── mapper/           MapStruct（INSTANCE），**不是 MyBatis**
@@ -105,12 +105,12 @@ com/dusk/module/auth/
 - 设置：`*SettingProvider` 注册设置项，`SettingManagerDefault` 管理，`RedisSettingsCache` 缓存，`MinorSettingsPublish`
   推送到其他模块。
 
-## 6. 对外 RPC
+## 6. 对外服务契约（同进程 bean + 网关内网端点）
 
-- 契约在 `dusk-module-auth-shared`（`I*RpcService`），服务端实现位于 `service/impl`，`@DubboService` 注册；扫描包
-  `com.dusk.module.auth.service`。
+- 契约在 `dusk-module-auth-shared`（`I*RpcService`），实现位于 `service/impl`，用 `@Service` 注册；单体化后同进程的其他模块直接
+  `@Autowired` 注入这些实现即可，不再有 RPC 序列化与超时语义。
 - 修改契约（方法签名/出入参）会影响网关与其他模块：必须同步发布 shared 构件并升级消费方。
-- 消费其他模块：`@DubboReference`，注意区分本模块自引用与 metadata/workflow 等外部契约。
+- 消费其他模块：`@Autowired` 注入对方 `*RpcService` 接口（不再有 `@DubboReference`）；注意区分本模块自引用与 metadata/workflow 等外部契约。
 
 ## 7. 数据库与迁移
 
@@ -127,7 +127,8 @@ com/dusk/module/auth/
 2. **`mapper/` 是 MapStruct**：不是 MyBatis，也没有 XML。
 3. **dev 关闭 Flyway**：表结构问题先查是否忘了手工迁移。
 4. **缓存双实现**：权限/特性/设置均有 Redis 与内存兜底，改缓存逻辑要同时验证。
-5. **Dubbo 序列化检查被禁用**：`serialize-check-status: DISABLE` 是遗留 TODO。
+5. **网关访问本模块只能走内网端点**：`/internal/auth/**`（`InternalAuthController`、`InternalAuthorizationRuntimeController`），
+   不要给网关新加 bean 依赖——它是独立进程。
 6. **多租户上下文**：必须使用 `TenantContextHolder` / `UserContext`，不要从入参推断。
 7. **RPC 变更影响面大**：网关鉴权、workflow 待办、notification 邮件/推送都依赖 auth。
 8. **敏感配置**：微信 appid/secret、SM4 密钥、数据库口令不得入库；dev 中的默认值仅用于本地。

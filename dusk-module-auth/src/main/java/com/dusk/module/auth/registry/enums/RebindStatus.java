@@ -1,9 +1,11 @@
 package com.dusk.module.auth.registry.enums;
 
+import com.dusk.common.core.entity.BaseEnum;
+
 /**
  * 换绑待办状态，见《权限优化方案-整理版》4.7。
  */
-public enum RebindStatus {
+public enum RebindStatus implements BaseEnum {
 
     /**
      * 待审批：候选 Release 不得接流量。
@@ -28,5 +30,10 @@ public enum RebindStatus {
 
     public String getDisplayName() {
         return displayName;
+    }
+
+    @Override
+    public int getValue() {
+        return ordinal();
     }
 }

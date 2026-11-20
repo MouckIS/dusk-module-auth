@@ -13,7 +13,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Transactional
-@DubboService(retries = 0, timeout = 2000)
+@Service
 public class TodoRpcServiceImpl implements ITodoRpcService {
     @Resource
     private IToDoService toDoService;

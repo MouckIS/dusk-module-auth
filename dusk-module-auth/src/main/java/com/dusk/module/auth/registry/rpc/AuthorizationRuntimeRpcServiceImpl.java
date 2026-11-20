@@ -8,7 +8,7 @@ import com.dusk.common.rpc.authz.SubjectSnapshot;
 import com.dusk.module.auth.authz.readmodel.AuthorizationReadModelResolver;
 import com.dusk.module.auth.registry.service.ResourceRuntimeResolver;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
@@ -18,7 +18,7 @@ import java.util.Optional;
  * <p>回源只在网关 L1/L2 都未命中时发生；本实现直接读取 PostgreSQL（唯一事实源），
  * 不把 Redis 当作事实来源。返回结果都带版本号，供网关写入缓存前再次比较。</p>
  */
-@DubboService
+@Service
 @Slf4j
 public class AuthorizationRuntimeRpcServiceImpl implements IAuthorizationRuntimeRpcService {
 

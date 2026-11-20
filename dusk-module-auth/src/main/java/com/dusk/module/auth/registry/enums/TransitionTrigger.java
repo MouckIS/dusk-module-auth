@@ -1,5 +1,7 @@
 package com.dusk.module.auth.registry.enums;
 
+import com.dusk.common.core.entity.BaseEnum;
+
 /**
  * 状态迁移的触发来源。
  *
@@ -8,7 +10,7 @@ package com.dusk.module.auth.registry.enums;
  * 而「人工安全决策」（例如管理员禁用权限）只能由 {@link #MANUAL} 触发，
  * 且这类状态不得被部署动作静默回滚。</p>
  */
-public enum TransitionTrigger {
+public enum TransitionTrigger implements BaseEnum {
 
     /**
      * 自动化触发：SDK 快照注册、Diff、Nacos 实例同步、回滚等。
@@ -28,5 +30,10 @@ public enum TransitionTrigger {
 
     public String getDisplayName() {
         return displayName;
+    }
+
+    @Override
+    public int getValue() {
+        return ordinal();
     }
 }
